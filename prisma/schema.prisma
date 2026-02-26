@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Neon DB menggunakan connection pooling — aktifkan jika menggunakan Serverless/Edge
+  // directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────
+// Tabel: Story
+// Menyimpan cerita pendek berbahasa Jepang
+// untuk bahan latihan membaca.
+// ─────────────────────────────────────────
+model Story {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────
+// Tabel: LearningProgress
+// Melacak seberapa sering pengguna mengklik
+// / mempelajari sebuah karakter kana.
+// ─────────────────────────────────────────
+model LearningProgress {
+  id         Int      @id @default(autoincrement())
+  character  String   @unique   // kana character, e.g. 'あ', 'キャ'
+  clickCount Int      @default(0)
+  lastSeen   DateTime @default(now()) @updatedAt
+}
