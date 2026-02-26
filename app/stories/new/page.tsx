@@ -30,6 +30,7 @@ import {
   type ActionState,
   type BatchStory,
 } from "@/src/app/stories/actions";
+import { ThemeToggle } from "@/src/components/ThemeToggle";
 
 // ─────────────────────────────────────────
 // JSON template untuk ditampilkan ke user
@@ -333,9 +334,12 @@ export default function NewStoryPage() {
               Tambah Cerita
             </span>
           </div>
-          <Chip variant="soft" size="sm" className="text-xs font-medium">
-            Admin
-          </Chip>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Chip variant="soft" size="sm" className="text-xs font-medium">
+              Admin
+            </Chip>
+          </div>
         </div>
       </header>
 

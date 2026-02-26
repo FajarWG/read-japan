@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+/* ─── Class-based dark mode for Tailwind v4 ─────── */
+@variant dark (&:where(.dark, .dark *));
+
 /* ─── Design tokens ─────────────────────────────── */
 :root {
   --background: #faf9f7;
@@ -13,16 +16,14 @@
   --muted: #6b7280;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f0f0f;
-    --foreground: #f0ede8;
-    --surface: #1a1917;
-    --surface-muted: #242220;
-    --border: #2e2c29;
-    --accent: #7c6ef5;
-    --muted: #9ca3af;
-  }
+.dark {
+  --background: #0f0f0f;
+  --foreground: #f0ede8;
+  --surface: #1a1917;
+  --surface-muted: #242220;
+  --border: #2e2c29;
+  --accent: #7c6ef5;
+  --muted: #9ca3af;
 }
 
 /* ─── Tailwind theme tokens ──────────────────────── */

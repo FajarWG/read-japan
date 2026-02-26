@@ -16,6 +16,7 @@ import {
 
 import { prisma } from "@/src/lib/db";
 import Reader from "@/src/components/Reader";
+import { ThemeToggle } from "@/src/components/ThemeToggle";
 
 // ─────────────────────────────────────────
 // Metadata dinamis
@@ -93,17 +94,20 @@ export default async function ReadPage({
             </BreadcrumbsItem>
           </Breadcrumbs>
 
-          {/* Back button */}
-          <Link
-            href="/"
-            className={buttonVariants({
-              variant: "ghost",
-              size: "sm",
-              className: "shrink-0",
-            })}
-          >
-            ← Kembali
-          </Link>
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link
+              href="/"
+              className={buttonVariants({
+                variant: "ghost",
+                size: "sm",
+                className: "shrink-0",
+              })}
+            >
+              ← Kembali
+            </Link>
+          </div>
         </div>
       </header>
 

@@ -10,6 +10,7 @@ import {
 } from "@heroui/react";
 
 import { prisma } from "@/src/lib/db";
+import { ThemeToggle } from "@/src/components/ThemeToggle";
 
 // ─────────────────────────────────────────
 // Helpers
@@ -52,17 +53,20 @@ export default async function Home() {
             </p>
           </div>
 
-          {/* CTA */}
-          <Link
-            href="/stories/new"
-            className={buttonVariants({
-              variant: "primary",
-              size: "sm",
-              className: "shrink-0",
-            })}
-          >
-            + Tambah Cerita
-          </Link>
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link
+              href="/stories/new"
+              className={buttonVariants({
+                variant: "primary",
+                size: "sm",
+                className: "shrink-0",
+              })}
+            >
+              + Tambah Cerita
+            </Link>
+          </div>
         </div>
       </header>
 
