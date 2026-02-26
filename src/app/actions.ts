@@ -51,3 +51,39 @@ export async function recordWrongReads(chars: string[]): Promise<void> {
     ),
   );
 }
+
+/**
+ * Server Action: recordPerfectRead
+ *
+ * Dipanggil saat user selesai membaca cerita tanpa salah (skor 100%).
+ * Untuk setiap kana di cerita yang punya "hutang" (wrongCount/clickCount > 0),
+ * kurangi 1: wrongCount diprioritaskan, lalu baru clickCount.
+ * Ini mekanisme "pembayaran hutang" bacaan.
+ *
+ * @param chars - Array karakter unik kana yang muncul di cerita
+ */
+export async function recordPerfectRead(chars: string[]): Promise<void> {
+  if (chars.length === 0) return;
+
+  const records = await prisma.learningProgress.findMany({
+    where: { character: { in: chars } },
+    select: { character: true, clickCount: true, wrongCount: true },
+  });
+
+  const updates = records
+    .filter((r) => r.wrongCount > 0 || r.clickCount > 0)
+    .map((r) => {
+      if (r.wrongCount > 0) {
+        return prisma.learningProgress.update({
+          where: { character: r.character },
+          data: { wrongCount: { decrement: 1 } },
+        });
+      }
+      return prisma.learningProgress.update({
+        where: { character: r.character },
+        data: { clickCount: { decrement: 1 } },
+      });
+    });
+
+  await Promise.all(updates);
+}

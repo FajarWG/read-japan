@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Serif_JP } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/src/components/ThemeProvider";
+import { BottomNav } from "@/src/components/BottomNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,9 +49,12 @@ export default function RootLayout({
       <body
         className={`${
           geistSans.variable
-        } ${geistMono.variable} ${notoSerifJP.variable} antialiased bg-background text-foreground`}
+        } ${geistMono.variable} ${notoSerifJP.variable} antialiased bg-background text-foreground pb-24`}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <BottomNav />
+        </ThemeProvider>
       </body>
     </html>
   );

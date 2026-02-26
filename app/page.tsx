@@ -31,9 +31,18 @@ function formatDate(date: Date): string {
 // Page
 // ─────────────────────────────────────────
 export default async function Home() {
-  const stories = await prisma.story.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const [stories, statsAgg] = await Promise.all([
+    prisma.story.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.learningProgress.aggregate({
+      _sum: { clickCount: true, wrongCount: true },
+      _count: { _all: true },
+    }),
+  ]);
+
+  const totalKana = statsAgg._count._all;
+  const totalClicks = statsAgg._sum.clickCount ?? 0;
+  const totalWrong = statsAgg._sum.wrongCount ?? 0;
+  const totalDebt = totalClicks + totalWrong;
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,6 +81,58 @@ export default async function Home() {
 
       {/* ── Main ────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl px-4 py-8">
+        {/* ── Stats row ──────────────────────────────────────── */}
+        {totalKana > 0 && (
+          <div className="mb-7 grid grid-cols-3 gap-3">
+            <div className="rounded-xl border border-border bg-surface px-3 py-3 text-center shadow-sm">
+              <p className="text-2xl font-bold tabular-nums text-foreground">
+                {totalKana}
+              </p>
+              <p className="mt-0.5 text-[11px] text-muted">kana diklik</p>
+            </div>
+            <div
+              className={[
+                "rounded-xl border px-3 py-3 text-center shadow-sm",
+                totalDebt > 0
+                  ? "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20"
+                  : "border-border bg-surface",
+              ].join(" ")}
+            >
+              <p
+                className={[
+                  "text-2xl font-bold tabular-nums",
+                  totalDebt > 0
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-foreground",
+                ].join(" ")}
+              >
+                {totalDebt}
+              </p>
+              <p className="mt-0.5 text-[11px] text-muted">total hutang</p>
+            </div>
+            <div
+              className={[
+                "rounded-xl border px-3 py-3 text-center shadow-sm",
+                totalWrong > 0
+                  ? "border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20"
+                  : "border-border bg-surface",
+              ].join(" ")}
+            >
+              <p
+                className={[
+                  "text-2xl font-bold tabular-nums",
+                  totalWrong > 0
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-foreground",
+                ].join(" ")}
+              >
+                {totalWrong}
+              </p>
+              <p className="mt-0.5 text-[11px] text-muted">total salah</p>
+            </div>
+          </div>
+        )}
+
         {/* Section heading */}
         <div className="mb-5 flex items-center gap-3">
           <h2 className="text-base font-semibold text-foreground">

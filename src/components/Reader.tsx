@@ -3,7 +3,11 @@
 import { useState, useCallback, useTransition, useEffect } from "react";
 import { parseJapaneseText } from "@/src/lib/parser";
 import type { ParsedUnit, KanaInfo } from "@/src/lib/parser";
-import { recordClick, recordWrongReads } from "@/src/app/actions";
+import {
+  recordClick,
+  recordWrongReads,
+  recordPerfectRead,
+} from "@/src/app/actions";
 
 type ReaderMode = "reading" | "review" | "result";
 
@@ -258,9 +262,12 @@ function ResultView({ units, wrongIndices, onReset }: ResultViewProps) {
 
       {/* Perfect score */}
       {wrongCount === 0 && (
-        <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 px-5 py-4 text-center">
+        <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 px-5 py-4 text-center flex flex-col gap-1">
           <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
             🌟 Luar biasa! Semua kana dibaca dengan benar!
+          </p>
+          <p className="text-xs text-emerald-600/80 dark:text-emerald-500">
+            Hutang bacaan untuk kana di cerita ini dikurangi 1 ✓
           </p>
         </div>
       )}
@@ -341,12 +348,20 @@ export default function Reader({ storyContent }: ReaderProps) {
   };
 
   const handleSubmitReview = () => {
-    // Deduplicate chars across indices
     const wrongChars = [
       ...new Set(Array.from(wrongIndices).map((i) => units[i].char)),
     ];
+    // Semua kana unik yang ada di cerita ini
+    const allKanaChars = [
+      ...new Set(units.filter((u) => u.info).map((u) => u.char)),
+    ];
     startSubmitTransition(async () => {
-      await recordWrongReads(wrongChars);
+      if (wrongChars.length === 0) {
+        // Skor sempurna — bayar hutang untuk semua kana di cerita ini
+        await recordPerfectRead(allKanaChars);
+      } else {
+        await recordWrongReads(wrongChars);
+      }
       setMode("result");
     });
   };
