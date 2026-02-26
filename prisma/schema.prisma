@@ -11,8 +11,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  // Neon DB menggunakan connection pooling — aktifkan jika menggunakan Serverless/Edge
+  // url is configured in prisma.config.ts (Prisma v7)
   // directUrl = env("DIRECT_URL")
 }
 
@@ -38,5 +37,6 @@ model LearningProgress {
   id         Int      @id @default(autoincrement())
   character  String   @unique   // kana character, e.g. 'あ', 'キャ'
   clickCount Int      @default(0)
+  wrongCount Int      @default(0)  // berapa kali ditandai salah baca
   lastSeen   DateTime @default(now()) @updatedAt
 }

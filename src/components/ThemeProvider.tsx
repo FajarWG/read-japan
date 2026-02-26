@@ -22,21 +22,36 @@ const ThemeContext = createContext<ThemeContextValue>({
 // Provider
 // ─────────────────────────────────────────────────────────────────────────────
 
+function applyTheme(t: Theme) {
+  const root = document.documentElement;
+  root.classList.toggle("dark", t === "dark");
+  root.setAttribute("data-theme", t);
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
 
-  // Sync from localStorage on mount (after the inline script has set the class)
+  // On mount: read stored preference or fall back to system preference,
+  // then explicitly apply the class + data-theme attribute.
   useEffect(() => {
     const stored = localStorage.getItem("theme") as Theme | null;
-    const initial = stored === "dark" || stored === "light" ? stored : "light";
+    let initial: Theme;
+    if (stored === "dark" || stored === "light") {
+      initial = stored;
+    } else {
+      initial = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
     setTheme(initial);
+    applyTheme(initial); // ensure class + data-theme are correct
   }, []);
 
   const toggleTheme = () => {
     const next: Theme = theme === "light" ? "dark" : "light";
     setTheme(next);
     localStorage.setItem("theme", next);
-    document.documentElement.classList.toggle("dark", next === "dark");
+    applyTheme(next);
   };
 
   return (

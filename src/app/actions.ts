@@ -17,11 +17,37 @@ export async function recordClick(char: string): Promise<void> {
     where: { character: char },
     update: {
       clickCount: { increment: 1 },
-      // lastSeen diupdate otomatis via @updatedAt di schema
     },
     create: {
       character: char,
       clickCount: 1,
     },
   });
+}
+
+/**
+ * Server Action: recordWrongReads
+ *
+ * Dipanggil setelah user submit hasil review.
+ * Menambah wrongCount untuk setiap huruf yang ditandai salah dibaca.
+ *
+ * @param chars - Array karakter unik yang ditandai salah (contoh: ['か', 'ゅ'])
+ */
+export async function recordWrongReads(chars: string[]): Promise<void> {
+  if (chars.length === 0) return;
+  await Promise.all(
+    chars.map((char) =>
+      prisma.learningProgress.upsert({
+        where: { character: char },
+        update: {
+          wrongCount: { increment: 1 },
+        },
+        create: {
+          character: char,
+          clickCount: 0,
+          wrongCount: 1,
+        },
+      }),
+    ),
+  );
 }
