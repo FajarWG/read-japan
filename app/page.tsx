@@ -82,34 +82,17 @@ export default async function Home() {
       {/* ── Main ────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl px-4 py-8">
         {/* ── Stats row ──────────────────────────────────────── */}
-        {totalKana > 0 && (
+        {totalClicks > 0 && (
           <div className="mb-7 grid grid-cols-3 gap-3">
+            {/* Total Klik */}
             <div className="rounded-xl border border-border bg-surface px-3 py-3 text-center shadow-sm">
               <p className="text-2xl font-bold tabular-nums text-foreground">
-                {totalKana}
+                {totalClicks}
               </p>
-              <p className="mt-0.5 text-[11px] text-muted">kana diklik</p>
+              <p className="mt-0.5 text-[11px] text-muted">total klik</p>
             </div>
-            <div
-              className={[
-                "rounded-xl border px-3 py-3 text-center shadow-sm",
-                totalDebt > 0
-                  ? "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20"
-                  : "border-border bg-surface",
-              ].join(" ")}
-            >
-              <p
-                className={[
-                  "text-2xl font-bold tabular-nums",
-                  totalDebt > 0
-                    ? "text-amber-600 dark:text-amber-400"
-                    : "text-foreground",
-                ].join(" ")}
-              >
-                {totalDebt}
-              </p>
-              <p className="mt-0.5 text-[11px] text-muted">total hutang</p>
-            </div>
+
+            {/* Total Salah */}
             <div
               className={[
                 "rounded-xl border px-3 py-3 text-center shadow-sm",
@@ -129,6 +112,28 @@ export default async function Home() {
                 {totalWrong}
               </p>
               <p className="mt-0.5 text-[11px] text-muted">total salah</p>
+            </div>
+
+            {/* Total Keduanya */}
+            <div
+              className={[
+                "rounded-xl border px-3 py-3 text-center shadow-sm",
+                totalDebt > 0
+                  ? "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20"
+                  : "border-border bg-surface",
+              ].join(" ")}
+            >
+              <p
+                className={[
+                  "text-2xl font-bold tabular-nums",
+                  totalDebt > 0
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-foreground",
+                ].join(" ")}
+              >
+                {totalDebt}
+              </p>
+              <p className="mt-0.5 text-[11px] text-muted">klik + salah</p>
             </div>
           </div>
         )}

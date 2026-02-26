@@ -3,15 +3,10 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// BottomNav — Floating bottom navigation tabs
-// Menggunakan HeroUI Tabs dengan selectedKey + onSelectionChange untuk routing.
-// ─────────────────────────────────────────────────────────────────────────────
-
 const NAV_ITEMS = [
-  { id: "home", route: "/", emoji: "📚", label: "Cerita" },
-  { id: "learn", route: "/learn", emoji: "📊", label: "Progres" },
-  { id: "kana", route: "/kana", emoji: "🔤", label: "Kana" },
+  { id: "home", route: "/", label: "Cerita" },
+  { id: "learn", route: "/learn", label: "Progres" },
+  { id: "kana", route: "/kana", label: "Kana" },
 ] as const;
 
 export function BottomNav() {
@@ -25,7 +20,7 @@ export function BottomNav() {
       : "home";
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-5 pointer-events-none">
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-6 pointer-events-none">
       <div className="pointer-events-auto">
         <Tabs
           selectedKey={selectedKey}
@@ -38,23 +33,35 @@ export function BottomNav() {
             <Tabs.List
               aria-label="Navigasi utama"
               className={[
-                "rounded-2xl border border-border bg-surface/90 shadow-xl backdrop-blur-md",
-                "px-1.5 py-1.5 gap-1",
-                /* override per-tab defaults */
-                "*:rounded-xl *:px-5 *:h-auto *:py-2",
-                "*:text-muted *:transition-colors",
-                "*:data-[selected=true]:text-accent",
+                /* Liquid glass container */
+                "rounded-2xl px-1.5 py-1.5 gap-0.5",
+                /* Translucent fill */
+                "bg-white/20 dark:bg-white/[0.07]",
+                /* Strong backdrop blur */
+                "backdrop-blur-2xl",
+                /* Glass edge — outer border */
+                "border border-white/40 dark:border-white/[0.12]",
+                /* Depth shadow + inner highlight */
+                "shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.5)]",
+                "dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]",
+                /* Tab overrides */
+                "*:rounded-xl *:px-5 *:h-9",
+                "*:text-sm *:font-semibold *:tracking-wide",
+                "*:text-foreground/60 *:transition-all *:duration-200",
+                "*:data-[selected=true]:text-foreground",
               ].join(" ")}
             >
-              {NAV_ITEMS.map(({ id, emoji, label }) => (
+              {NAV_ITEMS.map(({ id, label }) => (
                 <Tabs.Tab key={id} id={id}>
-                  <span className="flex flex-col items-center gap-0.5 select-none">
-                    <span className="text-[18px] leading-none">{emoji}</span>
-                    <span className="text-[10px] font-semibold leading-none tracking-wide uppercase">
-                      {label}
-                    </span>
-                  </span>
-                  <Tabs.Indicator className="bg-accent/10 rounded-xl" />
+                  {label}
+                  <Tabs.Indicator
+                    className={[
+                      "rounded-xl",
+                      "bg-white/50 dark:bg-white/[0.12]",
+                      "shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_1px_3px_rgba(0,0,0,0.1)]",
+                      "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_1px_3px_rgba(0,0,0,0.3)]",
+                    ].join(" ")}
+                  />
                 </Tabs.Tab>
               ))}
             </Tabs.List>

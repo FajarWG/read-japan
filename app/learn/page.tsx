@@ -71,32 +71,15 @@ export default async function LearnPage() {
           <>
             {/* Summary */}
             <div className="mb-7 grid grid-cols-3 gap-3">
+              {/* Total Klik */}
               <div className="rounded-xl border border-border bg-surface px-3 py-3 text-center shadow-sm">
                 <p className="text-2xl font-bold tabular-nums text-foreground">
-                  {enriched.length}
+                  {totalClicks}
                 </p>
-                <p className="mt-0.5 text-[11px] text-muted">kana diklik</p>
+                <p className="mt-0.5 text-[11px] text-muted">total klik</p>
               </div>
-              <div
-                className={[
-                  "rounded-xl border px-3 py-3 text-center shadow-sm",
-                  totalDebt > 0
-                    ? "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20"
-                    : "border-border bg-surface",
-                ].join(" ")}
-              >
-                <p
-                  className={[
-                    "text-2xl font-bold tabular-nums",
-                    totalDebt > 0
-                      ? "text-amber-600 dark:text-amber-400"
-                      : "text-foreground",
-                  ].join(" ")}
-                >
-                  {totalDebt}
-                </p>
-                <p className="mt-0.5 text-[11px] text-muted">total hutang</p>
-              </div>
+
+              {/* Total Salah */}
               <div
                 className={[
                   "rounded-xl border px-3 py-3 text-center shadow-sm",
@@ -116,6 +99,28 @@ export default async function LearnPage() {
                   {totalWrong}
                 </p>
                 <p className="mt-0.5 text-[11px] text-muted">total salah</p>
+              </div>
+
+              {/* Klik + Salah */}
+              <div
+                className={[
+                  "rounded-xl border px-3 py-3 text-center shadow-sm",
+                  totalDebt > 0
+                    ? "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20"
+                    : "border-border bg-surface",
+                ].join(" ")}
+              >
+                <p
+                  className={[
+                    "text-2xl font-bold tabular-nums",
+                    totalDebt > 0
+                      ? "text-amber-600 dark:text-amber-400"
+                      : "text-foreground",
+                  ].join(" ")}
+                >
+                  {totalDebt}
+                </p>
+                <p className="mt-0.5 text-[11px] text-muted">klik + salah</p>
               </div>
             </div>
 
@@ -141,7 +146,7 @@ export default async function LearnPage() {
             {/* Section: Semua yang dipelajari */}
             <section>
               <h2 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
-                📖 Semua Kana Dipelajari
+                📖 Kana yang di contek
                 <span className="text-xs font-normal text-muted">
                   ({enriched.length} huruf)
                 </span>
@@ -218,19 +223,6 @@ function KanaProgressCard({ record }: { record: ProgressRecord }) {
 
       {/* Counts — tampilkan hutang total per karakter */}
       <div className="flex flex-col items-center gap-0.5 mt-0.5">
-        {/* Hutang total */}
-        {clickCount + wrongCount > 0 && (
-          <span
-            className={[
-              "text-[10px] font-bold",
-              isWrong
-                ? "text-red-500 dark:text-red-400"
-                : "text-amber-600 dark:text-amber-400",
-            ].join(" ")}
-          >
-            hutang {clickCount + wrongCount}
-          </span>
-        )}
         {/* Detail breakdown */}
         <div className="flex flex-wrap justify-center gap-1">
           {clickCount > 0 && (
