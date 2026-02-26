@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 export interface BatchStory {
   title: string;
   content: string;
+  translation?: string;
+  focus?: string;
 }
 
 export type ActionState =
@@ -22,11 +24,16 @@ export async function createStory(
 ): Promise<ActionState> {
   const title = (formData.get("title") as string)?.trim();
   const content = (formData.get("content") as string)?.trim();
+  const translation =
+    (formData.get("translation") as string)?.trim() || undefined;
+  const focus = (formData.get("focus") as string)?.trim() || undefined;
 
   if (!title) return { status: "error", message: "Judul wajib diisi." };
   if (!content) return { status: "error", message: "Konten wajib diisi." };
 
-  const story = await prisma.story.create({ data: { title, content } });
+  const story = await prisma.story.create({
+    data: { title, content, translation, focus },
+  });
   redirect(`/read/${story.id}`);
 }
 
@@ -46,12 +53,18 @@ export async function createManyStories(
       throw new Error(`Item ke-${i + 1}: field 'content' wajib diisi.`);
   }
 
-  const result = await prisma.story.createMany({
-    data: stories.map((s) => ({
-      title: s.title.trim(),
-      content: s.content.trim(),
-    })),
-  });
+  const results = await Promise.all(
+    stories.map((s) =>
+      prisma.story.create({
+        data: {
+          title: s.title.trim(),
+          content: s.content.trim(),
+          translation: s.translation?.trim() || undefined,
+          focus: s.focus?.trim() || undefined,
+        },
+      }),
+    ),
+  );
 
-  return { count: result.count };
+  return { count: results.length };
 }

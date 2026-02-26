@@ -40,16 +40,25 @@ const JSON_TEMPLATE: BatchStory[] = [
     title: "はじめての日本語",
     content:
       "きょうはいいてんきですね。わたしはがくせいです。にほんごをべんきょうしています。",
+    translation:
+      "Hari ini cuacanya bagus ya. Saya adalah seorang siswa. Saya sedang belajar bahasa Jepang.",
+    focus: "あいうえお のむは がく にほんご へ",
   },
   {
     title: "東京の朝",
     content:
       "あさはやくおきました。でんしゃにのってとうきょうえきにいきます。まちはにぎやかです。",
+    translation:
+      "Saya bangun pagi-pagi. Saya naik kereta menuju Stasiun Tokyo. Kotanya sangat ramai.",
+    focus: "あさ でんしゃ まち きました",
   },
   {
     title: "カフェにて",
     content:
       "コーヒーをのみながらほんをよんでいます。しずかなカフェがすきです。",
+    translation:
+      "Saya membaca buku sambil minum kopi. Saya suka kafe yang tenang.",
+    focus: "カタカナ コーヒー カフェ のみがら よんでいます",
   },
 ];
 
@@ -100,6 +109,43 @@ function SingleStoryForm() {
           placeholder={"きょうはいいてんきですね。\nわたしはがくせいです。"}
           required
           className="font-jp resize-none leading-relaxed"
+        />
+        <FieldError className="text-xs text-red-500" />
+      </TextField>
+
+      {/* Translation field */}
+      <TextField name="translation" fullWidth className="flex flex-col gap-1.5">
+        <Label className="text-sm font-medium text-foreground">
+          Arti{" "}
+          <span className="font-normal text-muted">
+            (terjemahan Indonesia, opsional) — pisahkan kalimat dengan titik (.)
+          </span>
+        </Label>
+        <TextArea
+          variant="primary"
+          fullWidth
+          rows={4}
+          placeholder={
+            "Hari ini cuacanya bagus ya.\nSaya adalah seorang siswa."
+          }
+          className="resize-none leading-relaxed"
+        />
+        <FieldError className="text-xs text-red-500" />
+      </TextField>
+
+      {/* Focus field */}
+      <TextField name="focus" fullWidth className="flex flex-col gap-1.5">
+        <Label className="text-sm font-medium text-foreground">
+          Fokus Huruf{" "}
+          <span className="font-normal text-muted">
+            (deskripsi singkat kana di cerita ini, opsional)
+          </span>
+        </Label>
+        <Input
+          variant="primary"
+          fullWidth
+          placeholder="Contoh: hiragana dasar あいうえお, katakana コーヒーカフェ"
+          className="font-jp"
         />
         <FieldError className="text-xs text-red-500" />
       </TextField>
@@ -235,6 +281,16 @@ function BatchStoryForm() {
               content
             </code>
             <span>string, wajib</span>
+            <span className="text-border">·</span>
+            <code className="rounded bg-surface px-1.5 py-0.5 border border-border">
+              translation
+            </code>
+            <span>string, opsional</span>
+            <span className="text-border">·</span>
+            <code className="rounded bg-surface px-1.5 py-0.5 border border-border">
+              focus
+            </code>
+            <span>string, opsional</span>
           </div>
         )}
       </div>

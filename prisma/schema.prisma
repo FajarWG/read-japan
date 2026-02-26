@@ -21,11 +21,14 @@ datasource db {
 // untuk bahan latihan membaca.
 // ─────────────────────────────────────────
 model Story {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  translation String?
+  focus       String?
+  totalReads  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // ─────────────────────────────────────────

@@ -7,6 +7,7 @@ import {
   recordClick,
   recordWrongReads,
   recordPerfectRead,
+  recordStoryRead,
 } from "@/src/app/actions";
 
 type ReaderMode = "reading" | "review" | "result";
@@ -168,17 +169,70 @@ function ReviewKanaToken({
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ResultView — tampilan hasil setelah submit
+// ─────────────────────────────────────────────────────────────────────────────// TranslationCard — arti cerita ditampilkan di review & result mode
+// ───────────────────────────────────────────────────────────────────────────────
+
+interface TranslationCardProps {
+  content: string;
+  translation: string;
+}
+
+function TranslationCard({ content, translation }: TranslationCardProps) {
+  // Split Japanese by 。 (full-width period)
+  const jpSentences = content
+    .split("。")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => s + "。");
+
+  // Split Indonesian translation by .
+  const idSentences = translation
+    .split(".")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => s + ".");
+
+  return (
+    <div className="rounded-2xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50 dark:bg-indigo-950/20 px-5 py-4">
+      <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-400 mb-3">
+        📝 Arti Cerita
+      </p>
+      <div className="flex flex-col gap-3">
+        {jpSentences.map((jp, i) => (
+          <div key={i} className="flex flex-col gap-0.5">
+            <p className="font-jp text-sm leading-relaxed text-foreground">
+              {jp}
+            </p>
+            {idSentences[i] && (
+              <p className="text-sm leading-relaxed text-muted">
+                {idSentences[i]}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ───────────────────────────────────────────────────────────────────────────────// ResultView — tampilan hasil setelah submit
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface ResultViewProps {
   units: ParsedUnit[];
   wrongIndices: Set<number>;
   onReset: () => void;
+  storyContent: string;
+  translation?: string;
 }
 
-function ResultView({ units, wrongIndices, onReset }: ResultViewProps) {
+function ResultView({
+  units,
+  wrongIndices,
+  onReset,
+  storyContent,
+  translation,
+}: ResultViewProps) {
   const kanaUnits = units.filter((u) => u.info);
   const totalKana = kanaUnits.length;
   const wrongCount = wrongIndices.size;
@@ -272,6 +326,11 @@ function ResultView({ units, wrongIndices, onReset }: ResultViewProps) {
         </div>
       )}
 
+      {/* Translation */}
+      {translation && (
+        <TranslationCard content={storyContent} translation={translation} />
+      )}
+
       {/* Baca ulang button */}
       <div className="flex justify-center pt-1">
         <button
@@ -293,9 +352,15 @@ function ResultView({ units, wrongIndices, onReset }: ResultViewProps) {
 
 interface ReaderProps {
   storyContent: string;
+  translation?: string;
+  storyId: number;
 }
 
-export default function Reader({ storyContent }: ReaderProps) {
+export default function Reader({
+  storyContent,
+  translation,
+  storyId,
+}: ReaderProps) {
   const [mode, setMode] = useState<ReaderMode>("reading");
 
   // Reading mode state
@@ -345,6 +410,9 @@ export default function Reader({ storyContent }: ReaderProps) {
     setActiveIndex(null);
     setWrongIndices(new Set());
     setMode("review");
+    startTransition(async () => {
+      await recordStoryRead(storyId);
+    });
   };
 
   const handleSubmitReview = () => {
@@ -380,6 +448,8 @@ export default function Reader({ storyContent }: ReaderProps) {
         units={units}
         wrongIndices={wrongIndices}
         onReset={handleReset}
+        storyContent={storyContent}
+        translation={translation}
       />
     );
   }
@@ -430,6 +500,11 @@ export default function Reader({ storyContent }: ReaderProps) {
             );
           })}
         </div>
+
+        {/* Translation */}
+        {translation && (
+          <TranslationCard content={storyContent} translation={translation} />
+        )}
 
         {/* Action bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border">

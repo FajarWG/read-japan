@@ -145,6 +145,15 @@ export default async function ReadPage({
               >
                 ⏱️ {readingTime}
               </Chip>
+              {story.focus && (
+                <Chip
+                  variant="soft"
+                  size="sm"
+                  className="bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 font-medium font-jp text-xs"
+                >
+                  🎯 {story.focus}
+                </Chip>
+              )}
             </div>
           </CardHeader>
 
@@ -169,7 +178,11 @@ export default async function ReadPage({
           {/* Card body: teks cerita */}
           <CardContent className="px-8 pt-6 pb-8">
             <article className="font-jp">
-              <Reader storyContent={story.content} />
+              <Reader
+                storyContent={story.content}
+                translation={story.translation ?? undefined}
+                storyId={story.id}
+              />
             </article>
           </CardContent>
 

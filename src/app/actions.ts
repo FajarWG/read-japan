@@ -3,6 +3,19 @@
 import { prisma } from "@/src/lib/db";
 
 /**
+ * Server Action: recordStoryRead
+ *
+ * Dipanggil saat user klik "Selesai Membaca".
+ * Menambah totalReads pada story yang bersangkutan.
+ */
+export async function recordStoryRead(storyId: number): Promise<void> {
+  await prisma.story.update({
+    where: { id: storyId },
+    data: { totalReads: { increment: 1 } },
+  });
+}
+
+/**
  * Server Action: recordClick
  *
  * Dipanggil saat user mengklik huruf kana di Reader.

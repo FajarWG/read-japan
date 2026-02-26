@@ -32,7 +32,9 @@ function formatDate(date: Date): string {
 // ─────────────────────────────────────────
 export default async function Home() {
   const [stories, statsAgg] = await Promise.all([
-    prisma.story.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.story.findMany({
+      orderBy: [{ totalReads: "asc" }, { createdAt: "desc" }],
+    }),
     prisma.learningProgress.aggregate({
       _sum: { clickCount: true, wrongCount: true },
       _count: { _all: true },
@@ -200,6 +202,16 @@ export default async function Home() {
                         >
                           ✍️ {countKana(story.content)} kana
                         </Chip>
+                        <span
+                          className={[
+                            "text-[11px] font-medium tabular-nums",
+                            story.totalReads === 0
+                              ? "text-muted"
+                              : "text-indigo-500 dark:text-indigo-400",
+                          ].join(" ")}
+                        >
+                          📖 {story.totalReads}x dibaca
+                        </span>
                         <span className="text-[11px] text-muted whitespace-nowrap">
                           {formatDate(new Date(story.createdAt))}
                         </span>
@@ -211,6 +223,16 @@ export default async function Home() {
                       <p className="font-jp line-clamp-2 text-sm leading-relaxed text-muted">
                         {story.content}
                       </p>
+
+                      {/* Focus tag */}
+                      {story.focus && (
+                        <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted">
+                          <span className="shrink-0">🎯</span>
+                          <span className="font-jp line-clamp-1">
+                            {story.focus}
+                          </span>
+                        </p>
+                      )}
 
                       {/* "Baca" affordance */}
                       <p className="mt-3 text-xs font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
