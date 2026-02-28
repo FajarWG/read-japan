@@ -11,6 +11,7 @@ import {
   CardContent,
   Chip,
 } from "@heroui/react";
+import { useLanguage } from "@/src/components/LanguageProvider";
 
 // ─────────────────────────────────────────
 // Types
@@ -31,8 +32,8 @@ function countKana(text: string): number {
   return (text.match(/[\u3040-\u309f\u30a0-\u30ff]/g) ?? []).length;
 }
 
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("id-ID", {
+function formatDate(date: Date, lang: string): string {
+  return new Intl.DateTimeFormat(lang === "id" ? "id-ID" : "en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -44,6 +45,7 @@ function formatDate(date: Date): string {
 // ─────────────────────────────────────────
 export function StoryPickerModal({ stories }: { stories: StoryItem[] }) {
   const router = useRouter();
+  const { t, lang } = useLanguage();
   const [selected, setSelected] = useState<number | null>(null);
 
   function handlePick(id: number) {
@@ -54,16 +56,15 @@ export function StoryPickerModal({ stories }: { stories: StoryItem[] }) {
   return (
     <Modal>
       <Button variant="secondary" size="sm" className="shrink-0">
-        📚 Pilih Cerita
+        📚 {t.chooseStory}
       </Button>
       <Modal.Backdrop>
         <Modal.Container scroll="inside" size="lg">
           <Modal.Dialog className="sm:max-w-130">
             <Modal.Header>
-              <Modal.Heading>Pilih Cerita</Modal.Heading>
+              <Modal.Heading>{t.chooseStory}</Modal.Heading>
               <p className="text-sm leading-5 text-muted">
-                {stories.length} cerita tersedia · diurutkan dari paling jarang
-                dibaca
+                {t.storiesAvailable.replace("{n}", String(stories.length))}
               </p>
             </Modal.Header>
 
@@ -115,7 +116,7 @@ export function StoryPickerModal({ stories }: { stories: StoryItem[] }) {
                           📖 {story.totalReads}x dibaca
                         </span>
                         <span className="text-[11px] text-muted whitespace-nowrap">
-                          {formatDate(new Date(story.createdAt))}
+                          {formatDate(new Date(story.createdAt), lang)}
                         </span>
                       </div>
                     </CardHeader>
@@ -140,7 +141,7 @@ export function StoryPickerModal({ stories }: { stories: StoryItem[] }) {
 
             <Modal.Footer>
               <Button slot="close" variant="secondary">
-                Batal
+                {t.cancel}
               </Button>
             </Modal.Footer>
             <Modal.CloseTrigger />

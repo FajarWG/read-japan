@@ -2,16 +2,18 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
-
-const NAV_ITEMS = [
-  { id: "home", route: "/", label: "Cerita" },
-  { id: "learn", route: "/learn", label: "Progres" },
-  { id: "kana", route: "/kana", label: "Kana" },
-] as const;
+import { useLanguage } from "@/src/components/LanguageProvider";
 
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
+
+  const NAV_ITEMS = [
+    { id: "home", route: "/", label: t.navStories },
+    { id: "learn", route: "/learn", label: t.navProgress },
+    { id: "kana", route: "/kana", label: t.navKana },
+  ] as const;
 
   const selectedKey = pathname.startsWith("/learn")
     ? "learn"
@@ -36,11 +38,11 @@ export function BottomNav() {
                 /* Liquid glass container */
                 "rounded-2xl px-1.5 py-1.5 gap-0.5",
                 /* Translucent fill */
-                "bg-white/20 dark:bg-white/[0.07]",
+                "bg-white/20 dark:bg-white/7",
                 /* Strong backdrop blur */
                 "backdrop-blur-2xl",
                 /* Glass edge — outer border */
-                "border border-white/40 dark:border-white/[0.12]",
+                "border border-white/40 dark:border-white/12",
                 /* Depth shadow + inner highlight */
                 "shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.5)]",
                 "dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]",
@@ -57,7 +59,7 @@ export function BottomNav() {
                   <Tabs.Indicator
                     className={[
                       "rounded-xl",
-                      "bg-white/50 dark:bg-white/[0.12]",
+                      "bg-white/50 dark:bg-white/12",
                       "shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_1px_3px_rgba(0,0,0,0.1)]",
                       "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_1px_3px_rgba(0,0,0,0.3)]",
                     ].join(" ")}

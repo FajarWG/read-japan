@@ -1,6 +1,8 @@
 "use client";
 
 import { ThemeToggle } from "@/src/components/ThemeToggle";
+import { LanguageToggle } from "@/src/components/LanguageToggle";
+import { useLanguage } from "@/src/components/LanguageProvider";
 import { kanaMap } from "@/src/lib/kana-map";
 import type { KanaEntry, KanaType } from "@/src/lib/kana-map";
 import { Tabs } from "@heroui/react";
@@ -14,7 +16,10 @@ type KanaGroup = {
   entries: [string, KanaEntry][];
 };
 
-function groupKana(type: KanaType): KanaGroup[] {
+function groupKana(
+  type: KanaType,
+  labels: [string, string, string],
+): KanaGroup[] {
   const all = Object.entries(kanaMap).filter(([, e]) => e.type === type);
 
   const base = all.filter(([, e]) => !e.origin);
@@ -30,14 +35,11 @@ function groupKana(type: KanaType): KanaGroup[] {
   );
 
   return [
-    { label: "Dasar", entries: base },
-    { label: "Dakuten & Handakuten", entries: modified },
-    { label: "Kombinasi (Yōon)", entries: combinations },
+    { label: labels[0], entries: base },
+    { label: labels[1], entries: modified },
+    { label: labels[2], entries: combinations },
   ].filter((g) => g.entries.length > 0);
 }
-
-const hiraganaGroups = groupKana("hiragana");
-const katakanaGroups = groupKana("katakana");
 
 // ─────────────────────────────────────────
 // KanaCard
@@ -95,12 +97,22 @@ function KanaSection({ groups }: { groups: KanaGroup[] }) {
 // ─────────────────────────────────────────
 
 export default function KanaPage() {
+  const { t } = useLanguage();
+
   const totalHiragana = Object.values(kanaMap).filter(
     (e) => e.type === "hiragana",
   ).length;
   const totalKatakana = Object.values(kanaMap).filter(
     (e) => e.type === "katakana",
   ).length;
+
+  const groupLabels: [string, string, string] = [
+    t.kanaBasic,
+    t.kanaDakuten,
+    t.kanaYoon,
+  ];
+  const hiraganaGroups = groupKana("hiragana", groupLabels);
+  const katakanaGroups = groupKana("katakana", groupLabels);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
@@ -110,13 +122,16 @@ export default function KanaPage() {
           <div className="flex items-center justify-between gap-4 px-4 py-4">
             <div>
               <h1 className="font-jp text-lg font-bold leading-tight text-foreground">
-                Referensi Kana
+                {t.kanaRefTitle}
               </h1>
               <p className="text-xs text-muted">
                 {totalHiragana} hiragana · {totalKatakana} katakana
               </p>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
           </div>
         </header>
 

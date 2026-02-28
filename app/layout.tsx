@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Serif_JP } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/src/components/ThemeProvider";
+import { LanguageProvider } from "@/src/components/LanguageProvider";
 import { BottomNav } from "@/src/components/BottomNav";
 
 const geistSans = Geist({
@@ -52,8 +53,10 @@ export default function RootLayout({
         } ${geistMono.variable} ${notoSerifJP.variable} antialiased bg-background text-foreground pb-24`}
       >
         <ThemeProvider>
-          {children}
-          <BottomNav />
+          <LanguageProvider>
+            {children}
+            <BottomNav />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

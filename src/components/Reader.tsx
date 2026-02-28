@@ -10,6 +10,7 @@ import {
   recordPerfectRead,
   recordStoryRead,
 } from "@/src/app/actions";
+import { useLanguage } from "@/src/components/LanguageProvider";
 
 type ReaderMode = "reading" | "review" | "result";
 
@@ -20,9 +21,10 @@ type ReaderMode = "reading" | "review" | "result";
 interface KanaPopoverProps {
   info: KanaInfo;
   onStopPropagation: (e: React.MouseEvent) => void;
+  fromLabel: string;
 }
 
-function KanaPopover({ info, onStopPropagation }: KanaPopoverProps) {
+function KanaPopover({ info, onStopPropagation, fromLabel }: KanaPopoverProps) {
   return (
     <span
       className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 flex flex-col items-center pointer-events-auto"
@@ -44,7 +46,7 @@ function KanaPopover({ info, onStopPropagation }: KanaPopoverProps) {
         </span>
         {info.origin && (
           <span className="flex items-center gap-1 text-xs text-gray-400">
-            <span>dari</span>
+            <span>{fromLabel}</span>
             <span className="text-yellow-300 font-bold text-base leading-none">
               {info.origin}
             </span>
@@ -71,6 +73,7 @@ interface KanaTokenProps {
   isActive: boolean;
   isPendingThis: boolean;
   onToggle: (index: number, unit: ParsedUnit, e: React.MouseEvent) => void;
+  fromLabel: string;
 }
 
 function KanaToken({
@@ -79,6 +82,7 @@ function KanaToken({
   isActive,
   isPendingThis,
   onToggle,
+  fromLabel,
 }: KanaTokenProps) {
   const info = unit.info!;
   return (
@@ -107,6 +111,7 @@ function KanaToken({
         <KanaPopover
           info={info}
           onStopPropagation={(e) => e.stopPropagation()}
+          fromLabel={fromLabel}
         />
       )}
     </span>
@@ -176,9 +181,14 @@ function ReviewKanaToken({
 interface TranslationCardProps {
   content: string;
   translation: string;
+  storyMeaning: string;
 }
 
-function TranslationCard({ content, translation }: TranslationCardProps) {
+function TranslationCard({
+  content,
+  translation,
+  storyMeaning,
+}: TranslationCardProps) {
   // Split Japanese by 。 (full-width period)
   const jpSentences = content
     .split("。")
@@ -196,7 +206,7 @@ function TranslationCard({ content, translation }: TranslationCardProps) {
   return (
     <div className="rounded-2xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50 dark:bg-indigo-950/20 px-5 py-4">
       <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-400 mb-3">
-        📝 Arti Cerita
+        📝 {storyMeaning}
       </p>
       <div className="flex flex-col gap-3">
         {jpSentences.map((jp, i) => (
@@ -226,6 +236,17 @@ interface ResultViewProps {
   onGoHome: () => void;
   storyContent: string;
   translation?: string;
+  t: {
+    resultOf: string;
+    kanaReadCorrectly: string;
+    wrong: string;
+    needsStudy: string;
+    perfectScore: string;
+    debtReduced: string;
+    countdownPrefix: string;
+    goHomeNow: string;
+    storyMeaning: string;
+  };
 }
 
 function ResultView({
@@ -235,6 +256,7 @@ function ResultView({
   onGoHome,
   storyContent,
   translation,
+  t,
 }: ResultViewProps) {
   const kanaUnits = units.filter((u) => u.info);
   const totalKana = kanaUnits.length;
@@ -270,15 +292,15 @@ function ResultView({
         <span className="text-5xl leading-none">{emoji}</span>
         <div className="text-5xl font-bold text-foreground mt-1">{score}%</div>
         <p className="text-sm text-muted mt-0.5">
-          <strong className="text-foreground">{correctCount}</strong> dari{" "}
-          <strong className="text-foreground">{totalKana}</strong> kana dibaca
-          benar
+          <strong className="text-foreground">{correctCount}</strong>{" "}
+          {t.resultOf} <strong className="text-foreground">{totalKana}</strong>{" "}
+          {t.kanaReadCorrectly}
           {wrongCount > 0 && (
             <>
               {" "}
               ·{" "}
               <strong className="text-red-500 dark:text-red-400">
-                {wrongCount} salah
+                {wrongCount} {t.wrong}
               </strong>
             </>
           )}
@@ -289,7 +311,7 @@ function ResultView({
       {wrongCharsMap.size > 0 && (
         <div className="rounded-2xl border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20 px-5 py-4">
           <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-3">
-            📚 Perlu dipelajari lagi:
+            📚 {t.needsStudy}
           </p>
           <div className="flex flex-wrap gap-2">
             {[...wrongCharsMap.entries()].map(([char, info]) => (
@@ -321,17 +343,21 @@ function ResultView({
       {wrongCount === 0 && (
         <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 px-5 py-4 text-center flex flex-col gap-1">
           <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
-            🌟 Luar biasa! Semua kana dibaca dengan benar!
+            🌟 {t.perfectScore}
           </p>
           <p className="text-xs text-emerald-600/80 dark:text-emerald-500">
-            Hutang bacaan untuk kana di cerita ini dikurangi 1 ✓
+            {t.debtReduced}
           </p>
         </div>
       )}
 
       {/* Translation */}
       {translation && (
-        <TranslationCard content={storyContent} translation={translation} />
+        <TranslationCard
+          content={storyContent}
+          translation={translation}
+          storyMeaning={t.storyMeaning}
+        />
       )}
 
       {/* Countdown + go home */}
@@ -344,7 +370,7 @@ function ResultView({
           />
         </div>
         <p className="text-sm text-muted">
-          Kembali ke beranda dalam{" "}
+          {t.countdownPrefix}{" "}
           <strong className="text-foreground tabular-nums">{countdown}</strong>
           s…
         </p>
@@ -354,7 +380,7 @@ function ResultView({
           className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold transition-colors shadow-sm flex items-center gap-2"
         >
           <span>🏠</span>
-          <span>Ke Beranda Sekarang</span>
+          <span>{t.goHomeNow}</span>
         </button>
       </div>
     </div>
@@ -377,6 +403,7 @@ export default function Reader({
   storyId,
 }: ReaderProps) {
   const router = useRouter();
+  const { t } = useLanguage();
   const [mode, setMode] = useState<ReaderMode>("reading");
 
   // Reading mode state
@@ -500,6 +527,17 @@ export default function Reader({
         onGoHome={() => router.push("/")}
         storyContent={storyContent}
         translation={translation}
+        t={{
+          resultOf: t.resultOf,
+          kanaReadCorrectly: t.resultKanaRead,
+          wrong: t.resultWrong,
+          needsStudy: t.needsStudy,
+          perfectScore: t.perfectScore,
+          debtReduced: t.debtReduced,
+          countdownPrefix: t.countdownPrefix,
+          goHomeNow: t.goHomeNow,
+          storyMeaning: t.storyMeaning,
+        }}
       />
     );
   }
@@ -573,10 +611,10 @@ export default function Reader({
           <p className="text-sm text-muted">
             {wrongIndices.size > 0 ? (
               <span className="text-red-500 dark:text-red-400 font-medium">
-                {wrongIndices.size} kana ditandai salah
+                {wrongIndices.size} {t.markedWrong}
               </span>
             ) : (
-              <span>Belum ada yang ditandai — tap huruf yang salah baca</span>
+              <span>{t.noneMarked}</span>
             )}
           </p>
           <div className="flex items-center gap-2 shrink-0">
@@ -585,7 +623,7 @@ export default function Reader({
               onClick={() => setMode("reading")}
               className="px-4 py-2 rounded-xl border border-border bg-surface text-sm font-medium text-foreground hover:bg-surface-muted transition-colors"
             >
-              ← Kembali Membaca
+              {t.backToReading}
             </button>
             <button
               type="button"
@@ -599,10 +637,10 @@ export default function Reader({
               ].join(" ")}
             >
               {isSubmitting
-                ? "Menyimpan…"
+                ? t.saving
                 : wrongIndices.size > 0
-                  ? `Submit Hasil (${wrongIndices.size} salah)`
-                  : "Submit — Semua Benar ✓"}
+                  ? t.submitWrong.replace("{n}", String(wrongIndices.size))
+                  : t.submitPerfect}
             </button>
           </div>
         </div>
@@ -632,6 +670,7 @@ export default function Reader({
               isActive={activeIndex === index}
               isPendingThis={isPending && pendingIndex === index}
               onToggle={handleTogglePopover}
+              fromLabel={t.fromOrigin}
             />
           );
         })}
@@ -645,7 +684,7 @@ export default function Reader({
           className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold transition-colors shadow-sm flex items-center gap-2"
         >
           <span>✅</span>
-          <span>Selesai Membaca</span>
+          <span>{t.finishReading}</span>
         </button>
       </div>
     </div>

@@ -1,23 +1,9 @@
-import Link from "next/link";
-import { buttonVariants } from "@heroui/react";
-
 import { prisma } from "@/src/lib/db";
-import { ThemeToggle } from "@/src/components/ThemeToggle";
-import { StoryPickerModal } from "@/src/components/StoryPickerModal";
+import { HomeContent } from "@/src/components/HomeContent";
 
 // Selalu render ulang setiap request agar data dari DB selalu fresh
 export const dynamic = "force-dynamic";
 
-// ─────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────
-function countKana(text: string): number {
-  return (text.match(/[\u3040-\u309f\u30a0-\u30ff]/g) ?? []).length;
-}
-
-// ─────────────────────────────────────────
-// Page
-// ─────────────────────────────────────────
 export default async function Home() {
   const [stories, statsAgg] = await Promise.all([
     prisma.story.findMany({
@@ -34,182 +20,11 @@ export default async function Home() {
   const totalDebt = totalClicks + totalWrong;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <div className="flex w-full max-w-3xl flex-col">
-        {/* ── Header ──────────────────────────────────────────── */}
-        <header className="border-b border-border  backdrop-blur-sm rounded-t-2xl">
-          <div className="flex items-center justify-between gap-4 px-4 py-4">
-            {/* Brand */}
-            <div>
-              <h1 className="font-jp text-lg font-bold leading-tight text-foreground">
-                読む日本語
-                <span className="ml-2 font-sans text-sm font-normal text-muted">
-                  Read Japan
-                </span>
-              </h1>
-              <p className="text-xs text-muted">
-                Belajar Baca Hiragana &amp; Katakana
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <Link
-                href="/stories/new"
-                className={buttonVariants({
-                  variant: "primary",
-                  size: "sm",
-                  className: "shrink-0",
-                })}
-              >
-                + Tambah Cerita
-              </Link>
-            </div>
-          </div>
-        </header>
-
-        {/* ── Main ────────────────────────────────────────────── */}
-        <main className="px-4 py-8">
-          {/* ── Stats row ──────────────────────────────────────── */}
-          {totalClicks > 0 && (
-            <div className="mb-7 grid grid-cols-3 gap-3">
-              {/* Total Klik */}
-              <div className="rounded-xl border border-border bg-surface px-3 py-3 text-center shadow-sm">
-                <p className="text-2xl font-bold tabular-nums text-foreground">
-                  {totalClicks}
-                </p>
-                <p className="mt-0.5 text-[11px] text-muted">total klik</p>
-              </div>
-
-              {/* Total Salah */}
-              <div
-                className={[
-                  "rounded-xl border px-3 py-3 text-center shadow-sm",
-                  totalWrong > 0
-                    ? "border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20"
-                    : "border-border bg-surface",
-                ].join(" ")}
-              >
-                <p
-                  className={[
-                    "text-2xl font-bold tabular-nums",
-                    totalWrong > 0
-                      ? "text-red-600 dark:text-red-400"
-                      : "text-foreground",
-                  ].join(" ")}
-                >
-                  {totalWrong}
-                </p>
-                <p className="mt-0.5 text-[11px] text-muted">total salah</p>
-              </div>
-
-              {/* Total Keduanya */}
-              <div
-                className={[
-                  "rounded-xl border px-3 py-3 text-center shadow-sm",
-                  totalDebt > 0
-                    ? "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20"
-                    : "border-border bg-surface",
-                ].join(" ")}
-              >
-                <p
-                  className={[
-                    "text-2xl font-bold tabular-nums",
-                    totalDebt > 0
-                      ? "text-amber-600 dark:text-amber-400"
-                      : "text-foreground",
-                  ].join(" ")}
-                >
-                  {totalDebt}
-                </p>
-                <p className="mt-0.5 text-[11px] text-muted">klik + salah</p>
-              </div>
-            </div>
-          )}
-
-          {/* ── Start Reading CTA ──────────────────────────────── */}
-          {stories.length > 0 && (
-            <div className="mb-8">
-              <Link
-                href={`/read/${stories[0].id}`}
-                className="group block"
-                aria-label={`Mulai membaca: ${stories[0].title}`}
-              >
-                <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-linear-to-br from-accent/10 via-accent/5 to-transparent px-6 py-6 shadow-sm transition-all duration-200 hover:border-accent/60 hover:shadow-md">
-                  {/* Background decoration */}
-                  <span className="pointer-events-none absolute -right-4 -top-4 select-none text-8xl opacity-[0.06]">
-                    本
-                  </span>
-
-                  <div className="relative flex items-center justify-between gap-4">
-                    <div className="min-w-0 flex flex-col gap-1">
-                      <p className="text-xs font-medium text-accent uppercase tracking-wide">
-                        ✨ Lanjut membaca hari ini
-                      </p>
-                      <h2 className="font-jp text-xl font-bold text-foreground leading-snug line-clamp-1 group-hover:text-accent transition-colors">
-                        {stories[0].title}
-                      </h2>
-                      <p className="font-jp text-sm text-muted line-clamp-1 mt-0.5">
-                        {stories[0].content}
-                      </p>
-                      <p className="mt-2 text-[11px] text-muted">
-                        📖 {stories[0].totalReads}x dibaca · ✍️{" "}
-                        {countKana(stories[0].content)} kana
-                      </p>
-                    </div>
-
-                    <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-white shadow-sm transition-transform duration-200 group-hover:scale-105 group-hover:shadow-md">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="h-5 w-5"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          )}
-
-          {/* Empty state */}
-          {stories.length === 0 && (
-            <div className="flex flex-col items-center gap-5 py-28 text-center">
-              <span className="font-jp select-none text-7xl opacity-20">
-                本
-              </span>
-              <div className="flex flex-col gap-1">
-                <p className="font-semibold text-foreground">
-                  Belum ada cerita
-                </p>
-                <p className="text-sm text-muted">
-                  Mulai dengan menambah cerita pertama untuk latihan membaca.
-                </p>
-              </div>
-              <Link
-                href="/stories/new"
-                className={buttonVariants({ variant: "primary" })}
-              >
-                + Tambah Cerita Pertama
-              </Link>
-            </div>
-          )}
-
-          {/* Pilih manual via modal */}
-          {stories.length > 0 && (
-            <div className="flex justify-center">
-              <StoryPickerModal stories={stories} />
-            </div>
-          )}
-        </main>
-      </div>
-    </div>
+    <HomeContent
+      stories={stories}
+      totalClicks={totalClicks}
+      totalWrong={totalWrong}
+      totalDebt={totalDebt}
+    />
   );
 }
