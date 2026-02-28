@@ -1,16 +1,9 @@
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Chip,
-  buttonVariants,
-  Separator,
-} from "@heroui/react";
+import { buttonVariants } from "@heroui/react";
 
 import { prisma } from "@/src/lib/db";
 import { ThemeToggle } from "@/src/components/ThemeToggle";
+import { StoryPickerModal } from "@/src/components/StoryPickerModal";
 
 // Selalu render ulang setiap request agar data dari DB selalu fresh
 export const dynamic = "force-dynamic";
@@ -20,14 +13,6 @@ export const dynamic = "force-dynamic";
 // ─────────────────────────────────────────
 function countKana(text: string): number {
   return (text.match(/[\u3040-\u309f\u30a0-\u30ff]/g) ?? []).length;
-}
-
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
 }
 
 // ─────────────────────────────────────────
@@ -44,7 +29,6 @@ export default async function Home() {
     }),
   ]);
 
-  const totalKana = statsAgg._count._all;
   const totalClicks = statsAgg._sum.clickCount ?? 0;
   const totalWrong = statsAgg._sum.wrongCount ?? 0;
   const totalDebt = totalClicks + totalWrong;
@@ -194,18 +178,6 @@ export default async function Home() {
           </div>
         )}
 
-        {/* Section heading */}
-        <div className="mb-5 flex items-center gap-3">
-          <h2 className="text-base font-semibold text-foreground">
-            Pilih Cerita
-          </h2>
-          <Chip variant="soft" size="sm" className="text-[11px] font-medium">
-            {stories.length} cerita
-          </Chip>
-        </div>
-
-        <Separator className="bg-border mb-6" />
-
         {/* Empty state */}
         {stories.length === 0 && (
           <div className="flex flex-col items-center gap-5 py-28 text-center">
@@ -225,79 +197,11 @@ export default async function Home() {
           </div>
         )}
 
-        {/* Story list */}
+        {/* Pilih manual via modal */}
         {stories.length > 0 && (
-          <ul className="flex flex-col gap-3">
-            {stories.map((story, i) => (
-              <li key={story.id}>
-                <Link
-                  href={`/read/${story.id}`}
-                  className="group block"
-                  aria-label={`Baca cerita: ${story.title}`}
-                >
-                  <Card className="border border-border bg-surface shadow-none transition-all duration-150 hover:border-accent/50 hover:shadow-md rounded-xl">
-                    <CardHeader className="flex flex-row items-start justify-between gap-4 px-6 pt-5 pb-3">
-                      {/* Left: number + title */}
-                      <div className="min-w-0 flex flex-col gap-0.5">
-                        <span className="text-[11px] font-medium text-muted">
-                          #{i + 1}
-                        </span>
-                        <CardTitle className="font-jp text-xl font-semibold leading-snug text-foreground transition-colors group-hover:text-accent">
-                          {story.title}
-                        </CardTitle>
-                      </div>
-
-                      {/* Right: badges */}
-                      <div className="flex shrink-0 flex-col items-end gap-1.5">
-                        <Chip
-                          variant="soft"
-                          size="sm"
-                          className="text-[11px] font-medium"
-                        >
-                          ✍️ {countKana(story.content)} kana
-                        </Chip>
-                        <span
-                          className={[
-                            "text-[11px] font-medium tabular-nums",
-                            story.totalReads === 0
-                              ? "text-muted"
-                              : "text-indigo-500 dark:text-indigo-400",
-                          ].join(" ")}
-                        >
-                          📖 {story.totalReads}x dibaca
-                        </span>
-                        <span className="text-[11px] text-muted whitespace-nowrap">
-                          {formatDate(new Date(story.createdAt))}
-                        </span>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="px-6 pb-5">
-                      {/* Content preview */}
-                      <p className="font-jp line-clamp-2 text-sm leading-relaxed text-muted">
-                        {story.content}
-                      </p>
-
-                      {/* Focus tag */}
-                      {story.focus && (
-                        <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted">
-                          <span className="shrink-0">🎯</span>
-                          <span className="font-jp line-clamp-1">
-                            {story.focus}
-                          </span>
-                        </p>
-                      )}
-
-                      {/* "Baca" affordance */}
-                      <p className="mt-3 text-xs font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
-                        Klik untuk membaca →
-                      </p>
-                    </CardContent>
-                  </Card>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="flex justify-center">
+            <StoryPickerModal stories={stories} />
+          </div>
         )}
       </main>
     </div>

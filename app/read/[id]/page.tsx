@@ -199,7 +199,7 @@ export default async function ReadPage({
           </div>
 
           {/* Card body: teks cerita */}
-          <CardContent className="px-8 pt-6 pb-8">
+          <CardContent className="px-8 pt-6">
             <article className="font-jp">
               <Reader
                 storyContent={story.content}
@@ -210,9 +210,7 @@ export default async function ReadPage({
           </CardContent>
 
           {/* Card footer: info story */}
-          <div className="px-8">
-            <Separator className="bg-border" />
-          </div>
+
           <CardFooter className="px-8 py-5 flex items-center justify-between text-xs text-muted">
             <span>Story #{story.id}</span>
             <span>
