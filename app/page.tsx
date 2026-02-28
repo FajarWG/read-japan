@@ -143,10 +143,61 @@ export default async function Home() {
           </div>
         )}
 
+        {/* ── Start Reading CTA ──────────────────────────────── */}
+        {stories.length > 0 && (
+          <div className="mb-8">
+            <Link
+              href={`/read/${stories[0].id}`}
+              className="group block"
+              aria-label={`Mulai membaca: ${stories[0].title}`}
+            >
+              <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-linear-to-br from-accent/10 via-accent/5 to-transparent px-6 py-6 shadow-sm transition-all duration-200 hover:border-accent/60 hover:shadow-md">
+                {/* Background decoration */}
+                <span className="pointer-events-none absolute -right-4 -top-4 select-none text-8xl opacity-[0.06]">
+                  本
+                </span>
+
+                <div className="relative flex items-center justify-between gap-4">
+                  <div className="min-w-0 flex flex-col gap-1">
+                    <p className="text-xs font-medium text-accent uppercase tracking-wide">
+                      ✨ Lanjut membaca hari ini
+                    </p>
+                    <h2 className="font-jp text-xl font-bold text-foreground leading-snug line-clamp-1 group-hover:text-accent transition-colors">
+                      {stories[0].title}
+                    </h2>
+                    <p className="font-jp text-sm text-muted line-clamp-1 mt-0.5">
+                      {stories[0].content}
+                    </p>
+                    <p className="mt-2 text-[11px] text-muted">
+                      📖 {stories[0].totalReads}x dibaca · ✍️{" "}
+                      {countKana(stories[0].content)} kana
+                    </p>
+                  </div>
+
+                  <div className="shrink-0 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-white shadow-sm transition-transform duration-200 group-hover:scale-105 group-hover:shadow-md">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="h-5 w-5"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        )}
+
         {/* Section heading */}
         <div className="mb-5 flex items-center gap-3">
           <h2 className="text-base font-semibold text-foreground">
-            Daftar Cerita
+            Pilih Cerita
           </h2>
           <Chip variant="soft" size="sm" className="text-[11px] font-medium">
             {stories.length} cerita
