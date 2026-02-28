@@ -12,6 +12,9 @@ import {
 import { prisma } from "@/src/lib/db";
 import { ThemeToggle } from "@/src/components/ThemeToggle";
 
+// Selalu render ulang setiap request agar data dari DB selalu fresh
+export const dynamic = "force-dynamic";
+
 // ─────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────

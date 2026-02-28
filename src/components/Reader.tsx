@@ -390,8 +390,13 @@ export default function Reader({
       setActiveIndex((prev) => (prev === index ? null : index));
       setPendingIndex(index);
       startTransition(async () => {
-        await recordClick(unit.char);
-        setPendingIndex(null);
+        try {
+          await recordClick(unit.char);
+        } catch (err) {
+          console.error("[recordClick] gagal:", err);
+        } finally {
+          setPendingIndex(null);
+        }
       });
     },
     [],
@@ -411,7 +416,11 @@ export default function Reader({
     setWrongIndices(new Set());
     setMode("review");
     startTransition(async () => {
-      await recordStoryRead(storyId);
+      try {
+        await recordStoryRead(storyId);
+      } catch (err) {
+        console.error("[recordStoryRead] gagal:", err);
+      }
     });
   };
 
@@ -424,13 +433,18 @@ export default function Reader({
       ...new Set(units.filter((u) => u.info).map((u) => u.char)),
     ];
     startSubmitTransition(async () => {
-      if (wrongChars.length === 0) {
-        // Skor sempurna — bayar hutang untuk semua kana di cerita ini
-        await recordPerfectRead(allKanaChars);
-      } else {
-        await recordWrongReads(wrongChars);
+      try {
+        if (wrongChars.length === 0) {
+          // Skor sempurna — bayar hutang untuk semua kana di cerita ini
+          await recordPerfectRead(allKanaChars);
+        } else {
+          await recordWrongReads(wrongChars);
+        }
+      } catch (err) {
+        console.error("[handleSubmitReview] gagal menyimpan:", err);
+      } finally {
+        setMode("result");
       }
-      setMode("result");
     });
   };
 

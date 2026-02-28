@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "Progres Belajar",
 };
 
+// Selalu render ulang setiap request agar progres belajar selalu fresh
+export const dynamic = "force-dynamic";
+
 // ─────────────────────────────────────────
 // Page
 // ─────────────────────────────────────────

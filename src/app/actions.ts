@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/src/lib/db";
 
 /**
@@ -13,6 +14,7 @@ export async function recordStoryRead(storyId: number): Promise<void> {
     where: { id: storyId },
     data: { totalReads: { increment: 1 } },
   });
+  revalidatePath("/");
 }
 
 /**
@@ -36,6 +38,8 @@ export async function recordClick(char: string): Promise<void> {
       clickCount: 1,
     },
   });
+  revalidatePath("/learn");
+  revalidatePath("/");
 }
 
 /**
@@ -63,6 +67,8 @@ export async function recordWrongReads(chars: string[]): Promise<void> {
       }),
     ),
   );
+  revalidatePath("/learn");
+  revalidatePath("/");
 }
 
 /**
@@ -99,4 +105,6 @@ export async function recordPerfectRead(chars: string[]): Promise<void> {
     });
 
   await Promise.all(updates);
+  revalidatePath("/learn");
+  revalidatePath("/");
 }
