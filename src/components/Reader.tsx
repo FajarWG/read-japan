@@ -507,37 +507,66 @@ export default function Reader({
   // ── REVIEW MODE ────────────────────────────────────────────────────────────
 
   if (mode === "review") {
+    // Kelompokkan units per kalimat (pisah di 。)
+    const sentenceGroups: { units: ParsedUnit[]; startIndex: number }[] = [];
+    let cur: ParsedUnit[] = [];
+    let curStart = 0;
+    for (let i = 0; i < units.length; i++) {
+      cur.push(units[i]);
+      if (units[i].char === "。") {
+        sentenceGroups.push({ units: cur, startIndex: curStart });
+        curStart = i + 1;
+        cur = [];
+      }
+    }
+    if (cur.length > 0)
+      sentenceGroups.push({ units: cur, startIndex: curStart });
+
+    const idSentences = translation
+      ? translation
+          .split(".")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
     return (
       <div className="flex flex-col gap-5">
-        {/* Teks + romaji, items-end agar huruf non-kana sejajar di bawah */}
-        <div className="flex flex-wrap items-end gap-x-0.5 gap-y-2">
-          {units.map((unit, index) => {
-            if (!unit.info) {
-              return (
-                <span
-                  key={index}
-                  className="text-3xl text-foreground font-jp leading-tight pb-0.5"
-                >
-                  {unit.char}
-                </span>
-              );
-            }
-            return (
-              <ReviewKanaToken
-                key={index}
-                unit={unit}
-                index={index}
-                isWrong={wrongIndices.has(index)}
-                onToggle={handleToggleWrong}
-              />
-            );
-          })}
+        {/* Teks + romaji per kalimat, terjemahan langsung di bawahnya */}
+        <div className="flex flex-col gap-4">
+          {sentenceGroups.map((group, si) => (
+            <div key={si} className="flex flex-col gap-1.5">
+              <div className="flex flex-wrap items-end gap-x-0.5 gap-y-2">
+                {group.units.map((unit, localIdx) => {
+                  const globalIndex = group.startIndex + localIdx;
+                  if (!unit.info) {
+                    return (
+                      <span
+                        key={globalIndex}
+                        className="text-3xl text-foreground font-jp leading-tight pb-0.5"
+                      >
+                        {unit.char}
+                      </span>
+                    );
+                  }
+                  return (
+                    <ReviewKanaToken
+                      key={globalIndex}
+                      unit={unit}
+                      index={globalIndex}
+                      isWrong={wrongIndices.has(globalIndex)}
+                      onToggle={handleToggleWrong}
+                    />
+                  );
+                })}
+              </div>
+              {idSentences[si] && (
+                <p className="text-sm text-muted leading-relaxed pl-1">
+                  {idSentences[si]}.
+                </p>
+              )}
+            </div>
+          ))}
         </div>
-
-        {/* Translation */}
-        {translation && (
-          <TranslationCard content={storyContent} translation={translation} />
-        )}
 
         {/* Action bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border">
