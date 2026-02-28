@@ -103,53 +103,55 @@ export default function KanaPage() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4">
-          <div>
-            <h1 className="font-jp text-lg font-bold leading-tight text-foreground">
-              Referensi Kana
-            </h1>
-            <p className="text-xs text-muted">
-              {totalHiragana} hiragana · {totalKatakana} katakana
-            </p>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      <div className="flex w-full max-w-3xl flex-col">
+        {/* Header */}
+        <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
+          <div className="flex items-center justify-between gap-4 px-4 py-4">
+            <div>
+              <h1 className="font-jp text-lg font-bold leading-tight text-foreground">
+                Referensi Kana
+              </h1>
+              <p className="text-xs text-muted">
+                {totalHiragana} hiragana · {totalKatakana} katakana
+              </p>
+            </div>
+            <ThemeToggle />
           </div>
-          <ThemeToggle />
-        </div>
-      </header>
+        </header>
 
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <Tabs className="w-full">
-          <Tabs.ListContainer className="mb-6 sticky top-14.25 z-30 bg-background py-2">
-            <Tabs.List
-              aria-label="Pilih jenis kana"
-              className={[
-                "w-fit",
-                "*:h-8 *:px-5 *:text-sm *:font-medium",
-                "*:data-[selected=true]:text-accent-foreground",
-              ].join(" ")}
-            >
-              <Tabs.Tab id="hiragana">
-                ひ Hiragana ({totalHiragana})
-                <Tabs.Indicator className="bg-accent" />
-              </Tabs.Tab>
-              <Tabs.Tab id="katakana">
-                カ Katakana ({totalKatakana})
-                <Tabs.Indicator className="bg-accent" />
-              </Tabs.Tab>
-            </Tabs.List>
-          </Tabs.ListContainer>
+        <main className="px-4 pt-4">
+          <Tabs className="w-full">
+            <Tabs.ListContainer className="sticky top-0 z-30 bg-background py-2">
+              <Tabs.List
+                aria-label="Pilih jenis kana"
+                className={[
+                  "w-fit",
+                  "*:h-8 *:px-8 *:text-sm *:font-medium",
+                  "*:data-[selected=true]:text-accent-foreground",
+                ].join(" ")}
+              >
+                <Tabs.Tab id="hiragana">
+                  Hiragana
+                  <Tabs.Indicator className="bg-accent" />
+                </Tabs.Tab>
+                <Tabs.Tab id="katakana">
+                  Katakana
+                  <Tabs.Indicator className="bg-accent" />
+                </Tabs.Tab>
+              </Tabs.List>
+            </Tabs.ListContainer>
 
-          <Tabs.Panel id="hiragana">
-            <KanaSection groups={hiraganaGroups} />
-          </Tabs.Panel>
+            <Tabs.Panel id="hiragana">
+              <KanaSection groups={hiraganaGroups} />
+            </Tabs.Panel>
 
-          <Tabs.Panel id="katakana">
-            <KanaSection groups={katakanaGroups} />
-          </Tabs.Panel>
-        </Tabs>
-      </main>
+            <Tabs.Panel id="katakana">
+              <KanaSection groups={katakanaGroups} />
+            </Tabs.Panel>
+          </Tabs>
+        </main>
+      </div>
     </div>
   );
 }

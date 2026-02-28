@@ -370,81 +370,83 @@ function BatchStoryForm() {
 // ─────────────────────────────────────────
 export default function NewStoryPage() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className={buttonVariants({
-                variant: "ghost",
-                size: "sm",
-                className: "text-muted",
-              })}
-            >
-              ← Beranda
-            </Link>
-            <span className="text-border">/</span>
-            <span className="text-sm font-medium text-foreground">
-              Tambah Cerita
-            </span>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+      <div className="flex w-full max-w-2xl flex-col">
+        {/* Header */}
+        <header className="border-b border-border bg-surface/80 backdrop-blur-sm rounded-t-2xl">
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                className={buttonVariants({
+                  variant: "ghost",
+                  size: "sm",
+                  className: "text-muted",
+                })}
+              >
+                ← Beranda
+              </Link>
+              <span className="text-border">/</span>
+              <span className="text-sm font-medium text-foreground">
+                Tambah Cerita
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Chip variant="soft" size="sm" className="text-xs font-medium">
+                Admin
+              </Chip>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Chip variant="soft" size="sm" className="text-xs font-medium">
-              Admin
-            </Chip>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Main */}
-      <main className="mx-auto max-w-2xl px-4 py-8">
-        <Card className="border border-border bg-surface shadow-sm rounded-2xl">
-          <CardHeader className="px-8 pt-7 pb-4">
-            <CardTitle className="text-xl font-bold text-foreground">
-              Tambah Cerita Baru
-            </CardTitle>
-            <p className="mt-1 text-sm text-muted">
-              Masukkan teks Jepang untuk latihan membaca. Kana akan dideteksi
-              otomatis.
-            </p>
-          </CardHeader>
+        {/* Main */}
+        <main className="px-4 py-8">
+          <Card className="border border-border bg-surface shadow-sm rounded-2xl">
+            <CardHeader className="px-8 pt-7 pb-4">
+              <CardTitle className="text-xl font-bold text-foreground">
+                Tambah Cerita Baru
+              </CardTitle>
+              <p className="mt-1 text-sm text-muted">
+                Masukkan teks Jepang untuk latihan membaca. Kana akan dideteksi
+                otomatis.
+              </p>
+            </CardHeader>
 
-          <div className="px-8">
-            <Separator className="bg-border" />
-          </div>
+            <div className="px-8">
+              <Separator className="bg-border" />
+            </div>
 
-          <CardContent className="px-8 py-6">
-            {/* Tabs */}
-            <Tabs variant="primary" className="w-full">
-              <TabListContainer className="mb-6">
-                <TabList className="w-full sm:w-auto">
-                  <Tab id="single">
-                    ✏️ Satu Cerita
-                    <Tabs.Indicator />
-                  </Tab>
-                  <Tab id="batch">
-                    📦 Batch (JSON)
-                    <Tabs.Indicator />
-                  </Tab>
-                </TabList>
-              </TabListContainer>
+            <CardContent className="px-8 py-6">
+              {/* Tabs */}
+              <Tabs variant="primary" className="w-full">
+                <TabListContainer className="mb-6">
+                  <TabList className="w-full sm:w-auto">
+                    <Tab id="single">
+                      ✏️ Satu Cerita
+                      <Tabs.Indicator />
+                    </Tab>
+                    <Tab id="batch">
+                      📦 Batch (JSON)
+                      <Tabs.Indicator />
+                    </Tab>
+                  </TabList>
+                </TabListContainer>
 
-              {/* Tab: single */}
-              <TabPanel id="single">
-                <SingleStoryForm />
-              </TabPanel>
+                {/* Tab: single */}
+                <TabPanel id="single">
+                  <SingleStoryForm />
+                </TabPanel>
 
-              {/* Tab: batch */}
-              <TabPanel id="batch">
-                <BatchStoryForm />
-              </TabPanel>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </main>
+                {/* Tab: batch */}
+                <TabPanel id="batch">
+                  <BatchStoryForm />
+                </TabPanel>
+              </Tabs>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
     </div>
   );
 }
