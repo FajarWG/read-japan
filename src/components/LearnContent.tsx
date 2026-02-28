@@ -90,7 +90,7 @@ export function LearnContent({
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="flex w-full max-w-3xl flex-col">
         {/* Header */}
-        <header className="border-b border-border bg-surface/80 backdrop-blur-sm rounded-t-2xl">
+        <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
           <div className="flex items-center justify-between gap-4 px-4 py-4">
             <div>
               <h1 className="text-lg font-bold text-foreground leading-tight">

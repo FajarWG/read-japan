@@ -101,7 +101,7 @@ function SingleStoryForm() {
         <Input
           variant="primary"
           fullWidth
-          placeholder="Contoh: はじめての日本語"
+          placeholder="はじめての日本語"
           required
           autoFocus
           className="font-jp"
@@ -138,9 +138,7 @@ function SingleStoryForm() {
           variant="primary"
           fullWidth
           rows={4}
-          placeholder={
-            "Hari ini cuacanya bagus ya.\nSaya adalah seorang siswa."
-          }
+          placeholder={"Today the weather is nice.\nI am a student."}
           className="resize-none leading-relaxed"
         />
         <FieldError className="text-xs text-red-500" />
@@ -155,7 +153,7 @@ function SingleStoryForm() {
         <Input
           variant="primary"
           fullWidth
-          placeholder="Contoh: hiragana dasar あいうえお, katakana コーヒーカフェ"
+          placeholder="あいうえお, コーヒー カフェ"
           className="font-jp"
         />
         <FieldError className="text-xs text-red-500" />
@@ -321,7 +319,7 @@ function BatchStoryForm() {
           }}
           rows={12}
           placeholder={
-            '[\n  {\n    "title": "はじめての日本語",\n    "content": "きょうはいいてんきですね。"\n  }\n]'
+            '[\n  {\n    "title": "はじめての日本語",\n    "content": "きょうはいいてんきですね。",\n    "translation": "Today the weather is nice.",\n    "focus": "あいうえお"\n  }\n]'
           }
           spellCheck={false}
           className={[
@@ -380,7 +378,7 @@ export default function NewStoryPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="flex w-full max-w-2xl flex-col">
         {/* Header */}
-        <header className="border-b border-border bg-surface/80 backdrop-blur-sm rounded-t-2xl">
+        <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
           <div className="flex items-center justify-between gap-4 px-4 py-3">
             <div className="flex items-center gap-2">
               <Link
@@ -426,11 +424,11 @@ export default function NewStoryPage() {
               <Tabs variant="primary" className="w-full">
                 <TabListContainer className="mb-6">
                   <TabList className="w-full sm:w-auto">
-                    <Tab id="single">
+                    <Tab id="single" className="whitespace-nowrap">
                       {t.singleTabLabel}
                       <Tabs.Indicator />
                     </Tab>
-                    <Tab id="batch">
+                    <Tab id="batch" className="whitespace-nowrap">
                       {t.batchTabLabel}
                       <Tabs.Indicator />
                     </Tab>

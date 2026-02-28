@@ -106,8 +106,8 @@ export const translations = {
     required: "required",
     optional: "optional",
     batchSuccess: "Successfully saved {n} stories. Redirecting to home…",
-    singleTabLabel: "✏️ Single Story",
-    batchTabLabel: "📦 Batch (JSON)",
+    singleTabLabel: "Single Story",
+    batchTabLabel: "Batch (JSON)",
 
     // ── Error messages ──────────────────────────────────────
     titleRequired: "Title is required.",
@@ -228,8 +228,8 @@ export const translations = {
     required: "wajib",
     optional: "opsional",
     batchSuccess: "Berhasil menyimpan {n} cerita. Mengarahkan ke beranda…",
-    singleTabLabel: "✏️ Satu Cerita",
-    batchTabLabel: "📦 Batch (JSON)",
+    singleTabLabel: "Satu Cerita",
+    batchTabLabel: "Batch (JSON)",
 
     // ── Error messages ──────────────────────────────────────
     titleRequired: "Judul wajib diisi.",
@@ -244,4 +244,4 @@ export const translations = {
   },
 } as const;
 
-export type Translations = typeof translations.en;
+export type Translations = (typeof translations)[Lang];

@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 import {
-  Breadcrumbs,
-  BreadcrumbsItem,
   buttonVariants,
   Card,
   CardContent,
@@ -65,28 +63,9 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
       <div className="flex w-full max-w-3xl flex-col">
         {/* ── Top bar ──────────────────────────────────────── */}
         <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
-          <div className="flex items-center justify-between px-4 py-3">
-            {/* Breadcrumb */}
-            <Breadcrumbs className="text-sm">
-              <BreadcrumbsItem>
-                <Link
-                  href="/"
-                  className="text-muted hover:text-foreground transition-colors"
-                >
-                  {t.home}
-                </Link>
-              </BreadcrumbsItem>
-              <BreadcrumbsItem>
-                <span className="text-foreground font-medium line-clamp-1 max-w-45 sm:max-w-xs">
-                  {story.title}
-                </span>
-              </BreadcrumbsItem>
-            </Breadcrumbs>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <LanguageToggle />
-              <ThemeToggle />
+          <div className="grid grid-cols-3 items-center px-4 py-3">
+            {/* Left: Back button */}
+            <div className="flex items-center">
               <Link
                 href="/"
                 className={buttonVariants({
@@ -97,6 +76,19 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
               >
                 {t.back}
               </Link>
+            </div>
+
+            {/* Center: Title */}
+            <div className="flex justify-center">
+              <span className="font-jp text-sm font-semibold text-foreground line-clamp-1 text-center max-w-40 sm:max-w-xs">
+                Reading Mode
+              </span>
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex items-center justify-end gap-2">
+              <LanguageToggle />
+              <ThemeToggle />
             </div>
           </div>
         </header>
@@ -203,10 +195,6 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
               </span>
             </CardFooter>
           </Card>
-
-          <p className="mt-8 text-center text-xs text-muted">
-            {t.progressSaved}
-          </p>
         </main>
       </div>
     </div>
