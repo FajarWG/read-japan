@@ -12,6 +12,7 @@ import {
   CardTitle,
   Chip,
   Separator,
+  Tooltip,
 } from "@heroui/react";
 
 import { prisma } from "@/src/lib/db";
@@ -117,20 +118,55 @@ export default async function ReadPage({
         <Card className="bg-surface border border-border shadow-sm rounded-2xl overflow-hidden">
           {/* Card header: judul + meta */}
           <CardHeader className="px-8 pt-8 pb-4 flex flex-col gap-3">
-            {/* Judul */}
-            <CardTitle className="font-jp text-3xl font-bold leading-snug text-foreground">
-              {story.title}
-            </CardTitle>
+            {/* Judul + tooltip */}
+            <div className="flex items-start justify-between gap-3">
+              <CardTitle className="font-jp text-3xl font-bold leading-snug text-foreground">
+                {story.title}
+              </CardTitle>
+              <Tooltip delay={0}>
+                <Tooltip.Trigger>
+                  <button
+                    type="button"
+                    aria-label="Petunjuk membaca"
+                    className="mt-1 flex items-center justify-center w-7 h-7 rounded-full text-muted hover:text-foreground hover:bg-surface-muted transition-colors shrink-0"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </Tooltip.Trigger>
+                <Tooltip.Content className="max-w-72">
+                  <div className="flex flex-col gap-2 py-0.5">
+                    <div className="flex flex-col gap-0.5">
+                      <p className="text-xs font-semibold">📖 Mode Membaca</p>
+                      <p className="text-xs text-muted">
+                        Klik huruf kana (bergaris bawah) untuk melihat cara
+                        bacanya. Setiap klik dicatat untuk melacak progres.
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <p className="text-xs font-semibold">✅ Mode Review</p>
+                      <p className="text-xs text-muted">
+                        Setelah selesai membaca, tandai huruf yang salah dibaca.
+                        Hasilnya tersimpan otomatis.
+                      </p>
+                    </div>
+                  </div>
+                </Tooltip.Content>
+              </Tooltip>
+            </div>
 
             {/* Deskripsi singkat + meta badges */}
             <div className="flex flex-wrap items-center gap-2">
-              <Chip
-                variant="soft"
-                size="sm"
-                className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 font-medium text-xs"
-              >
-                📖 Cerita Pendek
-              </Chip>
               <Chip
                 variant="soft"
                 size="sm"
@@ -160,19 +196,6 @@ export default async function ReadPage({
           {/* Divider */}
           <div className="px-8">
             <Separator className="bg-border" />
-          </div>
-
-          {/* Tip bar */}
-          <div className="mx-8 mt-5 rounded-xl bg-surface-muted border border-border px-4 py-3 text-sm text-muted flex items-start gap-2">
-            <span className="text-lg leading-none mt-0.5">💡</span>
-            <p>
-              Klik pada{" "}
-              <span className="underline underline-offset-2 decoration-indigo-400 font-medium text-foreground">
-                huruf kana
-              </span>{" "}
-              untuk melihat cara bacanya (romaji) dan penjelasan modifikasinya.
-              Setiap klik dicatat untuk membantu lacak progres belajarmu.
-            </p>
           </div>
 
           {/* Card body: teks cerita */}

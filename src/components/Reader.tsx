@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { parseJapaneseText } from "@/src/lib/parser";
 import type { ParsedUnit, KanaInfo } from "@/src/lib/parser";
 import {
@@ -221,7 +222,8 @@ function TranslationCard({ content, translation }: TranslationCardProps) {
 interface ResultViewProps {
   units: ParsedUnit[];
   wrongIndices: Set<number>;
-  onReset: () => void;
+  countdown: number;
+  onGoHome: () => void;
   storyContent: string;
   translation?: string;
 }
@@ -229,7 +231,8 @@ interface ResultViewProps {
 function ResultView({
   units,
   wrongIndices,
-  onReset,
+  countdown,
+  onGoHome,
   storyContent,
   translation,
 }: ResultViewProps) {
@@ -331,15 +334,27 @@ function ResultView({
         <TranslationCard content={storyContent} translation={translation} />
       )}
 
-      {/* Baca ulang button */}
-      <div className="flex justify-center pt-1">
+      {/* Countdown + go home */}
+      <div className="flex flex-col items-center gap-3 pt-1">
+        {/* Progress bar */}
+        <div className="w-full h-1.5 rounded-full bg-border overflow-hidden">
+          <div
+            className="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-linear"
+            style={{ width: `${(countdown / 5) * 100}%` }}
+          />
+        </div>
+        <p className="text-sm text-muted">
+          Kembali ke beranda dalam{" "}
+          <strong className="text-foreground tabular-nums">{countdown}</strong>
+          s…
+        </p>
         <button
           type="button"
-          onClick={onReset}
+          onClick={onGoHome}
           className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold transition-colors shadow-sm flex items-center gap-2"
         >
-          <span>🔄</span>
-          <span>Baca Ulang</span>
+          <span>🏠</span>
+          <span>Ke Beranda Sekarang</span>
         </button>
       </div>
     </div>
@@ -361,6 +376,7 @@ export default function Reader({
   translation,
   storyId,
 }: ReaderProps) {
+  const router = useRouter();
   const [mode, setMode] = useState<ReaderMode>("reading");
 
   // Reading mode state
@@ -372,6 +388,9 @@ export default function Reader({
   const [wrongIndices, setWrongIndices] = useState<Set<number>>(new Set());
   const [isSubmitting, startSubmitTransition] = useTransition();
 
+  // Result mode: countdown to redirect
+  const [countdown, setCountdown] = useState(5);
+
   const units = parseJapaneseText(storyContent);
 
   // Tutup popover saat klik di luar (reading mode saja)
@@ -381,6 +400,28 @@ export default function Reader({
     document.addEventListener("click", close);
     return () => document.removeEventListener("click", close);
   }, [activeIndex, mode]);
+
+  // Hitung mundur dan redirect ke beranda setelah result
+  useEffect(() => {
+    if (mode !== "result") return;
+    setCountdown(5);
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [mode]);
+
+  useEffect(() => {
+    if (mode === "result" && countdown === 0) {
+      router.push("/");
+    }
+  }, [countdown, mode, router]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -448,12 +489,6 @@ export default function Reader({
     });
   };
 
-  const handleReset = () => {
-    setWrongIndices(new Set());
-    setActiveIndex(null);
-    setMode("reading");
-  };
-
   // ── RESULT MODE ────────────────────────────────────────────────────────────
 
   if (mode === "result") {
@@ -461,7 +496,8 @@ export default function Reader({
       <ResultView
         units={units}
         wrongIndices={wrongIndices}
-        onReset={handleReset}
+        countdown={countdown}
+        onGoHome={() => router.push("/")}
         storyContent={storyContent}
         translation={translation}
       />
@@ -473,23 +509,6 @@ export default function Reader({
   if (mode === "review") {
     return (
       <div className="flex flex-col gap-5">
-        {/* Instruction banner */}
-        <div className="rounded-xl border border-orange-200 dark:border-orange-800/50 bg-orange-50 dark:bg-orange-950/20 px-4 py-3 flex items-start gap-2">
-          <span className="text-lg leading-none mt-0.5 shrink-0">👆</span>
-          <p className="text-sm text-orange-700 dark:text-orange-300">
-            Semua romaji sudah ditampilkan. Klik huruf yang tadi kamu{" "}
-            <strong>salah baca</strong> untuk menandainya.{" "}
-            <span className="text-red-500 dark:text-red-400 font-medium">
-              Merah = salah
-            </span>{" "}
-            ·{" "}
-            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-              Hijau = benar
-            </span>
-            .
-          </p>
-        </div>
-
         {/* Teks + romaji, items-end agar huruf non-kana sejajar di bawah */}
         <div className="flex flex-wrap items-end gap-x-0.5 gap-y-2">
           {units.map((unit, index) => {
@@ -566,24 +585,6 @@ export default function Reader({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Legend */}
-      <div className="flex items-center gap-3 text-xs text-muted select-none">
-        <span className="flex items-center gap-1">
-          <span className="inline-block w-6 text-center border-b border-indigo-400/60 text-foreground">
-            か
-          </span>
-          <span>= klik untuk melihat cara baca</span>
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="px-1.5 py-0.5 rounded-full bg-emerald-600/80 text-emerald-100 text-[10px] font-bold uppercase tracking-wide">
-            hiragana
-          </span>
-          <span className="px-1.5 py-0.5 rounded-full bg-violet-600/80 text-violet-100 text-[10px] font-bold uppercase tracking-wide">
-            katakana
-          </span>
-        </span>
-      </div>
-
       {/* Teks cerita */}
       <p className="text-3xl leading-14 tracking-wider font-medium overflow-visible">
         {units.map((unit, index) => {
