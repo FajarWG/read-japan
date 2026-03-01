@@ -57,6 +57,9 @@ export default function RootLayout({
           <LanguageProvider>
             <PageTransition>{children}</PageTransition>
             <BottomNav />
+            <p className="fixed bottom-1 left-0 right-0 text-center text-[10px] text-foreground/50 pointer-events-none select-none z-40">
+              © 2026 FajarWG &amp; Claude Sonnet 4.6
+            </p>
           </LanguageProvider>
         </ThemeProvider>
       </body>
