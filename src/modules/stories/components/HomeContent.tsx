@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { buttonVariants } from "@heroui/react";
 
-import { ThemeToggle } from "@/src/components/ThemeToggle";
-import { LanguageToggle } from "@/src/components/LanguageToggle";
-import { StoryPickerModal } from "@/src/components/StoryPickerModal";
-import { useLanguage } from "@/src/components/LanguageProvider";
+import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
+import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { StoryPickerModal } from "@/src/modules/stories/components/StoryPickerModal";
+import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
 // ─────────────────────────────────────────
 // Types

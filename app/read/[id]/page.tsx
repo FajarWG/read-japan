@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
-import { prisma } from "@/src/lib/db";
-import { ReadPageContent } from "@/src/components/ReadPageContent";
+import { prisma } from "@/src/shared/lib/db";
+import { ReadPageContent } from "@/src/modules/read/components/ReadPageContent";
 
 export async function generateMetadata({
   params,

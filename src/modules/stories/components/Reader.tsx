@@ -2,15 +2,15 @@
 
 import { useState, useCallback, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { parseJapaneseText } from "@/src/lib/parser";
-import type { ParsedUnit, KanaInfo } from "@/src/lib/parser";
+import { parseJapaneseText } from "@/src/shared/lib/parser";
+import type { ParsedUnit, KanaInfo } from "@/src/shared/lib/parser";
 import {
   recordClick,
   recordWrongReads,
   recordPerfectRead,
   recordStoryRead,
-} from "@/src/app/actions";
-import { useLanguage } from "@/src/components/LanguageProvider";
+} from "@/src/modules/stories/actions";
+import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
 type ReaderMode = "reading" | "review" | "result";
 

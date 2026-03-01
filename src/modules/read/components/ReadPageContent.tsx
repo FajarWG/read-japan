@@ -13,10 +13,10 @@ import {
   Tooltip,
 } from "@heroui/react";
 
-import Reader from "@/src/components/Reader";
-import { ThemeToggle } from "@/src/components/ThemeToggle";
-import { LanguageToggle } from "@/src/components/LanguageToggle";
-import { useLanguage } from "@/src/components/LanguageProvider";
+import Reader from "@/src/modules/stories/components/Reader";
+import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
+import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
 // ─────────────────────────────────────────
 // Types

@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
-import { useLanguage } from "@/src/components/LanguageProvider";
+import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
 export function BottomNav() {
   const pathname = usePathname();

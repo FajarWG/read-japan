@@ -1,10 +1,10 @@
 "use client";
 
-import { ThemeToggle } from "@/src/components/ThemeToggle";
-import { LanguageToggle } from "@/src/components/LanguageToggle";
-import { useLanguage } from "@/src/components/LanguageProvider";
-import { kanaMap } from "@/src/lib/kana-map";
-import type { KanaEntry, KanaType } from "@/src/lib/kana-map";
+import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
+import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { kanaMap } from "@/src/modules/kana/lib/kana-map";
+import type { KanaEntry, KanaType } from "@/src/modules/kana/lib/kana-map";
 import { Tabs } from "@heroui/react";
 
 // ─────────────────────────────────────────

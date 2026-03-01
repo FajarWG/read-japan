@@ -1,4 +1,4 @@
-import { kanaMap, KanaEntry } from "./kana-map";
+import { kanaMap, KanaEntry } from "@/src/modules/kana/lib/kana-map";
 
 // ─────────────────────────────────────────
 // Types

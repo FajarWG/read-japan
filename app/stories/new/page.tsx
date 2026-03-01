@@ -29,10 +29,10 @@ import {
   createManyStories,
   type ActionState,
   type BatchStory,
-} from "@/src/app/stories/actions";
-import { ThemeToggle } from "@/src/components/ThemeToggle";
-import { LanguageToggle } from "@/src/components/LanguageToggle";
-import { useLanguage } from "@/src/components/LanguageProvider";
+} from "@/src/modules/stories/actions";
+import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
+import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
 // ─────────────────────────────────────────
 // JSON template untuk ditampilkan ke user

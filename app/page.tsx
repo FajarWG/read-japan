@@ -1,5 +1,5 @@
-import { prisma } from "@/src/lib/db";
-import { HomeContent } from "@/src/components/HomeContent";
+import { prisma } from "@/src/shared/lib/db";
+import { HomeContent } from "@/src/modules/stories/components/HomeContent";
 
 // Selalu render ulang setiap request agar data dari DB selalu fresh
 export const dynamic = "force-dynamic";

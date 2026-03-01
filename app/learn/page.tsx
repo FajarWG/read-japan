@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { prisma } from "@/src/lib/db";
-import { kanaMap } from "@/src/lib/kana-map";
-import { LearnContent } from "@/src/components/LearnContent";
+import { prisma } from "@/src/shared/lib/db";
+import { kanaMap } from "@/src/modules/kana/lib/kana-map";
+import { LearnContent } from "@/src/modules/learn/components/LearnContent";
 
 export const metadata: Metadata = { title: "Learning Progress" };
 

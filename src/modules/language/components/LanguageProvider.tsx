@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
-import { translations } from "@/src/lib/i18n";
-import type { Lang, Translations } from "@/src/lib/i18n";
+import { translations } from "@/src/modules/language/lib/i18n";
+import type { Lang, Translations } from "@/src/modules/language/lib/i18n";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Context
