@@ -9,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
   Chip,
+  Popover,
   Separator,
-  Tooltip,
 } from "@heroui/react";
 
 import Reader from "@/src/modules/stories/components/Reader";
@@ -102,8 +102,8 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
                 <CardTitle className="font-jp text-3xl font-bold leading-snug text-foreground">
                   {story.title}
                 </CardTitle>
-                <Tooltip delay={0}>
-                  <Tooltip.Trigger>
+                <Popover>
+                  <Popover.Trigger>
                     <button
                       type="button"
                       aria-label="Reading guide"
@@ -122,26 +122,30 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
                         />
                       </svg>
                     </button>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content className="max-w-72">
-                    <div className="flex flex-col gap-2 py-0.5">
-                      <div className="flex flex-col gap-0.5">
-                        <p className="text-xs font-semibold">
-                          {t.readingModeTitle}
-                        </p>
-                        <p className="text-xs text-muted">
-                          {t.readingModeDesc}
-                        </p>
+                  </Popover.Trigger>
+                  <Popover.Content className="max-w-72">
+                    <Popover.Dialog>
+                      <div className="flex flex-col gap-2 py-0.5">
+                        <div className="flex flex-col gap-0.5">
+                          <Popover.Heading className="text-xs font-semibold">
+                            {t.readingModeTitle}
+                          </Popover.Heading>
+                          <p className="text-xs text-muted">
+                            {t.readingModeDesc}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          <p className="text-xs font-semibold">
+                            {t.reviewModeTitle}
+                          </p>
+                          <p className="text-xs text-muted">
+                            {t.reviewModeDesc}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-0.5">
-                        <p className="text-xs font-semibold">
-                          {t.reviewModeTitle}
-                        </p>
-                        <p className="text-xs text-muted">{t.reviewModeDesc}</p>
-                      </div>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip>
+                    </Popover.Dialog>
+                  </Popover.Content>
+                </Popover>
               </div>
 
               {/* Meta badges */}
