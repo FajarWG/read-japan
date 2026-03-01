@@ -64,6 +64,14 @@ export const kanaMap: Record<string, KanaEntry> = {
   て: { romaji: "te", type: "hiragana" },
   と: { romaji: "to", type: "hiragana" },
 
+  // Sokuon (small tsu) — penanda konsonan ganda
+  っ: {
+    romaji: "(double)",
+    type: "hiragana",
+    origin: "つ",
+    explanation: "sokuon — doubles the next consonant",
+  },
+
   // D-row (dakuten dari T)
   だ: { romaji: "da", type: "hiragana", origin: "た", explanation: "dakuten" },
   ぢ: { romaji: "di", type: "hiragana", origin: "ち", explanation: "dakuten" },
@@ -423,6 +431,14 @@ export const kanaMap: Record<string, KanaEntry> = {
   ツ: { romaji: "tsu", type: "katakana" },
   テ: { romaji: "te", type: "katakana" },
   ト: { romaji: "to", type: "katakana" },
+
+  // Sokuon (small tsu) — penanda konsonan ganda
+  ッ: {
+    romaji: "(double)",
+    type: "katakana",
+    origin: "ツ",
+    explanation: "sokuon — doubles the next consonant",
+  },
 
   // D-row (dakuten dari T)
   ダ: { romaji: "da", type: "katakana", origin: "タ", explanation: "dakuten" },
