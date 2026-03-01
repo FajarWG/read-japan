@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useTransition, useEffect } from "react";
+import { useState, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Popover } from "@heroui/react";
 import { parseJapaneseText } from "@/src/shared/lib/parser";
@@ -209,7 +209,6 @@ function TranslationCard({
 interface ResultViewProps {
   units: ParsedUnit[];
   wrongIndices: Set<number>;
-  countdown: number;
   onGoHome: () => void;
   storyContent: string;
   translation?: string;
@@ -220,7 +219,6 @@ interface ResultViewProps {
     needsStudy: string;
     perfectScore: string;
     debtReduced: string;
-    countdownPrefix: string;
     goHomeNow: string;
     storyMeaning: string;
   };
@@ -229,7 +227,6 @@ interface ResultViewProps {
 function ResultView({
   units,
   wrongIndices,
-  countdown,
   onGoHome,
   storyContent,
   translation,
@@ -242,17 +239,6 @@ function ResultView({
   const score =
     totalKana > 0 ? Math.round((correctCount / totalKana) * 100) : 100;
 
-  const emoji =
-    score === 100
-      ? "🎉"
-      : score >= 80
-        ? "😊"
-        : score >= 60
-          ? "🙂"
-          : score >= 40
-            ? "😅"
-            : "💪";
-
   // Deduplicate wrong chars
   const wrongCharsMap = new Map<string, KanaInfo>();
   for (const idx of wrongIndices) {
@@ -264,26 +250,6 @@ function ResultView({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Score card */}
-      <div className="rounded-2xl border border-border bg-surface-muted px-6 py-6 flex flex-col items-center gap-2 text-center">
-        <span className="text-5xl leading-none">{emoji}</span>
-        <div className="text-5xl font-bold text-foreground mt-1">{score}%</div>
-        <p className="text-sm text-muted mt-0.5">
-          <strong className="text-foreground">{correctCount}</strong>{" "}
-          {t.resultOf} <strong className="text-foreground">{totalKana}</strong>{" "}
-          {t.kanaReadCorrectly}
-          {wrongCount > 0 && (
-            <>
-              {" "}
-              ·{" "}
-              <strong className="text-red-500 dark:text-red-400">
-                {wrongCount} {t.wrong}
-              </strong>
-            </>
-          )}
-        </p>
-      </div>
-
       {/* Wrong chars detail */}
       {wrongCharsMap.size > 0 && (
         <div className="rounded-2xl border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20 px-5 py-4">
@@ -313,6 +279,21 @@ function ResultView({
               </div>
             ))}
           </div>
+          <p className="text-sm text-muted mt-0.5 text-center">
+            <strong className="text-foreground">{correctCount}</strong>{" "}
+            {t.resultOf}{" "}
+            <strong className="text-foreground">{totalKana}</strong>{" "}
+            {t.kanaReadCorrectly}
+            {wrongCount > 0 && (
+              <>
+                {" "}
+                ·{" "}
+                <strong className="text-red-500 dark:text-red-400">
+                  {wrongCount} {t.wrong}
+                </strong>
+              </>
+            )}
+          </p>
         </div>
       )}
 
@@ -328,29 +309,8 @@ function ResultView({
         </div>
       )}
 
-      {/* Translation */}
-      {translation && (
-        <TranslationCard
-          content={storyContent}
-          translation={translation}
-          storyMeaning={t.storyMeaning}
-        />
-      )}
-
-      {/* Countdown + go home */}
-      <div className="flex flex-col items-center gap-3 pt-1">
-        {/* Progress bar */}
-        <div className="w-full h-1.5 rounded-full bg-border overflow-hidden">
-          <div
-            className="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-linear"
-            style={{ width: `${(countdown / 5) * 100}%` }}
-          />
-        </div>
-        <p className="text-sm text-muted">
-          {t.countdownPrefix}{" "}
-          <strong className="text-foreground tabular-nums">{countdown}</strong>
-          s…
-        </p>
+      {/* Go home */}
+      <div className="flex justify-center pt-1">
         <button
           type="button"
           onClick={onGoHome}
@@ -390,32 +350,7 @@ export default function Reader({
   const [wrongIndices, setWrongIndices] = useState<Set<number>>(new Set());
   const [isSubmitting, startSubmitTransition] = useTransition();
 
-  // Result mode: countdown to redirect
-  const [countdown, setCountdown] = useState(5);
-
   const units = parseJapaneseText(storyContent);
-
-  // Hitung mundur dan redirect ke beranda setelah result
-  useEffect(() => {
-    if (mode !== "result") return;
-    setCountdown(5);
-    const interval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [mode]);
-
-  useEffect(() => {
-    if (mode === "result" && countdown === 0) {
-      router.push("/");
-    }
-  }, [countdown, mode, router]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -471,7 +406,6 @@ export default function Reader({
       <ResultView
         units={units}
         wrongIndices={wrongIndices}
-        countdown={countdown}
         onGoHome={() => router.push("/")}
         storyContent={storyContent}
         translation={translation}
@@ -482,7 +416,6 @@ export default function Reader({
           needsStudy: t.needsStudy,
           perfectScore: t.perfectScore,
           debtReduced: t.debtReduced,
-          countdownPrefix: t.countdownPrefix,
           goHomeNow: t.goHomeNow,
           storyMeaning: t.storyMeaning,
         }}
