@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/src/shared/lib/db";
+import { getSession } from "@/src/shared/lib/session";
 
 // ─────────────────────────────────────────
 // Types
@@ -78,10 +79,13 @@ export async function recordStoryRead(storyId: number): Promise<void> {
 }
 
 export async function recordClick(char: string): Promise<void> {
+  const session = await getSession();
+  if (!session) return; // guest: handled client-side via localStorage
+
   await prisma.learningProgress.upsert({
-    where: { character: char },
+    where: { character_userId: { character: char, userId: session.id } },
     update: { clickCount: { increment: 1 } },
-    create: { character: char, clickCount: 1 },
+    create: { character: char, clickCount: 1, userId: session.id },
   });
   revalidatePath("/learn");
   revalidatePath("/");
@@ -89,12 +93,20 @@ export async function recordClick(char: string): Promise<void> {
 
 export async function recordWrongReads(chars: string[]): Promise<void> {
   if (chars.length === 0) return;
+  const session = await getSession();
+  if (!session) return; // guest: handled client-side
+
   await Promise.all(
     chars.map((char) =>
       prisma.learningProgress.upsert({
-        where: { character: char },
+        where: { character_userId: { character: char, userId: session.id } },
         update: { wrongCount: { increment: 1 } },
-        create: { character: char, clickCount: 0, wrongCount: 1 },
+        create: {
+          character: char,
+          clickCount: 0,
+          wrongCount: 1,
+          userId: session.id,
+        },
       }),
     ),
   );
@@ -104,9 +116,11 @@ export async function recordWrongReads(chars: string[]): Promise<void> {
 
 export async function recordPerfectRead(chars: string[]): Promise<void> {
   if (chars.length === 0) return;
+  const session = await getSession();
+  if (!session) return; // guest: handled client-side
 
   const records = await prisma.learningProgress.findMany({
-    where: { character: { in: chars } },
+    where: { character: { in: chars }, userId: session.id },
     select: { character: true, clickCount: true, wrongCount: true },
   });
 
@@ -115,12 +129,16 @@ export async function recordPerfectRead(chars: string[]): Promise<void> {
     .map((r) => {
       if (r.wrongCount > 0) {
         return prisma.learningProgress.update({
-          where: { character: r.character },
+          where: {
+            character_userId: { character: r.character, userId: session.id },
+          },
           data: { wrongCount: { decrement: 1 } },
         });
       }
       return prisma.learningProgress.update({
-        where: { character: r.character },
+        where: {
+          character_userId: { character: r.character, userId: session.id },
+        },
         data: { clickCount: { decrement: 1 } },
       });
     });

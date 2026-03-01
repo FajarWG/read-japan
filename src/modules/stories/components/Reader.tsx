@@ -12,6 +12,12 @@ import {
   recordStoryRead,
 } from "@/src/modules/stories/actions";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { useAuth } from "@/src/modules/auth/components/AuthProvider";
+import {
+  recordGuestClick,
+  recordGuestWrong,
+  recordGuestPerfect,
+} from "@/src/shared/lib/guest-progress";
 
 type ReaderMode = "reading" | "review" | "result";
 
@@ -22,9 +28,11 @@ type ReaderMode = "reading" | "review" | "result";
 interface KanaTokenProps {
   unit: ParsedUnit;
   fromLabel: string;
+  /** Called when the popover opens — records a click (DB or localStorage) */
+  onRecordOpen: (char: string) => void;
 }
 
-function KanaToken({ unit, fromLabel }: KanaTokenProps) {
+function KanaToken({ unit, fromLabel, onRecordOpen }: KanaTokenProps) {
   const [isPending, startClickTransition] = useTransition();
   const info = unit.info!;
 
@@ -34,9 +42,9 @@ function KanaToken({ unit, fromLabel }: KanaTokenProps) {
         if (!open) return;
         startClickTransition(async () => {
           try {
-            await recordClick(unit.char);
+            await onRecordOpen(unit.char);
           } catch (err) {
-            console.error("[recordClick] gagal:", err);
+            console.error("[KanaToken] recordOpen gagal:", err);
           }
         });
       }}
@@ -341,6 +349,8 @@ export default function Reader({
 }: ReaderProps) {
   const router = useRouter();
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const isGuest = !user;
   const [mode, setMode] = useState<ReaderMode>("reading");
 
   // Transition for recording story read
@@ -363,9 +373,25 @@ export default function Reader({
     });
   }, []);
 
+  /**
+   * Called when a kana token popover opens.
+   * Guest → localStorage, logged-in → server action.
+   */
+  const handleKanaRecord = useCallback(
+    async (char: string) => {
+      if (isGuest) {
+        recordGuestClick(char);
+      } else {
+        await recordClick(char);
+      }
+    },
+    [isGuest],
+  );
+
   const handleFinishReading = () => {
     setWrongIndices(new Set());
     setMode("review");
+    // Always record story read to DB (global counter)
     startRecordTransition(async () => {
       try {
         await recordStoryRead(storyId);
@@ -383,10 +409,21 @@ export default function Reader({
     const allKanaChars = [
       ...new Set(units.filter((u) => u.info).map((u) => u.char)),
     ];
+
+    if (isGuest) {
+      // Guest: synchronous localStorage update
+      if (wrongChars.length === 0) {
+        recordGuestPerfect(allKanaChars);
+      } else {
+        recordGuestWrong(wrongChars);
+      }
+      setMode("result");
+      return;
+    }
+
     startSubmitTransition(async () => {
       try {
         if (wrongChars.length === 0) {
-          // Skor sempurna — bayar hutang untuk semua kana di cerita ini
           await recordPerfectRead(allKanaChars);
         } else {
           await recordWrongReads(wrongChars);
@@ -543,7 +580,14 @@ export default function Reader({
               </span>
             );
           }
-          return <KanaToken key={index} unit={unit} fromLabel={t.fromOrigin} />;
+          return (
+            <KanaToken
+              key={index}
+              unit={unit}
+              fromLabel={t.fromOrigin}
+              onRecordOpen={handleKanaRecord}
+            />
+          );
         })}
       </p>
 

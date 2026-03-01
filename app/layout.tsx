@@ -3,8 +3,10 @@ import { Geist, Geist_Mono, Noto_Serif_JP } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/src/modules/theme/components/ThemeProvider";
 import { LanguageProvider } from "@/src/modules/language/components/LanguageProvider";
+import { AuthProvider } from "@/src/modules/auth/components/AuthProvider";
 import { BottomNav } from "@/src/shared/components/BottomNav";
 import { PageTransition } from "@/src/shared/components/PageTransition";
+import { getSession } from "@/src/shared/lib/session";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,11 +35,12 @@ export const metadata: Metadata = {
     "Latihan membaca teks Jepang dengan Hiragana dan Katakana. Klik huruf untuk melihat cara bacanya.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getSession();
   return (
     <html lang="ja" suppressHydrationWarning>
       <head>
@@ -55,11 +58,13 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <LanguageProvider>
-            <PageTransition>{children}</PageTransition>
-            <BottomNav />
-            <p className="fixed bottom-1 left-0 right-0 text-center text-[10px] text-foreground/50 pointer-events-none select-none z-40">
-              © 2026 FajarWG &amp; Claude Sonnet 4.6
-            </p>
+            <AuthProvider user={user}>
+              <PageTransition>{children}</PageTransition>
+              <BottomNav />
+              <p className="fixed bottom-1 left-0 right-0 text-center text-[10px] text-foreground/50 pointer-events-none select-none z-40">
+                © 2026 FajarWG &amp; Claude Sonnet 4.6
+              </p>
+            </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

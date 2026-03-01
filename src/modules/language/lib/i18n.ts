@@ -2,8 +2,32 @@ export type Lang = "en" | "id";
 
 export const translations = {
   en: {
+    // ── Auth ────────────────────────────────────────────────
+    authWelcome: "Welcome to Read Japan",
+    authSubtitle: "Log in or create an account to save your progress.",
+    authLogin: "Login",
+    authRegister: "Register",
+    authLogout: "Logout",
+    authUsername: "Username",
+    authName: "Display Name",
+    authPassword: "Password",
+    authUsernameHint: "Min. 3 characters, lowercase",
+    authPasswordHint: "Min. 6 characters",
+    authShow: "Show",
+    authHide: "Hide",
+    authLoggingIn: "Logging in\u2026",
+    authRegistering: "Registering\u2026",
+    authOr: "or",
+    authContinueGuest: "Continue without login",
+    authGuestWarning:
+      "Guest data is stored in this browser only and will be lost if you clear browser data. We recommend logging in.",
+    authGuestModeTitle: "Guest Mode",
+    authGuestModeDesc:
+      "Your progress is stored in this browser only \u2014 it will be lost if you clear browser data.",
+    authLoginRecommended: "Log in to save permanently.",
+
     // ── Common ──────────────────────────────────────────────
-    home: "🏠 Home",
+    home: "\uD83C\uDFE0 Home",
     back: "← Back",
     cancel: "Cancel",
     admin: "Admin",
@@ -121,8 +145,32 @@ export const translations = {
     serverError: "A server error occurred.",
   },
   id: {
+    // ── Auth ────────────────────────────────────────────────
+    authWelcome: "Selamat Datang di Read Japan",
+    authSubtitle: "Masuk atau daftar untuk menyimpan progresmu.",
+    authLogin: "Masuk",
+    authRegister: "Daftar",
+    authLogout: "Keluar",
+    authUsername: "Username",
+    authName: "Nama Tampilan",
+    authPassword: "Password",
+    authUsernameHint: "Min. 3 karakter, huruf kecil",
+    authPasswordHint: "Min. 6 karakter",
+    authShow: "Tampilkan",
+    authHide: "Sembunyikan",
+    authLoggingIn: "Sedang masuk\u2026",
+    authRegistering: "Sedang mendaftar\u2026",
+    authOr: "atau",
+    authContinueGuest: "Lanjut tanpa login",
+    authGuestWarning:
+      "Data tamu hanya tersimpan di browser ini dan akan hilang jika browser dibersihkan. Kami sarankan untuk login.",
+    authGuestModeTitle: "Mode Tamu",
+    authGuestModeDesc:
+      "Progresmu hanya tersimpan di browser ini \u2014 akan hilang jika browser dibersihkan.",
+    authLoginRecommended: "Login untuk simpan secara permanen.",
+
     // ── Common ──────────────────────────────────────────────
-    home: "🏠 Beranda",
+    home: "\uD83C\uDFE0 Beranda",
     back: "← Kembali",
     cancel: "Batal",
     admin: "Admin",

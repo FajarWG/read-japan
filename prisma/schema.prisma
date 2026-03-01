@@ -32,14 +32,40 @@ model Story {
 }
 
 // ─────────────────────────────────────────
+// Enum: Role
+// ─────────────────────────────────────────
+enum Role {
+  USER
+  ADMIN
+}
+
+// ─────────────────────────────────────────
+// Tabel: User
+// ─────────────────────────────────────────
+model User {
+  id        Int                @id @default(autoincrement())
+  username  String             @unique
+  name      String
+  password  String
+  role      Role               @default(USER)
+  createdAt DateTime           @default(now())
+  progress  LearningProgress[]
+}
+
+// ─────────────────────────────────────────
 // Tabel: LearningProgress
 // Melacak seberapa sering pengguna mengklik
 // / mempelajari sebuah karakter kana.
+// userId nullable: NULL = data lama (legacy), non-null = per-user.
 // ─────────────────────────────────────────
 model LearningProgress {
   id         Int      @id @default(autoincrement())
-  character  String   @unique   // kana character, e.g. 'あ', 'キャ'
+  character  String   // kana character, e.g. 'あ', 'キャ'
   clickCount Int      @default(0)
-  wrongCount Int      @default(0)  // berapa kali ditandai salah baca
+  wrongCount Int      @default(0) // berapa kali ditandai salah baca
   lastSeen   DateTime @default(now()) @updatedAt
+  userId     Int?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([character, userId])
 }

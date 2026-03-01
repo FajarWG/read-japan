@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { buttonVariants } from "@heroui/react";
 
 import { kanaMap } from "@/src/modules/kana/lib/kana-map";
 import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
 import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { getGuestProgress } from "@/src/shared/lib/guest-progress";
 
 // ─────────────────────────────────────────
 // Types
@@ -25,6 +27,7 @@ interface LearnContentProps {
   totalWrong: number;
   totalDebt: number;
   hasWrong: boolean;
+  isGuest: boolean;
 }
 
 // ─────────────────────────────────────────
@@ -78,13 +81,45 @@ function KanaProgressCard({ record }: { record: ProgressRecord }) {
 // ─────────────────────────────────────────
 
 export function LearnContent({
-  enriched,
-  totalClicks,
-  totalWrong,
-  totalDebt,
-  hasWrong,
+  enriched: enrichedProp,
+  totalClicks: totalClicksProp,
+  totalWrong: totalWrongProp,
+  totalDebt: totalDebtProp,
+  hasWrong: hasWrongProp,
+  isGuest,
 }: LearnContentProps) {
   const { t } = useLanguage();
+
+  // For guest mode: compute enriched from localStorage on mount
+  const [enriched, setEnriched] = useState<ProgressRecord[]>(enrichedProp);
+  const [totalClicks, setTotalClicks] = useState(totalClicksProp);
+  const [totalWrong, setTotalWrong] = useState(totalWrongProp);
+  const [totalDebt, setTotalDebt] = useState(totalDebtProp);
+  const [hasWrong, setHasWrong] = useState(hasWrongProp);
+
+  useEffect(() => {
+    if (!isGuest) return;
+    const map = getGuestProgress();
+    const records: ProgressRecord[] = Object.entries(map)
+      .filter(([, v]) => v.clickCount > 0 || v.wrongCount > 0)
+      .map(([char, v]) => ({
+        character: char,
+        clickCount: v.clickCount,
+        wrongCount: v.wrongCount,
+        info: kanaMap[char] ?? null,
+      }))
+      .sort(
+        (a, b) => b.wrongCount - a.wrongCount || b.clickCount - a.clickCount,
+      );
+
+    const tc = records.reduce((s, r) => s + r.clickCount, 0);
+    const tw = records.reduce((s, r) => s + r.wrongCount, 0);
+    setEnriched(records);
+    setTotalClicks(tc);
+    setTotalWrong(tw);
+    setTotalDebt(tc + tw);
+    setHasWrong(records.some((r) => r.wrongCount > 0));
+  }, [isGuest]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">

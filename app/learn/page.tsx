@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/src/shared/lib/db";
 import { kanaMap } from "@/src/modules/kana/lib/kana-map";
 import { LearnContent } from "@/src/modules/learn/components/LearnContent";
+import { getSession } from "@/src/shared/lib/session";
 
 export const metadata: Metadata = { title: "Learning Progress" };
 
@@ -9,8 +10,27 @@ export const metadata: Metadata = { title: "Learning Progress" };
 export const dynamic = "force-dynamic";
 
 export default async function LearnPage() {
+  const session = await getSession();
+
+  // Guest: pass empty data — LearnContent will read localStorage client-side
+  if (!session) {
+    return (
+      <LearnContent
+        enriched={[]}
+        totalClicks={0}
+        totalWrong={0}
+        totalDebt={0}
+        hasWrong={false}
+        isGuest={true}
+      />
+    );
+  }
+
   const records = await prisma.learningProgress.findMany({
-    where: { OR: [{ clickCount: { gt: 0 } }, { wrongCount: { gt: 0 } }] },
+    where: {
+      userId: session.id,
+      OR: [{ clickCount: { gt: 0 } }, { wrongCount: { gt: 0 } }],
+    },
     orderBy: [{ wrongCount: "desc" }, { clickCount: "desc" }],
   });
 
@@ -31,6 +51,7 @@ export default async function LearnPage() {
       totalWrong={totalWrong}
       totalDebt={totalDebt}
       hasWrong={hasWrong}
+      isGuest={false}
     />
   );
 }

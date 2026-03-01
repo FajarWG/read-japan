@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { buttonVariants } from "@heroui/react";
+import { useEffect, useState, useTransition } from "react";
+import { buttonVariants, Chip } from "@heroui/react";
 
 import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
 import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
 import { StoryPickerModal } from "@/src/modules/stories/components/StoryPickerModal";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { useAuth } from "@/src/modules/auth/components/AuthProvider";
+import { logoutAction } from "@/src/modules/auth/actions";
+import { getGuestStats } from "@/src/shared/lib/guest-progress";
 
 // ─────────────────────────────────────────
 // Types
@@ -26,6 +30,7 @@ interface HomeContentProps {
   totalClicks: number;
   totalWrong: number;
   totalDebt: number;
+  isGuest: boolean;
 }
 
 // ─────────────────────────────────────────
@@ -37,6 +42,76 @@ function countKana(text: string): number {
 }
 
 // ─────────────────────────────────────────
+// GuestStatsRow — reads from localStorage on client
+// ─────────────────────────────────────────
+
+function GuestStatsRow() {
+  const { t } = useLanguage();
+  const [stats, setStats] = useState({
+    totalClicks: 0,
+    totalWrong: 0,
+    totalDebt: 0,
+  });
+
+  useEffect(() => {
+    setStats(getGuestStats());
+  }, []);
+
+  if (stats.totalClicks === 0 && stats.totalWrong === 0) return null;
+
+  return (
+    <div className="mb-7 grid grid-cols-3 gap-3">
+      <div className="rounded-xl border border-border bg-surface px-3 py-3 text-center shadow-sm">
+        <p className="text-2xl font-bold tabular-nums text-foreground">
+          {stats.totalClicks}
+        </p>
+        <p className="mt-0.5 text-[11px] text-muted">{t.totalClicks}</p>
+      </div>
+      <div
+        className={[
+          "rounded-xl border px-3 py-3 text-center shadow-sm",
+          stats.totalWrong > 0
+            ? "border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20"
+            : "border-border bg-surface",
+        ].join(" ")}
+      >
+        <p
+          className={[
+            "text-2xl font-bold tabular-nums",
+            stats.totalWrong > 0
+              ? "text-red-600 dark:text-red-400"
+              : "text-foreground",
+          ].join(" ")}
+        >
+          {stats.totalWrong}
+        </p>
+        <p className="mt-0.5 text-[11px] text-muted">{t.totalWrong}</p>
+      </div>
+      <div
+        className={[
+          "rounded-xl border px-3 py-3 text-center shadow-sm",
+          stats.totalDebt > 0
+            ? "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20"
+            : "border-border bg-surface",
+        ].join(" ")}
+      >
+        <p
+          className={[
+            "text-2xl font-bold tabular-nums",
+            stats.totalDebt > 0
+              ? "text-amber-600 dark:text-amber-400"
+              : "text-foreground",
+          ].join(" ")}
+        >
+          {stats.totalDebt}
+        </p>
+        <p className="mt-0.5 text-[11px] text-muted">{t.clicksPlusWrong}</p>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────
 
@@ -45,8 +120,17 @@ export function HomeContent({
   totalClicks,
   totalWrong,
   totalDebt,
+  isGuest,
 }: HomeContentProps) {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const [, startLogout] = useTransition();
+
+  const handleLogout = () => {
+    startLogout(async () => {
+      await logoutAction();
+    });
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
@@ -69,24 +153,83 @@ export function HomeContent({
             <div className="flex items-center gap-2">
               <LanguageToggle />
               <ThemeToggle />
-              <Link
-                href="/stories/new"
-                className={buttonVariants({
-                  variant: "primary",
-                  size: "sm",
-                  className: "shrink-0",
-                })}
-              >
-                {t.addStory}
-              </Link>
+
+              {/* Guest → Login button */}
+              {isGuest && (
+                <Link
+                  href="/login"
+                  className={buttonVariants({
+                    variant: "primary",
+                    size: "sm",
+                    className: "shrink-0",
+                  })}
+                >
+                  {t.authLogin}
+                </Link>
+              )}
+
+              {/* Admin → Add Story */}
+              {user?.role === "ADMIN" && (
+                <Link
+                  href="/stories/new"
+                  className={buttonVariants({
+                    variant: "primary",
+                    size: "sm",
+                    className: "shrink-0",
+                  })}
+                >
+                  {t.addStory}
+                </Link>
+              )}
+
+              {/* Logged-in user → avatar + logout */}
+              {user && (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 hover:bg-surface-muted transition-colors"
+                  title={t.authLogout}
+                >
+                  <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                    {user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="hidden sm:block text-xs font-medium text-foreground max-w-20 truncate">
+                    {user.name}
+                  </span>
+                  {user.role === "ADMIN" && (
+                    <Chip
+                      size="sm"
+                      variant="soft"
+                      className="hidden sm:flex text-[9px] h-4 px-1.5"
+                    >
+                      {t.admin}
+                    </Chip>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </header>
 
         {/* ── Main ────────────────────────────────────────── */}
         <main className="px-4 py-8">
-          {/* Stats row */}
-          {totalClicks > 0 && (
+          {/* Guest warning banner */}
+          {isGuest && (
+            <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/20 px-4 py-3 flex flex-col gap-1">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                ⚠️ {t.authGuestModeTitle}
+              </p>
+              <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                {t.authGuestModeDesc}{" "}
+                <Link href="/login" className="underline font-medium">
+                  {t.authLoginRecommended}
+                </Link>
+              </p>
+            </div>
+          )}
+
+          {/* Stats row — DB stats for logged-in */}
+          {!isGuest && totalClicks > 0 && (
             <div className="mb-7 grid grid-cols-3 gap-3">
               <div className="rounded-xl border border-border bg-surface px-3 py-3 text-center shadow-sm">
                 <p className="text-2xl font-bold tabular-nums text-foreground">
@@ -140,6 +283,9 @@ export function HomeContent({
               </div>
             </div>
           )}
+
+          {/* Stats row — localStorage for guest */}
+          {isGuest && <GuestStatsRow />}
 
           {/* Start Reading CTA */}
           {stories.length > 0 && (
@@ -202,12 +348,14 @@ export function HomeContent({
                 </p>
                 <p className="text-sm text-muted">{t.noStoriesDesc}</p>
               </div>
-              <Link
-                href="/stories/new"
-                className={buttonVariants({ variant: "primary" })}
-              >
-                {t.addFirstStory}
-              </Link>
+              {user?.role === "ADMIN" && (
+                <Link
+                  href="/stories/new"
+                  className={buttonVariants({ variant: "primary" })}
+                >
+                  {t.addFirstStory}
+                </Link>
+              )}
             </div>
           )}
 
