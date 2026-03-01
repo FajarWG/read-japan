@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Button, Popover } from "@heroui/react";
 import { parseJapaneseText } from "@/src/shared/lib/parser";
 import type { ParsedUnit, KanaInfo } from "@/src/shared/lib/parser";
 import {
@@ -15,106 +16,82 @@ import { useLanguage } from "@/src/modules/language/components/LanguageProvider"
 type ReaderMode = "reading" | "review" | "result";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// KanaPopover — kartu info (reading mode)
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface KanaPopoverProps {
-  info: KanaInfo;
-  onStopPropagation: (e: React.MouseEvent) => void;
-  fromLabel: string;
-}
-
-function KanaPopover({ info, onStopPropagation, fromLabel }: KanaPopoverProps) {
-  return (
-    <span
-      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 flex flex-col items-center pointer-events-auto"
-      onClick={onStopPropagation}
-    >
-      <span className="bg-gray-900 rounded-2xl shadow-2xl px-4 py-3 min-w-max flex flex-col items-center gap-1.5 text-white border border-white/10">
-        <span className="text-2xl font-bold tracking-widest text-indigo-300 leading-none">
-          {info.romaji}
-        </span>
-        <span
-          className={[
-            "text-[10px] font-bold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full",
-            info.type === "hiragana"
-              ? "bg-emerald-600/80 text-emerald-100"
-              : "bg-violet-600/80 text-violet-100",
-          ].join(" ")}
-        >
-          {info.type}
-        </span>
-        {info.origin && (
-          <span className="flex items-center gap-1 text-xs text-gray-400">
-            <span>{fromLabel}</span>
-            <span className="text-yellow-300 font-bold text-base leading-none">
-              {info.origin}
-            </span>
-          </span>
-        )}
-        {info.explanation && (
-          <span className="text-[11px] text-gray-400 italic">
-            {info.explanation}
-          </span>
-        )}
-      </span>
-      <span className="w-3 h-3 bg-gray-900 rotate-45 -mt-1.5 rounded-sm border-r border-b border-white/10" />
-    </span>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // KanaToken — satu huruf kana (reading mode)
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface KanaTokenProps {
   unit: ParsedUnit;
-  index: number;
-  isActive: boolean;
-  isPendingThis: boolean;
-  onToggle: (index: number, unit: ParsedUnit, e: React.MouseEvent) => void;
   fromLabel: string;
 }
 
-function KanaToken({
-  unit,
-  index,
-  isActive,
-  isPendingThis,
-  onToggle,
-  fromLabel,
-}: KanaTokenProps) {
+function KanaToken({ unit, fromLabel }: KanaTokenProps) {
+  const [isPending, startClickTransition] = useTransition();
   const info = unit.info!;
+
   return (
-    <span className="relative inline-block">
-      <button
-        type="button"
-        aria-expanded={isActive}
-        aria-label={`${unit.char} (${info.romaji})`}
-        onClick={(e) => onToggle(index, unit, e)}
-        className={[
-          "relative cursor-pointer select-none rounded px-0.5",
-          "transition-all duration-100",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-1",
-          isPendingThis && "opacity-60",
-          isActive
-            ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
-            : "hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 text-foreground",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      >
-        {unit.char}
-        <span className="absolute bottom-0 left-0 right-0 h-px bg-indigo-400/60 rounded" />
-      </button>
-      {isActive && (
-        <KanaPopover
-          info={info}
-          onStopPropagation={(e) => e.stopPropagation()}
-          fromLabel={fromLabel}
-        />
-      )}
-    </span>
+    <Popover
+      onOpenChange={(open) => {
+        if (!open) return;
+        startClickTransition(async () => {
+          try {
+            await recordClick(unit.char);
+          } catch (err) {
+            console.error("[recordClick] gagal:", err);
+          }
+        });
+      }}
+    >
+      <Popover.Trigger className="inline-flex">
+        <button
+          type="button"
+          aria-label={`${unit.char} (${info.romaji})`}
+          className={[
+            "relative cursor-pointer select-none rounded px-0.5",
+            "transition-all duration-100",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-1",
+            isPending ? "opacity-60" : "",
+            "hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 text-foreground",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {unit.char}
+          <span className="absolute bottom-0 left-0 right-0 h-px bg-indigo-400/60 rounded" />
+        </button>
+      </Popover.Trigger>
+      <Popover.Content className="max-w-52" placement="top">
+        <Popover.Dialog>
+          <Popover.Heading className="text-2xl font-bold tracking-widest text-indigo-500 dark:text-indigo-300 text-center">
+            {info.romaji}
+          </Popover.Heading>
+          <div className="mt-2 flex flex-col items-center gap-2">
+            <span
+              className={[
+                "text-[10px] font-bold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full",
+                info.type === "hiragana"
+                  ? "bg-emerald-600/80 text-emerald-100"
+                  : "bg-violet-600/80 text-violet-100",
+              ].join(" ")}
+            >
+              {info.type}
+            </span>
+            {info.origin && (
+              <span className="flex items-center gap-1 text-xs text-muted">
+                <span>{fromLabel}</span>
+                <span className="text-yellow-500 dark:text-yellow-300 font-bold text-base leading-none">
+                  {info.origin}
+                </span>
+              </span>
+            )}
+            {info.explanation && (
+              <span className="text-[11px] text-muted italic text-center">
+                {info.explanation}
+              </span>
+            )}
+          </div>
+        </Popover.Dialog>
+      </Popover.Content>
+    </Popover>
   );
 }
 
@@ -406,10 +383,8 @@ export default function Reader({
   const { t } = useLanguage();
   const [mode, setMode] = useState<ReaderMode>("reading");
 
-  // Reading mode state
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [pendingIndex, setPendingIndex] = useState<number | null>(null);
-  const [isPending, startTransition] = useTransition();
+  // Transition for recording story read
+  const [, startRecordTransition] = useTransition();
 
   // Review mode state — Set of indices the user marked as wrong
   const [wrongIndices, setWrongIndices] = useState<Set<number>>(new Set());
@@ -419,14 +394,6 @@ export default function Reader({
   const [countdown, setCountdown] = useState(5);
 
   const units = parseJapaneseText(storyContent);
-
-  // Tutup popover saat klik di luar (reading mode saja)
-  useEffect(() => {
-    if (mode !== "reading" || activeIndex === null) return;
-    const close = () => setActiveIndex(null);
-    document.addEventListener("click", close);
-    return () => document.removeEventListener("click", close);
-  }, [activeIndex, mode]);
 
   // Hitung mundur dan redirect ke beranda setelah result
   useEffect(() => {
@@ -452,24 +419,6 @@ export default function Reader({
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
-  const handleTogglePopover = useCallback(
-    (index: number, unit: ParsedUnit, e: React.MouseEvent) => {
-      e.stopPropagation();
-      setActiveIndex((prev) => (prev === index ? null : index));
-      setPendingIndex(index);
-      startTransition(async () => {
-        try {
-          await recordClick(unit.char);
-        } catch (err) {
-          console.error("[recordClick] gagal:", err);
-        } finally {
-          setPendingIndex(null);
-        }
-      });
-    },
-    [],
-  );
-
   const handleToggleWrong = useCallback((index: number) => {
     setWrongIndices((prev) => {
       const next = new Set(prev);
@@ -480,10 +429,9 @@ export default function Reader({
   }, []);
 
   const handleFinishReading = () => {
-    setActiveIndex(null);
     setWrongIndices(new Set());
     setMode("review");
-    startTransition(async () => {
+    startRecordTransition(async () => {
       try {
         await recordStoryRead(storyId);
       } catch (err) {
@@ -662,17 +610,7 @@ export default function Reader({
               </span>
             );
           }
-          return (
-            <KanaToken
-              key={index}
-              unit={unit}
-              index={index}
-              isActive={activeIndex === index}
-              isPendingThis={isPending && pendingIndex === index}
-              onToggle={handleTogglePopover}
-              fromLabel={t.fromOrigin}
-            />
-          );
+          return <KanaToken key={index} unit={unit} fromLabel={t.fromOrigin} />;
         })}
       </p>
 
