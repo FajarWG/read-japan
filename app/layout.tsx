@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/src/modules/theme/components/ThemeProvider";
 import { LanguageProvider } from "@/src/modules/language/components/LanguageProvider";
 import { BottomNav } from "@/src/shared/components/BottomNav";
+import { PageTransition } from "@/src/shared/components/PageTransition";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,7 +55,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <LanguageProvider>
-            {children}
+            <PageTransition>{children}</PageTransition>
             <BottomNav />
           </LanguageProvider>
         </ThemeProvider>

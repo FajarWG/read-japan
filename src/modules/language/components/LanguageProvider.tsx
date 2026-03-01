@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { translations } from "@/src/modules/language/lib/i18n";
 import type { Lang, Translations } from "@/src/modules/language/lib/i18n";
 
@@ -24,14 +24,16 @@ const LanguageContext = createContext<LanguageContextValue>({
 // Provider
 // ─────────────────────────────────────────────────────────────────────────────
 
-function getInitialLang(): Lang {
-  if (typeof window === "undefined") return "en";
-  const stored = localStorage.getItem("lang");
-  return stored === "en" || stored === "id" ? stored : "en";
-}
-
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Lang>(getInitialLang);
+  // Always start with "en" to match SSR, then sync from localStorage after hydration
+  const [lang, setLang] = useState<Lang>("en");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("lang");
+    if (stored === "en" || stored === "id") {
+      setLang(stored);
+    }
+  }, []);
 
   const toggleLang = () => {
     setLang((prev) => {
