@@ -5,7 +5,6 @@ import { createContext, useContext } from "react";
 export type SessionUser = {
   id: number;
   username: string;
-  name: string;
   role: "USER" | "ADMIN";
 };
 

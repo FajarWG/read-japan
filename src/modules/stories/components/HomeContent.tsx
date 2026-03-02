@@ -191,10 +191,10 @@ export function HomeContent({
                   title={t.authLogout}
                 >
                   <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                    {user.name.charAt(0).toUpperCase()}
+                    {user.username.charAt(0).toUpperCase()}
                   </div>
                   <span className="hidden sm:block text-xs font-medium text-foreground max-w-20 truncate">
-                    {user.name}
+                    {user.username}
                   </span>
                   {user.role === "ADMIN" && (
                     <Chip

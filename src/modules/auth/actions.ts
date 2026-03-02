@@ -19,14 +19,16 @@ export async function loginAction(
   _prev: AuthResult,
   formData: FormData,
 ): Promise<AuthResult> {
-  const username = (formData.get("username") as string)?.trim().toLowerCase();
+  const username = (formData.get("username") as string)?.trim();
   const password = formData.get("password") as string;
 
   if (!username || !password) {
     return { success: false, error: "Username dan password wajib diisi." };
   }
 
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findFirst({
+    where: { username: { equals: username, mode: "insensitive" } },
+  });
   if (!user) {
     return { success: false, error: "Username atau password salah." };
   }
@@ -39,7 +41,6 @@ export async function loginAction(
   await createSession({
     id: user.id,
     username: user.username,
-    name: user.name,
     role: user.role,
   });
 
@@ -54,12 +55,11 @@ export async function registerAction(
   _prev: AuthResult,
   formData: FormData,
 ): Promise<AuthResult> {
-  const username = (formData.get("username") as string)?.trim().toLowerCase();
-  const name = (formData.get("name") as string)?.trim();
+  const username = (formData.get("username") as string)?.trim();
   const password = formData.get("password") as string;
 
-  if (!username || !name || !password) {
-    return { success: false, error: "Semua field wajib diisi." };
+  if (!username || !password) {
+    return { success: false, error: "Username dan password wajib diisi." };
   }
   if (username.length < 3) {
     return { success: false, error: "Username minimal 3 karakter." };
@@ -68,20 +68,21 @@ export async function registerAction(
     return { success: false, error: "Password minimal 6 karakter." };
   }
 
-  const existing = await prisma.user.findUnique({ where: { username } });
+  const existing = await prisma.user.findFirst({
+    where: { username: { equals: username, mode: "insensitive" } },
+  });
   if (existing) {
     return { success: false, error: "Username sudah digunakan." };
   }
 
   const hashed = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
-    data: { username, name, password: hashed },
+    data: { username, password: hashed },
   });
 
   await createSession({
     id: user.id,
     username: user.username,
-    name: user.name,
     role: user.role,
   });
 
