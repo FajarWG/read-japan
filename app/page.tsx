@@ -38,7 +38,7 @@ export default async function Home() {
 
   return (
     <HomeContent
-      recommendedStories={stories.slice(0, 3)}
+      recommendedStories={stories.slice(0, 2)}
       stories={stories}
       totalClicks={totalClicks}
       totalWrong={totalWrong}
