@@ -8,6 +8,7 @@ import { BottomNav } from "@/src/shared/components/BottomNav";
 import { PageTransition } from "@/src/shared/components/PageTransition";
 import { OnboardingGuide } from "@/src/modules/onboarding/components/OnboardingGuide";
 import { getSession } from "@/src/shared/lib/session";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -116,6 +117,7 @@ export default async function RootLayout({
             </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
