@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/src/modules/language/components/LanguageProv
 import { AuthProvider } from "@/src/modules/auth/components/AuthProvider";
 import { BottomNav } from "@/src/shared/components/BottomNav";
 import { PageTransition } from "@/src/shared/components/PageTransition";
+import { OnboardingGuide } from "@/src/modules/onboarding/components/OnboardingGuide";
 import { getSession } from "@/src/shared/lib/session";
 
 const geistSans = Geist({
@@ -61,6 +62,7 @@ export default async function RootLayout({
             <AuthProvider user={user}>
               <PageTransition>{children}</PageTransition>
               <BottomNav />
+              <OnboardingGuide />
               <p className="fixed bottom-1 left-0 right-0 text-center text-[10px] text-foreground/50 pointer-events-none select-none z-40">
                 © 2026 FajarWG &amp; Claude Sonnet 4.6
               </p>

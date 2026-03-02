@@ -13,7 +13,6 @@ import {
   Input,
   FieldError,
   Separator,
-  Tabs,
 } from "@heroui/react";
 import { loginAction, registerAction } from "@/src/modules/auth/actions";
 import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
@@ -41,6 +40,7 @@ export function LoginPageContent() {
 
   const [showPass, setShowPass] = useState(false);
   const [showPassReg, setShowPassReg] = useState(false);
+  const [mode, setMode] = useState<"login" | "register">("login");
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12">
@@ -71,172 +71,218 @@ export function LoginPageContent() {
         </CardHeader>
 
         <CardContent className="px-6 pb-6">
-          <Tabs className="w-full mt-2">
-            <Tabs.ListContainer>
-              <Tabs.List
-                aria-label="Mode autentikasi"
-                className="w-full *:flex-1 *:h-8 *:text-sm *:font-medium *:data-[selected=true]:text-accent-foreground"
+          {/* ── Custom tab switcher ── */}
+          <div className="flex border-b border-border mt-2 mb-1">
+            <button
+              type="button"
+              onClick={() => setMode("login")}
+              className={[
+                "relative flex-1 py-2.5 text-sm font-medium transition-colors duration-200",
+                mode === "login"
+                  ? "text-foreground"
+                  : "text-muted hover:text-foreground/80",
+              ].join(" ")}
+            >
+              {t.authLogin}
+              <span
+                className={[
+                  "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-accent transition-opacity duration-200",
+                  mode === "login" ? "opacity-100" : "opacity-0",
+                ].join(" ")}
+              />
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("register")}
+              className={[
+                "relative flex-1 py-2.5 text-sm font-medium transition-colors duration-200",
+                mode === "register"
+                  ? "text-foreground"
+                  : "text-muted hover:text-foreground/80",
+              ].join(" ")}
+            >
+              {t.authRegister}
+              <span
+                className={[
+                  "absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-accent transition-opacity duration-200",
+                  mode === "register" ? "opacity-100" : "opacity-0",
+                ].join(" ")}
+              />
+            </button>
+          </div>
+
+          {/* ── Sliding panels ── */}
+          <div className="overflow-hidden">
+            <div
+              className="grid transition-transform duration-300 ease-in-out"
+              style={{
+                gridTemplateColumns: "repeat(2, 100%)",
+                transform:
+                  mode === "login" ? "translateX(0)" : "translateX(-50%)",
+              }}
+            >
+              {/* ── Login panel ── */}
+              <div
+                className="pt-4"
+                aria-hidden={mode !== "login"}
+                style={{ pointerEvents: mode === "login" ? "auto" : "none" }}
               >
-                <Tabs.Tab id="login">
-                  {t.authLogin}
-                  <Tabs.Indicator className="bg-accent" />
-                </Tabs.Tab>
-                <Tabs.Tab id="register">
-                  {t.authRegister}
-                  <Tabs.Indicator className="bg-accent" />
-                </Tabs.Tab>
-              </Tabs.List>
-            </Tabs.ListContainer>
-
-            {/* ── Login tab ── */}
-            <Tabs.Panel id="login" className="pt-4">
-              <form action={loginDispatch} className="flex flex-col gap-4">
-                <TextField
-                  name="username"
-                  fullWidth
-                  className="flex flex-col gap-1.5"
-                >
-                  <Label className="text-sm font-medium text-foreground">
-                    {t.authUsername}
-                  </Label>
-                  <Input
-                    placeholder="contoh: fajar123"
-                    autoComplete="username"
-                    autoCapitalize="none"
-                    required
-                    className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  />
-                  <FieldError className="text-xs text-red-500" />
-                </TextField>
-
-                <TextField
-                  name="password"
-                  fullWidth
-                  className="flex flex-col gap-1.5"
-                >
-                  <Label className="text-sm font-medium text-foreground">
-                    {t.authPassword}
-                  </Label>
-                  <div className="relative">
+                <form action={loginDispatch} className="flex flex-col gap-4">
+                  <TextField
+                    name="username"
+                    fullWidth
+                    className="flex flex-col gap-1.5"
+                  >
+                    <Label className="text-sm font-medium text-foreground">
+                      {t.authUsername}
+                    </Label>
                     <Input
-                      placeholder="••••••••"
-                      type={showPass ? "text" : "password"}
-                      autoComplete="current-password"
+                      placeholder="contoh: fajar123"
+                      autoComplete="username"
+                      autoCapitalize="none"
                       required
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 pr-16 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPass((p) => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-foreground transition-colors"
-                    >
-                      {showPass ? t.authHide : t.authShow}
-                    </button>
-                  </div>
-                  <FieldError className="text-xs text-red-500" />
-                </TextField>
+                    <FieldError className="text-xs text-red-500" />
+                  </TextField>
 
-                {!loginResult.success && loginResult.error && (
-                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
-                    ⚠️ {loginResult.error}
-                  </div>
-                )}
+                  <TextField
+                    name="password"
+                    fullWidth
+                    className="flex flex-col gap-1.5"
+                  >
+                    <Label className="text-sm font-medium text-foreground">
+                      {t.authPassword}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        placeholder="••••••••"
+                        type={showPass ? "text" : "password"}
+                        autoComplete="current-password"
+                        required
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 pr-16 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPass((p) => !p)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-foreground transition-colors"
+                      >
+                        {showPass ? t.authHide : t.authShow}
+                      </button>
+                    </div>
+                    <FieldError className="text-xs text-red-500" />
+                  </TextField>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  isDisabled={loginPending}
-                  className="w-full"
-                >
-                  {loginPending ? t.authLoggingIn : t.authLogin}
-                </Button>
-              </form>
-            </Tabs.Panel>
+                  {!loginResult.success && loginResult.error && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
+                      ⚠️ {loginResult.error}
+                    </div>
+                  )}
 
-            {/* ── Register tab ── */}
-            <Tabs.Panel id="register" className="pt-4">
-              <form action={registerDispatch} className="flex flex-col gap-4">
-                <TextField
-                  name="name"
-                  fullWidth
-                  className="flex flex-col gap-1.5"
-                >
-                  <Label className="text-sm font-medium text-foreground">
-                    {t.authName}
-                  </Label>
-                  <Input
-                    placeholder="contoh: Fajar"
-                    autoComplete="name"
-                    required
-                    className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  />
-                  <FieldError className="text-xs text-red-500" />
-                </TextField>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    isDisabled={loginPending}
+                    className="w-full"
+                  >
+                    {loginPending ? t.authLoggingIn : t.authLogin}
+                  </Button>
+                </form>
+              </div>
 
-                <TextField
-                  name="username"
-                  fullWidth
-                  className="flex flex-col gap-1.5"
-                >
-                  <Label className="text-sm font-medium text-foreground">
-                    {t.authUsername}
-                  </Label>
-                  <Input
-                    placeholder="contoh: fajar123"
-                    autoComplete="username"
-                    autoCapitalize="none"
-                    required
-                    className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  />
-                  <p className="text-[11px] text-muted">{t.authUsernameHint}</p>
-                  <FieldError className="text-xs text-red-500" />
-                </TextField>
-
-                <TextField
-                  name="password"
-                  fullWidth
-                  className="flex flex-col gap-1.5"
-                >
-                  <Label className="text-sm font-medium text-foreground">
-                    {t.authPassword}
-                  </Label>
-                  <div className="relative">
+              {/* ── Register panel ── */}
+              <div
+                className="pt-4"
+                aria-hidden={mode !== "register"}
+                style={{ pointerEvents: mode === "register" ? "auto" : "none" }}
+              >
+                <form action={registerDispatch} className="flex flex-col gap-4">
+                  <TextField
+                    name="name"
+                    fullWidth
+                    className="flex flex-col gap-1.5"
+                  >
+                    <Label className="text-sm font-medium text-foreground">
+                      {t.authName}
+                    </Label>
                     <Input
-                      placeholder="••••••••"
-                      type={showPassReg ? "text" : "password"}
-                      autoComplete="new-password"
+                      placeholder="contoh: Fajar"
+                      autoComplete="name"
                       required
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 pr-16 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassReg((p) => !p)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-foreground transition-colors"
-                    >
-                      {showPassReg ? t.authHide : t.authShow}
-                    </button>
-                  </div>
-                  <p className="text-[11px] text-muted">{t.authPasswordHint}</p>
-                  <FieldError className="text-xs text-red-500" />
-                </TextField>
+                    <FieldError className="text-xs text-red-500" />
+                  </TextField>
 
-                {!registerResult.success && registerResult.error && (
-                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
-                    ⚠️ {registerResult.error}
-                  </div>
-                )}
+                  <TextField
+                    name="username"
+                    fullWidth
+                    className="flex flex-col gap-1.5"
+                  >
+                    <Label className="text-sm font-medium text-foreground">
+                      {t.authUsername}
+                    </Label>
+                    <Input
+                      placeholder="contoh: fajar123"
+                      autoComplete="username"
+                      autoCapitalize="none"
+                      required
+                      className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    />
+                    <p className="text-[11px] text-muted">
+                      {t.authUsernameHint}
+                    </p>
+                    <FieldError className="text-xs text-red-500" />
+                  </TextField>
 
-                <Button
-                  type="submit"
-                  variant="primary"
-                  isDisabled={registerPending}
-                  className="w-full"
-                >
-                  {registerPending ? t.authRegistering : t.authRegister}
-                </Button>
-              </form>
-            </Tabs.Panel>
-          </Tabs>
+                  <TextField
+                    name="password"
+                    fullWidth
+                    className="flex flex-col gap-1.5"
+                  >
+                    <Label className="text-sm font-medium text-foreground">
+                      {t.authPassword}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        placeholder="••••••••"
+                        type={showPassReg ? "text" : "password"}
+                        autoComplete="new-password"
+                        required
+                        className="w-full rounded-xl border border-border bg-background px-3 py-2 pr-16 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassReg((p) => !p)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-foreground transition-colors"
+                      >
+                        {showPassReg ? t.authHide : t.authShow}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-muted">
+                      {t.authPasswordHint}
+                    </p>
+                    <FieldError className="text-xs text-red-500" />
+                  </TextField>
+
+                  {!registerResult.success && registerResult.error && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
+                      ⚠️ {registerResult.error}
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    isDisabled={registerPending}
+                    className="w-full"
+                  >
+                    {registerPending ? t.authRegistering : t.authRegister}
+                  </Button>
+                </form>
+              </div>
+            </div>
+          </div>
 
           {/* Divider */}
           <div className="my-5 flex items-center gap-3">

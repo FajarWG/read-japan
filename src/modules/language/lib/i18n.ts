@@ -143,6 +143,29 @@ export const translations = {
     jsonMissingTitle: "Item {n}: field 'title' is required.",
     jsonMissingContent: "Item {n}: field 'content' is required.",
     serverError: "A server error occurred.",
+
+    // ── Onboarding ────────────────────────────────────────────────────
+    onboardingSlide1Title: "Welcome to Read Japan! \uD83D\uDC4B",
+    onboardingSlide1Desc:
+      "Practice reading Japanese Hiragana & Katakana through real stories. It\u2019s free and works without an account.",
+    onboardingSlide2Title: "Reading Mode \uD83D\uDCDA",
+    onboardingSlide2Desc:
+      "Tap underlined kana characters to see their reading. Every tap is tracked automatically so you can review later.",
+    onboardingSlide3Title: "Review Mode \u2705",
+    onboardingSlide3Desc:
+      "After finishing a story, mark the characters you misread. Results are saved \u2014 the app builds your personal review list.",
+    onboardingSlide4Title: "Track Your Progress \uD83D\uDCCA",
+    onboardingSlide4Desc:
+      "The Progress tab shows every kana you\u2019ve looked up and highlights those needing more practice.",
+    onboardingSlide5Title: "Save Your Progress \uD83D\uDD10",
+    onboardingSlide5Desc:
+      "Guest data lives only in this browser. Log in to sync your progress to the cloud and access it anywhere.",
+    onboardingDontShow: "Don\u2019t show again",
+    onboardingNext: "Next \u2192",
+    onboardingBack: "\u2190 Back",
+    onboardingStart: "Start Learning!",
+    onboardingGuide: "Guide",
+    onboardingClose: "Close",
   },
   id: {
     // ── Auth ────────────────────────────────────────────────
@@ -289,6 +312,29 @@ export const translations = {
     jsonMissingTitle: "Item ke-{n}: field 'title' wajib diisi.",
     jsonMissingContent: "Item ke-{n}: field 'content' wajib diisi.",
     serverError: "Terjadi kesalahan server.",
+
+    // ── Onboarding ────────────────────────────────────────────────────
+    onboardingSlide1Title: "Selamat Datang di Read Japan! \uD83D\uDC4B",
+    onboardingSlide1Desc:
+      "Latihan membaca Hiragana & Katakana Jepang melalui cerita nyata. Gratis dan bisa dipakai tanpa akun.",
+    onboardingSlide2Title: "Mode Membaca \uD83D\uDCDA",
+    onboardingSlide2Desc:
+      "Tap huruf kana yang bergaris bawah untuk melihat cara bacanya. Setiap tap dicatat otomatis agar bisa direview.",
+    onboardingSlide3Title: "Mode Review \u2705",
+    onboardingSlide3Desc:
+      "Setelah selesai membaca, tandai huruf yang salah baca. Hasilnya tersimpan \u2014 app akan membuat daftar review pribadimu.",
+    onboardingSlide4Title: "Lacak Progresmu \uD83D\uDCCA",
+    onboardingSlide4Desc:
+      "Tab Progres menampilkan semua kana yang pernah kamu buka dan menyoroti yang perlu lebih banyak latihan.",
+    onboardingSlide5Title: "Simpan Progresmu \uD83D\uDD10",
+    onboardingSlide5Desc:
+      "Data tamu hanya tersimpan di browser ini. Login untuk menyinkronkan progres ke cloud dan akses dari mana saja.",
+    onboardingDontShow: "Jangan tampilkan lagi",
+    onboardingNext: "Selanjutnya \u2192",
+    onboardingBack: "\u2190 Kembali",
+    onboardingStart: "Mulai Belajar!",
+    onboardingGuide: "Panduan",
+    onboardingClose: "Tutup",
   },
 } as const;
 

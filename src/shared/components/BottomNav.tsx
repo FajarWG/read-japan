@@ -21,6 +21,9 @@ export function BottomNav() {
       ? "kana"
       : "home";
 
+  // Hide on auth pages
+  if (pathname === "/login" || pathname === "/register") return null;
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-6 pointer-events-none">
       <div className="pointer-events-auto">
