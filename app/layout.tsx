@@ -27,13 +27,60 @@ const notoSerifJP = Noto_Serif_JP({
   display: "swap",
 });
 
+const BASE_URL = "https://read-japan.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: {
     template: "%s | Read Japan",
     default: "Read Japan — Belajar Baca Hiragana & Katakana",
   },
   description:
-    "Latihan membaca teks Jepang dengan Hiragana dan Katakana. Klik huruf untuk melihat cara bacanya.",
+    "Aplikasi web gratis untuk latihan membaca Hiragana dan Katakana bahasa Jepang. Baca cerita pendek, klik huruf untuk melihat cara bacanya, dan lacak progres belajarmu.",
+  keywords: [
+    "belajar hiragana",
+    "belajar katakana",
+    "belajar bahasa Jepang",
+    "latihan membaca Jepang",
+    "hiragana online",
+    "katakana online",
+    "Japanese reading practice",
+    "learn Japanese",
+    "read Japan",
+    "aplikasi belajar Jepang",
+  ],
+  authors: [{ name: "FajarWG", url: "https://github.com/fajarwg" }],
+  creator: "FajarWG",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    alternateLocale: "en_US",
+    url: BASE_URL,
+    siteName: "Read Japan",
+    title: "Read Japan — Belajar Baca Hiragana & Katakana",
+    description:
+      "Aplikasi web gratis untuk latihan membaca Hiragana dan Katakana bahasa Jepang. Baca cerita pendek dan lacak progres belajarmu.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Read Japan — Belajar Baca Hiragana & Katakana",
+    description:
+      "Aplikasi web gratis untuk latihan membaca Hiragana dan Katakana bahasa Jepang.",
+    creator: "@fajarwg",
+  },
+  alternates: {
+    canonical: BASE_URL,
+  },
 };
 
 export default async function RootLayout({
@@ -43,7 +90,7 @@ export default async function RootLayout({
 }>) {
   const user = await getSession();
   return (
-    <html lang="ja" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <head>
         {/* Prevent flash of wrong theme — runs before React hydration */}
         <script

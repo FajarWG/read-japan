@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import { prisma } from "@/src/shared/lib/db";
 import { HomeContent } from "@/src/modules/stories/components/HomeContent";
 import { getSession } from "@/src/shared/lib/session";
 
 // Selalu render ulang setiap request agar data dari DB selalu fresh
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Read Japan — Belajar Baca Hiragana & Katakana",
+  description:
+    "Aplikasi web gratis untuk latihan membaca Hiragana dan Katakana bahasa Jepang. Baca cerita pendek, klik huruf untuk melihat cara bacanya, dan lacak progres belajarmu.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default async function Home() {
   const session = await getSession();

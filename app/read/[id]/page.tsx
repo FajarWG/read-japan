@@ -15,11 +15,25 @@ export async function generateMetadata({
 
   const story = await prisma.story.findUnique({
     where: { id },
-    select: { title: true },
+    select: { title: true, content: true },
   });
 
+  if (!story) return {};
+
+  const preview = story.content.slice(0, 100).replace(/\n/g, " ");
+
   return {
-    title: story?.title ?? "Story not found",
+    title: story.title,
+    description: `Baca dan latihan kana dari cerita "${story.title}". ${preview}…`,
+    openGraph: {
+      title: `${story.title} | Read Japan`,
+      description: `Latihan membaca kana dari cerita: ${story.title}`,
+      type: "article",
+      url: `/read/${id}`,
+    },
+    alternates: {
+      canonical: `/read/${id}`,
+    },
   };
 }
 
