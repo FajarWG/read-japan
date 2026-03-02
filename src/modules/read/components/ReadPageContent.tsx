@@ -99,7 +99,7 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
             {/* Card header */}
             <CardHeader className="px-8 pt-8 pb-4 flex flex-col gap-3">
               <div className="flex items-start justify-between gap-3">
-                <CardTitle className="font-jp text-3xl font-bold leading-snug text-foreground">
+                <CardTitle className="font-jp text-xl lg:text-3xl font-bold leading-snug text-foreground">
                   {story.title}
                 </CardTitle>
                 <Popover>
@@ -168,7 +168,7 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
                   <Chip
                     variant="soft"
                     size="sm"
-                    className="bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 font-medium font-jp text-xs"
+                    className="bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 font-medium font-jp text-xs max-w-[16ch] sm:max-w-none truncate"
                   >
                     🎯 {story.focus}
                   </Chip>

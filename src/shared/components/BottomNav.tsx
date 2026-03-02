@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
@@ -8,6 +9,31 @@ export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useLanguage();
+
+  // ── Scroll-hide logic ─────────────────────────────────────────────────────
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      const goingDown = currentY > lastScrollY.current;
+      lastScrollY.current = currentY;
+
+      if (timerRef.current) clearTimeout(timerRef.current);
+
+      timerRef.current = setTimeout(() => {
+        setVisible(!goingDown);
+      }, 500);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const NAV_ITEMS = [
     { id: "home", route: "/", label: t.navStories },
@@ -25,7 +51,14 @@ export function BottomNav() {
   if (pathname === "/login" || pathname === "/register") return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-6 pointer-events-none">
+    <div
+      className={[
+        "fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-6 pointer-events-none",
+        "transition-transform duration-500 ease-in-out",
+        visible ? "translate-y-0" : "translate-y-[calc(100%+1.5rem)]",
+      ].join(" ")}
+    >
+      {" "}
       <div className="pointer-events-auto">
         <Tabs
           selectedKey={selectedKey}

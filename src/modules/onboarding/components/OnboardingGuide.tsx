@@ -34,8 +34,30 @@ export function OnboardingGuide() {
   const { t } = useLanguage();
   const pathname = usePathname();
   const [step, setStep] = useState(0);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [logoLoading, setLogoLoading] = useState(true);
+  const [navVisible, setNavVisible] = useState(true);
   // Ref on the FAB so we can auto-open the HeroUI modal on first visit
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const lastScrollY = useRef(0);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      const goingDown = currentY > lastScrollY.current;
+      lastScrollY.current = currentY;
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => {
+        setNavVisible(!goingDown);
+      }, 500);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+    };
+  }, []);
 
   // ── Slide definitions ──────────────────────────────────────────────────────
   //
@@ -92,8 +114,16 @@ export function OnboardingGuide() {
     }
   }, []);
 
+  // Reset loading state whenever the slide (and its image) changes
+  useEffect(() => {
+    if (current.imageSrc) setImageLoading(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
   function handleOpen() {
     setStep(0);
+    setImageLoading(true);
+    setLogoLoading(true);
   }
 
   function handleDontShow() {
@@ -119,8 +149,9 @@ export function OnboardingGuide() {
           type="button"
           aria-label={t.creditsAbout}
           className={[
-            "fixed bottom-6 right-[calc(1rem+0.5rem)] z-50 flex items-center justify-center rounded-2xl bg-surface border border-border shadow-lg w-8 h-8 text-sm font-bold text-muted hover:text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-150",
+            "fixed bottom-25 md:bottom-6.5 right-[calc(1rem+0.5rem)] z-50 flex items-center justify-center rounded-2xl bg-surface border border-border shadow-lg w-8 h-8 text-sm font-bold text-muted hover:text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-500 ease-in-out",
             hideOnPage ? "hidden" : "",
+            navVisible ? "translate-y-0" : "translate-y-[calc(100%+6rem)]",
           ].join(" ")}
         >
           ?
@@ -133,13 +164,19 @@ export function OnboardingGuide() {
 
               <Modal.Body className="px-6 pt-8 pb-4 flex flex-col gap-5">
                 {/* Logo / brand */}
-                <Image
-                  src="/logo.png"
-                  alt="Read Japan logo"
-                  width={120}
-                  height={120}
-                  className="mx-auto"
-                />
+                <div className="relative w-[120px] h-[120px] mx-auto">
+                  {logoLoading && (
+                    <div className="absolute inset-0 rounded-xl bg-surface-muted animate-pulse" />
+                  )}
+                  <Image
+                    src="/logo.png"
+                    alt="Read Japan logo"
+                    width={120}
+                    height={120}
+                    className={`transition-opacity duration-300 ${logoLoading ? "opacity-0" : "opacity-100"}`}
+                    onLoad={() => setLogoLoading(false)}
+                  />
+                </div>
 
                 <p className="text-sm text-muted leading-relaxed text-center">
                   {t.creditsProjectDesc}
@@ -209,8 +246,9 @@ export function OnboardingGuide() {
           onClick={handleOpen}
           aria-label={t.onboardingGuide}
           className={[
-            "fixed bottom-5.5 right-18 z-50 flex items-center gap-1.5 rounded-2xl bg-surface border border-border shadow-lg px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-150",
+            "fixed bottom-24 md:bottom-6 right-18 z-50 flex items-center gap-1.5 rounded-2xl bg-surface border border-border shadow-lg px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-500 ease-in-out",
             hideOnPage ? "hidden" : "",
+            navVisible ? "translate-y-0" : "translate-y-[calc(100%+6rem)]",
           ].join(" ")}
         >
           {/* Book icon */}
@@ -238,18 +276,21 @@ export function OnboardingGuide() {
               <div className="px-6 pt-7">
                 <div className="mb-5 h-44 w-full shadow-sm border overflow-hidden rounded-xl bg-surface-muted flex items-center justify-center relative">
                   {current.imageSrc ? (
-                    /*
-                     * Once you add the image file under /public/onboarding/,
-                     * uncomment the imageSrc line in the slides array above.
-                     * The <Image> fills the 176px-tall container.
-                     */
-                    <Image
-                      src={current.imageSrc}
-                      alt={current.imageAlt ?? current.title}
-                      fill
-                      className="object-cover "
-                      sizes="(max-width: 640px) 100vw, 249px"
-                    />
+                    <>
+                      {imageLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-surface-muted">
+                          <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-border border-t-accent" />
+                        </div>
+                      )}
+                      <Image
+                        src={current.imageSrc}
+                        alt={current.imageAlt ?? current.title}
+                        fill
+                        className={`object-cover transition-opacity duration-300 ${imageLoading ? "opacity-0" : "opacity-100"}`}
+                        sizes="(max-width: 640px) 100vw, 249px"
+                        onLoad={() => setImageLoading(false)}
+                      />
+                    </>
                   ) : (
                     <span className="text-6xl select-none">
                       {current.emoji}

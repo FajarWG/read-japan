@@ -69,7 +69,7 @@ function KanaToken({ unit, fromLabel, onRecordOpen }: KanaTokenProps) {
       </Popover.Trigger>
       <Popover.Content className="max-w-52" placement="top">
         <Popover.Dialog>
-          <Popover.Heading className="text-2xl font-bold tracking-widest text-indigo-500 dark:text-indigo-300 text-center">
+          <Popover.Heading className="text-xl font-bold tracking-widest text-indigo-500 dark:text-indigo-300 text-center">
             {info.romaji}
           </Popover.Heading>
           <div className="mt-2 flex flex-col items-center gap-2">
@@ -150,7 +150,7 @@ function ReviewKanaToken({
       {/* Kana di bawah */}
       <span
         className={[
-          "text-3xl leading-tight font-jp",
+          "text-xl md:text-3xl leading-tight font-jp",
           isWrong ? "text-red-600 dark:text-red-300" : "text-foreground",
         ].join(" ")}
       >
@@ -189,7 +189,7 @@ function TranslationCard({
     .map((s) => s + ".");
 
   return (
-    <div className="rounded-2xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50 dark:bg-indigo-950/20 px-5 py-4">
+    <div className="rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50 dark:bg-indigo-950/20 px-5 py-4">
       <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-400 mb-3">
         📝 {storyMeaning}
       </p>
@@ -260,7 +260,7 @@ function ResultView({
     <div className="flex flex-col gap-5">
       {/* Wrong chars detail */}
       {wrongCharsMap.size > 0 && (
-        <div className="rounded-2xl border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20 px-5 py-4">
+        <div className="rounded-xl border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20 px-5 py-4">
           <p className="text-sm font-semibold text-red-700 dark:text-red-400 mb-3">
             📚 {t.needsStudy}
           </p>
@@ -273,7 +273,7 @@ function ResultView({
                 <span className="text-[11px] font-bold text-indigo-500 dark:text-indigo-400 leading-none pb-0.5">
                   {info.romaji}
                 </span>
-                <span className="text-2xl font-jp leading-snug">{char}</span>
+                <span className="text-xl font-jp leading-snug">{char}</span>
                 <span
                   className={[
                     "text-[9px] font-bold uppercase tracking-wide mt-1 px-1.5 py-0.5 rounded-full",
@@ -307,7 +307,7 @@ function ResultView({
 
       {/* Perfect score */}
       {wrongCount === 0 && (
-        <div className="rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 px-5 py-4 text-center flex flex-col gap-1">
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 px-5 py-4 text-center flex flex-col gap-1">
           <p className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
             🌟 {t.perfectScore}
           </p>
@@ -498,7 +498,7 @@ export default function Reader({
                     return (
                       <span
                         key={globalIndex}
-                        className="text-3xl text-foreground font-jp leading-tight pb-0.5"
+                        className="text-xl md:text-3xl text-foreground font-jp leading-tight pb-0.5"
                       >
                         {unit.char}
                       </span>
@@ -571,7 +571,7 @@ export default function Reader({
   return (
     <div className="flex flex-col gap-5">
       {/* Teks cerita */}
-      <p className="text-3xl leading-14 tracking-wider font-medium overflow-visible">
+      <p className="text-xl md:text-3xl leading-14 tracking-wider font-medium overflow-visible">
         {units.map((unit, index) => {
           if (!unit.info) {
             return (

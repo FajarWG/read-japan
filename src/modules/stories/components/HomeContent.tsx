@@ -227,7 +227,7 @@ export function HomeContent({
 
                   {/* Dropdown */}
                   {userMenuOpen && (
-                    <div className="absolute right-0 top-full mt-1.5 z-50 min-w-36 rounded-xl border border-border bg-surface shadow-xl py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="absolute right-0 top-full mt-1.5 z-50 min-w-36 rounded-xl border border-border bg-white shadow-xl py-1 animate-in fade-in slide-in-from-top-1 duration-150">
                       <div className="px-3 py-2 border-b border-border">
                         <p className="text-[11px] text-muted truncate">
                           {user.username}
@@ -450,7 +450,7 @@ export function HomeContent({
                           ✍️ {countKana(story.content)} kana
                         </span>
                         {story.focus && (
-                          <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] font-medium text-accent">
+                          <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] font-medium text-accent max-w-[12ch] sm:max-w-none truncate">
                             {story.focus}
                           </span>
                         )}
