@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Modal, Button } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { LanguageToggle } from "../../language/components/LanguageToggle";
 
 const STORAGE_KEY = "rj-onboarding-seen";
 
@@ -55,43 +56,22 @@ export function OnboardingGuide() {
       emoji: "📖",
       title: t.onboardingSlide2Title,
       desc: t.onboardingSlide2Desc,
-      //
-      // ── Slide 2 image ─────────────────────────────────────────────────────
-      //  Content : Screenshot of the reading page with a kana tooltip visible.
-      //            Example: tap あ so the popup "a — hiragana" appears, then
-      //            take a screenshot.
-      //  File    : /public/onboarding/reading-mode.png  (800×440 px)
-      //
-      // imageSrc: "/onboarding/reading-mode.png",
-      imageSrc: undefined,
+
+      imageSrc: "/onboarding/reading-mode.png",
       imageAlt: "Reading mode — tap kana to see its reading",
     },
     {
       emoji: "✅",
       title: t.onboardingSlide3Title,
       desc: t.onboardingSlide3Desc,
-      //
-      // ── Slide 3 image ─────────────────────────────────────────────────────
-      //  Content : Screenshot of the review screen after finishing reading.
-      //            Show a couple of kana tapped/highlighted as "wrong".
-      //  File    : /public/onboarding/review-mode.png  (800×440 px)
-      //
-      // imageSrc: "/onboarding/review-mode.png",
-      imageSrc: undefined,
+      imageSrc: "/onboarding/review-mode.png",
       imageAlt: "Review mode — mark characters you misread",
     },
     {
       emoji: "📊",
       title: t.onboardingSlide4Title,
       desc: t.onboardingSlide4Desc,
-      //
-      // ── Slide 4 image ─────────────────────────────────────────────────────
-      //  Content : Screenshot of the Progress tab (/learn) showing the kana
-      //            table with clickCount and wrongCount columns visible.
-      //  File    : /public/onboarding/progress.png  (800×440 px)
-      //
-      // imageSrc: "/onboarding/progress.png",
-      imageSrc: undefined,
+      imageSrc: "/onboarding/progress.png",
       imageAlt: "Progress page — see which kana need practice",
     },
     {
@@ -140,7 +120,7 @@ export function OnboardingGuide() {
         onClick={handleOpen}
         aria-label={t.onboardingGuide}
         className={[
-          "fixed bottom-24 right-4 z-50 flex items-center gap-1.5 rounded-2xl bg-surface border border-border shadow-lg px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-150",
+          "fixed bottom-6 right-4 z-50 flex items-center gap-1.5 rounded-2xl bg-surface border border-border shadow-lg px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-150",
           hideOnPage ? "hidden" : "",
         ].join(" ")}
       >
@@ -160,11 +140,14 @@ export function OnboardingGuide() {
       <Modal.Backdrop>
         <Modal.Container>
           <Modal.Dialog className="max-w-md w-full">
+            <div className="absolute right-12 top-4 z-10 flex items-center gap-1">
+              <LanguageToggle />
+            </div>
             <Modal.CloseTrigger />
 
             {/* Slide image / emoji */}
             <div className="px-6 pt-7">
-              <div className="mb-5 h-44 w-full overflow-hidden rounded-xl bg-surface-muted flex items-center justify-center relative">
+              <div className="mb-5 h-44 w-full shadow-sm border overflow-hidden rounded-xl bg-surface-muted flex items-center justify-center relative">
                 {current.imageSrc ? (
                   /*
                    * Once you add the image file under /public/onboarding/,
@@ -175,8 +158,8 @@ export function OnboardingGuide() {
                     src={current.imageSrc}
                     alt={current.imageAlt ?? current.title}
                     fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, 448px"
+                    className="object-cover "
+                    sizes="(max-width: 640px) 100vw, 249px"
                   />
                 ) : (
                   <span className="text-6xl select-none">{current.emoji}</span>
@@ -212,7 +195,7 @@ export function OnboardingGuide() {
               </div>
             </Modal.Body>
 
-            <Modal.Footer className="flex flex-col gap-2 px-6 pb-5 pt-3">
+            <Modal.Footer className="flex flex-col gap-2 px-6  pt-3">
               {/* Back / Next row */}
               <div className="flex gap-2">
                 {step > 0 && (
