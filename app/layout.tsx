@@ -9,6 +9,7 @@ import { PageTransition } from "@/src/shared/components/PageTransition";
 import { OnboardingGuide } from "@/src/modules/onboarding/components/OnboardingGuide";
 import { getSession } from "@/src/shared/lib/session";
 import { Analytics } from "@vercel/analytics/next";
+import { ServiceWorkerRegistration } from "@/src/shared/components/ServiceWorkerRegistration";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -99,6 +100,30 @@ export default async function RootLayout({
             __html: `(function(){var t=localStorage.getItem('theme');var dark=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.classList.toggle('dark',dark);document.documentElement.setAttribute('data-theme',dark?'dark':'light');})();`,
           }}
         />
+        {/* PWA meta tags */}
+        <meta name="application-name" content="Read Japan" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Read Japan" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#dc2626" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="152x152"
+          href="/icons/icon-152x152.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/icons/icon-192x192.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="167x167"
+          href="/icons/icon-192x192.png"
+        />
       </head>
       <body
         className={`${
@@ -118,6 +143,7 @@ export default async function RootLayout({
           </LanguageProvider>
         </ThemeProvider>
         <Analytics />
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );
