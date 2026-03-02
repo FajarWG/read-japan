@@ -49,6 +49,8 @@ export const translations = {
     chooseStory: "📚 Choose Story",
     noStoriesTitle: "No stories yet",
     noStoriesDesc: "Start by adding your first story for reading practice.",
+    recommendedStories: "📖 Recommended Stories",
+    recommendedStoriesDesc: "Click a story to start reading",
 
     // ── Story Picker Modal ──────────────────────────────────
     storiesAvailable: "{n} stories available · sorted by least read",
@@ -166,6 +168,15 @@ export const translations = {
     onboardingStart: "Start Learning!",
     onboardingGuide: "Guide",
     onboardingClose: "Close",
+
+    // ── Credits / About ─────────────────────────────────────────
+    creditsAbout: "About",
+    creditsTitle: "About Read Japan",
+    creditsProjectDesc:
+      "An open-source web app to practice reading Japanese Hiragana & Katakana through real stories. Free, no ads, no tracking.",
+    creditsMadeBy: "Made by",
+    creditsContact: "Suggestions & feedback:",
+    creditsOpenSource: "Open Source on GitHub",
   },
   id: {
     // ── Auth ────────────────────────────────────────────────
@@ -216,6 +227,8 @@ export const translations = {
     noStoriesTitle: "Belum ada cerita",
     noStoriesDesc:
       "Mulai dengan menambah cerita pertama untuk latihan membaca.",
+    recommendedStories: "📖 Rekomendasi Cerita",
+    recommendedStoriesDesc: "Klik cerita untuk langsung mulai membaca",
 
     // ── Story Picker Modal ──────────────────────────────────
     storiesAvailable:
@@ -335,6 +348,15 @@ export const translations = {
     onboardingStart: "Mulai Belajar!",
     onboardingGuide: "Panduan",
     onboardingClose: "Tutup",
+
+    // ── Credits / About ─────────────────────────────────────────
+    creditsAbout: "Tentang",
+    creditsTitle: "Tentang Read Japan",
+    creditsProjectDesc:
+      "Aplikasi web open-source untuk latihan membaca Hiragana & Katakana Jepang lewat cerita nyata. Gratis, tanpa iklan, tanpa pelacakan.",
+    creditsMadeBy: "Dibuat oleh",
+    creditsContact: "Saran & masukan:",
+    creditsOpenSource: "Open Source di GitHub",
   },
 } as const;
 

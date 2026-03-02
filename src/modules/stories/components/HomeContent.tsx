@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { buttonVariants, Chip } from "@heroui/react";
 
 import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
@@ -26,6 +26,7 @@ export interface StoryRow {
 }
 
 interface HomeContentProps {
+  recommendedStories: StoryRow[];
   stories: StoryRow[];
   totalClicks: number;
   totalWrong: number;
@@ -116,6 +117,7 @@ function GuestStatsRow() {
 // ─────────────────────────────────────────
 
 export function HomeContent({
+  recommendedStories,
   stories,
   totalClicks,
   totalWrong,
@@ -125,8 +127,24 @@ export function HomeContent({
   const { t } = useLanguage();
   const { user } = useAuth();
   const [, startLogout] = useTransition();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node)
+      ) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
+    setUserMenuOpen(false);
     startLogout(async () => {
       await logoutAction();
     });
@@ -182,30 +200,71 @@ export function HomeContent({
                 </Link>
               )}
 
-              {/* Logged-in user → avatar + logout */}
+              {/* Logged-in user → avatar + popover menu */}
               {user && (
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 hover:bg-surface-muted transition-colors"
-                  title={t.authLogout}
-                >
-                  <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300 flex items-center justify-center text-[11px] font-bold shrink-0">
-                    {user.username.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="hidden sm:block text-xs font-medium text-foreground max-w-20 truncate">
-                    {user.username}
-                  </span>
-                  {user.role === "ADMIN" && (
-                    <Chip
-                      size="sm"
-                      variant="soft"
-                      className="hidden sm:flex text-[9px] h-4 px-1.5"
-                    >
-                      {t.admin}
-                    </Chip>
+                <div ref={userMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setUserMenuOpen((p) => !p)}
+                    className="flex items-center gap-1.5 rounded-xl px-2 py-1.5 hover:bg-surface-muted transition-colors"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      {user.username.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="hidden sm:block text-xs font-medium text-foreground max-w-20 truncate">
+                      {user.username}
+                    </span>
+                    {user.role === "ADMIN" && (
+                      <Chip
+                        size="sm"
+                        variant="soft"
+                        className="hidden sm:flex text-[9px] h-4 px-1.5"
+                      >
+                        {t.admin}
+                      </Chip>
+                    )}
+                  </button>
+
+                  {/* Dropdown */}
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-1.5 z-50 min-w-36 rounded-xl border border-border bg-surface shadow-xl py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                      <div className="px-3 py-2 border-b border-border">
+                        <p className="text-[11px] text-muted truncate">
+                          {user.username}
+                        </p>
+                        {user.role === "ADMIN" && (
+                          <p className="text-[10px] font-semibold text-accent uppercase tracking-wide mt-0.5">
+                            {t.admin}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-4 w-4 shrink-0"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
+                            clipRule="evenodd"
+                          />
+                          <path
+                            fillRule="evenodd"
+                            d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        {t.authLogout}
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
               )}
             </div>
           </div>
@@ -359,9 +418,65 @@ export function HomeContent({
             </div>
           )}
 
+          {/* Recommended stories list */}
+          {recommendedStories.length > 0 && (
+            <div className="mb-6">
+              <div className="mb-3 flex items-baseline justify-between">
+                <p className="text-sm font-semibold text-foreground">
+                  {t.recommendedStories}
+                </p>
+                <p className="text-xs text-muted">{t.recommendedStoriesDesc}</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {recommendedStories.map((story) => (
+                  <Link
+                    key={story.id}
+                    href={`/read/${story.id}`}
+                    className="group flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 shadow-sm transition-all duration-150 hover:border-accent/50 hover:bg-surface-muted hover:shadow-md"
+                  >
+                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <p className="font-jp text-sm font-semibold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                        {story.title}
+                      </p>
+                      <p className="font-jp text-xs text-muted line-clamp-1">
+                        {story.content}
+                      </p>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="text-[10px] text-muted">
+                          📖 {story.totalReads}
+                          {t.timesRead}
+                        </span>
+                        <span className="text-[10px] text-muted">
+                          ✍️ {countKana(story.content)} kana
+                        </span>
+                        {story.focus && (
+                          <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] font-medium text-accent">
+                            {story.focus}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="h-4 w-4 shrink-0 text-muted group-hover:text-accent transition-colors"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Pilih manual via modal */}
           {stories.length > 0 && (
-            <div className="flex justify-center">
+            <div className="flex justify-center -mt-2">
               <StoryPickerModal stories={stories} />
             </div>
           )}

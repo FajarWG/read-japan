@@ -112,142 +112,234 @@ export function OnboardingGuide() {
   const hideOnPage = pathname === "/login" || pathname === "/register";
 
   return (
-    <Modal>
-      {/* ── FAB trigger ─────────────────────────────────────────────────── */}
-      <Button
-        ref={triggerRef}
-        type="button"
-        onClick={handleOpen}
-        aria-label={t.onboardingGuide}
-        className={[
-          "fixed bottom-6 right-4 z-50 flex items-center gap-1.5 rounded-2xl bg-surface border border-border shadow-lg px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-150",
-          hideOnPage ? "hidden" : "",
-        ].join(" ")}
-      >
-        {/* Book icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="h-3.5 w-3.5 text-accent shrink-0"
+    <>
+      {/* ── Credits / About modal ──────────────────────────────────────────── */}
+      <Modal>
+        <Button
+          type="button"
+          aria-label={t.creditsAbout}
+          className={[
+            "fixed bottom-6 right-[calc(1rem+0.5rem)] z-50 flex items-center justify-center rounded-2xl bg-surface border border-border shadow-lg w-8 h-8 text-sm font-bold text-muted hover:text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-150",
+            hideOnPage ? "hidden" : "",
+          ].join(" ")}
         >
-          <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.025a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.5c1.978 0 3.783.674 5.25 1.784V4.533ZM12.75 20.284A8.235 8.235 0 0 1 18 18.5c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.707V4.262a.75.75 0 0 0-.5-.707A9.734 9.734 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v15.75Z" />
-        </svg>
-        {t.onboardingGuide}
-      </Button>
+          ?
+        </Button>
 
-      {/* ── Modal ───────────────────────────────────────────────────────── */}
-      <Modal.Backdrop>
-        <Modal.Container>
-          <Modal.Dialog className="max-w-md w-full">
-            <div className="absolute right-12 top-4 z-10 flex items-center gap-1">
-              <LanguageToggle />
-            </div>
-            <Modal.CloseTrigger />
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog className="max-w-sm w-full">
+              <Modal.CloseTrigger />
 
-            {/* Slide image / emoji */}
-            <div className="px-6 pt-7">
-              <div className="mb-5 h-44 w-full shadow-sm border overflow-hidden rounded-xl bg-surface-muted flex items-center justify-center relative">
-                {current.imageSrc ? (
-                  /*
-                   * Once you add the image file under /public/onboarding/,
-                   * uncomment the imageSrc line in the slides array above.
-                   * The <Image> fills the 176px-tall container.
-                   */
-                  <Image
-                    src={current.imageSrc}
-                    alt={current.imageAlt ?? current.title}
-                    fill
-                    className="object-cover "
-                    sizes="(max-width: 640px) 100vw, 249px"
-                  />
-                ) : (
-                  <span className="text-6xl select-none">{current.emoji}</span>
-                )}
+              <Modal.Body className="px-6 pt-8 pb-4 flex flex-col gap-5">
+                {/* Logo / brand */}
+                <Image
+                  src="/logo.png"
+                  alt="Read Japan logo"
+                  width={120}
+                  height={120}
+                  className="mx-auto"
+                />
+
+                <p className="text-sm text-muted leading-relaxed text-center">
+                  {t.creditsProjectDesc}
+                </p>
+
+                <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface-muted px-4 py-3 text-sm">
+                  {/* Made by */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-base">👤</span>
+                    <div>
+                      <p className="text-[11px] text-muted">
+                        {t.creditsMadeBy}
+                      </p>
+                      <p className="font-semibold text-foreground">FajarWG</p>
+                    </div>
+                  </div>
+
+                  {/* Contact */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-base">✉️</span>
+                    <div>
+                      <p className="text-[11px] text-muted">
+                        {t.creditsContact}
+                      </p>
+                      <a
+                        href="mailto:fajarwahyugumelar@gmail.com"
+                        className="font-medium text-accent hover:underline"
+                      >
+                        fajarwahyugumelar@gmail.com
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* GitHub */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-base">🐙</span>
+                    <div>
+                      <a
+                        href="https://github.com/fajarwg/read-japan"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-accent hover:underline"
+                      >
+                        {t.creditsOpenSource}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </Modal.Body>
+
+              <Modal.Footer className="px-6 pb-5 pt-2">
+                <Button slot="close" variant="secondary" className="w-full">
+                  {t.onboardingClose}
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
+
+      {/* ── Guide modal ─────────────────────────────────────────────────────── */}
+      <Modal>
+        {/* ── FAB trigger ─────────────────────────────────────────────────── */}
+        <Button
+          ref={triggerRef}
+          type="button"
+          onClick={handleOpen}
+          aria-label={t.onboardingGuide}
+          className={[
+            "fixed bottom-5.5 right-18 z-50 flex items-center gap-1.5 rounded-2xl bg-surface border border-border shadow-lg px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-150",
+            hideOnPage ? "hidden" : "",
+          ].join(" ")}
+        >
+          {/* Book icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="h-3.5 w-3.5 text-accent shrink-0"
+          >
+            <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.025a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.5c1.978 0 3.783.674 5.25 1.784V4.533ZM12.75 20.284A8.235 8.235 0 0 1 18 18.5c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.707V4.262a.75.75 0 0 0-.5-.707A9.734 9.734 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v15.75Z" />
+          </svg>
+          {t.onboardingGuide}
+        </Button>
+
+        {/* ── Modal ───────────────────────────────────────────────────────── */}
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog className="max-w-md w-full">
+              <div className="absolute right-12 top-4 z-10 flex items-center gap-1">
+                <LanguageToggle />
               </div>
-            </div>
+              <Modal.CloseTrigger />
 
-            <Modal.Body className="px-6 pb-2 flex flex-col gap-2">
-              {/* Title + description */}
-              <h2 className="text-base font-bold text-foreground leading-snug">
-                {current.title}
-              </h2>
-              <p className="text-sm text-muted leading-relaxed">
-                {current.desc}
-              </p>
-
-              {/* Dot navigator */}
-              <div className="mt-3 flex justify-center gap-1.5">
-                {slides.map((_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setStep(i)}
-                    className={[
-                      "h-1.5 rounded-full transition-all duration-200",
-                      i === step
-                        ? "w-5 bg-accent"
-                        : "w-1.5 bg-border hover:bg-muted",
-                    ].join(" ")}
-                    aria-label={`Slide ${i + 1}`}
-                  />
-                ))}
+              {/* Slide image / emoji */}
+              <div className="px-6 pt-7">
+                <div className="mb-5 h-44 w-full shadow-sm border overflow-hidden rounded-xl bg-surface-muted flex items-center justify-center relative">
+                  {current.imageSrc ? (
+                    /*
+                     * Once you add the image file under /public/onboarding/,
+                     * uncomment the imageSrc line in the slides array above.
+                     * The <Image> fills the 176px-tall container.
+                     */
+                    <Image
+                      src={current.imageSrc}
+                      alt={current.imageAlt ?? current.title}
+                      fill
+                      className="object-cover "
+                      sizes="(max-width: 640px) 100vw, 249px"
+                    />
+                  ) : (
+                    <span className="text-6xl select-none">
+                      {current.emoji}
+                    </span>
+                  )}
+                </div>
               </div>
-            </Modal.Body>
 
-            <Modal.Footer className="flex flex-col gap-2 px-6  pt-3">
-              {/* Back / Next row */}
-              <div className="flex gap-2">
-                {step > 0 && (
-                  <Button
-                    variant="secondary"
-                    className="flex-1"
-                    onPress={handleBack}
+              <Modal.Body className="px-6 pb-2 flex flex-col gap-2">
+                {/* Title + description */}
+                <h2 className="text-base font-bold text-foreground leading-snug">
+                  {current.title}
+                </h2>
+                <p className="text-sm text-muted leading-relaxed">
+                  {current.desc}
+                </p>
+
+                {/* Dot navigator */}
+                <div className="mt-3 flex justify-center gap-1.5">
+                  {slides.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setStep(i)}
+                      className={[
+                        "h-1.5 rounded-full transition-all duration-200",
+                        i === step
+                          ? "w-5 bg-accent"
+                          : "w-1.5 bg-border hover:bg-muted",
+                      ].join(" ")}
+                      aria-label={`Slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              </Modal.Body>
+
+              <Modal.Footer className="flex flex-col gap-2 px-6  pt-3">
+                {/* Back / Next row */}
+                <div className="flex gap-2">
+                  {step > 0 && (
+                    <Button
+                      variant="secondary"
+                      className="flex-1"
+                      onPress={handleBack}
+                    >
+                      {t.onboardingBack}
+                    </Button>
+                  )}
+                  {isLast ? (
+                    /* Last slide: "Start!" closes the modal */
+                    <Button slot="close" variant="primary" className="flex-1">
+                      {t.onboardingStart}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      className="flex-1"
+                      onPress={handleNext}
+                    >
+                      {t.onboardingNext}
+                    </Button>
+                  )}
+                </div>
+
+                {/* Login CTA on last slide */}
+                {isLast && (
+                  <Link
+                    href="/login"
+                    onClick={handleDontShow}
+                    className="block text-center text-xs text-accent font-medium py-1.5 hover:underline transition-colors"
                   >
-                    {t.onboardingBack}
-                  </Button>
+                    {t.authLogin} →
+                  </Link>
                 )}
-                {isLast ? (
-                  /* Last slide: "Start!" closes the modal */
-                  <Button slot="close" variant="primary" className="flex-1">
-                    {t.onboardingStart}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="primary"
-                    className="flex-1"
-                    onPress={handleNext}
-                  >
-                    {t.onboardingNext}
-                  </Button>
-                )}
-              </div>
 
-              {/* Login CTA on last slide */}
-              {isLast && (
-                <Link
-                  href="/login"
-                  onClick={handleDontShow}
-                  className="block text-center text-xs text-accent font-medium py-1.5 hover:underline transition-colors"
+                {/* Don't show again */}
+                <Button
+                  slot="close"
+                  variant="ghost"
+                  size="sm"
+                  className="text-[11px] text-muted w-full"
+                  onPress={handleDontShow}
                 >
-                  {t.authLogin} →
-                </Link>
-              )}
-
-              {/* Don't show again */}
-              <Button
-                slot="close"
-                variant="ghost"
-                size="sm"
-                className="text-[11px] text-muted w-full"
-                onPress={handleDontShow}
-              >
-                {t.onboardingDontShow}
-              </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
-    </Modal>
+                  {t.onboardingDontShow}
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
+    </>
   );
 }
