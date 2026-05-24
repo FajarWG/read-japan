@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { Popover } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { useTheme } from "@/src/modules/theme/components/ThemeProvider";
@@ -13,15 +13,17 @@ export function SettingsDropdown() {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
   const [isPending, startLogout] = useTransition();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
+    setIsOpen(false);
     startLogout(async () => {
       await logoutAction();
     });
   };
 
   return (
-    <Popover>
+    <Popover isOpen={isOpen} onOpenChange={setIsOpen}>
       <Popover.Trigger>
         <button
           type="button"
@@ -79,7 +81,8 @@ export function SettingsDropdown() {
           {/* Guide Button */}
           <button
             onClick={() => {
-              setTimeout(() => window.dispatchEvent(new CustomEvent("open-guide")), 0);
+              setIsOpen(false);
+              window.dispatchEvent(new CustomEvent("open-guide"));
             }}
             className="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg transition-colors cursor-pointer"
           >
@@ -89,7 +92,8 @@ export function SettingsDropdown() {
           {/* About Button */}
           <button
             onClick={() => {
-              setTimeout(() => window.dispatchEvent(new CustomEvent("open-about")), 0);
+              setIsOpen(false);
+              window.dispatchEvent(new CustomEvent("open-about"));
             }}
             className="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg transition-colors cursor-pointer"
           >
@@ -100,6 +104,7 @@ export function SettingsDropdown() {
           {!user ? (
             <Link
               href="/login"
+              onClick={() => setIsOpen(false)}
               className="w-full text-center block text-xs font-semibold text-white bg-accent hover:bg-accent/90 py-2 rounded-lg transition-colors cursor-pointer mt-1"
             >
               {t.authLogin}

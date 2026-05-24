@@ -52,11 +52,12 @@ interface PrepDataPayload {
 }
 
 export function PrepContent({ username, role }: PrepContentProps) {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
 
   // State pemilihan bab & poin
   const [chapter, setChapter] = useState<number>(1);
   const [point, setPoint] = useState<number>(1);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   // State data materi
   const [data, setData] = useState<PrepDataPayload | null>(null);
@@ -94,6 +95,8 @@ export function PrepContent({ username, role }: PrepContentProps) {
   // State untuk latihan soal (exercises)
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [showAnswerFor, setShowAnswerFor] = useState<Record<string, boolean>>({});
+  // State untuk menampilkan terjemahan contoh percakapan
+  const [showDialogTranslationFor, setShowDialogTranslationFor] = useState<Record<string, boolean>>({});
 
   // Ambil daftar file audio yang tersedia dari server
   useEffect(() => {
@@ -117,14 +120,37 @@ export function PrepContent({ username, role }: PrepContentProps) {
     fetchAudios();
   }, []);
 
+  // Baca chapter & point sebelumnya dari localStorage saat pertama kali dimuat
+  useEffect(() => {
+    const storedChapter = localStorage.getItem("rj-prep-chapter");
+    const storedPoint = localStorage.getItem("rj-prep-point");
+    if (storedChapter) {
+      setChapter(Number(storedChapter));
+    }
+    if (storedPoint) {
+      setPoint(Number(storedPoint));
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Simpan chapter & point ke localStorage setiap kali ada perubahan setelah inisialisasi
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("rj-prep-chapter", String(chapter));
+      localStorage.setItem("rj-prep-point", String(point));
+    }
+  }, [chapter, point, isLoaded]);
+
   // Ambil data persiapan dari database saat chapter/point berubah
   useEffect(() => {
+    if (!isLoaded) return;
     async function fetchPrepData() {
       setLoading(true);
       setIsEditing(false);
       setData(null);
       setUserAnswers({});
       setShowAnswerFor({});
+      setShowDialogTranslationFor({});
       try {
         const res = await fetch(`/api/prep?chapter=${chapter}&point=${point}`);
         if (res.ok) {
@@ -190,7 +216,7 @@ export function PrepContent({ username, role }: PrepContentProps) {
       }
     }
     fetchPrepData();
-  }, [chapter, point]);
+  }, [chapter, point, isLoaded]);
 
   // Validasi JSON secara real-time saat jsonInput berubah
   useEffect(() => {
@@ -810,10 +836,11 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                 </div>
 
                 {/* Tab Menu Belajar */}
-                <div className="flex justify-center border-b border-border">
+                <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border pt-3 flex justify-center">
                   <div className="flex gap-6 flex-wrap justify-center">
                     {[
                       { id: "dialogue", label: t.prepTabMateri || "💬 Materi & Latihan" },
+                      { id: "grammar", label: t.prepTabGrammar || "📚 Tata Bahasa" },
                       { id: "vocabulary", label: t.prepTabVocabulary || "📝 Kosakata (Kotoba)" },
                       { id: "audio", label: t.prepTabAudio || "🎵 Putar Audio" },
                     ].map((tab) => (
@@ -833,11 +860,11 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                   </div>
                 </div>
 
-                {/* TAB KONTEN 1: MATERI & LATIHAN (CONVERSATIONS + EXERCISES + GRAMMAR) */}
+                {/* TAB KONTEN 1: MATERI & LATIHAN (CONVERSATIONS + EXERCISES) */}
                 {activeTab === "dialogue" && (
                   <div className="flex flex-col gap-6">
                     
-                    {/* 1. SECTIONS / SUB-TOPICS (CONVERSATIONS + EXERCISES + GRAMMAR) */}
+                    {/* 1. SECTIONS / SUB-TOPICS (CONVERSATIONS + EXERCISES) */}
                     {data.sections && data.sections.length > 0 ? (
                       <div className="flex flex-col gap-6">
                         {data.sections.map((sect, sectIdx) => (
@@ -854,21 +881,52 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                               <div className="flex flex-col gap-4">
                                 <h4 className="text-xs font-bold text-muted uppercase tracking-wider">💬 Contoh Percakapan</h4>
                                 <div className="space-y-4">
-                                  {sect.conversations.map((conv, convIdx) => (
-                                    <div key={convIdx} className="flex gap-3 items-start">
-                                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300 text-xs font-bold shrink-0 mt-0.5">
-                                        {conv.speaker}
+                                  {sect.conversations.map((conv, convIdx) => {
+                                    const dialogKey = `sect-${sectIdx}-conv-${convIdx}`;
+                                    const isTranslationVisible = !!showDialogTranslationFor[dialogKey];
+                                    return (
+                                      <div key={convIdx} className="flex gap-3 items-start">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300 text-xs font-bold shrink-0 mt-0.5">
+                                          {conv.speaker}
+                                        </div>
+                                        <div className="flex-1 flex flex-col gap-0.5 min-w-0">
+                                          <span className="font-jp text-base text-foreground leading-relaxed">
+                                            {conv.japanese}
+                                          </span>
+                                          {isTranslationVisible ? (
+                                            <div className="text-xs text-muted flex items-center gap-1.5 mt-0.5 select-none">
+                                              <span>{conv.translation}</span>
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setShowDialogTranslationFor((prev) => ({
+                                                    ...prev,
+                                                    [dialogKey]: false,
+                                                  }));
+                                                }}
+                                                className="text-[10px] font-semibold text-indigo-500 hover:underline ml-1 cursor-pointer"
+                                              >
+                                                {lang === "en" ? "(Hide)" : "(Sembunyikan)"}
+                                              </button>
+                                            </div>
+                                          ) : (
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setShowDialogTranslationFor((prev) => ({
+                                                  ...prev,
+                                                  [dialogKey]: true,
+                                                }));
+                                              }}
+                                              className="self-start text-[10px] font-semibold text-indigo-500 hover:text-indigo-600 bg-indigo-500/5 hover:bg-indigo-500/10 px-2 py-0.5 rounded-md transition-all mt-1 cursor-pointer select-none"
+                                            >
+                                              {lang === "en" ? "🔍 Show Translation" : "🔍 Lihat Arti"}
+                                            </button>
+                                          )}
+                                        </div>
                                       </div>
-                                      <div className="flex-1 flex flex-col gap-0.5 min-w-0">
-                                        <span className="font-jp text-base text-foreground leading-relaxed">
-                                          {conv.japanese}
-                                        </span>
-                                        <span className="text-xs text-muted">
-                                          {conv.translation}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               </div>
                             )}
@@ -926,63 +984,6 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                               </div>
                             )}
 
-                            {/* Section Tata Bahasa (Grammar) */}
-                            {sect.grammar && sect.grammar.length > 0 && (
-                              <div className="flex flex-col gap-3 pt-4 border-t border-dashed border-border mt-2">
-                                <h4 className="text-xs font-bold text-muted uppercase tracking-wider">📚 Tata Bahasa</h4>
-                                <div className="flex flex-col gap-3">
-                                  {sect.grammar.map((gram, gramIdx) => {
-                                    const grammarKey = `sect-${sectIdx}-gram-${gramIdx}`;
-                                    const isGrammarVisible = !!showAnswerFor[grammarKey];
-                                    return (
-                                      <div key={gramIdx} className="rounded-xl border border-border bg-surface-muted/30 p-4 flex flex-col gap-2">
-                                        <div className="flex justify-between items-center">
-                                          <h5 className="font-jp text-sm font-bold text-indigo-500">
-                                            {gram.pattern}
-                                          </h5>
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              setShowAnswerFor((prev) => ({
-                                                ...prev,
-                                                [grammarKey]: !prev[grammarKey],
-                                              }));
-                                            }}
-                                            className="text-xs font-semibold text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer"
-                                          >
-                                            {isGrammarVisible ? "Sembunyikan Pola ▲" : "Tampilkan Pola ▼"}
-                                          </button>
-                                        </div>
-
-                                        {isGrammarVisible && (
-                                          <div className="mt-2.5 flex flex-col gap-2 transition-all duration-300">
-                                            <p className="text-xs text-foreground leading-relaxed">
-                                              {gram.explanation}
-                                            </p>
-
-                                            {gram.examples && gram.examples.length > 0 && (
-                                              <div className="space-y-2 pl-3 border-l-2 border-indigo-200 dark:border-indigo-800">
-                                                {gram.examples.map((ex, exIdx) => (
-                                                  <div key={exIdx} className="flex flex-col gap-0.5">
-                                                    <span className="font-jp text-xs text-foreground">
-                                                      {ex.japanese}
-                                                    </span>
-                                                    <span className="text-[10px] text-muted">
-                                                      {ex.translation}
-                                                    </span>
-                                                  </div>
-                                                ))}
-                                              </div>
-                                            )}
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            )}
-
                           </div>
                         ))}
                       </div>
@@ -993,21 +994,52 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                           <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
                             <h3 className="text-sm font-bold text-indigo-500 pb-2 border-b border-border">💬 Contoh Percakapan</h3>
                             <div className="space-y-4">
-                              {data.conversations.map((conv, idx) => (
-                                <div key={idx} className="flex gap-3 items-start">
-                                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300 text-xs font-bold shrink-0 mt-0.5">
-                                    {conv.speaker}
+                              {data.conversations.map((conv, idx) => {
+                                const dialogKey = `legacy-conv-${idx}`;
+                                const isTranslationVisible = !!showDialogTranslationFor[dialogKey];
+                                return (
+                                  <div key={idx} className="flex gap-3 items-start">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300 text-xs font-bold shrink-0 mt-0.5">
+                                      {conv.speaker}
+                                    </div>
+                                    <div className="flex-1 flex flex-col gap-0.5 min-w-0">
+                                      <span className="font-jp text-base text-foreground leading-relaxed">
+                                        {conv.japanese}
+                                      </span>
+                                      {isTranslationVisible ? (
+                                        <div className="text-xs text-muted flex items-center gap-1.5 mt-0.5 select-none">
+                                          <span>{conv.translation}</span>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              setShowDialogTranslationFor((prev) => ({
+                                                ...prev,
+                                                [dialogKey]: false,
+                                              }));
+                                            }}
+                                            className="text-[10px] font-semibold text-indigo-500 hover:underline ml-1 cursor-pointer"
+                                          >
+                                            {lang === "en" ? "(Hide)" : "(Sembunyikan)"}
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setShowDialogTranslationFor((prev) => ({
+                                              ...prev,
+                                              [dialogKey]: true,
+                                            }));
+                                          }}
+                                          className="self-start text-[10px] font-semibold text-indigo-500 hover:text-indigo-600 bg-indigo-500/5 hover:bg-indigo-500/10 px-2 py-0.5 rounded-md transition-all mt-1 cursor-pointer select-none"
+                                        >
+                                          {lang === "en" ? "🔍 Show Translation" : "🔍 Lihat Arti"}
+                                        </button>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="flex-1 flex flex-col gap-0.5 min-w-0">
-                                    <span className="font-jp text-base text-foreground leading-relaxed">
-                                      {conv.japanese}
-                                    </span>
-                                    <span className="text-xs text-muted">
-                                      {conv.translation}
-                                    </span>
-                                  </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         )}
@@ -1066,12 +1098,86 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                       </div>
                     )}
 
-                    {/* 2. PENJELASAN TATA BAHASA (GRAMMAR) */}
+                  </div>
+                )}
+
+                {/* TAB KONTEN 2: TATA BAHASA (GRAMMAR) */}
+                {activeTab === "grammar" && (
+                  <div className="flex flex-col gap-6">
+                    {/* Section-level Grammar if available */}
+                    {data.sections && data.sections.some(s => s.grammar && s.grammar.length > 0) && (
+                      <div className="flex flex-col gap-6">
+                        {data.sections.map((sect, sectIdx) => {
+                          if (!sect.grammar || sect.grammar.length === 0) return null;
+                          return (
+                            <div key={sectIdx} className="rounded-2xl border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
+                              <div className="border-b border-border pb-2">
+                                <h3 className="text-md font-bold text-indigo-500 font-jp">
+                                  {sect.title}
+                                </h3>
+                              </div>
+                              <div className="flex flex-col gap-3">
+                                {sect.grammar.map((gram, gramIdx) => {
+                                  const grammarKey = `sect-${sectIdx}-gram-${gramIdx}`;
+                                  const isGrammarVisible = !!showAnswerFor[grammarKey];
+                                  return (
+                                    <div key={gramIdx} className="rounded-xl border border-border bg-surface-muted/30 p-4 flex flex-col gap-2">
+                                      <div className="flex justify-between items-center">
+                                        <h5 className="font-jp text-sm font-bold text-indigo-500">
+                                          {gram.pattern}
+                                        </h5>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setShowAnswerFor((prev) => ({
+                                              ...prev,
+                                              [grammarKey]: !prev[grammarKey],
+                                            }));
+                                          }}
+                                          className="text-xs font-semibold text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer"
+                                        >
+                                          {isGrammarVisible ? "Sembunyikan Pola ▲" : "Tampilkan Pola ▼"}
+                                        </button>
+                                      </div>
+
+                                      {isGrammarVisible && (
+                                        <div className="mt-2.5 flex flex-col gap-2 transition-all duration-300">
+                                          <p className="text-xs text-foreground leading-relaxed">
+                                            {gram.explanation}
+                                          </p>
+
+                                          {gram.examples && gram.examples.length > 0 && (
+                                            <div className="space-y-2 pl-3 border-l-2 border-indigo-200 dark:border-indigo-800">
+                                              {gram.examples.map((ex, exIdx) => (
+                                                <div key={exIdx} className="flex flex-col gap-0.5">
+                                                  <span className="font-jp text-xs text-foreground">
+                                                    {ex.japanese}
+                                                  </span>
+                                                  <span className="text-[10px] text-muted">
+                                                    {ex.translation}
+                                                  </span>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Root-level Grammar (Legacy fallback / Root explanations) */}
                     {data.grammar && data.grammar.length > 0 && (
-                      <div className="flex flex-col gap-4 mt-4">
+                      <div className="flex flex-col gap-4">
                         <div className="border-b border-border pb-2">
                           <h3 className="text-md font-bold text-foreground">
-                            📚 Penjelasan Tata Bahasa (Grammar Explanations)
+                            📚 {t.prepGrammarTitle || "Penjelasan Tata Bahasa"}
                           </h3>
                         </div>
 
@@ -1128,6 +1234,12 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                       </div>
                     )}
 
+                    {/* No grammar data message */}
+                    {(!data.grammar || data.grammar.length === 0) && (!data.sections || !data.sections.some(s => s.grammar && s.grammar.length > 0)) && (
+                      <p className="text-xs text-muted italic text-center p-8 border border-border rounded-xl">
+                        Tidak ada penjelasan tata bahasa untuk bab ini.
+                      </p>
+                    )}
                   </div>
                 )}
 
