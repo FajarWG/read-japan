@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       isNaN(parsedChapter) ||
       isNaN(parsedPoint) ||
       !title ||
-      !Array.isArray(grammar) ||
+      (grammar !== undefined && grammar !== null && !Array.isArray(grammar)) ||
       !Array.isArray(audioFiles)
     ) {
       return NextResponse.json(
@@ -152,6 +152,32 @@ export async function POST(request: NextRequest) {
             );
           }
         }
+        if (sect.grammar !== undefined && sect.grammar !== null) {
+          if (!Array.isArray(sect.grammar)) {
+            return NextResponse.json(
+              { error: `Section pada indeks ${i} wajib memiliki array 'grammar' jika didefinisikan.` },
+              { status: 400 }
+            );
+          }
+          for (let j = 0; j < sect.grammar.length; j++) {
+            const item = sect.grammar[j];
+            if (!item || typeof item.pattern !== "string" || typeof item.explanation !== "string" || !Array.isArray(item.examples)) {
+              return NextResponse.json(
+                { error: `Section ${i} grammar item pada indeks ${j} wajib memiliki 'pattern', 'explanation', dan 'examples' berupa array.` },
+                { status: 400 }
+              );
+            }
+            for (let k = 0; k < item.examples.length; k++) {
+              const ex = item.examples[k];
+              if (!ex || typeof ex.japanese !== "string" || typeof ex.translation !== "string") {
+                return NextResponse.json(
+                  { error: `Section ${i} grammar item ${j} contoh ${k} wajib memiliki 'japanese' dan 'translation' berupa string.` },
+                  { status: 400 }
+                );
+              }
+            }
+          }
+        }
       }
     }
 
@@ -166,7 +192,7 @@ export async function POST(request: NextRequest) {
       update: {
         title,
         conversations: conversations ?? null,
-        grammar,
+        grammar: grammar ?? [],
         exercises: exercises ?? null,
         sections: sections ?? null,
         audioFiles,
@@ -176,7 +202,7 @@ export async function POST(request: NextRequest) {
         point: parsedPoint,
         title,
         conversations: conversations ?? null,
-        grammar,
+        grammar: grammar ?? [],
         exercises: exercises ?? null,
         sections: sections ?? null,
         audioFiles,

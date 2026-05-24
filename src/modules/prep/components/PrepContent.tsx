@@ -38,6 +38,7 @@ interface SectionItem {
   title: string;
   conversations: ConversationItem[];
   exercises: ExerciseItem[];
+  grammar?: GrammarItem[];
 }
 
 interface PrepDataPayload {
@@ -154,26 +155,26 @@ export function PrepContent({ username, role }: PrepContentProps) {
                     },
                     {
                       speaker: "B",
-                      japanese: "いいですね. 食べましょう。",
+                      japanese: "いいですね。食べましょう。",
                       translation: "Boleh, bagus juga. Ayo makan."
                     }
                   ],
                   exercises: [
                     {
                       prompt: "① 今週の金曜日・映画",
-                      answer: "A：今週の金曜日、一緒に映画を見ませんか. B：いいですね。見ましょう。"
+                      answer: "A：今週の金曜日、一緒に映画を見ませんか. B：いいですね. 見ましょう。"
                     }
-                  ]
-                }
-              ],
-              grammar: [
-                {
-                  pattern: "〜ませんか",
-                  explanation: "Digunakan untuk mengajak seseorang melakukan sesuatu secara sopan.",
-                  examples: [
+                  ],
+                  grammar: [
                     {
-                      japanese: "一緒にご飯を食べませんか。",
-                      translation: "Mau makan bersama?"
+                      pattern: "〜ませんか",
+                      explanation: "Digunakan untuk mengajak seseorang melakukan sesuatu secara sopan.",
+                      examples: [
+                        {
+                          japanese: "一緒にご飯を食べませんか。",
+                          translation: "Mau makan bersama?"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -269,29 +270,54 @@ export function PrepContent({ username, role }: PrepContentProps) {
               return;
             }
           }
+          if (sect.grammar !== undefined && sect.grammar !== null) {
+            if (!Array.isArray(sect.grammar)) {
+              setJsonError(`Section ke-${i + 1} field 'grammar' harus berupa array.`);
+              setJsonValid(false);
+              return;
+            }
+            for (let j = 0; j < sect.grammar.length; j++) {
+              const item = sect.grammar[j];
+              if (!item || !item.pattern || !item.explanation || !Array.isArray(item.examples)) {
+                setJsonError(`Section ke-${i + 1} grammar item ke-${j + 1} harus memiliki 'pattern', 'explanation', dan 'examples' (array).`);
+                setJsonValid(false);
+                return;
+              }
+              for (let k = 0; k < item.examples.length; k++) {
+                const ex = item.examples[k];
+                if (!ex || !ex.japanese || !ex.translation) {
+                  setJsonError(`Section ke-${i + 1} contoh grammar ke-${k + 1} pada pola '${item.pattern}' harus memiliki 'japanese' dan 'translation'.`);
+                  setJsonValid(false);
+                  return;
+                }
+              }
+            }
+          }
         }
       }
 
-      if (!Array.isArray(parsed.grammar)) {
-        setJsonError("Field 'grammar' wajib berupa array.");
-        setJsonValid(false);
-        return;
-      }
-
-      // Validasi item dalam grammar
-      for (let i = 0; i < parsed.grammar.length; i++) {
-        const item = parsed.grammar[i];
-        if (!item.pattern || !item.explanation || !Array.isArray(item.examples)) {
-          setJsonError(`Grammar item ke-${i + 1} harus memiliki 'pattern', 'explanation', dan 'examples' (array).`);
+      if (parsed.grammar !== undefined && parsed.grammar !== null) {
+        if (!Array.isArray(parsed.grammar)) {
+          setJsonError("Field 'grammar' harus berupa array.");
           setJsonValid(false);
           return;
         }
-        for (let j = 0; j < item.examples.length; j++) {
-          const ex = item.examples[j];
-          if (!ex.japanese || !ex.translation) {
-            setJsonError(`Contoh grammar ke-${j + 1} pada pola '${item.pattern}' harus memiliki 'japanese' dan 'translation'.`);
+
+        // Validasi item dalam grammar
+        for (let i = 0; i < parsed.grammar.length; i++) {
+          const item = parsed.grammar[i];
+          if (!item.pattern || !item.explanation || !Array.isArray(item.examples)) {
+            setJsonError(`Grammar item ke-${i + 1} harus memiliki 'pattern', 'explanation', dan 'examples' (array).`);
             setJsonValid(false);
             return;
+          }
+          for (let j = 0; j < item.examples.length; j++) {
+            const ex = item.examples[j];
+            if (!ex.japanese || !ex.translation) {
+              setJsonError(`Contoh grammar ke-${j + 1} pada pola '${item.pattern}' harus memiliki 'japanese' dan 'translation'.`);
+              setJsonValid(false);
+              return;
+            }
           }
         }
       }
@@ -358,19 +384,19 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
       "exercises": [
         {
           "prompt": "[Soal latihan/cues untuk latihan membuat kalimat dari bagian ini, contoh: ① 今週の金曜日・映画]",
-          "answer": "[Kunci jawaban lengkap berupa kalimat/percakapan utuh berdasarkan pola tata bahasa dan contoh percakapan bagian ini. Berikan semua opsi respons (misal opsi menerima dan menolak) jika dicontohkan di buku. Contoh: A：今週の金曜日、一緒に映画を見ませんか。 B：いいですね。見ましょう。 / B：ああ、今週の金曜日ですか. すみません、今週の金曜日はちょっと……。]"
+          "answer": "[Kunci jawaban lengkap berupa kalimat/percakapan utuh berdasarkan pola tata bahasa dan contoh percakapan bagian ini. Berikan semua opsi respons (misal opsi menerima dan menolak) jika dicontohkan di buku. Contoh: A：今週の金曜日、一緒に映画を見ませんか。 B：いいですね。makan bersama? / B：ああ、今週の金曜日ですか. すみません、今週の金曜日はちょっと……。]"
         }
-      ]
-    }
-  ],
-  "grammar": [
-    {
-      "pattern": "[Pola tata bahasa yang dipelajari, contoh: 〜ませんか]",
-      "explanation": "[Penjelasan tata bahasa dalam Bahasa Indonesia]",
-      "examples": [
+      ],
+      "grammar": [
         {
-          "japanese": "[Contoh kalimat menggunakan pola ini]",
-          "translation": "[Terjemahan contoh kalimat]"
+          "pattern": "[Pola tata bahasa yang dipelajari, contoh: 〜ませんか]",
+          "explanation": "[Penjelasan tata bahasa dalam Bahasa Indonesia]",
+          "examples": [
+            {
+              "japanese": "[Contoh kalimat menggunakan pola ini]",
+              "translation": "[Terjemahan contoh kalimat]"
+            }
+          ]
         }
       ]
     }
@@ -381,7 +407,7 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
 1. Pastikan output HANYA berupa JSON valid dan bersih tanpa dibungkus markdown tambahan di luar JSON.
 2. Tulis terjemahan ke Bahasa Indonesia dengan tata bahasa yang alami dan akurat.
 3. Gunakan Kanji asli dari buku Jepang tersebut.
-4. Kelompokkan percakapan (conversations) dan latihan soal (exercises) ke dalam bagian masing-masing di dalam array 'sections' agar terikat satu sama lain sesuai layout buku.`;
+4. Kelompokkan percakapan (conversations), latihan soal (exercises), dan penjelasan tata bahasa (grammar) ke dalam bagian masing-masing di dalam array 'sections' agar terikat satu sama lain sesuai layout buku.`;
 
     navigator.clipboard.writeText(promptText);
     setCopied(true);
@@ -802,7 +828,7 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                 {activeTab === "dialogue" && (
                   <div className="flex flex-col gap-6">
                     
-                    {/* 1. SECTIONS / SUB-TOPICS (CONVERSATIONS + EXERCISES) */}
+                    {/* 1. SECTIONS / SUB-TOPICS (CONVERSATIONS + EXERCISES + GRAMMAR) */}
                     {data.sections && data.sections.length > 0 ? (
                       <div className="flex flex-col gap-6">
                         {data.sections.map((sect, sectIdx) => (
@@ -849,7 +875,7 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                                     return (
                                       <div key={exIdx} className="rounded-xl border border-border bg-surface-muted/30 p-4 flex flex-col gap-3">
                                         <div className="flex justify-between items-baseline gap-2">
-                                          <span className="font-jp text-sm font-semibold text-foreground">
+                                          <span className="font-jp text-sm font-semibold text-foreground flex-1">
                                             {ex.prompt}
                                           </span>
                                           <span className="text-[9px] bg-indigo-500/10 text-indigo-500 font-semibold px-2 py-0.5 rounded-full shrink-0">
@@ -884,6 +910,63 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                                             </div>
                                           )}
                                         </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Section Tata Bahasa (Grammar) */}
+                            {sect.grammar && sect.grammar.length > 0 && (
+                              <div className="flex flex-col gap-3 pt-4 border-t border-dashed border-border mt-2">
+                                <h4 className="text-xs font-bold text-muted uppercase tracking-wider">📚 Tata Bahasa</h4>
+                                <div className="flex flex-col gap-3">
+                                  {sect.grammar.map((gram, gramIdx) => {
+                                    const grammarKey = `sect-${sectIdx}-gram-${gramIdx}`;
+                                    const isGrammarVisible = !!showAnswerFor[grammarKey];
+                                    return (
+                                      <div key={gramIdx} className="rounded-xl border border-border bg-surface-muted/30 p-4 flex flex-col gap-2">
+                                        <div className="flex justify-between items-center">
+                                          <h5 className="font-jp text-sm font-bold text-indigo-500">
+                                            {gram.pattern}
+                                          </h5>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              setShowAnswerFor((prev) => ({
+                                                ...prev,
+                                                [grammarKey]: !prev[grammarKey],
+                                              }));
+                                            }}
+                                            className="text-xs font-semibold text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer"
+                                          >
+                                            {isGrammarVisible ? "Sembunyikan Pola ▲" : "Tampilkan Pola ▼"}
+                                          </button>
+                                        </div>
+
+                                        {isGrammarVisible && (
+                                          <div className="mt-2.5 flex flex-col gap-2 transition-all duration-300">
+                                            <p className="text-xs text-foreground leading-relaxed">
+                                              {gram.explanation}
+                                            </p>
+
+                                            {gram.examples && gram.examples.length > 0 && (
+                                              <div className="space-y-2 pl-3 border-l-2 border-indigo-200 dark:border-indigo-800">
+                                                {gram.examples.map((ex, exIdx) => (
+                                                  <div key={exIdx} className="flex flex-col gap-0.5">
+                                                    <span className="font-jp text-xs text-foreground">
+                                                      {ex.japanese}
+                                                    </span>
+                                                    <span className="text-[10px] text-muted">
+                                                      {ex.translation}
+                                                    </span>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            )}
+                                          </div>
+                                        )}
                                       </div>
                                     );
                                   })}

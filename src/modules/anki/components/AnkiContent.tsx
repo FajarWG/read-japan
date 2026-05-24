@@ -46,6 +46,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [flipped, setFlipped] = useState<boolean>(false);
   const [reviewedCount, setReviewedCount] = useState<number>(0);
   const [sessionFinished, setSessionFinished] = useState<boolean>(false);
+  const [ankiMode, setAnkiMode] = useState<"srs" | "quick">("srs");
 
   // Ambil progres SRS pengguna saat pertama kali masuk
   useEffect(() => {
@@ -133,29 +134,34 @@ export function AnkiContent({ username }: AnkiContentProps) {
   }, [filteredVocabulary, progressMap]);
 
   // Mulai sesi belajar
-  const startSession = (mode: "due" | "all") => {
-    const now = new Date();
+  const startSession = (mode: "due" | "all" | "quick") => {
     let queue: VocabularyCard[] = [];
 
-    if (mode === "due") {
-      // Ambil yang jatuh tempo saja
-      queue = filteredVocabulary.filter((card) => {
-        const prog = progressMap[card.cardKey];
-        if (!prog) return false; // Abaikan yang baru
-        return new Date(prog.dueDate) <= now;
-      });
+    if (mode === "quick") {
+      // Quick mode: ambil semua kosakata terpilih
+      queue = [...filteredVocabulary];
     } else {
-      // Campur: Ambil yang jatuh tempo dahulu, baru yang Baru (maksimal 20 kartu baru)
-      const dueCards = filteredVocabulary.filter((card) => {
-        const prog = progressMap[card.cardKey];
-        return prog && new Date(prog.dueDate) <= now;
-      });
+      const now = new Date();
+      if (mode === "due") {
+        // Ambil yang jatuh tempo saja
+        queue = filteredVocabulary.filter((card) => {
+          const prog = progressMap[card.cardKey];
+          if (!prog) return false; // Abaikan yang baru
+          return new Date(prog.dueDate) <= now;
+        });
+      } else {
+        // Campur: Ambil yang jatuh tempo dahulu, baru yang Baru (maksimal 20 kartu baru)
+        const dueCards = filteredVocabulary.filter((card) => {
+          const prog = progressMap[card.cardKey];
+          return prog && new Date(prog.dueDate) <= now;
+        });
 
-      const newCards = filteredVocabulary.filter((card) => {
-        return !progressMap[card.cardKey];
-      }).slice(0, 20); // Batasi 20 kartu baru per sesi
+        const newCards = filteredVocabulary.filter((card) => {
+          return !progressMap[card.cardKey];
+        }).slice(0, 20); // Batasi 20 kartu baru per sesi
 
-      queue = [...dueCards, ...newCards];
+        queue = [...dueCards, ...newCards];
+      }
     }
 
     // Acak antrean agar lebih bervariasi
@@ -166,6 +172,30 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setFlipped(false);
     setReviewedCount(0);
     setSessionFinished(false);
+  };
+
+  // Jawaban untuk Quick Memorization Mode (Sudah Tahu / Tidak Tahu)
+  const handleQuickAnswer = (knows: boolean) => {
+    if (sessionQueue.length === 0) return;
+    const currentCard = sessionQueue[currentIndex];
+
+    // Reset flipped
+    setFlipped(false);
+    setReviewedCount((prev) => prev + 1);
+
+    if (!knows) {
+      // Tidak tahu: masukkan kartu ke akhir antrean sesi agar diulang terus
+      const reQueueCard = { ...currentCard };
+      setSessionQueue((prev) => [...prev, reQueueCard]);
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      // Sudah tahu: lanjut ke kartu berikutnya (keluarkan dari sisa sesi)
+      if (currentIndex + 1 >= sessionQueue.length) {
+        setSessionFinished(true);
+      } else {
+        setCurrentIndex((prev) => prev + 1);
+      }
+    }
   };
 
   // Nilai kartu saat ini
@@ -288,6 +318,34 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     ⚙️ Halo {username}, Atur Sesi Belajar
                   </h3>
 
+                  {/* Switcher Mode Belajar */}
+                  <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setAnkiMode("srs")}
+                      className={[
+                        "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                        ankiMode === "srs"
+                          ? "bg-surface text-foreground shadow-sm"
+                          : "text-muted hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      📅 Spaced Repetition (SRS)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAnkiMode("quick")}
+                      className={[
+                        "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                        ankiMode === "quick"
+                          ? "bg-surface text-foreground shadow-sm"
+                          : "text-muted hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      ⚡ Menghafal Sekilas (Quick)
+                    </button>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Filter Bab */}
                     <div className="flex flex-col gap-1.5">
@@ -340,41 +398,67 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     </div>
                   </div>
 
-                  {/* Statistik Kartu Terfilter */}
-                  <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
-                    <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
-                      <p className="text-xs font-bold text-amber-500 tabular-nums">{cardStats.due}</p>
-                      <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
-                        {t.ankiCardDue || "Jatuh Tempo"}
-                      </p>
-                    </div>
-                    <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
-                      <p className="text-xs font-bold text-indigo-500 tabular-nums">{cardStats.newCards}</p>
-                      <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
-                        {t.ankiCardNew || "Baru"}
-                      </p>
-                    </div>
-                  </div>
+                  {ankiMode === "srs" ? (
+                    <>
+                      {/* Statistik Kartu Terfilter */}
+                      <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
+                        <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
+                          <p className="text-xs font-bold text-amber-500 tabular-nums">{cardStats.due}</p>
+                          <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                            {t.ankiCardDue || "Jatuh Tempo"}
+                          </p>
+                        </div>
+                        <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
+                          <p className="text-xs font-bold text-indigo-500 tabular-nums">{cardStats.newCards}</p>
+                          <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                            {t.ankiCardNew || "Baru"}
+                          </p>
+                        </div>
+                      </div>
 
-                  {/* Tombol Mulai Sesi */}
-                  <div className="flex flex-col sm:flex-row gap-3 border-t border-border pt-4">
-                    <Button
-                      variant="secondary"
-                      className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer"
-                      onClick={() => startSession("due")}
-                      isDisabled={cardStats.due === 0}
-                    >
-                      🚀 Review Kartu Jatuh Tempo ({cardStats.due})
-                    </Button>
-                    <Button
-                      variant="primary"
-                      className="font-semibold shadow-xs flex-1 cursor-pointer"
-                      onClick={() => startSession("all")}
-                      isDisabled={filteredVocabulary.length === 0}
-                    >
-                      ✨ Pelajari Campuran / Semua ({Math.min(filteredVocabulary.length, cardStats.due + 20)})
-                    </Button>
-                  </div>
+                      {/* Tombol Mulai Sesi SRS */}
+                      <div className="flex flex-col sm:flex-row gap-3 border-t border-border pt-4">
+                        <Button
+                          variant="secondary"
+                          className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer"
+                          onClick={() => startSession("due")}
+                          isDisabled={cardStats.due === 0}
+                        >
+                          🚀 Review Kartu Jatuh Tempo ({cardStats.due})
+                        </Button>
+                        <Button
+                          variant="primary"
+                          className="font-semibold shadow-xs flex-1 cursor-pointer"
+                          onClick={() => startSession("all")}
+                          isDisabled={filteredVocabulary.length === 0}
+                        >
+                          ✨ Pelajari Campuran / Semua ({Math.min(filteredVocabulary.length, cardStats.due + 20)})
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Statistik Quick Memorization */}
+                      <div className="rounded-xl bg-surface-muted/50 p-4 text-center border border-border border-t pt-4">
+                        <p className="text-xs font-bold text-indigo-500 tabular-nums">{filteredVocabulary.length}</p>
+                        <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                          Total Kosakata Bab/Poin Ini
+                        </p>
+                      </div>
+
+                      {/* Tombol Mulai Sesi Quick */}
+                      <div className="flex border-t border-border pt-4">
+                        <Button
+                          variant="primary"
+                          className="font-bold shadow-xs w-full cursor-pointer py-5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none"
+                          onClick={() => startSession("quick")}
+                          isDisabled={filteredVocabulary.length === 0}
+                        >
+                          ⚡ Mulai Menghafal Sekilas ({filteredVocabulary.length} Kartu)
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </Card>
 
               </div>
@@ -486,56 +570,72 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
                 {/* GRADING BUTTONS (Hanya muncul jika kartu sudah dibalik) */}
                 <div className="w-full max-w-md flex flex-col gap-2">
-                  {flipped ? (
-                    <div className="grid grid-cols-4 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                      {/* Again */}
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleRateCard(1); }}
-                        className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
-                      >
-                        <span className="text-[11px] font-bold">Again</span>
-                        <span className="text-[9px] opacity-75 mt-0.5">Lupa ❌</span>
-                      </button>
+                  {flipped && (
+                    ankiMode === "srs" ? (
+                      <div className="grid grid-cols-4 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                        {/* Again */}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleRateCard(1); }}
+                          className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
+                        >
+                          <span className="text-[11px] font-bold">Again</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">Lupa ❌</span>
+                        </button>
 
-                      {/* Hard */}
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleRateCard(2); }}
-                        className="flex flex-col items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
-                      >
-                        <span className="text-[11px] font-bold">Hard</span>
-                        <span className="text-[9px] opacity-75 mt-0.5">Susah ⚠️</span>
-                      </button>
+                        {/* Hard */}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleRateCard(2); }}
+                          className="flex flex-col items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
+                        >
+                          <span className="text-[11px] font-bold">Hard</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">Susah ⚠️</span>
+                        </button>
 
-                      {/* Good */}
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleRateCard(3); }}
-                        className="flex flex-col items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
-                      >
-                        <span className="text-[11px] font-bold">Good</span>
-                        <span className="text-[9px] opacity-75 mt-0.5">Biasa ✓</span>
-                      </button>
+                        {/* Good */}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleRateCard(3); }}
+                          className="flex flex-col items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
+                        >
+                          <span className="text-[11px] font-bold">Good</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">Biasa ✓</span>
+                        </button>
 
-                      {/* Easy */}
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleRateCard(4); }}
-                        className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
-                      >
-                        <span className="text-[11px] font-bold">Easy</span>
-                        <span className="text-[9px] opacity-75 mt-0.5">Mudah 🌟</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      className="w-full font-bold shadow-xs py-5"
-                      onClick={() => setFlipped(true)}
-                    >
-                      🔎 Lihat Jawaban
-                    </Button>
+                        {/* Easy */}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleRateCard(4); }}
+                          className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
+                        >
+                          <span className="text-[11px] font-bold">Easy</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">Mudah 🌟</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                        {/* Tidak Tahu */}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleQuickAnswer(false); }}
+                          className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200"
+                        >
+                          <span>Tidak Tahu ❌</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">Diulang lagi</span>
+                        </button>
+
+                        {/* Sudah Tahu */}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleQuickAnswer(true); }}
+                          className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200"
+                        >
+                          <span>Sudah Tahu ✓</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">Selesai</span>
+                        </button>
+                      </div>
+                    )
                   )}
                 </div>
 
