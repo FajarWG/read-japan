@@ -49,6 +49,7 @@ model User {
   role      Role               @default(USER)
   createdAt DateTime           @default(now())
   progress  LearningProgress[]
+  ankiProgress AnkiProgress[]
 }
 
 // ─────────────────────────────────────────
@@ -67,4 +68,45 @@ model LearningProgress {
   user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([character, userId])
+}
+
+// ─────────────────────────────────────────
+// Tabel: PrepData
+// Menyimpan data persiapan per bab dan poin
+// ─────────────────────────────────────────
+model PrepData {
+  id            Int      @id @default(autoincrement())
+  chapter       Int      // Nomor Bab (1-15)
+  point         Int      // Nomor Poin (1-3)
+  title         String
+  conversations Json?    // Array of: { speaker: string, japanese: string, translation: string } (Legacy flat format)
+  grammar       Json     // Array of: { pattern: string, explanation: string, examples: { japanese: string, translation: string }[] }
+  exercises     Json?    // Array of: { prompt: string, answer: string } (Legacy flat format)
+  sections      Json?    // Grouped format: Array of { title: string, conversations: ConversationItem[], exercises: ExerciseItem[] }
+  audioFiles    Json     // Array of strings, e.g. ["/audio/7008004_sound01/7008004_DiscA_01.mp3"]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([chapter, point])
+}
+
+// ─────────────────────────────────────────
+// Tabel: AnkiProgress
+// Melacak progres flashcard pengguna (SRS)
+// ─────────────────────────────────────────
+model AnkiProgress {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardKey      String   // Format: "Bab {chapterIndex}-{sectionIndex}-{kanji}-{hiragana}"
+  chapter      String   // E.g., "Bab １"
+  sectionIndex Int      // E.g., 0, 1, 2
+  interval     Int      @default(0) // Hari untuk review berikutnya
+  ease         Float    @default(2.5) // E-factor
+  repetitions  Int      @default(0) // Jumlah pengulangan sukses berturut-turut
+  dueDate      DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, cardKey])
 }
