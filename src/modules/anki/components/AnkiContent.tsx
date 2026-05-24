@@ -3,8 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Button, Card, Chip } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
-import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
-import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
 
 interface AnkiContentProps {
@@ -37,7 +36,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [filterPoint, setFilterPoint] = useState<string>("all");
 
   // Progres dari database
-  const [progressMap, setProgressMap] = useState<Record<string, SRSProgress>>({});
+  const [progressMap, setProgressMap] = useState<Record<string, SRSProgress>>(
+    {},
+  );
   const [loading, setLoading] = useState<boolean>(true);
 
   // Sesi belajar saat ini
@@ -73,7 +74,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   // Ekstrak semua kosakata yang cocok dengan filter
   const filteredVocabulary = useMemo(() => {
     const list: VocabularyCard[] = [];
-    
+
     DekiruNihongoGroups.forEach((chap, cIdx) => {
       // Filter bab jika bukan "all"
       // Cocokkan chapter index (e.g. Bab 1 -> cIdx = 0)
@@ -103,7 +104,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
             kanji: item.kanji,
             hiragana: item.hiragana,
             romaji: item.romaji || "",
-            translation: item.translations?.id || item.translations?.en || "No translation",
+            translation:
+              item.translations?.id ||
+              item.translations?.en ||
+              "No translation",
           });
         });
       });
@@ -156,9 +160,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
           return prog && new Date(prog.dueDate) <= now;
         });
 
-        const newCards = filteredVocabulary.filter((card) => {
-          return !progressMap[card.cardKey];
-        }).slice(0, 20); // Batasi 20 kartu baru per sesi
+        const newCards = filteredVocabulary
+          .filter((card) => {
+            return !progressMap[card.cardKey];
+          })
+          .slice(0, 20); // Batasi 20 kartu baru per sesi
 
         queue = [...dueCards, ...newCards];
       }
@@ -261,22 +267,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="flex w-full max-w-3xl flex-col">
-        
         {/* Header */}
         <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
-          <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="font-jp text-lg font-bold leading-tight text-foreground flex items-center gap-2">
+          <div className="flex items-center justify-between gap-4 px-4 py-4">
+            <div className="min-w-0">
+              <h1 className="font-jp text-base sm:text-lg font-bold leading-tight text-foreground flex items-center gap-2 truncate">
                 <span>読む日本語</span>
-                <span className="font-sans text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold">
-                  Anki Flashcards
+                <span className="font-sans text-[10px] sm:text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">
+                  Anki
                 </span>
               </h1>
-              <p className="text-xs text-muted">{t.ankiSubtitle}</p>
+              <p className="text-[10px] sm:text-xs text-muted line-clamp-1 truncate">{t.ankiSubtitle}</p>
             </div>
-            <div className="flex items-center gap-2 self-end sm:self-center">
-              <LanguageToggle />
-              <ThemeToggle />
+            <div className="flex items-center gap-2 shrink-0">
+              <SettingsDropdown />
             </div>
           </div>
         </header>
@@ -289,11 +293,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
           </div>
         ) : (
           <main className="mt-6">
-            
             {/* TAMPILAN SELEKSI DECK / FILTER (Jika sesi belajar belum aktif) */}
             {sessionQueue.length === 0 || sessionFinished ? (
               <div className="flex flex-col gap-6">
-                
                 {/* Panel Sesi Selesai */}
                 {sessionFinished && (
                   <Card className="border border-border bg-surface p-6 shadow-sm text-center flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-200">
@@ -303,7 +305,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         {t.ankiFinishedTitle || "Sesi Selesai!"}
                       </h3>
                       <p className="text-sm text-muted">
-                        {t.ankiFinishedDesc || "Kamu telah mereview semua kartu dalam sesi ini."}
+                        {t.ankiFinishedDesc ||
+                          "Kamu telah mereview semua kartu dalam sesi ini."}
                       </p>
                     </div>
                     <div className="text-xs bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 px-3 py-1.5 rounded-full font-bold">
@@ -360,7 +363,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         }}
                         className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden"
                       >
-                        <option value="all">{t.ankiAllChapters || "Semua Bab"}</option>
+                        <option value="all">
+                          {t.ankiAllChapters || "Semua Bab"}
+                        </option>
                         {Array.from({ length: 15 }, (_, i) => (
                           <option key={i + 1} value={i + 1}>
                             Bab {i + 1} — {DekiruNihongoGroups[i]?.title || ""}
@@ -379,7 +384,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         onChange={(e) => setFilterPoint(e.target.value)}
                         className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden"
                       >
-                        <option value="all">{t.ankiAllPoints || "Semua Poin"}</option>
+                        <option value="all">
+                          {t.ankiAllPoints || "Semua Poin"}
+                        </option>
                         {filterChapter === "all" ? (
                           <>
                             <option value="1">Poin 1</option>
@@ -388,7 +395,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             <option value="4">Poin 4 / もう一度聞こう</option>
                           </>
                         ) : (
-                          DekiruNihongoGroups[parseInt(filterChapter) - 1]?.sections.map((sect, sIdx) => (
+                          DekiruNihongoGroups[
+                            parseInt(filterChapter) - 1
+                          ]?.sections.map((sect, sIdx) => (
                             <option key={sIdx} value={String(sIdx + 1)}>
                               Poin {sIdx + 1}: {sect.title}
                             </option>
@@ -403,13 +412,17 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       {/* Statistik Kartu Terfilter */}
                       <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
                         <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
-                          <p className="text-xs font-bold text-amber-500 tabular-nums">{cardStats.due}</p>
+                          <p className="text-xs font-bold text-amber-500 tabular-nums">
+                            {cardStats.due}
+                          </p>
                           <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
                             {t.ankiCardDue || "Jatuh Tempo"}
                           </p>
                         </div>
                         <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
-                          <p className="text-xs font-bold text-indigo-500 tabular-nums">{cardStats.newCards}</p>
+                          <p className="text-xs font-bold text-indigo-500 tabular-nums">
+                            {cardStats.newCards}
+                          </p>
                           <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
                             {t.ankiCardNew || "Baru"}
                           </p>
@@ -432,7 +445,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           onClick={() => startSession("all")}
                           isDisabled={filteredVocabulary.length === 0}
                         >
-                          ✨ Pelajari Campuran / Semua ({Math.min(filteredVocabulary.length, cardStats.due + 20)})
+                          ✨ Pelajari Campuran / Semua (
+                          {Math.min(
+                            filteredVocabulary.length,
+                            cardStats.due + 20,
+                          )}
+                          )
                         </Button>
                       </div>
                     </>
@@ -440,7 +458,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     <>
                       {/* Statistik Quick Memorization */}
                       <div className="rounded-xl bg-surface-muted/50 p-4 text-center border border-border border-t pt-4">
-                        <p className="text-xs font-bold text-indigo-500 tabular-nums">{filteredVocabulary.length}</p>
+                        <p className="text-xs font-bold text-indigo-500 tabular-nums">
+                          {filteredVocabulary.length}
+                        </p>
                         <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
                           Total Kosakata Bab/Poin Ini
                         </p>
@@ -454,19 +474,17 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           onClick={() => startSession("quick")}
                           isDisabled={filteredVocabulary.length === 0}
                         >
-                          ⚡ Mulai Menghafal Sekilas ({filteredVocabulary.length} Kartu)
+                          ⚡ Mulai Menghafal Sekilas (
+                          {filteredVocabulary.length} Kartu)
                         </Button>
                       </div>
                     </>
                   )}
                 </Card>
-
               </div>
             ) : (
-              
               /* SESI BELAJAR AKTIF (FLASHCARD INTERAKTIF) */
               <div className="flex flex-col items-center gap-6 animate-in fade-in duration-200">
-                
                 {/* Progress bar */}
                 <div className="w-full flex items-center justify-between gap-4 bg-surface border border-border rounded-xl p-3 shadow-xs">
                   <div className="flex-1 flex flex-col gap-1">
@@ -480,7 +498,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       />
                     </div>
                   </div>
-                  
+
                   <Button
                     size="sm"
                     variant="danger-soft"
@@ -512,27 +530,35 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       flipped ? "[transform:rotateY(180deg)]" : "",
                     ].join(" ")}
                   >
-                    
                     {/* Sisi Depan (Front) */}
                     <div
                       className="absolute w-full h-full bg-surface border border-border rounded-2xl flex flex-col items-center justify-center p-6 shadow-sm"
-                      style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+                      style={{
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
+                      }}
                     >
                       <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
                         Depan
                       </span>
                       <h2 className="font-jp text-5xl font-bold leading-none text-foreground select-none">
-                        {currentCard.kanji === "-" ? currentCard.hiragana : currentCard.kanji}
+                        {currentCard.kanji === "-"
+                          ? currentCard.hiragana
+                          : currentCard.kanji}
                       </h2>
                       <p className="mt-8 text-xs text-muted/60 animate-pulse select-none">
-                        👆 {t.ankiFlipCard || "Ketuk kartu untuk melihat jawaban"}
+                        👆{" "}
+                        {t.ankiFlipCard || "Ketuk kartu untuk melihat jawaban"}
                       </p>
                     </div>
 
                     {/* Sisi Belakang (Back) */}
                     <div
                       className="absolute w-full h-full [transform:rotateY(180deg)] bg-surface border border-border rounded-2xl flex flex-col items-center justify-center p-6 shadow-sm"
-                      style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+                      style={{
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
+                      }}
                     >
                       <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/20 text-indigo-500 px-2 py-0.5 rounded-full">
                         Belakang
@@ -545,7 +571,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             {currentCard.kanji}
                           </h3>
                         )}
-                        
+
                         {/* Hiragana */}
                         <h2 className="font-jp text-4xl font-bold text-foreground">
                           {currentCard.hiragana}
@@ -564,53 +590,72 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         </p>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
                 {/* GRADING BUTTONS (Hanya muncul jika kartu sudah dibalik) */}
                 <div className="w-full max-w-md flex flex-col gap-2">
-                  {flipped && (
-                    ankiMode === "srs" ? (
+                  {flipped &&
+                    (ankiMode === "srs" ? (
                       <div className="grid grid-cols-4 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
                         {/* Again */}
                         <button
                           type="button"
-                          onClick={(e) => { e.stopPropagation(); handleRateCard(1); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRateCard(1);
+                          }}
                           className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
                         >
                           <span className="text-[11px] font-bold">Again</span>
-                          <span className="text-[9px] opacity-75 mt-0.5">Lupa ❌</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">
+                            Lupa ❌
+                          </span>
                         </button>
 
                         {/* Hard */}
                         <button
                           type="button"
-                          onClick={(e) => { e.stopPropagation(); handleRateCard(2); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRateCard(2);
+                          }}
                           className="flex flex-col items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
                         >
                           <span className="text-[11px] font-bold">Hard</span>
-                          <span className="text-[9px] opacity-75 mt-0.5">Susah ⚠️</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">
+                            Susah ⚠️
+                          </span>
                         </button>
 
                         {/* Good */}
                         <button
                           type="button"
-                          onClick={(e) => { e.stopPropagation(); handleRateCard(3); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRateCard(3);
+                          }}
                           className="flex flex-col items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
                         >
                           <span className="text-[11px] font-bold">Good</span>
-                          <span className="text-[9px] opacity-75 mt-0.5">Biasa ✓</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">
+                            Biasa ✓
+                          </span>
                         </button>
 
                         {/* Easy */}
                         <button
                           type="button"
-                          onClick={(e) => { e.stopPropagation(); handleRateCard(4); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRateCard(4);
+                          }}
                           className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
                         >
                           <span className="text-[11px] font-bold">Easy</span>
-                          <span className="text-[9px] opacity-75 mt-0.5">Mudah 🌟</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">
+                            Mudah 🌟
+                          </span>
                         </button>
                       </div>
                     ) : (
@@ -618,33 +663,39 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         {/* Tidak Tahu */}
                         <button
                           type="button"
-                          onClick={(e) => { e.stopPropagation(); handleQuickAnswer(false); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuickAnswer(false);
+                          }}
                           className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200"
                         >
                           <span>Tidak Tahu ❌</span>
-                          <span className="text-[9px] opacity-75 mt-0.5">Diulang lagi</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">
+                            Diulang lagi
+                          </span>
                         </button>
 
                         {/* Sudah Tahu */}
                         <button
                           type="button"
-                          onClick={(e) => { e.stopPropagation(); handleQuickAnswer(true); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuickAnswer(true);
+                          }}
                           className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200"
                         >
                           <span>Sudah Tahu ✓</span>
-                          <span className="text-[9px] opacity-75 mt-0.5">Selesai</span>
+                          <span className="text-[9px] opacity-75 mt-0.5">
+                            Selesai
+                          </span>
                         </button>
                       </div>
-                    )
-                  )}
+                    ))}
                 </div>
-
               </div>
             )}
-
           </main>
         )}
-
       </div>
     </div>
   );

@@ -180,19 +180,22 @@ export const translations = {
 
     // ── Prep & Anki ─────────────────────────────────────────────
     prepTitle: "Pre-Class Prep & Cheat Sheet",
-    prepSubtitle: "Prepare your lessons with dialogues, grammar, and vocabulary.",
+    prepSubtitle:
+      "Prepare your lessons with dialogues, grammar, and vocabulary.",
     prepSelectChapter: "Select Chapter",
     prepSelectPoint: "Select Point",
     prepPointLabel: "Point {n}",
     prepNoDataTitle: "No study materials yet",
-    prepNoDataDesc: "There is no study data for this chapter and point in the database.",
+    prepNoDataDesc:
+      "There is no study data for this chapter and point in the database.",
     prepUploadInstruction: "How to Upload Data",
     prepLLMPromptTitle: "AI LLM Prompt",
     prepCopyPrompt: "Copy Prompt",
     prepPromptCopied: "Prompt copied to clipboard!",
     prepPasteJsonLabel: "Paste generated JSON here",
     prepAudioSelectLabel: "Select associated audios",
-    prepNoAudioAvailable: "No audio files found. Place mp3 files in public/audio/.",
+    prepNoAudioAvailable:
+      "No audio files found. Place mp3 files in public/audio/.",
     prepSaveData: "Save & Start Studying",
     prepEditData: "Edit Lesson Data",
     prepDialogTitle: "💬 Dialogue",
@@ -207,15 +210,16 @@ export const translations = {
     prepToggleTranslation: "Hide/Show Translation",
     prepPlayAudio: "Play Audio",
     prepSaveSuccess: "Lesson data saved successfully!",
-    prepSaveFailed: "Failed to save lesson data. Make sure JSON format is correct.",
+    prepSaveFailed:
+      "Failed to save lesson data. Make sure JSON format is correct.",
     prepExercisePromptPlaceholder: "Type your sentence here...",
     prepExerciseShowAnswer: "Show Answer Key",
     prepExerciseHideAnswer: "Hide Answer Key",
     prepExerciseCorrectAnswerLabel: "Answer Key (LLM):",
     prepExerciseCheckButton: "Check Answer",
 
-    ankiTitle: "Anki Flashcards",
-    ankiSubtitle: "Retain vocabulary using spaced repetition (SRS).",
+    ankiTitle: "Anki",
+    ankiSubtitle: "Spaced repetition (SRS).",
     ankiCardCount: "{n} cards left for today",
     ankiCardDue: "Due",
     ankiCardNew: "New",
@@ -228,7 +232,8 @@ export const translations = {
     ankiFinishedDesc: "You have reviewed all cards due for today. Keep it up!",
     ankiResetSession: "Study Again",
     ankiNoCardsTitle: "No cards to review",
-    ankiNoCardsDesc: "There are no vocabulary cards for the selected chapter/point.",
+    ankiNoCardsDesc:
+      "There are no vocabulary cards for the selected chapter/point.",
     ankiFilterChapter: "Filter by Chapter",
     ankiFilterPoint: "Filter by Point",
     ankiAllChapters: "All Chapters",
@@ -416,19 +421,22 @@ export const translations = {
 
     // ── Prep & Anki ─────────────────────────────────────────────
     prepTitle: "Pre-Class Prep & Cheat Sheet",
-    prepSubtitle: "Persiapkan materi belajar dengan percakapan, tata bahasa, dan kosakata.",
+    prepSubtitle:
+      "Persiapkan materi belajar dengan percakapan, tata bahasa, dan kosakata.",
     prepSelectChapter: "Pilih Bab",
     prepSelectPoint: "Pilih Poin Pembahasan",
     prepPointLabel: "Poin {n}",
     prepNoDataTitle: "Belum ada materi belajar",
-    prepNoDataDesc: "Data persiapan untuk bab dan poin pembahasan ini belum diunggah.",
+    prepNoDataDesc:
+      "Data persiapan untuk bab dan poin pembahasan ini belum diunggah.",
     prepUploadInstruction: "Cara Unggah Data",
     prepLLMPromptTitle: "Prompt AI / LLM",
     prepCopyPrompt: "Salin Prompt",
     prepPromptCopied: "Prompt berhasil disalin!",
     prepPasteJsonLabel: "Tempel JSON hasil generate di sini",
     prepAudioSelectLabel: "Pilih audio yang sesuai",
-    prepNoAudioAvailable: "Berkas audio tidak ditemukan. Taruh file mp3 di public/audio/.",
+    prepNoAudioAvailable:
+      "Berkas audio tidak ditemukan. Taruh file mp3 di public/audio/.",
     prepSaveData: "Simpan & Mulai Belajar",
     prepEditData: "Edit Data Persiapan",
     prepDialogTitle: "💬 Percakapan",
@@ -461,10 +469,12 @@ export const translations = {
     ankiGood: "Biasa (Good)",
     ankiEasy: "Mudah (Easy)",
     ankiFinishedTitle: "Sesi Belajar Selesai! 🎉",
-    ankiFinishedDesc: "Kamu telah mereview semua kartu yang jatuh tempo hari ini. Pertahankan progresmu!",
+    ankiFinishedDesc:
+      "Kamu telah mereview semua kartu yang jatuh tempo hari ini. Pertahankan progresmu!",
     ankiResetSession: "Belajar Lagi",
     ankiNoCardsTitle: "Tidak ada kartu",
-    ankiNoCardsDesc: "Kosakata tidak ditemukan untuk filter bab/poin yang dipilih.",
+    ankiNoCardsDesc:
+      "Kosakata tidak ditemukan untuk filter bab/poin yang dipilih.",
     ankiFilterChapter: "Filter Bab",
     ankiFilterPoint: "Filter Poin",
     ankiAllChapters: "Semua Bab",

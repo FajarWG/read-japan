@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import { buttonVariants } from "@heroui/react";
 
 import { kanaMap } from "@/src/modules/kana/lib/kana-map";
-import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
-import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { getGuestProgress } from "@/src/shared/lib/guest-progress";
 
@@ -134,8 +133,7 @@ export function LearnContent({
               <p className="text-xs text-muted">{t.learnSubtitle}</p>
             </div>
             <div className="flex items-center gap-2">
-              <LanguageToggle />
-              <ThemeToggle />
+              <SettingsDropdown />
             </div>
           </div>
         </header>

@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Button, Card } from "@heroui/react";
+import { Button, Card, Tabs } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
-import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
-import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
 
 interface PrepContentProps {
-  username: string;
-  role: string;
+  username?: string | null;
+  role?: string | null;
 }
 
 interface ConversationItem {
@@ -510,19 +509,17 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
       <div className="flex w-full max-w-3xl flex-col">
         {/* Header */}
         <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
-          <div className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="font-jp text-lg font-bold leading-tight text-foreground flex items-center gap-2">
+          <div className="flex items-center justify-between gap-4 px-4 py-4">
+            <div className="min-w-0">
+              <h1 className="font-jp text-base sm:text-lg font-bold leading-tight text-foreground flex items-center gap-2 truncate">
                 <span>読む日本語</span>
-                <span className="font-sans text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold">
-                  Prep & Cheat Sheet
+                <span className="font-sans text-[10px] sm:text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">
+                  Prep
                 </span>
               </h1>
-              <p className="text-xs text-muted">{t.prepSubtitle}</p>
             </div>
-            <div className="flex items-center gap-2 self-end sm:self-center">
-              <LanguageToggle />
-              <ThemeToggle />
+            <div className="flex items-center gap-2 shrink-0">
+              <SettingsDropdown />
             </div>
           </div>
         </header>
@@ -552,22 +549,30 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
             <label className="text-xs font-semibold text-muted uppercase tracking-wider">
               {t.prepSelectPoint}
             </label>
-            <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
-              {[1, 2, 3].map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPoint(p)}
+            <Tabs
+              selectedKey={String(point)}
+              onSelectionChange={(key) => setPoint(Number(key))}
+              variant="primary"
+              className="w-full"
+            >
+              <Tabs.ListContainer>
+                <Tabs.List
+                  aria-label={t.prepSelectPoint}
                   className={[
-                    "flex-1 rounded-lg py-1.5 text-center text-xs font-semibold transition-all duration-200",
-                    point === p
-                      ? "bg-surface text-foreground shadow-sm"
-                      : "text-muted hover:text-foreground",
+                    "w-full flex",
+                    "*:h-8 *:px-3 *:text-xs *:font-semibold",
+                    "*:data-[selected=true]:text-accent-foreground",
                   ].join(" ")}
                 >
-                  Poin {p}
-                </button>
-              ))}
-            </div>
+                  {[1, 2, 3].map((p) => (
+                    <Tabs.Tab key={p} id={String(p)} className="flex-1 text-center cursor-pointer">
+                      Poin {p}
+                      <Tabs.Indicator className="bg-accent" />
+                    </Tabs.Tab>
+                  ))}
+                </Tabs.List>
+              </Tabs.ListContainer>
+            </Tabs>
           </div>
         </div>
 
@@ -593,13 +598,15 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                   </p>
                 </div>
                 
-                <Button
-                  variant="primary"
-                  className="font-semibold shadow-sm cursor-pointer"
-                  onClick={() => setIsEditing(true)}
-                >
-                  + Unggah Data Poin Pembahasan
-                </Button>
+                {role && role !== "GUEST" && (
+                  <Button
+                    variant="primary"
+                    className="font-semibold shadow-sm cursor-pointer"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    + Unggah Data Poin Pembahasan
+                  </Button>
+                )}
               </div>
             ) : null}
 
@@ -790,14 +797,16 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                     </h2>
                   </div>
 
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="font-semibold self-start sm:self-center shrink-0 cursor-pointer"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    ✏️ Edit Materi
-                  </Button>
+                  {role && role !== "GUEST" && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="font-semibold self-start sm:self-center shrink-0 cursor-pointer"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      ✏️ Edit Materi
+                    </Button>
+                  )}
                 </div>
 
                 {/* Tab Menu Belajar */}

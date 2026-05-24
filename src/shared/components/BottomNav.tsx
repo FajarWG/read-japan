@@ -14,22 +14,19 @@ export function BottomNav() {
   const [visible, setVisible] = useState(true);
 
   const NAV_ITEMS = [
-    { id: "home", route: "/", label: t.navStories },
-    { id: "prep", route: "/prep", label: "Prep" },
+    { id: "prep", route: "/", label: "Prep" },
     { id: "anki", route: "/anki", label: "Anki" },
-    { id: "learn", route: "/learn", label: t.navProgress },
     { id: "kana", route: "/kana", label: t.navKana },
+    { id: "story", route: "/stories", label: t.navStories },
   ] as const;
 
-  const selectedKey = pathname.startsWith("/learn")
-    ? "learn"
+  const selectedKey = pathname.startsWith("/anki")
+    ? "anki"
     : pathname.startsWith("/kana")
       ? "kana"
-      : pathname.startsWith("/prep")
-        ? "prep"
-        : pathname.startsWith("/anki")
-          ? "anki"
-          : "home";
+      : pathname.startsWith("/stories") || pathname.startsWith("/read") || pathname.startsWith("/learn")
+        ? "story"
+        : "prep";
 
   // Hide on auth pages
   if (pathname === "/login" || pathname === "/register") return null;

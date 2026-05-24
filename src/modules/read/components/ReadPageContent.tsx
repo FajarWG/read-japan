@@ -14,8 +14,7 @@ import {
 } from "@heroui/react";
 
 import Reader from "@/src/modules/stories/components/Reader";
-import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
-import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
 // ─────────────────────────────────────────
@@ -87,8 +86,7 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
 
             {/* Right: Actions */}
             <div className="flex items-center justify-end gap-2">
-              <LanguageToggle />
-              <ThemeToggle />
+              <SettingsDropdown />
             </div>
           </div>
         </header>

@@ -1,0 +1,62 @@
+import type { Metadata } from "next";
+import { prisma } from "@/src/shared/lib/db";
+import { HomeContent } from "@/src/modules/stories/components/HomeContent";
+import { getSession } from "@/src/shared/lib/session";
+import { kanaMap } from "@/src/modules/kana/lib/kana-map";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Read Japan — Cerita Pendek & Progres Belajar",
+  description:
+    "Baca cerita pendek bahasa Jepang, ketuk huruf untuk melihat cara baca, dan lacak progres belajarmu.",
+};
+
+export default async function StoriesPage() {
+  const session = await getSession();
+
+  const stories = await prisma.story.findMany({
+    orderBy: [{ totalReads: "asc" }, { createdAt: "desc" }],
+  });
+
+  let records: any[] = [];
+  let totalClicks = 0;
+  let totalWrong = 0;
+  let totalDebt = 0;
+
+  if (session) {
+    records = await prisma.learningProgress.findMany({
+      where: {
+        userId: session.id,
+        OR: [{ clickCount: { gt: 0 } }, { wrongCount: { gt: 0 } }],
+      },
+      orderBy: [{ wrongCount: "desc" }, { clickCount: "desc" }],
+    });
+
+    totalClicks = records.reduce((sum, r) => sum + r.clickCount, 0);
+    totalWrong = records.reduce((sum, r) => sum + r.wrongCount, 0);
+    totalDebt = totalClicks + totalWrong;
+  }
+
+  const enriched = records.map((r) => ({
+    character: r.character,
+    clickCount: r.clickCount,
+    wrongCount: r.wrongCount,
+    info: kanaMap[r.character] ?? null,
+  }));
+
+  const hasWrong = enriched.some((r) => r.wrongCount > 0);
+
+  return (
+    <HomeContent
+      recommendedStories={stories.slice(0, 2)}
+      stories={stories}
+      totalClicks={totalClicks}
+      totalWrong={totalWrong}
+      totalDebt={totalDebt}
+      isGuest={!session}
+      enriched={enriched}
+      hasWrong={hasWrong}
+    />
+  );
+}

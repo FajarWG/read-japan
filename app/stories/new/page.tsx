@@ -30,8 +30,7 @@ import {
   type ActionState,
   type BatchStory,
 } from "@/src/modules/stories/actions";
-import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
-import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
 // ─────────────────────────────────────────
@@ -397,8 +396,7 @@ export default function NewStoryPage() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <LanguageToggle />
-              <ThemeToggle />
+              <SettingsDropdown />
               <Chip variant="soft" size="sm" className="text-xs font-medium">
                 {t.admin}
               </Chip>

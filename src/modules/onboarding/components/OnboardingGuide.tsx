@@ -36,38 +36,12 @@ export function OnboardingGuide() {
   const [step, setStep] = useState(0);
   const [imageLoading, setImageLoading] = useState(true);
   const [logoLoading, setLogoLoading] = useState(true);
-  const [navVisible, setNavVisible] = useState(true);
-  // Ref on the FAB so we can auto-open the HeroUI modal on first visit
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const lastScrollY = useRef(0);
-  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      const goingDown = currentY > lastScrollY.current;
-      lastScrollY.current = currentY;
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-      scrollTimerRef.current = setTimeout(() => {
-        setNavVisible(!goingDown);
-      }, 500);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
-    };
-  }, []);
+  // Controlled states for modals
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
-  // ── Slide definitions ──────────────────────────────────────────────────────
-  //
-  //  IMAGE GUIDE — for each slide that has a placeholder, add a screenshot:
-  //    • Size: 800 × 440 px  (2:1 ratio works too, e.g. 600 × 330 px)
-  //    • Format: PNG or WebP
-  //    • Place the file in /public/onboarding/
-  //    • Then set imageSrc: "/onboarding/<filename>.png"  (or .webp)
-  //
-  // ──────────────────────────────────────────────────────────────────────────
+  // Slide definitions
   const slides: Slide[] = [
     {
       emoji: "🌸",
@@ -78,7 +52,6 @@ export function OnboardingGuide() {
       emoji: "📖",
       title: t.onboardingSlide2Title,
       desc: t.onboardingSlide2Desc,
-
       imageSrc: "/onboarding/reading-mode.png",
       imageAlt: "Reading mode — tap kana to see its reading",
     },
@@ -107,18 +80,38 @@ export function OnboardingGuide() {
   const isLast = step === totalSteps - 1;
   const current = slides[step];
 
-  // Auto-open on first visit by programmatically clicking the HeroUI trigger
+  // Auto-open on first visit
   useEffect(() => {
     if (!localStorage.getItem(STORAGE_KEY)) {
-      triggerRef.current?.click();
+      handleOpen();
+      setGuideOpen(true);
     }
+  }, []);
+
+  // Listen to global events to open the modals
+  useEffect(() => {
+    const handleOpenGuideEvent = () => {
+      handleOpen();
+      setGuideOpen(true);
+    };
+
+    const handleOpenAboutEvent = () => {
+      setAboutOpen(true);
+    };
+
+    window.addEventListener("open-guide", handleOpenGuideEvent);
+    window.addEventListener("open-about", handleOpenAboutEvent);
+
+    return () => {
+      window.removeEventListener("open-guide", handleOpenGuideEvent);
+      window.removeEventListener("open-about", handleOpenAboutEvent);
+    };
   }, []);
 
   // Reset loading state whenever the slide (and its image) changes
   useEffect(() => {
     if (current.imageSrc) setImageLoading(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
+  }, [step, current.imageSrc]);
 
   function handleOpen() {
     setStep(0);
@@ -138,25 +131,10 @@ export function OnboardingGuide() {
     setStep((s) => Math.max(0, s - 1));
   }
 
-  // Hide FAB on auth pages
-  const hideOnPage = pathname === "/login" || pathname === "/register";
-
   return (
     <>
       {/* ── Credits / About modal ──────────────────────────────────────────── */}
-      <Modal>
-        <Button
-          type="button"
-          aria-label={t.creditsAbout}
-          className={[
-            "fixed bottom-25 md:bottom-6.5 right-[calc(1rem+0.5rem)] z-50 flex items-center justify-center rounded-2xl bg-surface border border-border shadow-lg w-8 h-8 text-sm font-bold text-muted hover:text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-500 ease-in-out",
-            hideOnPage ? "hidden" : "",
-            navVisible ? "translate-y-0" : "translate-y-[calc(100%+6rem)]",
-          ].join(" ")}
-        >
-          ?
-        </Button>
-
+      <Modal isOpen={aboutOpen} onOpenChange={setAboutOpen}>
         <Modal.Backdrop>
           <Modal.Container>
             <Modal.Dialog className="max-w-sm w-full">
@@ -228,7 +206,7 @@ export function OnboardingGuide() {
               </Modal.Body>
 
               <Modal.Footer className="px-6 pb-5 pt-2">
-                <Button slot="close" variant="secondary" className="w-full">
+                <Button slot="close" variant="secondary" className="w-full cursor-pointer">
                   {t.onboardingClose}
                 </Button>
               </Modal.Footer>
@@ -238,32 +216,7 @@ export function OnboardingGuide() {
       </Modal>
 
       {/* ── Guide modal ─────────────────────────────────────────────────────── */}
-      <Modal>
-        {/* ── FAB trigger ─────────────────────────────────────────────────── */}
-        <Button
-          ref={triggerRef}
-          type="button"
-          onClick={handleOpen}
-          aria-label={t.onboardingGuide}
-          className={[
-            "fixed bottom-24 md:bottom-6 right-18 z-50 flex items-center gap-1.5 rounded-2xl bg-surface border border-border shadow-lg px-3 py-2 text-xs font-semibold text-foreground hover:bg-surface-muted active:scale-95 transition-all duration-500 ease-in-out",
-            hideOnPage ? "hidden" : "",
-            navVisible ? "translate-y-0" : "translate-y-[calc(100%+6rem)]",
-          ].join(" ")}
-        >
-          {/* Book icon */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-3.5 w-3.5 text-accent shrink-0"
-          >
-            <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.025a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.5c1.978 0 3.783.674 5.25 1.784V4.533ZM12.75 20.284A8.235 8.235 0 0 1 18 18.5c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.707V4.262a.75.75 0 0 0-.5-.707A9.734 9.734 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v15.75Z" />
-          </svg>
-          {t.onboardingGuide}
-        </Button>
-
-        {/* ── Modal ───────────────────────────────────────────────────────── */}
+      <Modal isOpen={guideOpen} onOpenChange={setGuideOpen}>
         <Modal.Backdrop>
           <Modal.Container>
             <Modal.Dialog className="max-w-md w-full">
@@ -316,7 +269,7 @@ export function OnboardingGuide() {
                       type="button"
                       onClick={() => setStep(i)}
                       className={[
-                        "h-1.5 rounded-full transition-all duration-200",
+                        "h-1.5 rounded-full transition-all duration-200 cursor-pointer",
                         i === step
                           ? "w-5 bg-accent"
                           : "w-1.5 bg-border hover:bg-muted",
@@ -327,13 +280,13 @@ export function OnboardingGuide() {
                 </div>
               </Modal.Body>
 
-              <Modal.Footer className="flex flex-col gap-2 px-6  pt-3">
+              <Modal.Footer className="flex flex-col gap-2 px-6 pt-3">
                 {/* Back / Next row */}
                 <div className="flex gap-2">
                   {step > 0 && (
                     <Button
                       variant="secondary"
-                      className="flex-1"
+                      className="flex-1 cursor-pointer"
                       onPress={handleBack}
                     >
                       {t.onboardingBack}
@@ -341,13 +294,13 @@ export function OnboardingGuide() {
                   )}
                   {isLast ? (
                     /* Last slide: "Start!" closes the modal */
-                    <Button slot="close" variant="primary" className="flex-1">
+                    <Button slot="close" variant="primary" className="flex-1 cursor-pointer">
                       {t.onboardingStart}
                     </Button>
                   ) : (
                     <Button
                       variant="primary"
-                      className="flex-1"
+                      className="flex-1 cursor-pointer"
                       onPress={handleNext}
                     >
                       {t.onboardingNext}
@@ -371,7 +324,7 @@ export function OnboardingGuide() {
                   slot="close"
                   variant="ghost"
                   size="sm"
-                  className="text-[11px] text-muted w-full"
+                  className="text-[11px] text-muted w-full cursor-pointer"
                   onPress={handleDontShow}
                 >
                   {t.onboardingDontShow}

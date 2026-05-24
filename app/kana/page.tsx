@@ -1,7 +1,6 @@
 "use client";
 
-import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
-import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
+import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { kanaMap } from "@/src/modules/kana/lib/kana-map";
 import type { KanaEntry, KanaType } from "@/src/modules/kana/lib/kana-map";
@@ -129,8 +128,7 @@ export default function KanaPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <LanguageToggle />
-              <ThemeToggle />
+              <SettingsDropdown />
             </div>
           </div>
         </header>

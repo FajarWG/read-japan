@@ -5,11 +5,6 @@ import { getSession } from "@/src/shared/lib/session";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const chapter = parseInt(searchParams.get("chapter") ?? "");
   const point = parseInt(searchParams.get("point") ?? "");
