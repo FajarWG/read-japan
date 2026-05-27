@@ -51,6 +51,47 @@ interface PrepDataPayload {
   audioFiles: string[];
 }
 
+const getPlaceholderJson = (chapter: number, point: number) => {
+  return JSON.stringify({
+    title: `Topik Pembahasan Bab ${chapter} Poin ${point}`,
+    sections: [
+      {
+        title: "1. [Sub-pola, contoh: 〜ませんか]",
+        conversations: [
+          {
+            speaker: "A",
+            japanese: "今晩、一緒にご飯を食べませんか。",
+            translation: "Malam ini, mau makan bersama?"
+          },
+          {
+            speaker: "B",
+            japanese: "いいですね。食べましょう。",
+            translation: "Boleh, bagus juga. Ayo makan."
+          }
+        ],
+        exercises: [
+          {
+            prompt: "① 今週の金曜日・映画",
+            answer: "A：今週の金曜日、一緒に映画を見ませんか。 B：いいですね。見ましょう。"
+          }
+        ],
+        grammar: [
+          {
+            pattern: "〜ませんか",
+            explanation: "Digunakan untuk mengajak seseorang melakukan sesuatu secara sopan.",
+            examples: [
+              {
+                japanese: "一緒にご飯を食べませんか。",
+                translation: "Mau makan bersama?"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }, null, 2);
+};
+
 export function PrepContent({ username, role }: PrepContentProps) {
   const { lang, t } = useLanguage();
 
@@ -157,55 +198,10 @@ export function PrepContent({ username, role }: PrepContentProps) {
           const json = await res.json();
           if (json.data) {
             setData(json.data);
-            setJsonInput(JSON.stringify({
-              title: json.data.title,
-              conversations: json.data.conversations || undefined,
-              grammar: json.data.grammar,
-              exercises: json.data.exercises || undefined,
-              sections: json.data.sections || undefined
-            }, null, 2));
+            setJsonInput("");
             setSelectedAudios(json.data.audioFiles || []);
           } else {
-            // Templat default jika belum ada data
-            const defaultJson = {
-              title: `Topik Pembahasan Bab ${chapter} Poin ${point}`,
-              sections: [
-                {
-                  title: "1. [Sub-pola, contoh: 〜ませんか]",
-                  conversations: [
-                    {
-                      speaker: "A",
-                      japanese: "今晩、一緒にご飯を食べませんか。",
-                      translation: "Malam ini, mau makan bersama?"
-                    },
-                    {
-                      speaker: "B",
-                      japanese: "いいですね。食べましょう。",
-                      translation: "Boleh, bagus juga. Ayo makan."
-                    }
-                  ],
-                  exercises: [
-                    {
-                      prompt: "① 今週の金曜日・映画",
-                      answer: "A：今週の金曜日、一緒に映画を見ませんか. B：いいですね. 見ましょう。"
-                    }
-                  ],
-                  grammar: [
-                    {
-                      pattern: "〜ませんか",
-                      explanation: "Digunakan untuk mengajak seseorang melakukan sesuatu secara sopan.",
-                      examples: [
-                        {
-                          japanese: "一緒にご飯を食べませんか。",
-                          translation: "Mau makan bersama?"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            };
-            setJsonInput(JSON.stringify(defaultJson, null, 2));
+            setJsonInput("");
             setSelectedAudios([]);
           }
         }
@@ -511,16 +507,24 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
     };
   }, []);
 
-  // Filter berkas audio yang sedang dicari
+  // Filter berkas audio yang sedang dicari, dan sembunyikan yang sudah terpilih
   const getFilteredAudios = () => {
-    if (!searchAudio.trim()) return audioOptions;
-    
     const result: Record<string, string[]> = {};
     Object.entries(audioOptions).forEach(([folder, files]) => {
-      const filtered = files.filter((file) =>
-        file.toLowerCase().includes(searchAudio.toLowerCase()) ||
-        folder.toLowerCase().includes(searchAudio.toLowerCase())
-      );
+      const filtered = files.filter((file) => {
+        // Jangan tampilkan jika sudah terpilih
+        if (selectedAudios.includes(file)) return false;
+        
+        // Filter pencarian jika ada
+        if (searchAudio.trim()) {
+          return (
+            file.toLowerCase().includes(searchAudio.toLowerCase()) ||
+            folder.toLowerCase().includes(searchAudio.toLowerCase())
+          );
+        }
+        return true;
+      });
+      
       if (filtered.length > 0) {
         result[folder] = filtered;
       }
@@ -686,18 +690,44 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
 
                 {/* Input Textarea JSON */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-foreground flex items-center justify-between">
-                    <span>{t.prepPasteJsonLabel}</span>
-                    {jsonValid ? (
-                      <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-full">✓ JSON Valid</span>
-                    ) : (
-                      <span className="text-[10px] text-red-600 font-semibold bg-red-50 dark:bg-red-950/20 px-2 py-0.5 rounded-full">✗ Invalid</span>
-                    )}
+                  <label className="text-xs font-bold text-foreground flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="flex items-center gap-2">
+                      {t.prepPasteJsonLabel}
+                      {jsonValid ? (
+                        <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-full whitespace-nowrap">✓ JSON Valid</span>
+                      ) : (
+                        <span className="text-[10px] text-red-600 font-semibold bg-red-50 dark:bg-red-950/20 px-2 py-0.5 rounded-full whitespace-nowrap">✗ Invalid / Kosong</span>
+                      )}
+                    </span>
+                    <div className="flex gap-3">
+                      {data && (
+                        <button
+                          type="button"
+                          onClick={() => setJsonInput(JSON.stringify({
+                            title: data.title,
+                            conversations: data.conversations || undefined,
+                            grammar: data.grammar,
+                            exercises: data.exercises || undefined,
+                            sections: data.sections || undefined
+                          }, null, 2))}
+                          className="text-[10px] text-indigo-500 hover:text-indigo-600 font-bold hover:underline cursor-pointer bg-transparent border-none p-0"
+                        >
+                          Muat Data Saat Ini
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setJsonInput(getPlaceholderJson(chapter, point))}
+                        className="text-[10px] text-indigo-500 hover:text-indigo-600 font-bold hover:underline cursor-pointer bg-transparent border-none p-0"
+                      >
+                        Muat Template Contoh
+                      </button>
+                    </div>
                   </label>
                   <textarea
                     value={jsonInput}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJsonInput(e.target.value)}
-                    placeholder='{"title": "...", "conversations": [], "grammar": []}'
+                    placeholder={getPlaceholderJson(chapter, point)}
                     rows={12}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-mono text-foreground focus:border-accent focus:outline-hidden"
                   />
@@ -713,6 +743,49 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                   <label className="text-xs font-bold text-foreground">
                     🎵 {t.prepAudioSelectLabel}
                   </label>
+
+                  {/* Audio Terpilih (Selected Audios) */}
+                  {selectedAudios.length > 0 && (
+                    <div className="flex flex-col gap-1.5 mb-2">
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                        Audio Terpilih ({selectedAudios.length})
+                      </span>
+                      <div className="rounded-xl border border-emerald-100 bg-emerald-50/10 dark:border-emerald-950/20 dark:bg-emerald-950/5 p-2 space-y-1.5 max-h-40 overflow-y-auto">
+                        {selectedAudios.map((file) => {
+                          const isPreviewingThis = previewAudioUrl === file;
+                          return (
+                            <div key={file} className="flex items-center justify-between gap-2 py-1 px-2 bg-surface rounded-lg border border-border shadow-xs">
+                              <span className="text-[11px] font-medium text-foreground truncate block flex-1">
+                                ✅ {file.split("/").pop()}
+                              </span>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  className={`h-5 min-w-10 px-1 text-[9px] font-bold cursor-pointer ${
+                                    isPreviewingThis && previewPlaying
+                                      ? "bg-red-500 text-white hover:bg-red-600"
+                                      : "bg-indigo-500 text-white hover:bg-indigo-600"
+                                  }`}
+                                  onClick={() => handleTogglePreviewAudio(file)}
+                                >
+                                  {isPreviewingThis && previewPlaying ? "Pause ⏸" : "Cek 🔊"}
+                                </Button>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedAudios(prev => prev.filter((a) => a !== file))}
+                                  className="text-[10px] text-red-500 hover:text-red-600 font-bold px-2 py-0.5 cursor-pointer bg-transparent border-none"
+                                >
+                                  Hapus ✕
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
                   <input
                     type="text"
                     placeholder="Cari berkas audio (contoh: DiscA_01)..."
