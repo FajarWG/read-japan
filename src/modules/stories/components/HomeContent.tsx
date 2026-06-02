@@ -211,9 +211,9 @@ export function HomeContent({
             {/* Brand */}
             <div className="min-w-0">
               <h1 className="font-jp text-base sm:text-lg font-bold leading-tight text-foreground truncate">
-                読む日本語
+                日本語フロー
                 <span className="ml-2 font-sans text-xs sm:text-sm font-normal text-muted">
-                  Read Japan
+                  Nihongo Flow
                 </span>
               </h1>
               <p className="text-[10px] sm:text-xs text-muted line-clamp-1 truncate">{t.brandDesc}</p>

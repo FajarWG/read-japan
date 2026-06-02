@@ -1,25 +1,17 @@
 import type { Metadata } from "next";
-import { PrepContent } from "@/src/modules/prep/components/PrepContent";
-import { getSession } from "@/src/shared/lib/session";
+import { HomeDashboard } from "@/src/modules/home/components/HomeDashboard";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Read Japan — Prep & Cheat Sheet",
+  title: "Nihongo Flow — Belajar Bahasa Jepang Interaktif",
   description:
-    "Aplikasi web gratis untuk latihan membaca Hiragana dan Katakana bahasa Jepang, dilengkapi materi persiapan pelajaran (Prep Sheet).",
+    "Aplikasi web belajar bahasa Jepang gratis: kuasai konjugasi kata kerja (Kotoba Flex), latihan membaca Hiragana & Katakana melalui cerita pendek, Anki Flashcards, dan persiapan belajar (Prep Sheet).",
   alternates: {
     canonical: "/",
   },
 };
 
 export default async function Home() {
-  const session = await getSession();
-
-  return (
-    <PrepContent
-      username={session?.username ?? null}
-      role={session?.role ?? null}
-    />
-  );
+  return <HomeDashboard />;
 }

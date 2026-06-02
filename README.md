@@ -1,8 +1,8 @@
 <img width="100" height="100" alt="logo" src="https://github.com/user-attachments/assets/de2cfd6a-bb01-482a-88e6-35db82d5c318" />
 
-# Read Japan
+# Nihongo Flow
 
-A web app for learning to read Japanese — read short stories, track your progress, and practice kana.
+A comprehensive Japanese study suite — practice reading short stories with active furigana, master verb conjugations using Kotoba Flex, review vocabulary via SRS flashcards, and prepare lesson cheat sheets.
 
 Built with Next.js, Prisma, and HeroUI. Supports guest mode (no account required) and registered accounts.
 
@@ -10,8 +10,11 @@ Built with Next.js, Prisma, and HeroUI. Supports guest mode (no account required
 
 ## Features
 
-- **Read** — Browse and read Japanese stories with furigana support
-- **Learn** — Practice hiragana and katakana with a kana chart
+- **Kotoba Flex** — Automatic verb conjugation conjugator, rules guide, and interactive flashcard quizzes (covering JLPT N5 - N3)
+- **Read Stories** — Browse and read Japanese stories with furigana support and reading tracker
+- **Prep Sheets** — Prepare for lessons with dialogs, grammar, vocabulary, and audio playbacks
+- **Anki Cards** — Spaced Repetition (SRS) vocabulary card studies
+- **Kana Chart** — Complete Hiragana and Katakana charts including Dakuten and Yoon
 - **Progress tracking** — Persists per-story reading progress (guest via localStorage, users via database)
 - **Auth** — Register / login with username + password; roles: `USER` and `ADMIN`
 - **i18n** — UI language toggle: English / Indonesian
@@ -39,8 +42,8 @@ Built with Next.js, Prisma, and HeroUI. Supports guest mode (no account required
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/fajarwg/read-japan.git
-cd read-japan
+git clone https://github.com/fajarwg/nihongo-flow.git
+cd nihongo-flow
 bun install
 ```
 

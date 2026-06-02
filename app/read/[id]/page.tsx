@@ -26,7 +26,7 @@ export async function generateMetadata({
     title: story.title,
     description: `Baca dan latihan kana dari cerita "${story.title}". ${preview}…`,
     openGraph: {
-      title: `${story.title} | Read Japan`,
+      title: `${story.title} | Nihongo Flow`,
       description: `Latihan membaca kana dari cerita: ${story.title}`,
       type: "article",
       url: `/read/${id}`,

@@ -7,7 +7,7 @@ import { kanaMap } from "@/src/modules/kana/lib/kana-map";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Read Japan — Cerita Pendek & Progres Belajar",
+  title: "Nihongo Flow — Cerita Pendek & Progres Belajar",
   description:
     "Baca cerita pendek bahasa Jepang, ketuk huruf untuk melihat cara baca, dan lacak progres belajarmu.",
 };

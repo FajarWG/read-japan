@@ -78,16 +78,7 @@ export function SettingsDropdown() {
 
           <div className="h-px bg-border my-1" />
 
-          {/* Guide Button */}
-          <button
-            onClick={() => {
-              setIsOpen(false);
-              window.dispatchEvent(new CustomEvent("open-guide"));
-            }}
-            className="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg transition-colors cursor-pointer"
-          >
-            📖 {t.onboardingGuide}
-          </button>
+
 
           {/* About Button */}
           <button

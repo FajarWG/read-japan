@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Read Japan — Reading Practice for Hiragana & Katakana",
-    short_name: "Read Japan",
+    name: "Nihongo Flow — Interactive Japanese Learning",
+    short_name: "Nihongo Flow",
     description:
-      "Application for practicing reading Hiragana and Katakana. Read short stories, click characters to see their readings, and track your learning progress.",
+      "A comprehensive interactive workspace for learning Japanese: practice reading stories with furigana, master verb conjugations with Kotoba Flex, and prepare cheat sheets.",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

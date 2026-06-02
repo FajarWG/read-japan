@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Read Japan — Belajar Baca Hiragana & Katakana";
+export const alt = "Nihongo Flow — Belajar Bahasa Jepang Interaktif";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -31,7 +31,7 @@ export default function OgImage() {
           right: 80,
         }}
       >
-        読
+        流
       </div>
 
       {/* Content */}
@@ -52,7 +52,7 @@ export default function OgImage() {
             letterSpacing: -2,
           }}
         >
-          読む日本語
+          日本語フロー
         </div>
         <div
           style={{
@@ -61,7 +61,7 @@ export default function OgImage() {
             color: "rgba(255,255,255,0.7)",
           }}
         >
-          Read Japan
+          Nihongo Flow
         </div>
         <div
           style={{
@@ -73,7 +73,7 @@ export default function OgImage() {
             lineHeight: 1.5,
           }}
         >
-          Latihan membaca Hiragana & Katakana lewat cerita pendek
+          Kuasai kata kerja (Kotoba Flex), membaca cerita, dan persiapan belajar Jepang
         </div>
       </div>
 

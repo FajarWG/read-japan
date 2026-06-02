@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
@@ -14,7 +14,7 @@ export function BottomNav() {
   const [visible, setVisible] = useState(true);
 
   const NAV_ITEMS = [
-    { id: "prep", route: "/", label: "Prep" },
+    { id: "prep", route: "/prep", label: "Prep" },
     { id: "anki", route: "/anki", label: "Anki" },
     { id: "kana", route: "/kana", label: t.navKana },
     { id: "story", route: "/stories", label: t.navStories },
@@ -26,7 +26,9 @@ export function BottomNav() {
       ? "kana"
       : pathname.startsWith("/stories") || pathname.startsWith("/read") || pathname.startsWith("/learn")
         ? "story"
-        : "prep";
+        : pathname.startsWith("/prep")
+          ? "prep"
+          : "none";
 
   // Hide on auth pages
   if (pathname === "/login" || pathname === "/register") return null;
@@ -40,7 +42,7 @@ export function BottomNav() {
           visible ? "translate-y-0" : "translate-y-[calc(100%+2.5rem)]",
         ].join(" ")}
       >
-        <div className="pointer-events-auto flex flex-col items-center gap-1.5">
+        <div className="pointer-events-auto flex flex-col items-center gap-5">
           <button
             onClick={() => setVisible(false)}
             className="flex items-center justify-center text-[9px] font-bold tracking-wider uppercase text-foreground/45 hover:text-foreground/80 bg-white/20 dark:bg-white/7 backdrop-blur-md border border-white/30 dark:border-white/10 rounded-full px-2.5 py-0.5 shadow-xs transition-all duration-200 cursor-pointer"
@@ -48,7 +50,36 @@ export function BottomNav() {
             Sembunyikan Navigasi ▼
           </button>
           
-          <div className="pointer-events-auto">
+          <div className="relative pointer-events-auto">
+            {/* Centered protruding Home Button */}
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+              <button
+                onClick={() => router.push("/")}
+                className={[
+                  "flex items-center justify-center h-8 w-8 rounded-full border shadow-md transition-all duration-200 cursor-pointer pointer-events-auto",
+                  pathname === "/"
+                    ? "bg-accent border-accent text-white shadow-accent/25 shadow-lg scale-105"
+                    : "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-white/40 dark:border-white/12 text-foreground/75 hover:text-foreground hover:border-white/70 hover:scale-110",
+                ].join(" ")}
+                title="Beranda"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+              </button>
+            </div>
+
             <Tabs
               selectedKey={selectedKey}
               onSelectionChange={(key) => {

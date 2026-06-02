@@ -272,7 +272,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
           <div className="flex items-center justify-between gap-4 px-4 py-4">
             <div className="min-w-0">
               <h1 className="font-jp text-base sm:text-lg font-bold leading-tight text-foreground flex items-center gap-2 truncate">
-                <span>読む日本語</span>
+                <span>日本語フロー</span>
                 <span className="font-sans text-[10px] sm:text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">
                   Anki
                 </span>

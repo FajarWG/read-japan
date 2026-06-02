@@ -1,10 +1,10 @@
-// Read Japan — Service Worker
+// Nihongo Flow — Service Worker
 // Strategi caching untuk offline mode
 
 const CACHE_VERSION = "v1";
-const STATIC_CACHE = `read-japan-static-${CACHE_VERSION}`;
-const PAGES_CACHE = `read-japan-pages-${CACHE_VERSION}`;
-const IMAGES_CACHE = `read-japan-images-${CACHE_VERSION}`;
+const STATIC_CACHE = `nihongo-flow-static-${CACHE_VERSION}`;
+const PAGES_CACHE = `nihongo-flow-pages-${CACHE_VERSION}`;
+const IMAGES_CACHE = `nihongo-flow-images-${CACHE_VERSION}`;
 
 // File yang di-pre-cache saat install
 const PRECACHE_ASSETS = ["/", "/kana", "/learn", "/offline"];

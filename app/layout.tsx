@@ -6,7 +6,7 @@ import { LanguageProvider } from "@/src/modules/language/components/LanguageProv
 import { AuthProvider } from "@/src/modules/auth/components/AuthProvider";
 import { BottomNav } from "@/src/shared/components/BottomNav";
 import { PageTransition } from "@/src/shared/components/PageTransition";
-import { OnboardingGuide } from "@/src/modules/onboarding/components/OnboardingGuide";
+
 import { getSession } from "@/src/shared/lib/session";
 import { Analytics } from "@vercel/analytics/next";
 import { ServiceWorkerRegistration } from "@/src/shared/components/ServiceWorkerRegistration";
@@ -34,11 +34,11 @@ const BASE_URL = "https://read-japan.vercel.app";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    template: "%s | Read Japan",
-    default: "Read Japan — Belajar Baca Hiragana & Katakana",
+    template: "%s | Nihongo Flow",
+    default: "Nihongo Flow — Belajar Bahasa Jepang Interaktif",
   },
   description:
-    "Aplikasi web gratis untuk latihan membaca Hiragana dan Katakana bahasa Jepang. Baca cerita pendek, klik huruf untuk melihat cara bacanya, dan lacak progres belajarmu.",
+    "Aplikasi web belajar bahasa Jepang gratis: latihan membaca Hiragana & Katakana melalui cerita, kuasai konjugasi kata kerja (Kotoba Flex), SRS Flashcards, dan Prep Sheet.",
   keywords: [
     "belajar hiragana",
     "belajar katakana",
@@ -48,7 +48,11 @@ export const metadata: Metadata = {
     "katakana online",
     "Japanese reading practice",
     "learn Japanese",
-    "read Japan",
+    "nihongo flow",
+    "kotoba flex",
+    "konjugasi kata kerja",
+    "belajar kosakata Jepang",
+    "anki flashcards",
     "aplikasi belajar Jepang",
   ],
   authors: [{ name: "FajarWG", url: "https://github.com/fajarwg" }],
@@ -68,16 +72,16 @@ export const metadata: Metadata = {
     locale: "id_ID",
     alternateLocale: "en_US",
     url: BASE_URL,
-    siteName: "Read Japan",
-    title: "Read Japan — Belajar Baca Hiragana & Katakana",
+    siteName: "Nihongo Flow",
+    title: "Nihongo Flow — Belajar Bahasa Jepang Interaktif",
     description:
-      "Aplikasi web gratis untuk latihan membaca Hiragana dan Katakana bahasa Jepang. Baca cerita pendek dan lacak progres belajarmu.",
+      "Aplikasi web belajar bahasa Jepang gratis: latihan membaca Hiragana & Katakana melalui cerita, kuasai konjugasi kata kerja (Kotoba Flex), SRS Flashcards, dan Prep Sheet.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Read Japan — Belajar Baca Hiragana & Katakana",
+    title: "Nihongo Flow — Belajar Bahasa Jepang Interaktif",
     description:
-      "Aplikasi web gratis untuk latihan membaca Hiragana dan Katakana bahasa Jepang.",
+      "Aplikasi web belajar bahasa Jepang gratis: latihan membaca Hiragana & Katakana melalui cerita, kuasai konjugasi kata kerja (Kotoba Flex), SRS Flashcards, dan Prep Sheet.",
     creator: "@fajarwg",
   },
   alternates: {
@@ -101,10 +105,10 @@ export default async function RootLayout({
           }}
         />
         {/* PWA meta tags */}
-        <meta name="application-name" content="Read Japan" />
+        <meta name="application-name" content="Nihongo Flow" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Read Japan" />
+        <meta name="apple-mobile-web-app-title" content="Nihongo Flow" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#dc2626" />
@@ -135,7 +139,7 @@ export default async function RootLayout({
             <AuthProvider user={user}>
               <PageTransition>{children}</PageTransition>
               <BottomNav />
-              <OnboardingGuide />
+
               <p className="fixed bottom-1 left-0 right-0 text-center text-[10px] text-foreground/50 pointer-events-none select-none z-40">
                 © 2026 FajarWG
               </p>
