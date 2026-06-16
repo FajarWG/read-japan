@@ -88,7 +88,12 @@ export async function recordClick(char: string): Promise<void> {
     create: { character: char, clickCount: 1, userId: session.id },
   });
   revalidatePath("/learn");
+  revalidatePath("/stories");
   revalidatePath("/");
+}
+
+export async function recordKotobaLookup(progressKey: string): Promise<void> {
+  await recordClick(progressKey);
 }
 
 export async function recordWrongReads(chars: string[]): Promise<void> {
@@ -111,6 +116,7 @@ export async function recordWrongReads(chars: string[]): Promise<void> {
     ),
   );
   revalidatePath("/learn");
+  revalidatePath("/stories");
   revalidatePath("/");
 }
 
@@ -145,5 +151,6 @@ export async function recordPerfectRead(chars: string[]): Promise<void> {
 
   await Promise.all(updates);
   revalidatePath("/learn");
+  revalidatePath("/stories");
   revalidatePath("/");
 }

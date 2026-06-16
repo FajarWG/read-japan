@@ -1,10 +1,19 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { Button, Card, Tabs } from "@heroui/react";
+import * as React from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Button, Card, Popover, Tabs } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
+import { useAuth } from "@/src/modules/auth/components/AuthProvider";
+import { recordGuestClick } from "@/src/shared/lib/guest-progress";
+import { recordKotobaLookup } from "@/src/modules/stories/actions";
+import {
+  buildKotobaAliasMap,
+  createKotobaLookupEntry,
+  type KotobaLookupEntry,
+} from "@/src/modules/prep/lib/kotoba-lookup";
 
 interface PrepContentProps {
   username?: string | null;
@@ -51,6 +60,68 @@ interface PrepDataPayload {
   audioFiles: string[];
 }
 
+interface KotobaVocabularyItem {
+  kanji: string;
+  hiragana: string;
+  romaji?: string;
+  translations?: Record<string, string>;
+}
+
+function KanjiLookupToken({
+  text,
+  entry,
+  onLookup,
+}: {
+  text: string;
+  entry: KotobaLookupEntry;
+  onLookup: (progressKey: string) => Promise<void> | void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  return (
+    <Popover
+      onOpenChange={(open) => {
+        if (!open) return;
+        startTransition(async () => {
+          try {
+            await onLookup(entry.progressKey);
+          } catch (error) {
+            console.error("[PrepContent] gagal mencatat lookup kanji:", error);
+          }
+        });
+      }}
+    >
+      <Popover.Trigger className="inline-flex">
+        <button
+          type="button"
+          className={[
+            "inline rounded px-0.5 font-jp text-inherit text-indigo-600 underline decoration-indigo-300 decoration-2 underline-offset-3 transition-colors",
+            "hover:bg-indigo-50 hover:text-indigo-700 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-300",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-1",
+            isPending ? "opacity-70" : "",
+          ].join(" ")}
+          aria-label={`${text} - ${entry.hiragana}`}
+        >
+          {text}
+        </button>
+      </Popover.Trigger>
+      <Popover.Content className="max-w-64" placement="top">
+        <Popover.Dialog>
+          <div className="flex flex-col gap-2">
+            <span className="font-jp text-xl font-bold text-foreground">
+              {entry.display}
+            </span>
+            <span className="font-jp text-sm font-semibold text-indigo-500 dark:text-indigo-400">
+              {entry.hiragana}
+            </span>
+            <p className="text-sm leading-relaxed text-muted">{entry.meaning}</p>
+          </div>
+        </Popover.Dialog>
+      </Popover.Content>
+    </Popover>
+  );
+}
+
 const getPlaceholderJson = (chapter: number, point: number) => {
   return JSON.stringify({
     title: `Topik Pembahasan Bab ${chapter} Poin ${point}`,
@@ -94,6 +165,7 @@ const getPlaceholderJson = (chapter: number, point: number) => {
 
 export function PrepContent({ username, role }: PrepContentProps) {
   const { lang, t } = useLanguage();
+  const { user } = useAuth();
 
   // State pemilihan bab & poin
   const [chapter, setChapter] = useState<number>(1);
@@ -382,7 +454,60 @@ export function PrepContent({ username, role }: PrepContentProps) {
     return sectData.examples || [];
   };
 
-  const vocabularyList = getVocabularyList();
+  const vocabularyList = getVocabularyList() as KotobaVocabularyItem[];
+  const kotobaAliasMap = useMemo(
+    () => buildKotobaAliasMap(vocabularyList),
+    [vocabularyList],
+  );
+  const sortedKotobaAliases = useMemo(
+    () => Array.from(kotobaAliasMap.keys()).sort((a, b) => b.length - a.length),
+    [kotobaAliasMap],
+  );
+
+  const handleKanjiLookup = async (progressKey: string) => {
+    if (!user) {
+      recordGuestClick(progressKey);
+      return;
+    }
+
+    await recordKotobaLookup(progressKey);
+  };
+
+  const renderJapaneseWithLookup = (text: string, keyPrefix: string) => {
+    const parts: React.ReactNode[] = [];
+    let index = 0;
+
+    while (index < text.length) {
+      const matchedAlias = sortedKotobaAliases.find((alias) =>
+        text.startsWith(alias, index),
+      );
+
+      if (!matchedAlias) {
+        parts.push(<span key={`${keyPrefix}-${index}`}>{text[index]}</span>);
+        index += 1;
+        continue;
+      }
+
+      const entry = kotobaAliasMap.get(matchedAlias);
+      if (!entry) {
+        parts.push(<span key={`${keyPrefix}-${index}`}>{text[index]}</span>);
+        index += 1;
+        continue;
+      }
+
+      parts.push(
+        <KanjiLookupToken
+          key={`${keyPrefix}-${index}-${entry.progressKey}`}
+          text={text.slice(index, index + matchedAlias.length)}
+          entry={entry}
+          onLookup={handleKanjiLookup}
+        />,
+      );
+      index += matchedAlias.length;
+    }
+
+    return parts;
+  };
 
   // Salin prompt untuk dikirim ke LLM
   const handleCopyPrompt = () => {
@@ -964,7 +1089,10 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                                         </div>
                                         <div className="flex-1 flex flex-col gap-0.5 min-w-0">
                                           <span className="font-jp text-base text-foreground leading-relaxed">
-                                            {conv.japanese}
+                                            {renderJapaneseWithLookup(
+                                              conv.japanese,
+                                              `sect-${sectIdx}-conv-${convIdx}`,
+                                            )}
                                           </span>
                                           {isTranslationVisible ? (
                                             <div className="text-xs text-muted flex items-center gap-1.5 mt-0.5 select-none">
@@ -1077,7 +1205,10 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                                     </div>
                                     <div className="flex-1 flex flex-col gap-0.5 min-w-0">
                                       <span className="font-jp text-base text-foreground leading-relaxed">
-                                        {conv.japanese}
+                                        {renderJapaneseWithLookup(
+                                          conv.japanese,
+                                          `legacy-conv-${idx}`,
+                                        )}
                                       </span>
                                       {isTranslationVisible ? (
                                         <div className="text-xs text-muted flex items-center gap-1.5 mt-0.5 select-none">
@@ -1224,7 +1355,10 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                                               {gram.examples.map((ex, exIdx) => (
                                                 <div key={exIdx} className="flex flex-col gap-0.5">
                                                   <span className="font-jp text-xs text-foreground">
-                                                    {ex.japanese}
+                                                    {renderJapaneseWithLookup(
+                                                      ex.japanese,
+                                                      `sect-${sectIdx}-gram-${gramIdx}-example-${exIdx}`,
+                                                    )}
                                                   </span>
                                                   <span className="text-[10px] text-muted">
                                                     {ex.translation}
@@ -1289,7 +1423,10 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                                         {gram.examples.map((ex, exIdx) => (
                                           <div key={exIdx} className="flex flex-col gap-0.5">
                                             <span className="font-jp text-sm text-foreground">
-                                              {ex.japanese}
+                                              {renderJapaneseWithLookup(
+                                                ex.japanese,
+                                                `grammar-${idx}-example-${exIdx}`,
+                                              )}
                                             </span>
                                             <span className="text-xs text-muted">
                                               {ex.translation}
@@ -1359,10 +1496,11 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                       </p>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {(vocabularyList as Array<{ kanji: string; hiragana: string; romaji?: string; translations?: Record<string, string> }>).map((item, idx) => {
+                        {vocabularyList.map((item, idx) => {
                           const cardId = `${idx}-${item.kanji}-${item.hiragana}`;
                           const isHiraganaHidden = !showAllHiragana && !hiddenHiraganaCards[cardId];
                           const isTranslationHidden = !showAllTranslation && !hiddenTranslationCards[cardId];
+                          const lookupEntry = createKotobaLookupEntry(item);
 
                           return (
                             <Card
@@ -1370,9 +1508,17 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                               className="border border-border bg-surface p-4 shadow-xs flex flex-col justify-between gap-3 hover:border-indigo-400 transition-colors"
                             >
                               <div className="flex justify-between items-baseline gap-2">
-                                <span className="font-jp text-lg font-bold text-foreground">
-                                  {item.kanji === "-" ? item.hiragana : item.kanji}
-                                </span>
+                                {lookupEntry ? (
+                                  <KanjiLookupToken
+                                    text={lookupEntry.display}
+                                    entry={lookupEntry}
+                                    onLookup={handleKanjiLookup}
+                                  />
+                                ) : (
+                                  <span className="font-jp text-lg font-bold text-foreground">
+                                    {item.kanji === "-" ? item.hiragana : item.kanji}
+                                  </span>
+                                )}
 
                                 {/* Hiragana / Bacaan */}
                                 {item.kanji !== "-" && (

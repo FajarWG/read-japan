@@ -69,6 +69,7 @@ export const translations = {
     goToStories: "Go to Story List",
     needsReview: "⚠️ Needs Review",
     allLookedUp: "📖 Kana you looked up",
+    kanjiLookedUp: "🈶 Kanji you looked up",
     characters: "characters",
 
     // ── Kana reference page ─────────────────────────────────
@@ -289,6 +290,7 @@ export const translations = {
     goToStories: "Ke Daftar Cerita",
     needsReview: "⚠️ Perlu Dipelajari Lagi",
     allLookedUp: "📖 Kana yang di contek",
+    kanjiLookedUp: "🈶 Kanji yang kamu lihat artinya",
     characters: "huruf",
 
     // ── Kana reference page ─────────────────────────────────

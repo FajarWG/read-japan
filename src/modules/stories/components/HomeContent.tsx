@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { buttonVariants, Chip, Tabs } from "@heroui/react";
 
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
@@ -11,6 +11,11 @@ import { useAuth } from "@/src/modules/auth/components/AuthProvider";
 import { logoutAction } from "@/src/modules/auth/actions";
 import { getGuestStats, getGuestProgress } from "@/src/shared/lib/guest-progress";
 import { kanaMap } from "@/src/modules/kana/lib/kana-map";
+import {
+  getAllKotobaLookupMap,
+  isKotobaProgressKey,
+  type KotobaLookupEntry,
+} from "@/src/modules/prep/lib/kotoba-lookup";
 
 // ─────────────────────────────────────────
 // Types
@@ -32,6 +37,13 @@ export type ProgressRecord = {
   info: (typeof kanaMap)[string] | null;
 };
 
+export type KotobaProgressRecord = {
+  character: string;
+  clickCount: number;
+  wrongCount: number;
+  entry: KotobaLookupEntry;
+};
+
 interface HomeContentProps {
   recommendedStories: StoryRow[];
   stories: StoryRow[];
@@ -39,7 +51,8 @@ interface HomeContentProps {
   totalWrong: number;
   totalDebt: number;
   isGuest: boolean;
-  enriched?: ProgressRecord[];
+  kanaProgress?: ProgressRecord[];
+  kotobaProgress?: KotobaProgressRecord[];
   hasWrong?: boolean;
 }
 
@@ -79,6 +92,29 @@ function KanaProgressCard({ record }: { record: ProgressRecord }) {
         )}
         <span className="text-[10px] text-muted tabular-nums">
           👁 {clickCount}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function KotobaProgressCard({ record }: { record: KotobaProgressRecord }) {
+  if (!record.entry) return null;
+
+  return (
+    <div className="flex flex-col gap-2 rounded-2xl border border-border bg-surface px-3 py-3 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <span className="font-jp text-2xl leading-none text-foreground font-semibold">
+          {record.entry.display}
+        </span>
+        <span className="text-[10px] text-muted tabular-nums">👁 {record.clickCount}</span>
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <span className="font-jp text-xs font-semibold text-indigo-500 dark:text-indigo-400">
+          {record.entry.hiragana}
+        </span>
+        <span className="text-[11px] leading-relaxed text-muted">
+          {record.entry.meaning}
         </span>
       </div>
     </div>
@@ -174,13 +210,18 @@ export function HomeContent({
   totalWrong,
   totalDebt,
   isGuest,
-  enriched: enrichedProp,
+  kanaProgress: kanaProgressProp,
+  kotobaProgress: kotobaProgressProp,
   hasWrong: hasWrongProp,
 }: HomeContentProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const kotobaLookupMap = useMemo(() => getAllKotobaLookupMap(), []);
 
-  const [enriched, setEnriched] = useState<ProgressRecord[]>(enrichedProp ?? []);
+  const [enriched, setEnriched] = useState<ProgressRecord[]>(kanaProgressProp ?? []);
+  const [kotobaEnriched, setKotobaEnriched] = useState<KotobaProgressRecord[]>(
+    kotobaProgressProp ?? [],
+  );
   const [hasWrong, setHasWrong] = useState(hasWrongProp ?? false);
 
   useEffect(() => {
@@ -188,6 +229,7 @@ export function HomeContent({
     const map = getGuestProgress();
     const records: ProgressRecord[] = Object.entries(map)
       .filter(([, v]) => v.clickCount > 0 || v.wrongCount > 0)
+      .filter(([char]) => !isKotobaProgressKey(char))
       .map(([char, v]) => ({
         character: char,
         clickCount: v.clickCount,
@@ -198,9 +240,24 @@ export function HomeContent({
         (a, b) => b.wrongCount - a.wrongCount || b.clickCount - a.clickCount,
       );
 
+    const kotobaRecords: KotobaProgressRecord[] = Object.entries(map)
+      .filter(([, v]) => v.clickCount > 0 || v.wrongCount > 0)
+      .filter(([char]) => isKotobaProgressKey(char))
+      .map(([char, v]) => ({
+        character: char,
+        clickCount: v.clickCount,
+        wrongCount: v.wrongCount,
+        entry: kotobaLookupMap.get(char) ?? null,
+      }))
+      .filter(
+        (record): record is KotobaProgressRecord => record.entry !== null,
+      )
+      .sort((a, b) => b.clickCount - a.clickCount);
+
     setEnriched(records);
+    setKotobaEnriched(kotobaRecords);
     setHasWrong(records.some((r) => r.wrongCount > 0));
-  }, [isGuest]);
+  }, [isGuest, kotobaLookupMap]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
@@ -479,7 +536,7 @@ export function HomeContent({
 
               <Tabs.Panel id="progress" className="pt-2">
                 {/* Empty state progres */}
-                {enriched.length === 0 && (
+                {enriched.length === 0 && kotobaEnriched.length === 0 && (
                   <div className="flex flex-col items-center gap-5 py-20 text-center animate-in fade-in duration-200">
                     <span className="font-jp select-none text-7xl opacity-20">
                       あ
@@ -493,7 +550,7 @@ export function HomeContent({
                   </div>
                 )}
 
-                {enriched.length > 0 && (
+                {(enriched.length > 0 || kotobaEnriched.length > 0) && (
                   <div className="flex flex-col gap-8 animate-in fade-in duration-200">
                     {/* Needs review section */}
                     {hasWrong && (
@@ -516,19 +573,37 @@ export function HomeContent({
                     )}
 
                     {/* All looked up */}
-                    <section>
-                      <h2 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
-                        {t.allLookedUp}
-                        <span className="text-xs font-normal text-muted">
-                          ({enriched.length} {t.characters})
-                        </span>
-                      </h2>
-                      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-                        {enriched.map((r) => (
-                          <KanaProgressCard key={r.character} record={r} />
-                        ))}
-                      </div>
-                    </section>
+                    {enriched.length > 0 && (
+                      <section>
+                        <h2 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
+                          {t.allLookedUp}
+                          <span className="text-xs font-normal text-muted">
+                            ({enriched.length} {t.characters})
+                          </span>
+                        </h2>
+                        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                          {enriched.map((r) => (
+                            <KanaProgressCard key={r.character} record={r} />
+                          ))}
+                        </div>
+                      </section>
+                    )}
+
+                    {kotobaEnriched.length > 0 && (
+                      <section>
+                        <h2 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
+                          {t.kanjiLookedUp}
+                          <span className="text-xs font-normal text-muted">
+                            ({kotobaEnriched.length} kata)
+                          </span>
+                        </h2>
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+                          {kotobaEnriched.map((r) => (
+                            <KotobaProgressCard key={r.character} record={r} />
+                          ))}
+                        </div>
+                      </section>
+                    )}
                   </div>
                 )}
               </Tabs.Panel>

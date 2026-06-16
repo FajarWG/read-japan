@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import { prisma } from "@/src/shared/lib/db";
-import { HomeContent } from "@/src/modules/stories/components/HomeContent";
+import {
+  HomeContent,
+  type KotobaProgressRecord,
+} from "@/src/modules/stories/components/HomeContent";
 import { getSession } from "@/src/shared/lib/session";
 import { kanaMap } from "@/src/modules/kana/lib/kana-map";
+import {
+  getAllKotobaLookupMap,
+  isKotobaProgressKey,
+} from "@/src/modules/prep/lib/kotoba-lookup";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +30,7 @@ export default async function StoriesPage() {
   let totalClicks = 0;
   let totalWrong = 0;
   let totalDebt = 0;
+  const kotobaLookupMap = getAllKotobaLookupMap();
 
   if (session) {
     records = await prisma.learningProgress.findMany({
@@ -38,14 +46,29 @@ export default async function StoriesPage() {
     totalDebt = totalClicks + totalWrong;
   }
 
-  const enriched = records.map((r) => ({
-    character: r.character,
-    clickCount: r.clickCount,
-    wrongCount: r.wrongCount,
-    info: kanaMap[r.character] ?? null,
-  }));
+  const kanaProgress = records
+    .filter((r) => !isKotobaProgressKey(r.character))
+    .map((r) => ({
+      character: r.character,
+      clickCount: r.clickCount,
+      wrongCount: r.wrongCount,
+      info: kanaMap[r.character] ?? null,
+    }));
 
-  const hasWrong = enriched.some((r) => r.wrongCount > 0);
+  const kotobaProgress: KotobaProgressRecord[] = records
+    .filter((r) => isKotobaProgressKey(r.character))
+    .map((r) => ({
+      character: r.character,
+      clickCount: r.clickCount,
+      wrongCount: r.wrongCount,
+      entry: kotobaLookupMap.get(r.character) ?? null,
+    }))
+    .filter(
+      (r): r is KotobaProgressRecord & { entry: NonNullable<typeof r.entry> } =>
+        r.entry !== null,
+    );
+
+  const hasWrong = kanaProgress.some((r) => r.wrongCount > 0);
 
   return (
     <HomeContent
@@ -55,7 +78,8 @@ export default async function StoriesPage() {
       totalWrong={totalWrong}
       totalDebt={totalDebt}
       isGuest={!session}
-      enriched={enriched}
+      kanaProgress={kanaProgress}
+      kotobaProgress={kotobaProgress}
       hasWrong={hasWrong}
     />
   );
