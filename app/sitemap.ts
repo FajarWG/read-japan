@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   const storyRoutes: MetadataRoute.Sitemap = stories.map((story) => ({
-    url: `${BASE_URL}/read/${story.id}`,
+    url: `${BASE_URL}/stories/read/${story.id}`,
     lastModified: story.createdAt,
     changeFrequency: "monthly" as const,
     priority: 0.6,

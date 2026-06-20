@@ -12,8 +12,9 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { PrismaNeonHttp } from "@prisma/adapter-neon";
 import { PrismaClient } from "../app/generated/prisma/client";
+import { PrismaNeonHttp } from "@prisma/adapter-neon";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 interface BatchStory {
   title: string;
@@ -22,6 +23,20 @@ interface BatchStory {
   focus?: string;
   chapter?: number;
   point?: number;
+}
+
+function isNeonUrl(url: string): boolean {
+  return /neon\.tech|neon\.build/.test(url);
+}
+
+function createPrismaClient(): PrismaClient {
+  const url = process.env.DATABASE_URL!;
+  if (!url) throw new Error("DATABASE_URL is not set");
+
+  if (isNeonUrl(url)) {
+    return new PrismaClient({ adapter: new PrismaNeonHttp(url, {}) });
+  }
+  return new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
 }
 
 async function main() {
@@ -35,8 +50,7 @@ async function main() {
     process.exit(1);
   }
 
-  const adapter = new PrismaNeonHttp(process.env.DATABASE_URL, {});
-  const prisma = new PrismaClient({ adapter });
+  const prisma = createPrismaClient();
 
   let created = 0;
   let skipped = 0;

@@ -50,7 +50,7 @@ export function StoryPickerModal({ stories }: { stories: StoryItem[] }) {
 
   function handlePick(id: number) {
     setSelected(id);
-    router.push(`/read/${id}`);
+    router.push(`/stories/read/${id}`);
   }
 
   return (

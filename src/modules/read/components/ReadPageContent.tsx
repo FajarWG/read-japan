@@ -13,6 +13,7 @@ import {
   Separator,
 } from "@heroui/react";
 
+import type { StoryToken } from "@/src/modules/prep/lib/kotoba-lookup";
 import Reader from "@/src/modules/stories/components/Reader";
 import { KotobaDekiruSection } from "@/src/modules/stories/components/KotobaDekiruSection";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
@@ -32,6 +33,8 @@ export interface StoryForRead {
   createdAt: Date;
   chapter: number | null;
   point: number | null;
+  /** Pre-computed story tokens from server (includes admin-added kanji) */
+  storyTokens: StoryToken[];
 }
 
 // ─────────────────────────────────────────
@@ -77,7 +80,7 @@ export function ReadPageContent({
             {/* Left: Back button */}
             <div className="flex items-center">
               <Link
-                href="/"
+                href="/stories"
                 className={buttonVariants({
                   variant: "ghost",
                   size: "sm",
@@ -207,6 +210,8 @@ export function ReadPageContent({
                   translation={story.translation ?? undefined}
                   storyId={story.id}
                   chapter={story.chapter}
+                  storyTitle={story.title}
+                  precomputedTokens={story.storyTokens}
                 />
               </article>
 

@@ -2,12 +2,13 @@
 
 import { useState, useCallback, useTransition, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Popover } from "@heroui/react";
+import { Popover } from "@heroui/react";
 import { parseJapaneseText } from "@/src/shared/lib/parser";
 import type { ParsedUnit, KanaInfo } from "@/src/shared/lib/parser";
 import { parseStoryText } from "@/src/modules/prep/lib/kotoba-lookup";
 import type { StoryToken } from "@/src/modules/prep/lib/kotoba-lookup";
 import { KotobaToken, useKotobaClickRecorder } from "@/src/modules/stories/components/KotobaToken";
+import { VocabularyReview } from "@/src/modules/stories/components/VocabularyReview";
 import {
   recordClick,
   recordWrongReads,
@@ -22,7 +23,7 @@ import {
   recordGuestPerfect,
 } from "@/src/shared/lib/guest-progress";
 
-type ReaderMode = "reading" | "review" | "result";
+type ReaderMode = "reading" | "review" | "result" | "vocabReview";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // KanaToken — satu huruf kana (reading mode)
@@ -223,6 +224,8 @@ interface ResultViewProps {
   onGoHome: () => void;
   storyContent: string;
   translation?: string;
+  hasVocabulary: boolean;
+  onStartVocabReview: () => void;
   t: {
     resultOf: string;
     kanaReadCorrectly: string;
@@ -232,6 +235,9 @@ interface ResultViewProps {
     debtReduced: string;
     goHomeNow: string;
     storyMeaning: string;
+    vocabReviewTitle: string;
+    vocabReviewCta: string;
+    vocabCount: string;
   };
 }
 
@@ -241,6 +247,8 @@ function ResultView({
   onGoHome,
   storyContent,
   translation,
+  hasVocabulary,
+  onStartVocabReview,
   t,
 }: ResultViewProps) {
   const kanaUnits = units.filter((u) => u.info);
@@ -320,6 +328,38 @@ function ResultView({
         </div>
       )}
 
+      {/* Memory Check CTA */}
+      {hasVocabulary && (
+        <button
+          type="button"
+          onClick={onStartVocabReview}
+          className="w-full rounded-xl border border-amber-300 dark:border-amber-700/60 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/30 dark:to-amber-900/20 px-5 py-4 text-left hover:from-amber-100 hover:to-amber-200 dark:hover:from-amber-950/40 dark:hover:to-amber-900/30 transition-colors group"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                🃏 {t.vocabReviewTitle}
+              </p>
+              <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">
+                {t.vocabReviewCta.replace("{n}", t.vocabCount)}
+              </p>
+            </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="h-5 w-5 text-amber-700 dark:text-amber-400 shrink-0 transition-transform group-hover:translate-x-1"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        </button>
+      )}
+
       {/* Go home */}
       <div className="flex justify-center pt-1">
         <button
@@ -327,7 +367,7 @@ function ResultView({
           onClick={onGoHome}
           className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold transition-colors shadow-sm flex items-center gap-2"
         >
-          <span>🏠</span>
+          <span>📚</span>
           <span>{t.goHomeNow}</span>
         </button>
       </div>
@@ -344,6 +384,9 @@ interface ReaderProps {
   translation?: string;
   storyId: number;
   chapter: number | null;
+  storyTitle?: string;
+  /** Pre-computed story tokens from server (includes KanjiDictionary). */
+  precomputedTokens?: StoryToken[];
 }
 
 export default function Reader({
@@ -351,6 +394,8 @@ export default function Reader({
   translation,
   storyId,
   chapter,
+  storyTitle,
+  precomputedTokens,
 }: ReaderProps) {
   const router = useRouter();
   const { t } = useLanguage();
@@ -366,11 +411,40 @@ export default function Reader({
   const [isSubmitting, startSubmitTransition] = useTransition();
 
   const units = parseJapaneseText(storyContent);
-  // Story tokens (with kotoba detection) — only used in reading mode
+  // Story tokens: prefer server-precomputed (includes KanjiDictionary),
+  // fallback to client-side parse if not provided.
   const storyTokens = useMemo<StoryToken[]>(
-    () => parseStoryText(storyContent, chapter),
-    [storyContent, chapter],
+    () => precomputedTokens ?? parseStoryText(storyContent, chapter),
+    [precomputedTokens, storyContent, chapter],
   );
+
+  // Unique vocabulary list (untuk Anki-style review)
+  const uniqueVocabulary = useMemo<
+    Array<{
+      entry: import("@/src/modules/prep/lib/kotoba-lookup").KotobaLookupEntry;
+      surface: string;
+      matchedChapter: number;
+    }>
+  >(() => {
+    const seen = new Map<
+      string,
+      {
+        entry: import("@/src/modules/prep/lib/kotoba-lookup").KotobaLookupEntry;
+        surface: string;
+        matchedChapter: number;
+      }
+    >();
+    for (const token of storyTokens) {
+      if (token.type !== "kotoba") continue;
+      if (seen.has(token.entry.progressKey)) continue;
+      seen.set(token.entry.progressKey, {
+        entry: token.entry,
+        surface: token.char,
+        matchedChapter: token.matchedChapter,
+      });
+    }
+    return Array.from(seen.values());
+  }, [storyTokens]);
 
   // Kotoba click recorder (handles guest vs logged-in)
   const handleKotobaClick = useKotobaClickRecorder();
@@ -449,6 +523,18 @@ export default function Reader({
     });
   };
 
+  // ── VOCAB REVIEW MODE ──────────────────────────────────────────────────────
+
+  if (mode === "vocabReview") {
+    return (
+      <VocabularyReview
+        storyTitle={storyTitle ?? ""}
+        vocabulary={uniqueVocabulary}
+        onExit={() => setMode("result")}
+      />
+    );
+  }
+
   // ── RESULT MODE ────────────────────────────────────────────────────────────
 
   if (mode === "result") {
@@ -456,9 +542,11 @@ export default function Reader({
       <ResultView
         units={units}
         wrongIndices={wrongIndices}
-        onGoHome={() => router.push("/")}
+        onGoHome={() => router.push("/stories")}
         storyContent={storyContent}
         translation={translation}
+        hasVocabulary={uniqueVocabulary.length > 0}
+        onStartVocabReview={() => setMode("vocabReview")}
         t={{
           resultOf: t.resultOf,
           kanaReadCorrectly: t.resultKanaRead,
@@ -468,6 +556,9 @@ export default function Reader({
           debtReduced: t.debtReduced,
           goHomeNow: t.goHomeNow,
           storyMeaning: t.storyMeaning,
+          vocabReviewTitle: t.vocabReviewTitle,
+          vocabReviewCta: t.vocabReviewCta,
+          vocabCount: String(uniqueVocabulary.length),
         }}
       />
     );
@@ -581,8 +672,22 @@ export default function Reader({
 
   // ── READING MODE ───────────────────────────────────────────────────────────
 
+  const kanaCount = units.filter((u) => u.info).length;
+  const kanjiCount = storyTokens.filter((t) => t.type === "kotoba").length;
+
   return (
     <div className="flex flex-col gap-5">
+      {/* Reading hint + stats */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50/50 dark:bg-indigo-950/10 px-4 py-2.5">
+        <p className="text-xs text-indigo-700 dark:text-indigo-300">
+          💡 {t.readingHint}
+        </p>
+        <div className="flex items-center gap-3 text-[11px] text-muted tabular-nums">
+          <span>✍️ {kanaCount} kana</span>
+          <span>🈶 {kanjiCount} kanji</span>
+        </div>
+      </div>
+
       {/* Teks cerita — kana + kanji dari bab chapter bisa diklik */}
       <p className="text-xl md:text-3xl leading-14 tracking-wider font-medium overflow-visible">
         {storyTokens.map((token, index) => {
@@ -623,7 +728,10 @@ export default function Reader({
       </p>
 
       {/* Selesai membaca button */}
-      <div className="flex justify-end pt-3 border-t border-border">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border">
+        <p className="text-xs text-muted">
+          {t.readingTip}
+        </p>
         <button
           type="button"
           onClick={handleFinishReading}

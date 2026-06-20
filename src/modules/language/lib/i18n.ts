@@ -61,6 +61,25 @@ export const translations = {
     kotobaDekiruBadge: "Bab",
     kotobaDekiruWords: "vocab",
 
+    // ── Vocabulary Review (Anki-style card flip) ───────────
+    vocabReviewTitle: "Memory Check",
+    vocabReviewCta: "Review {n} kotoba from this story with card flip",
+    vocabReviewTapToFlip: "Tap card to reveal",
+    vocabReviewTapToFront: "Tap to show kanji",
+    vocabReviewTapToBack: "Tap to show meaning",
+    vocabReviewBtnKnown: "I know this",
+    vocabReviewBtnUnknown: "Need review",
+    vocabReviewSkip: "Skip",
+    vocabReviewKnown: "known",
+    vocabReviewUnknown: "need review",
+    vocabReviewAccuracy: "accuracy",
+    vocabReviewDone: "Done!",
+    vocabReviewDoneDesc: "Reviewed {n} words from this story.",
+    vocabReviewAgain: "Review again",
+    vocabReviewNeedsPractice: "Words to practice",
+    vocabReviewEmpty: "No vocabulary to review",
+    vocabReviewEmptyDesc: "This story has no Kotoba Dekiru matches yet.",
+
     // ── Story Picker Modal ──────────────────────────────────
     storiesAvailable: "{n} stories available · sorted by least read",
 
@@ -101,6 +120,8 @@ export const translations = {
 
     // ── Reader component ────────────────────────────────────
     finishReading: "Finish Reading",
+    readingHint: "Tap any kana (underline) or kanji (orange) to see its reading & meaning. Looked-up words are saved to your progress.",
+    readingTip: "After reading, you'll mark kana you got wrong, then review vocabulary.",
     backToReading: "← Back to Reading",
     markedWrong: "kana marked wrong",
     noneMarked: "None marked yet — tap characters you read wrong",
@@ -295,6 +316,25 @@ export const translations = {
     kotobaDekiruBadge: "Bab",
     kotobaDekiruWords: "kosakata",
 
+    // ── Vocabulary Review (Anki-style card flip) ───────────
+    vocabReviewTitle: "Uji Ingatan",
+    vocabReviewCta: "Ulas {n} kosakata dari cerita ini dengan kartu flip",
+    vocabReviewTapToFlip: "Tap kartu untuk membuka",
+    vocabReviewTapToFront: "Tap untuk tampilkan kanji",
+    vocabReviewTapToBack: "Tap untuk tampilkan arti",
+    vocabReviewBtnKnown: "Saya tahu",
+    vocabReviewBtnUnknown: "Perlu dipelajari",
+    vocabReviewSkip: "Lewati",
+    vocabReviewKnown: "tahu",
+    vocabReviewUnknown: "perlu review",
+    vocabReviewAccuracy: "akurasi",
+    vocabReviewDone: "Selesai!",
+    vocabReviewDoneDesc: "Selesai mengulas {n} kosakata dari cerita ini.",
+    vocabReviewAgain: "Ulangi review",
+    vocabReviewNeedsPractice: "Kata yang perlu dipelajari",
+    vocabReviewEmpty: "Tidak ada kosakata untuk diulas",
+    vocabReviewEmptyDesc: "Cerita ini belum punya kosakata Dekiru yang cocok.",
+
     // ── Story Picker Modal ──────────────────────────────────
     storiesAvailable:
       "{n} cerita tersedia · diurutkan dari paling jarang dibaca",
@@ -336,6 +376,8 @@ export const translations = {
 
     // ── Reader component ────────────────────────────────────
     finishReading: "Selesai Membaca",
+    readingHint: "Tap huruf kana (bergaris bawah) atau kanji (oranye) untuk lihat cara baca & artinya. Yang kamu lihat akan tersimpan ke progres.",
+    readingTip: "Setelah membaca, tandai kana yang salah, lalu ulasi kosakata.",
     backToReading: "← Kembali Membaca",
     markedWrong: "kana ditandai salah",
     noneMarked: "Belum ada yang ditandai — tap huruf yang salah baca",

@@ -1,64 +1,15 @@
-import { notFound } from "next/navigation";
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { prisma } from "@/src/shared/lib/db";
-import { ReadPageContent } from "@/src/modules/read/components/ReadPageContent";
-import { getDekiruChapters } from "@/src/modules/prep/lib/kotoba-lookup";
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
-  const { id: idStr } = await params;
-  const id = Number(idStr);
-  if (isNaN(id)) return {};
-
-  const story = await prisma.story.findUnique({
-    where: { id },
-    select: { title: true, content: true },
-  });
-
-  if (!story) return {};
-
-  const preview = story.content.slice(0, 100).replace(/\n/g, " ");
-
-  return {
-    title: story.title,
-    description: `Baca dan latihan kana dari cerita "${story.title}". ${preview}…`,
-    openGraph: {
-      title: `${story.title} | Nihongo Flow`,
-      description: `Latihan membaca kana dari cerita: ${story.title}`,
-      type: "article",
-      url: `/read/${id}`,
-    },
-    alternates: {
-      canonical: `/read/${id}`,
-    },
-  };
-}
-
-export default async function ReadPage({
+/**
+ * Backward-compatibility: /read/[id] → /stories/read/[id]
+ *
+ * Redirect permanen agar link lama (bookmark, share URL, dll) tetap bekerja.
+ */
+export default async function ReadLegacyRedirect({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id: idStr } = await params;
-  const id = Number(idStr);
-  if (isNaN(id)) notFound();
-
-  const story = await prisma.story.findUnique({ where: { id } });
-  if (!story) notFound();
-
-  const chapters = getDekiruChapters();
-  const chapterInfo =
-    story.chapter != null ? chapters[story.chapter - 1] : undefined;
-
-  return (
-    <ReadPageContent
-      story={story}
-      chapterLabel={chapterInfo?.chapterLabel}
-      chapterTitle={chapterInfo?.title}
-    />
-  );
+  const { id } = await params;
+  redirect(`/stories/read/${id}`);
 }

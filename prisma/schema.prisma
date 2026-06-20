@@ -101,7 +101,7 @@ model PrepData {
 model AnkiProgress {
   id           Int      @id @default(autoincrement())
   userId       Int
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: userId, references: [id], onDelete: Cascade)
   cardKey      String   // Format: "Bab {chapterIndex}-{sectionIndex}-{kanji}-{hiragana}"
   chapter      String   // E.g., "Bab １"
   sectionIndex Int      // E.g., 0, 1, 2
@@ -113,4 +113,23 @@ model AnkiProgress {
   updatedAt    DateTime @updatedAt
 
   @@unique([userId, cardKey])
+}
+
+// ─────────────────────────────────────────
+// Tabel: KanjiDictionary
+// Kanji/kata yang ditambahkan admin lewat UI /stories/admin/kanji
+// untuk vocab yang belum ada di DekiruNihongoGroup.
+// ─────────────────────────────────────────
+model KanjiDictionary {
+  id        Int      @id @default(autoincrement())
+  kanji     String   // e.g. "走る"
+  hiragana  String   // e.g. "はしる"
+  meaningId String?  // terjemahan bahasa Indonesia
+  meaningEn String?  // terjemahan bahasa Inggris
+  chapter   Int?     // bab terkait (opsional, 1-15)
+  notes     String?  // catatan admin
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([kanji, hiragana])
 }

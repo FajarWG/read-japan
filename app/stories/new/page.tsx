@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useState, useTransition, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -30,6 +30,7 @@ import {
   type ActionState,
   type BatchStory,
 } from "@/src/modules/stories/actions";
+import { getDekiruChapters } from "@/src/modules/prep/lib/kotoba-lookup";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
@@ -44,6 +45,8 @@ const JSON_TEMPLATE: BatchStory[] = [
     translation:
       "Hari ini cuacanya bagus ya. Saya adalah seorang siswa. Saya sedang belajar bahasa Jepang.",
     focus: "あいうえお のむは がく にほんご へ",
+    chapter: 1,
+    point: 1,
   },
   {
     title: "東京の朝",
@@ -52,6 +55,8 @@ const JSON_TEMPLATE: BatchStory[] = [
     translation:
       "Saya bangun pagi-pagi. Saya naik kereta menuju Stasiun Tokyo. Kotanya sangat ramai.",
     focus: "あさ でんしゃ まち きました",
+    chapter: 1,
+    point: 2,
   },
   {
     title: "カフェにて",
@@ -60,8 +65,61 @@ const JSON_TEMPLATE: BatchStory[] = [
     translation:
       "Saya membaca buku sambil minum kopi. Saya suka kafe yang tenang.",
     focus: "カタカナ コーヒー カフェ のみがら よんでいます",
+    chapter: 1,
+    point: 3,
   },
 ];
+
+// ─────────────────────────────────────────
+// LLM Prompt untuk generate cerita Dekiru
+// ─────────────────────────────────────────
+const STORY_LLM_PROMPT = `Anda adalah penulis cerita pendek bahasa Jepang untuk pembelajar tingkat JLPT N5-N3.
+
+### TUGAS:
+Tulis 3 cerita pendek untuk BAB ${"{chapter}"} dari buku "Dekiru Nihongo" dengan judul "${"{chapterTitle}"}".
+
+Setiap cerita harus:
+1. Panjang 2-4 kalimat (40-80 karakter Jepang total)
+2. Menggunakan vocabulary dari bab ${"{chapter}"}: ${"{vocabSummary}"}
+3. Menampilkan 1 skenario berbeda (point 1, 2, 3 dari bab)
+4. Menggunakan bentuk kanji yang sesuai dengan buku
+5. Ada padanan per kalimat bahasa Indonesia yang natural
+
+### FORMAT JSON:
+[
+  {
+    "title": "Judul cerita Jepang (singkat, 4-10 karakter)",
+    "content": "Kalimat 1。Kalimat 2。Kalimat 3。",
+    "translation": "Terjemahan 1. Terjemahan 2. Terjemahan 3.",
+    "focus": "kata1 kata2 kata3",
+    "chapter": ${"{chapter}"},
+    "point": 1
+  },
+  {
+    "title": "...",
+    "content": "...",
+    "translation": "...",
+    "focus": "...",
+    "chapter": ${"{chapter}"},
+    "point": 2
+  },
+  {
+    "title": "...",
+    "content": "...",
+    "translation": "...",
+    "focus": "...",
+    "chapter": ${"{chapter}"},
+    "point": 3
+  }
+]
+
+### ATURAN:
+1. Output HANYA JSON valid tanpa markdown wrapper.
+2. Translation sentences DIPISAH dengan "." (titik).
+3. Content sentences DIPISAH dengan "。" (Japanese full-width period).
+4. Number of sentences content HARUS SAMA dengan translation.
+5. Vocabulary focus: 4-8 kata utama yang muncul dalam cerita (dipisah spasi).
+6. Judul pakai kanji jika memungkinkan.`;
 
 // ─────────────────────────────────────────
 // SingleStoryForm — tab pertama
@@ -229,7 +287,11 @@ function SingleStoryForm() {
 // ─────────────────────────────────────────
 // BatchStoryForm — tab kedua
 // ─────────────────────────────────────────
-function BatchStoryForm() {
+function BatchStoryForm({
+  chapters,
+}: {
+  chapters: Array<{ chapter: number; chapterLabel: string; title: string }>;
+}) {
   const { t } = useLanguage();
   const router = useRouter();
   const [jsonText, setJsonText] = useState("");
@@ -238,6 +300,27 @@ function BatchStoryForm() {
   const [isPending, startTransition] = useTransition();
 
   const [showTemplate, setShowTemplate] = useState(false);
+  const [showLlmPrompt, setShowLlmPrompt] = useState(false);
+  const [llmChapter, setLlmChapter] = useState(1);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+
+  function buildLlmPrompt(): string {
+    const ch = chapters[llmChapter - 1];
+    if (!ch) return STORY_LLM_PROMPT;
+    // Get vocab summary from JSON template (only first 8 items)
+    const vocab = JSON_TEMPLATE.flatMap((s) => (s.focus ?? "").split(" ")).slice(0, 8);
+    const vocabSummary = vocab.length > 0 ? vocab.join(", ") : "(lihat bab)";
+    return STORY_LLM_PROMPT.replace("{chapter}", String(llmChapter))
+      .replace("{chapterTitle}", ch.title)
+      .replace("{vocabSummary}", vocabSummary)
+      .replace("{chapter}", String(llmChapter));
+  }
+
+  function handleCopyLlmPrompt() {
+    navigator.clipboard.writeText(buildLlmPrompt());
+    setCopiedPrompt(true);
+    setTimeout(() => setCopiedPrompt(false), 2000);
+  }
 
   function handleSubmit() {
     setError(null);
@@ -288,6 +371,56 @@ function BatchStoryForm() {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* LLM Prompt section */}
+      <div className="rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-950/10 px-4 py-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-sm font-medium text-foreground">
+            🤖 Generate 3 cerita dengan LLM
+          </p>
+          <div className="flex gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowLlmPrompt((v) => !v)}
+              className="text-xs text-amber-700 dark:text-amber-400 hover:underline focus:outline-none"
+            >
+              {showLlmPrompt ? "Sembunyikan" : "Lihat prompt"}
+            </button>
+          </div>
+        </div>
+        {showLlmPrompt && (
+          <div className="mt-3 flex flex-col gap-3">
+            {/* Chapter selector */}
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium">Bab:</label>
+              <select
+                value={llmChapter}
+                onChange={(e) => setLlmChapter(Number(e.target.value))}
+                className="rounded-lg border border-border bg-surface px-2 py-1 text-sm focus:outline-none focus:border-amber-400"
+              >
+                {chapters.map((ch) => (
+                  <option key={ch.chapter} value={ch.chapter}>
+                    {ch.chapterLabel} — {ch.title}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={handleCopyLlmPrompt}
+                className="ml-auto rounded-md bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 text-xs font-semibold transition-colors"
+              >
+                {copiedPrompt ? "✓ Tersalin!" : "📋 Copy Prompt"}
+              </button>
+            </div>
+            <pre className="overflow-x-auto rounded-lg bg-gray-950 p-4 text-xs text-green-300 leading-relaxed font-mono max-h-72 overflow-y-auto">
+              {buildLlmPrompt()}
+            </pre>
+            <p className="text-[11px] text-muted">
+              Kirim ke ChatGPT / Claude → paste hasilnya di textarea di bawah
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Template section */}
       <div className="rounded-xl border border-border bg-surface-muted px-4 py-3">
         <div className="flex items-center justify-between">
@@ -419,6 +552,7 @@ function BatchStoryForm() {
 // ─────────────────────────────────────────
 export default function NewStoryPage() {
   const { t } = useLanguage();
+  const chapters = useMemo(() => getDekiruChapters(), []);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
@@ -426,23 +560,23 @@ export default function NewStoryPage() {
         {/* Header */}
         <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
           <div className="flex items-center justify-between gap-4 px-4 py-3">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <Link
-                href="/"
+                href="/stories/admin"
                 className={buttonVariants({
                   variant: "ghost",
                   size: "sm",
-                  className: "text-muted",
+                  className: "text-muted shrink-0",
                 })}
               >
-                {t.goHomeLabel}
+                ← Admin
               </Link>
               <span className="text-border">/</span>
-              <span className="text-sm font-medium text-foreground">
+              <span className="text-sm font-medium text-foreground truncate">
                 {t.newStoryNavLabel}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <SettingsDropdown />
               <Chip variant="soft" size="sm" className="text-xs font-medium">
                 {t.admin}
@@ -485,7 +619,7 @@ export default function NewStoryPage() {
                 </TabPanel>
 
                 <TabPanel id="batch">
-                  <BatchStoryForm />
+                  <BatchStoryForm chapters={chapters} />
                 </TabPanel>
               </Tabs>
             </CardContent>

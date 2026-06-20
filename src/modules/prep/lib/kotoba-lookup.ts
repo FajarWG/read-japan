@@ -1,5 +1,12 @@
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
-import { kanaMap, KanaEntry } from "@/src/modules/kana/lib/kana-map";
+import {
+  kanaMap,
+  type KanaEntry,
+} from "@/src/modules/kana/lib/kana-map";
+
+/** Re-export so server file can use it. */
+export { kanaMap };
+export type { KanaEntry };
 
 const KANJI_LOOKUP_PREFIX = "kotoba:";
 const KANJI_PATTERN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff々]/;
@@ -7,7 +14,6 @@ const OPTIONAL_GROUP_PATTERN = /[（(]([^()（）]+)[）)]/;
 
 // ─────────────────────────────────────────
 // Small combining kana (untuk yōon / kombinasi)
-// Disalin dari parser.ts karena tidak di-export.
 // ─────────────────────────────────────────
 const COMBINING_SMALL_KANA = new Set<string>([
   "ゃ", "ゅ", "ょ",
@@ -17,6 +23,9 @@ const COMBINING_SMALL_KANA = new Set<string>([
   "ゎ", "ヮ",
 ]);
 
+/** Public alias untuk file server-side (lihat kotoba-lookup-server.ts) */
+export const COMBINING_SMALL_KANA_PUBLIC = COMBINING_SMALL_KANA;
+
 function isKanaCodePoint(ch: string): boolean {
   const cp = ch.codePointAt(0) ?? 0;
   return (
@@ -25,6 +34,9 @@ function isKanaCodePoint(ch: string): boolean {
     (cp >= 0x31f0 && cp <= 0x31ff)
   );
 }
+
+/** Public alias untuk file server-side */
+export const isKanaCodePointPublic = isKanaCodePoint;
 
 export interface KotobaSourceItem {
   kanji: string;
@@ -336,9 +348,11 @@ interface AliasEntryWithChapter {
   chapter: number;
 }
 
+export type { AliasEntryWithChapter };
+
 /**
- * Bangun alias map fallback dari SEMUA bab (untuk handle kanji yang
- * tidak ada di bab spesifik cerita).
+ * Bangun alias map fallback dari SEMUA bab Dekiru + KanjiDictionary (admin).
+ * Versi sync (client-side) — tidak include KanjiDictionary.
  */
 function getGlobalKotobaAliasMapWithChapter(): Map<
   string,
@@ -363,26 +377,21 @@ function getGlobalKotobaAliasMapWithChapter(): Map<
     for (const entry of deduped.values()) {
       for (const alias of entry.aliases) {
         const existing = map.get(alias);
-        if (
-          !existing ||
-          // Preferir kanji lebih panjang ATAU entry dari bab yg lebih spesifik
-          (entry.kanji.length === existing.entry.kanji.length &&
-            chapter === existing.chapter)
-        ) {
-          if (
-            !existing ||
-            entry.kanji.length > existing.entry.kanji.length ||
-            (entry.kanji.length === existing.entry.kanji.length &&
-              chapter < existing.chapter)
-          ) {
-            map.set(alias, { entry, chapter });
-          }
+        if (!existing || entry.kanji.length > existing.entry.kanji.length) {
+          map.set(alias, { entry, chapter });
         }
       }
     }
   }
   return map;
 }
+
+/**
+ * Server-only helpers ada di file terpisah `kotoba-lookup-server.ts`.
+ * Jangan import dari file ini di client components — gunakan
+ * `dynamic import()` atau pindahkan logic ke server component.
+ * @see ./kotoba-lookup-server.ts
+ */
 
 /**
  * Tokenisasi teks cerita menjadi array `StoryToken`:
@@ -395,6 +404,9 @@ function getGlobalKotobaAliasMapWithChapter(): Map<
  *   2. Alias map global (fallback untuk kanji dari bab lain)
  *   3. Kana + combining small kana
  *   4. Single character
+ *
+ * Catatan: untuk include KanjiDictionary (admin-added) gunakan versi async
+ * `parseStoryTextAsync` di `./kotoba-lookup-server.ts` (server-only).
  */
 export function parseStoryText(
   text: string,

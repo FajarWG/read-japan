@@ -189,7 +189,7 @@ function DekiruStoriesSection({
                 {list.map((story) => (
                   <Link
                     key={story.id}
-                    href={`/read/${story.id}`}
+                    href={`/stories/read/${story.id}`}
                     className="group flex flex-col gap-1.5 rounded-xl border border-orange-200/70 dark:border-orange-800/40 bg-orange-50/40 dark:bg-orange-950/20 px-3 py-2.5 shadow-sm transition-all duration-150 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-md"
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -571,7 +571,7 @@ export function HomeContent({
                       {recommendedStories.map((story) => (
                         <Link
                           key={story.id}
-                          href={`/read/${story.id}`}
+                          href={`/stories/read/${story.id}`}
                           className="group flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 shadow-sm transition-all duration-150 hover:border-accent/50 hover:bg-surface-muted hover:shadow-md"
                         >
                           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -621,9 +621,19 @@ export function HomeContent({
                   </div>
                 )}
 
-                {/* Admin → Add Story (moved to bottom) */}
+                {/* Admin → links */}
                 {user?.role === "ADMIN" && (
-                  <div className="mt-6 flex justify-center">
+                  <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                    <Link
+                      href="/stories/admin"
+                      className={buttonVariants({
+                        variant: "secondary",
+                        size: "md",
+                        className: "font-semibold shadow-sm cursor-pointer",
+                      })}
+                    >
+                      🛠️ Admin Dashboard
+                    </Link>
                     <Link
                       href="/stories/new"
                       className={buttonVariants({
