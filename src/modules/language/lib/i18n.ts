@@ -51,6 +51,15 @@ export const translations = {
     noStoriesDesc: "Start by adding your first story for reading practice.",
     recommendedStories: "📖 Recommended Stories",
     recommendedStoriesDesc: "Click a story to start reading",
+    dekiruStoriesTitle: "Dekiru Nihongo Stories",
+    dekiruStoriesDesc:
+      "3 short stories per chapter, built with Kotoba Dekiru Nihongo vocabulary",
+
+    // ── Read page — Kotoba Dekiru section ───────────────────
+    chapter: "Chapter",
+    kotobaDekiruTitle: "Kotoba Dekiru Nihongo",
+    kotobaDekiruBadge: "Bab",
+    kotobaDekiruWords: "vocab",
 
     // ── Story Picker Modal ──────────────────────────────────
     storiesAvailable: "{n} stories available · sorted by least read",
@@ -123,6 +132,8 @@ export const translations = {
     storyFocusLabel: "Focus Characters",
     storyFocusHint: "(brief description of kana in this story, optional)",
     saveStory: "Save Story",
+    chapterLabel: "Chapter (Bab)",
+    pointLabel: "Point",
     batchFormat: "📋 Required JSON format",
     showTemplate: "Show template",
     hideTemplate: "Hide",
@@ -146,6 +157,9 @@ export const translations = {
     jsonMissingTitle: "Item {n}: field 'title' is required.",
     jsonMissingContent: "Item {n}: field 'content' is required.",
     serverError: "A server error occurred.",
+    chapterInvalid: "Chapter must be a number between 1 and 15.",
+    pointInvalid: "Point must be a number between 1 and 3.",
+    chapterPointPair: "Chapter and Point must be filled together.",
 
 
 
@@ -271,6 +285,15 @@ export const translations = {
       "Mulai dengan menambah cerita pertama untuk latihan membaca.",
     recommendedStories: "📖 Rekomendasi Cerita",
     recommendedStoriesDesc: "Klik cerita untuk langsung mulai membaca",
+    dekiruStoriesTitle: "Cerita Dekiru Nihongo",
+    dekiruStoriesDesc:
+      "3 cerita pendek per bab, menggunakan kosakata Kotoba Dekiru Nihongo",
+
+    // ── Read page — Kotoba Dekiru section ───────────────────
+    chapter: "Bab",
+    kotobaDekiruTitle: "Kotoba Dekiru Nihongo",
+    kotobaDekiruBadge: "Bab",
+    kotobaDekiruWords: "kosakata",
 
     // ── Story Picker Modal ──────────────────────────────────
     storiesAvailable:
@@ -344,6 +367,8 @@ export const translations = {
     storyFocusLabel: "Fokus Huruf",
     storyFocusHint: "(deskripsi singkat kana di cerita ini, opsional)",
     saveStory: "Simpan Cerita",
+    chapterLabel: "Bab",
+    pointLabel: "Poin",
     batchFormat: "📋 Format JSON yang diperlukan",
     showTemplate: "Lihat template",
     hideTemplate: "Sembunyikan",
@@ -368,6 +393,9 @@ export const translations = {
     jsonMissingTitle: "Item ke-{n}: field 'title' wajib diisi.",
     jsonMissingContent: "Item ke-{n}: field 'content' wajib diisi.",
     serverError: "Terjadi kesalahan server.",
+    chapterInvalid: "Bab harus berupa angka antara 1 dan 15.",
+    pointInvalid: "Poin harus berupa angka antara 1 dan 3.",
+    chapterPointPair: "Bab dan Poin harus diisi bersamaan.",
 
 
 

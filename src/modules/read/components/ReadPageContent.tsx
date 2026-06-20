@@ -14,6 +14,7 @@ import {
 } from "@heroui/react";
 
 import Reader from "@/src/modules/stories/components/Reader";
+import { KotobaDekiruSection } from "@/src/modules/stories/components/KotobaDekiruSection";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
@@ -29,6 +30,8 @@ export interface StoryForRead {
   focus: string | null;
   totalReads: number;
   createdAt: Date;
+  chapter: number | null;
+  point: number | null;
 }
 
 // ─────────────────────────────────────────
@@ -43,7 +46,15 @@ function countKanaChars(text: string): number {
 // Component
 // ─────────────────────────────────────────
 
-export function ReadPageContent({ story }: { story: StoryForRead }) {
+export function ReadPageContent({
+  story,
+  chapterLabel,
+  chapterTitle,
+}: {
+  story: StoryForRead;
+  chapterLabel?: string;
+  chapterTitle?: string;
+}) {
   const { lang, t } = useLanguage();
 
   const kanaCount = countKanaChars(story.content);
@@ -171,6 +182,16 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
                     🎯 {story.focus}
                   </Chip>
                 )}
+                {story.chapter != null && (
+                  <Chip
+                    variant="soft"
+                    size="sm"
+                    className="bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300 font-medium font-jp text-xs"
+                  >
+                    📖 {chapterLabel ?? `${t.chapter} ${story.chapter}`}
+                    {story.point != null && ` · #${story.point}`}
+                  </Chip>
+                )}
               </div>
             </CardHeader>
 
@@ -187,6 +208,17 @@ export function ReadPageContent({ story }: { story: StoryForRead }) {
                   storyId={story.id}
                 />
               </article>
+
+              {/* Kotoba Dekiru section — vocabulary dari bab ini */}
+              <KotobaDekiruSection
+                content={story.content}
+                chapter={story.chapter}
+                chapterLabel={
+                  chapterLabel && chapterTitle
+                    ? `${chapterLabel}・${chapterTitle}`
+                    : chapterLabel
+                }
+              />
             </CardContent>
 
             {/* Card footer */}

@@ -73,10 +73,15 @@ function SingleStoryForm() {
     createStory,
     initialState,
   );
+  const [chapter, setChapter] = useState("");
+  const [point, setPoint] = useState("");
 
   const errorMessages: Record<string, string> = {
     ERR_TITLE_REQUIRED: t.titleRequired,
     ERR_CONTENT_REQUIRED: t.contentRequired,
+    ERR_CHAPTER_INVALID: t.chapterInvalid,
+    ERR_POINT_INVALID: t.pointInvalid,
+    ERR_CHAPTER_POINT_PAIR: t.chapterPointPair,
   };
   const displayMessage =
     state.status === "error"
@@ -157,6 +162,48 @@ function SingleStoryForm() {
         />
         <FieldError className="text-xs text-red-500" />
       </TextField>
+
+      {/* Chapter & Point (Dekiru) */}
+      <div className="grid grid-cols-2 gap-3">
+        <TextField className="flex flex-col gap-1.5">
+          <Label className="text-sm font-medium text-foreground">
+            {t.chapterLabel}{" "}
+            <span className="font-normal text-muted">{t.optional}</span>
+          </Label>
+          <Input
+            type="number"
+            min={1}
+            max={15}
+            value={chapter}
+            onChange={(e) => setChapter(e.target.value)}
+            variant="primary"
+            fullWidth
+            placeholder="1-15"
+            inputMode="numeric"
+          />
+        </TextField>
+        <TextField className="flex flex-col gap-1.5">
+          <Label className="text-sm font-medium text-foreground">
+            {t.pointLabel}{" "}
+            <span className="font-normal text-muted">{t.optional}</span>
+          </Label>
+          <Input
+            type="number"
+            min={1}
+            max={3}
+            value={point}
+            onChange={(e) => setPoint(e.target.value)}
+            variant="primary"
+            fullWidth
+            placeholder="1-3"
+            inputMode="numeric"
+            disabled={!chapter}
+          />
+        </TextField>
+        {/* Hidden inputs submitted with form */}
+        <input type="hidden" name="chapter" value={chapter} />
+        <input type="hidden" name="point" value={point} />
+      </div>
 
       {/* Actions */}
       <div className="flex items-center justify-end gap-3 pt-1">

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { prisma } from "@/src/shared/lib/db";
 import { ReadPageContent } from "@/src/modules/read/components/ReadPageContent";
+import { getDekiruChapters } from "@/src/modules/prep/lib/kotoba-lookup";
 
 export async function generateMetadata({
   params,
@@ -49,5 +50,15 @@ export default async function ReadPage({
   const story = await prisma.story.findUnique({ where: { id } });
   if (!story) notFound();
 
-  return <ReadPageContent story={story} />;
+  const chapters = getDekiruChapters();
+  const chapterInfo =
+    story.chapter != null ? chapters[story.chapter - 1] : undefined;
+
+  return (
+    <ReadPageContent
+      story={story}
+      chapterLabel={chapterInfo?.chapterLabel}
+      chapterTitle={chapterInfo?.title}
+    />
+  );
 }

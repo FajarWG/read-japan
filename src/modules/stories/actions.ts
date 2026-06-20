@@ -14,6 +14,8 @@ export interface BatchStory {
   content: string;
   translation?: string;
   focus?: string;
+  chapter?: number; // 1-15, null = legacy
+  point?: number; // 1-3 (cerita ke-N dalam bab)
 }
 
 export type ActionState =
@@ -34,12 +36,39 @@ export async function createStory(
   const translation =
     (formData.get("translation") as string)?.trim() || undefined;
   const focus = (formData.get("focus") as string)?.trim() || undefined;
+  const chapterRaw = (formData.get("chapter") as string)?.trim();
+  const pointRaw = (formData.get("point") as string)?.trim();
+  const chapter = chapterRaw ? Number(chapterRaw) : null;
+  const point = pointRaw ? Number(pointRaw) : null;
+
+  if (
+    chapter !== null &&
+    (!Number.isInteger(chapter) || chapter < 1 || chapter > 15)
+  ) {
+    return { status: "error", message: "ERR_CHAPTER_INVALID" };
+  }
+  if (
+    point !== null &&
+    (!Number.isInteger(point) || point < 1 || point > 3)
+  ) {
+    return { status: "error", message: "ERR_POINT_INVALID" };
+  }
+  if ((chapter === null) !== (point === null)) {
+    return { status: "error", message: "ERR_CHAPTER_POINT_PAIR" };
+  }
 
   if (!title) return { status: "error", message: "ERR_TITLE_REQUIRED" };
   if (!content) return { status: "error", message: "ERR_CONTENT_REQUIRED" };
 
   const story = await prisma.story.create({
-    data: { title, content, translation, focus },
+    data: {
+      title,
+      content,
+      translation,
+      focus,
+      chapter,
+      point,
+    },
   });
   redirect(`/read/${story.id}`);
 }
@@ -51,16 +80,31 @@ export async function createManyStories(
     throw new Error("Data cerita tidak boleh kosong.");
 
   const results = await Promise.all(
-    stories.map((s) =>
-      prisma.story.create({
+    stories.map((s) => {
+      const chapter =
+        typeof s.chapter === "number" && Number.isInteger(s.chapter)
+          ? s.chapter
+          : null;
+      const point =
+        typeof s.point === "number" && Number.isInteger(s.point)
+          ? s.point
+          : null;
+      if ((chapter === null) !== (point === null)) {
+        throw new Error(
+          `Cerita "${s.title}": chapter & point harus diisi bersamaan.`,
+        );
+      }
+      return prisma.story.create({
         data: {
           title: s.title.trim(),
           content: s.content.trim(),
           translation: s.translation?.trim() || undefined,
           focus: s.focus?.trim() || undefined,
+          chapter,
+          point,
         },
-      }),
-    ),
+      });
+    }),
   );
 
   return { count: results.length };

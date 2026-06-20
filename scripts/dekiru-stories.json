@@ -1,0 +1,362 @@
+[
+  {
+    "title": "はじめまして",
+    "content": "はじめまして。田中です。アメリカの会社員です。どうぞよろしくお願いいします。",
+    "translation": "Senang bertemu dengan Anda. Saya Tanaka. Saya seorang karyawan perusahaan dari Amerika. Saya berharap bisa berkenalan dengan Anda.",
+    "focus": "私 名前 国 仕事 会社員",
+    "chapter": 1,
+    "point": 1
+  },
+  {
+    "title": "誕生日はいつですか",
+    "content": "私の誕生日は８月15日です。今年で25歳です。誕生日は家族のとお祝いをします。",
+    "translation": "Ulang tahun saya tanggal 15 Agustus. Tahun ini saya berusia 25 tahun. Untuk ulang tahun, saya merayakan bersama keluarga.",
+    "focus": "誕生日 〜月 〜日 〜歳 家族",
+    "chapter": 1,
+    "point": 2
+  },
+  {
+    "title": "私の趣味",
+    "content": "私の趣味は映画と読書です。土曜日はよく映画を見ます。ワさんはサッカーが好きです。",
+    "translation": "Hobi saya adalah menonton film dan membaca buku. Hari Sabtu saya sering menonton film. Saudara Wa menyukai sepak bola.",
+    "focus": "趣味 映画 読書 サッカー 好き",
+    "chapter": 1,
+    "point": 3
+  },
+  {
+    "title": "すみません、ＡＴＭはどこですか",
+    "content": "すみません、ＡＴＭはどこですか。銀行の中です。あっ、地下のＡＴＭですね。ありがとうございました。",
+    "translation": "Permisi, di mana ATM. Di dalam bank. Oh, ATM di lantai bawah ya. Terima kasih banyak.",
+    "focus": "ＡＴＭ どこ 銀行 地下 すみません",
+    "chapter": 2,
+    "point": 1
+  },
+  {
+    "title": "これはいくらですか",
+    "content": "すみません、これはいくらですか。時計ですか。時計は8000円です。じゃ、これを買います。",
+    "translation": "Permisi, ini berapa harganya. Ini jam tangan ya. Jam tangannya 8000 yen. Baik, saya akan membeli ini.",
+    "focus": "これ いくら 時計 〜円 買います",
+    "chapter": 2,
+    "point": 2
+  },
+  {
+    "title": "レストランで",
+    "content": "いらっしゃいませ。何にしますか。魚のカレーをお願いします。ありがとうございます。",
+    "translation": "Selamat datang. Mau pesan apa. Saya pesan kari ikan, tolong. Terima kasih.",
+    "focus": "レストラン 魚 カレー いらっしゃいませ ありがとう",
+    "chapter": 2,
+    "point": 3
+  },
+  {
+    "title": "今、何時ですか",
+    "content": "すみません、今は何時ですか。今、午後４時半です。４時半ですか。郵便局に行きます。",
+    "translation": "Permisi, sekarang jam berapa. Sekarang pukul 4:30 sore. Pukul 4:30 ya. Saya akan pergi ke kantor pos.",
+    "focus": "今 〜時 〜分 郵便局 行きます",
+    "chapter": 3,
+    "point": 1
+  },
+  {
+    "title": "私のスケジュール",
+    "content": "月曜日は授業があります。水曜日はテストがあります。土曜日はアルバイトをします。",
+    "translation": "Hari Senin ada kelas. Hari Rabu ada ujian. Hari Sabtu saya kerja paruh waktu.",
+    "focus": "月曜日 水曜日 授業 テスト アルバイト",
+    "chapter": 3,
+    "point": 2
+  },
+  {
+    "title": "週末の予定",
+    "content": "週末は友達と公園に行きます。春なので、桜がきれいです。弁当を作って持っていきます。",
+    "translation": "Akhir pekan saya pergi ke taman bersama teman. Karena musim semi, bunga sakura indah. Saya membuat bekal dan membawanya.",
+    "focus": "週末 友達 公園 春 桜 弁当",
+    "chapter": 3,
+    "point": 3
+  },
+  {
+    "title": "どうやって行きますか",
+    "content": "京都までどうやって行きますか。新幹線で３時間です。高いですね。",
+    "translation": "Bagaimana cara pergi ke Kyoto. Dengan shinkansen 3 jam. Mahal ya.",
+    "focus": "どうやって 新幹線 電車 時間 高い",
+    "chapter": 4,
+    "point": 1
+  },
+  {
+    "title": "私の町",
+    "content": "私の町に有名な神社があります。古いお寺もあって、静かです。週末は人が多いです。",
+    "translation": "Di kota saya ada kuil yang terkenal. Ada juga kuil tua, dan tempatnya tenang. Akhir pekan banyak orang.",
+    "focus": "町 有名 神社 寺 静か 人",
+    "chapter": 4,
+    "point": 2
+  },
+  {
+    "title": "季節と天気",
+    "content": "日本の冬は寒いですが、雪がきれいです。夏はとても暑いです。でも、秋は涼しくて好きです。",
+    "translation": "Musim dingin di Jepang dingin, tetapi saljunya indah. Musim panas sangat panas. Tapi, musim gugur sejuk dan saya suka.",
+    "focus": "冬 夏 秋 涼しい 暑い 雪",
+    "chapter": 4,
+    "point": 3
+  },
+  {
+    "title": "週末は何をしましたか",
+    "content": "週末は何をしましたか。家族と買い物に行きました。それから、家で晩ご飯を作りました。",
+    "translation": "Apa yang kamu lakukan akhir pekan. Saya pergi belanja bersama keluarga. Setelah itu, saya membuat makan malam di rumah.",
+    "focus": "週末 家族 買い物 晩ご飯 作る",
+    "chapter": 5,
+    "point": 1
+  },
+  {
+    "title": "休みの後で",
+    "content": "先週の休みはどうでしたか。忙しかったです。先週は風邪をひきました。でも、今は元気です。",
+    "translation": "Bagaimana liburan minggu lalu. Sibuk. Minggu lalu saya masuk angin. Tapi, sekarang sudah sehat.",
+    "focus": "先週 休み 忙しい 風邪 元気",
+    "chapter": 5,
+    "point": 2
+  },
+  {
+    "title": "今度の休み",
+    "content": "今度の休みに友達と旅行に行きます。来年、沖縄へ行く予定です。自転車で景色を見たいです。",
+    "translation": "Pada liburan kali ini saya akan bepergian dengan teman. Tahun depan, saya rencana pergi ke Okinawa. Saya ingin melihat pemandangan dengan sepeda.",
+    "focus": "今度 休み 友達 旅行 来年 自転車 景色",
+    "chapter": 5,
+    "point": 3
+  },
+  {
+    "title": "一緒に行きませんか",
+    "content": "今度の日曜日、一緒に映画を見に行きませんか。いいですね。行きましょう。何の映画を見ますか。",
+    "translation": "Minggu depan, mau pergi menonton film bersama. Ide bagus. Ayo pergi. Kita nonton film apa.",
+    "focus": "一緒に 映画 見ます いいですね 行きましょう",
+    "chapter": 6,
+    "point": 1
+  },
+  {
+    "title": "どちらがいいですか",
+    "content": "今晩、焼き肉とラーメン、どちらがいいですか。どちらも好きです。じゃ、焼き肉にしましょう。",
+    "translation": "Malam ini, yakiniku dan ramen, mana yang lebih enak. Saya suka dua-duanya. Kalau begitu, mari kita pilih yakiniku.",
+    "focus": "どちら 焼き肉 ラーメン どちらも いい",
+    "chapter": 6,
+    "point": 2
+  },
+  {
+    "title": "今晩の約束",
+    "content": "今晩、用事があります。残念です。また今度、一緒にご飯を食べませんか。いいですね。",
+    "translation": "Malam ini saya ada urusan. Sayang sekali. Lain kali, mau makan bersama lagi. Ide bagus.",
+    "focus": "今晩 用事 残念 また今度 一緒",
+    "chapter": 6,
+    "point": 3
+  },
+  {
+    "title": "道がわかりません",
+    "content": "すみません、駅はどこですか。この道をまっすぐ行って、二つ目の交差点を右に曲がってください。",
+    "translation": "Permisi, di mana stasiun. Jalan terus di jalan ini, lalu belok kanan di persimpangan kedua.",
+    "focus": "駅 道 まっすぐ 交差点 右 曲がる",
+    "chapter": 7,
+    "point": 1
+  },
+  {
+    "title": "パーティーの準備",
+    "content": "明日、友達の家でパーティーがあります。テーブルといすを準備します。料理も作ります。",
+    "translation": "Besok ada pesta di rumah teman. Saya menyiapkan meja dan kursi. Saya juga membuat masakan.",
+    "focus": "パーティー テーブル いす 料理 作る 準備",
+    "chapter": 7,
+    "point": 2
+  },
+  {
+    "title": "みんなで乾杯",
+    "content": "皆さん、ジュースで乾杯しましょう。いただきます。料理がおいしいです。たくさん食べました。",
+    "translation": "Semuanya, mari bersulang dengan jus. Selamat makan. Masakannya enak. Saya makan banyak.",
+    "focus": "皆さん ジュース 乾杯 いただきます 料理 食べる",
+    "chapter": 7,
+    "point": 3
+  },
+  {
+    "title": "私の家族",
+    "content": "私には父と母がいます。兄が一人と妹が一人います。父は医者で、母は先生です。",
+    "translation": "Saya punya ayah dan ibu. Saya punya satu kakak laki-laki dan satu adik perempuan. Ayah seorang dokter, ibu seorang guru.",
+    "focus": "父 母 兄 妹 医者 先生",
+    "chapter": 8,
+    "point": 1
+  },
+  {
+    "title": "私の友達",
+    "content": "私の友達は背が高くて、髪が長いです。顔がかっこいいです。明るくて、親切な人です。",
+    "translation": "Teman saya tinggi dan rambutnya panjang. Wajahnya tampan. Dia orangnya ceria dan baik hati.",
+    "focus": "友達 背が高い 髪 顔 かっこいい 親切",
+    "chapter": 8,
+    "point": 2
+  },
+  {
+    "title": "母の誕生日プレゼント",
+    "content": "来週は母の誕生日です。カードと花をプレゼントします。母はきっと喜んでくれると思います。",
+    "translation": "Minggu depan adalah ulang tahun ibu. Saya memberi kartu dan bunga sebagai hadiah. Saya pikir ibu pasti senang.",
+    "focus": "母 誕生日 カード 花 プレゼント 喜ぶ",
+    "chapter": 8,
+    "point": 3
+  },
+  {
+    "title": "いろいろな趣味",
+    "content": "私の趣味は音楽を聞くことです。最近はクラシックをよく聞きます。時々、ジャズも聞きます。",
+    "translation": "Hobi saya mendengarkan musik. Akhir-akhir ini saya sering mendengarkan musik klasik. Kadang-kadang saya juga mendengarkan jazz.",
+    "focus": "趣味 音楽 聞く 最近 クラシック ジャズ",
+    "chapter": 9,
+    "point": 1
+  },
+  {
+    "title": "できること",
+    "content": "私は泳ぐことができます。でも、スキーは全然できません。難しいです。",
+    "translation": "Saya bisa berenang. Tapi, saya sama sekali tidak bisa bermain ski. Itu sulit.",
+    "focus": "できる 泳ぐ スキー 全然 難しい",
+    "chapter": 9,
+    "point": 2
+  },
+  {
+    "title": "書道教室",
+    "content": "私は書道教室に通っています。漢字を書くのが好きです。上手に書けるようになりたいです。",
+    "translation": "Saya pergi ke kelas kaligrafi. Saya suka menulis kanji. Saya ingin bisa menulis dengan baik.",
+    "focus": "書道 教室 漢字 書く 上手",
+    "chapter": 9,
+    "point": 3
+  },
+  {
+    "title": "集合時間と場所",
+    "content": "明日、午前９時に駅で集合します。遅れないでください。バスで動物園に行きます。",
+    "translation": "Besok kita berkumpul di stasiun pukul 9 pagi. Jangan terlambat. Kita pergi ke kebun binatang dengan bus.",
+    "focus": "集合 午前 駅 遅れる バス 動物園",
+    "chapter": 10,
+    "point": 1
+  },
+  {
+    "title": "動物園での注意",
+    "content": "動物園でえさをあげないでください。動物を触らないでください。危ないですから。",
+    "translation": "Di kebun binatang, jangan memberi makan binatang. Jangan menyentuh binatang. Karena berbahaya.",
+    "focus": "動物園 えさ 触る 危ない 注意",
+    "chapter": 10,
+    "point": 2
+  },
+  {
+    "title": "動物園で",
+    "content": "動物園にパンダとゾウがいます。ペンギンもいました。子供たちはとても喜びました。",
+    "translation": "Di kebun binatang ada panda dan gajah. Ada juga penguin. Anak-anak sangat senang.",
+    "focus": "動物園 パンダ ゾウ ペンギン 子供 喜ぶ",
+    "chapter": 10,
+    "point": 3
+  },
+  {
+    "title": "私の生活",
+    "content": "私は毎日朝７時に起きます。それから、ジョギングをします。夜は日記を書きます。",
+    "translation": "Saya bangun setiap hari pukul 7 pagi. Setelah itu, saya jogging. Malam hari saya menulis buku harian.",
+    "focus": "毎日 朝 起きる ジョギング 夜 日記 書く",
+    "chapter": 11,
+    "point": 1
+  },
+  {
+    "title": "前の私",
+    "content": "私は去年、大学を卒業しました。それから、この会社に就職しました。今年から一人暮らしです。",
+    "translation": "Tahun lalu, saya lulus dari universitas. Setelah itu, saya bekerja di perusahaan ini. Mulai tahun ini saya tinggal sendiri.",
+    "focus": "去年 卒業 大学 就職 一人暮らし 今年",
+    "chapter": 11,
+    "point": 2
+  },
+  {
+    "title": "友達と",
+    "content": "毎週末、友達と公園を散歩します。時々、カフェで話もします。すごく楽しいです。",
+    "translation": "Setiap akhir pekan, saya berjalan-jalan di taman bersama teman. Kadang-kadang, kami juga mengobrol di kafe. Sangat menyenangkan.",
+    "focus": "毎週 友達 公園 散歩 話 楽しい",
+    "chapter": 11,
+    "point": 3
+  },
+  {
+    "title": "体の調子",
+    "content": "今日は頭が痛いです。熱もあります。調子が悪いので、明日病院へ行きます。",
+    "translation": "Hari ini kepala saya sakit. Saya juga demam. Karena kondisi saya tidak enak, besok saya akan pergi ke rumah sakit.",
+    "focus": "頭 痛い 熱 調子 悪い 病院",
+    "chapter": 12,
+    "point": 1
+  },
+  {
+    "title": "アドバイス",
+    "content": "ゆっくり休んでください。睡眠をたくさんとってください。薬を飲んで、早くよくなってください。",
+    "translation": "Tolong istirahat dengan tenang. Tolong banyak tidur. Minumlah obat, dan cepat sembuh ya.",
+    "focus": "ゆっくり 休む 睡眠 薬 飲む 早く",
+    "chapter": 12,
+    "point": 2
+  },
+  {
+    "title": "病院で",
+    "content": "受付に保険証を出してください。はい、待合室で少し待ってください。",
+    "translation": "Tolong serahkan kartu asuransi di resepsionis. Ya, tolong tunggu sebentar di ruang tunggu.",
+    "focus": "受付 保険証 出す 待合室 待つ",
+    "chapter": 12,
+    "point": 3
+  },
+  {
+    "title": "京都のおすすめ",
+    "content": "京都は紅葉がきれいです。秋に行くのがおすすめです。古い神社もあって、素晴らしいです。",
+    "translation": "Daun musim gugur di Kyoto indah. Saya sarankan pergi di musim gugur. Ada juga kuil kuno, dan menakjubkan.",
+    "focus": "紅葉 秋 おすすめ 神社 古い",
+    "chapter": 13,
+    "point": 1
+  },
+  {
+    "title": "おすすめのお土産",
+    "content": "東京のお土産にこのシャツはいかがですか。若い人に人気があります。赤い色もありますよ。",
+    "translation": "Bagaimana kalau kemeja ini sebagai oleh-oleh dari Tokyo. Populer di kalangan orang muda. Ada juga warna merah.",
+    "focus": "お土産 シャツ 若い 人気 赤い",
+    "chapter": 13,
+    "point": 2
+  },
+  {
+    "title": "遊園地で",
+    "content": "先週、家族と遊園地に行きました。ジェットコースターに乗りました。すごく楽しかったです。",
+    "translation": "Minggu lalu, saya pergi ke taman bermain bersama keluarga. Saya naik roller coaster. Sangat menyenangkan.",
+    "focus": "遊園地 家族 ジェットコースター 乗る 楽しい",
+    "chapter": 13,
+    "point": 3
+  },
+  {
+    "title": "初めて見たこと",
+    "content": "ホストファミリーの家でこたつを見ました。初めて見て、びっくりしました。すごく暖かかったです。",
+    "translation": "Di rumah host family saya melihat kotatsu. Saya kaget melihatnya untuk pertama kali. Hangat sekali.",
+    "focus": "ホストファミリー こたつ 初めて びっくり 暖かい",
+    "chapter": 14,
+    "point": 1
+  },
+  {
+    "title": "ルールとマナー",
+    "content": "日本では電車に乗る時、並びます。エレベーターでドアの前で止めます。ちゃんとマナーを守ります。",
+    "translation": "Di Jepang saat naik kereta, kita antri. Saat di elevator, berhenti di depan pintu. Kita menjaga tata krama dengan baik.",
+    "focus": "電車 並ぶ 止める きちんと マナー",
+    "chapter": 14,
+    "point": 2
+  },
+  {
+    "title": "私の意見",
+    "content": "田舎の空気はきれいです。都会は交通が便利ですが、静かではありません。私は田舎のほうが好きです。",
+    "translation": "Udara di pedesaan bersih. Kota，交通 praktis，tetapi tidak tenang. Saya lebih suka pedesaan.",
+    "focus": "田舎 空気 都会 交通 静か 好き",
+    "chapter": 14,
+    "point": 3
+  },
+  {
+    "title": "台風のニュース",
+    "content": "昨日のニュースで、台風が来ました。電車が止まりました。事故もあったそうです。心配です。",
+    "translation": "Dalam berita kemarin, ada typhoon. Kereta berhenti. Konon ada juga kecelakaan. Saya khawatir.",
+    "focus": "ニュース 台風 電車 止まる 事故 心配",
+    "chapter": 15,
+    "point": 1
+  },
+  {
+    "title": "スピーチコンテスト",
+    "content": "スピーチコンテストで優勝しました。緊張しましたが、思い出になりました。",
+    "translation": "Saya menang dalam lomba pidato. Saya gugup, tetapi itu menjadi kenangan.",
+    "focus": "スピーチコンテスト 優勝 緊張 思い出",
+    "chapter": 15,
+    "point": 2
+  },
+  {
+    "title": "町で",
+    "content": "雑誌で新しい店を知りました。今日は10パーセント引きのセールです。混む前に行きましょう。",
+    "translation": "Saya tahu toko baru dari majalah. Hari ini ada diskon 10 persen. Ayo pergi sebelum ramai.",
+    "focus": "雑誌 新しい 店 パーセント引き セール 混む",
+    "chapter": 15,
+    "point": 3
+  }
+]

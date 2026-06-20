@@ -27,6 +27,27 @@ function normalizeLookupText(text: string): string {
   return text.replace(/\s+/g, "").trim();
 }
 
+/**
+ * Strip footnote markers (e.g. "父※1" → "父", "お父さん※2" → "お父さん").
+ * Footnote markers referensi seperti "※1", "※2" sering muncul di kanji Dekiru.
+ */
+function stripFootnoteMarkers(text: string): string {
+  return text.replace(/※\d+/g, "");
+}
+
+/**
+ * Kembalikan true jika string hanya berisi karakter Jepang yang valid
+ * (Kanji CJK + Hiragana + Katakana + small kana + prolonged mark `ー`).
+ *
+ * Alias dengan `※`, brackets, koma, titik, latin, dll tidak dianggap cocok
+ * untuk lookup berbasis substring (mereka adalah "kalimat contoh" / penanda).
+ */
+const VALID_JAPANESE_CHAR = /^[぀-ゟ゠-ヿ㐀-䶿一-鿿々ー]+$/;
+function isValidJapaneseLookup(text: string): boolean {
+  if (!text) return false;
+  return VALID_JAPANESE_CHAR.test(text);
+}
+
 function expandOptionalGroups(text: string): string[] {
   const normalized = normalizeLookupText(text);
   if (!normalized) return [];
@@ -65,12 +86,14 @@ export function getKotobaMeaning(
 export function createKotobaLookupEntry(
   item: KotobaSourceItem,
 ): KotobaLookupEntry | null {
-  const rawKanji = normalizeLookupText(item.kanji);
+  const rawKanji = stripFootnoteMarkers(normalizeLookupText(item.kanji));
   if (!rawKanji || rawKanji === "-" || !hasKanji(rawKanji)) {
     return null;
   }
 
-  const aliases = expandOptionalGroups(rawKanji).filter(hasKanji);
+  const aliases = expandOptionalGroups(rawKanji)
+    .filter(hasKanji)
+    .filter(isValidJapaneseLookup);
   if (aliases.length === 0) return null;
 
   return {
@@ -130,4 +153,130 @@ export function getAllKotobaLookupMap(): Map<string, KotobaLookupEntry> {
 
 export function isKotobaProgressKey(key: string): boolean {
   return key.startsWith(KANJI_LOOKUP_PREFIX);
+}
+
+// ─────────────────────────────────────────
+// Per-bab helpers (untuk section "Kotoba Dekiru")
+// ─────────────────────────────────────────
+
+export interface DekiruChapter {
+  chapter: number; // 1-15
+  chapterLabel: string; // e.g. "Bab １"
+  title: string;
+}
+
+/**
+ * Daftar 15 bab dari DekiruNihongoGroup, dinomori 1-15 sesuai urutan.
+ */
+export function getDekiruChapters(): DekiruChapter[] {
+  return (DekiruNihongoGroups as Array<{ chapter: string; title: string }>).map(
+    (g, i) => ({
+      chapter: i + 1,
+      chapterLabel: g.chapter,
+      title: g.title,
+    }),
+  );
+}
+
+/**
+ * Kembalikan seluruh lookup entries (alias-aware) untuk satu bab.
+ */
+export function getKotobaLookupEntriesForChapter(
+  chapter: number,
+): KotobaLookupEntry[] {
+  const idx = chapter - 1;
+  const group = (DekiruNihongoGroups as Array<{
+    sections?: Array<{ examples?: KotobaSourceItem[] }>;
+  }>)[idx];
+  if (!group) return [];
+
+  const deduped = new Map<string, KotobaLookupEntry>();
+  for (const section of group.sections || []) {
+    for (const item of section.examples || []) {
+      const entry = createKotobaLookupEntry(item);
+      if (entry && !deduped.has(entry.progressKey)) {
+        deduped.set(entry.progressKey, entry);
+      }
+    }
+  }
+  return Array.from(deduped.values());
+}
+
+/**
+ * Kembalikan lookup entries (beserta alias map) untuk satu bab.
+ * Berguna untuk pencocokan substring ke teks cerita.
+ */
+export function getKotobaAliasMapForChapter(
+  chapter: number,
+): {
+  entries: KotobaLookupEntry[];
+  aliasMap: Map<string, KotobaLookupEntry>;
+} {
+  const entries = getKotobaLookupEntriesForChapter(chapter);
+  const aliasMap = new Map<string, KotobaLookupEntry>();
+  for (const entry of entries) {
+    for (const alias of entry.aliases) {
+      const existing = aliasMap.get(alias);
+      if (!existing || entry.kanji.length > existing.kanji.length) {
+        aliasMap.set(alias, entry);
+      }
+    }
+  }
+  return { entries, aliasMap };
+}
+
+export interface MatchedKotoba {
+  entry: KotobaLookupEntry;
+  /** surface form yang ditemukan dalam teks (bisa alias) */
+  surface: string;
+  /** jumlah kemunculan dalam teks */
+  count: number;
+  /** posisi kemunculan pertama (char index) */
+  firstIndex: number;
+}
+
+/**
+ * Cari semua kosakata dari bab `chapter` yang muncul dalam `text`.
+ * Strategi: scan teks dari kiri ke kanan, pada setiap posisi coba cocokkan
+ * alias terpanjang dulu (longest-match).
+ *
+ * Return diurutkan berdasarkan `firstIndex` (urut kemunculan di cerita).
+ */
+export function matchKotobaInText(
+  text: string,
+  chapter: number,
+): MatchedKotoba[] {
+  const { entries, aliasMap } = getKotobaAliasMapForChapter(chapter);
+  if (entries.length === 0) return [];
+
+  const aliasLengths = Array.from(aliasMap.keys())
+    .map((a) => a.length)
+    .filter((n) => n > 0);
+  if (aliasLengths.length === 0) return [];
+  const maxLen = Math.max(...aliasLengths);
+
+  const out = new Map<string, MatchedKotoba>(); // key: progressKey
+  for (let i = 0; i < text.length; i++) {
+    for (let len = maxLen; len >= 1; len--) {
+      const slice = text.slice(i, i + len);
+      if (slice.length < len) break;
+      const hit = aliasMap.get(slice);
+      if (!hit) continue;
+      const existing = out.get(hit.progressKey);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        out.set(hit.progressKey, {
+          entry: hit,
+          surface: slice,
+          count: 1,
+          firstIndex: i,
+        });
+      }
+      i += len - 1; // skip matched length
+      break;
+    }
+  }
+
+  return Array.from(out.values()).sort((a, b) => a.firstIndex - b.firstIndex);
 }

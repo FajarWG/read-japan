@@ -9,6 +9,7 @@ import { kanaMap } from "@/src/modules/kana/lib/kana-map";
 import {
   getAllKotobaLookupMap,
   isKotobaProgressKey,
+  getDekiruChapters,
 } from "@/src/modules/prep/lib/kotoba-lookup";
 
 export const dynamic = "force-dynamic";
@@ -70,10 +71,13 @@ export default async function StoriesPage() {
 
   const hasWrong = kanaProgress.some((r) => r.wrongCount > 0);
 
+  const dekiruChapters = getDekiruChapters();
+
   return (
     <HomeContent
       recommendedStories={stories.slice(0, 2)}
       stories={stories}
+      dekiruChapters={dekiruChapters}
       totalClicks={totalClicks}
       totalWrong={totalWrong}
       totalDebt={totalDebt}

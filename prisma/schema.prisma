@@ -26,9 +26,13 @@ model Story {
   content     String
   translation String?
   focus       String?
+  chapter     Int?     // Nomor Bab (1-15) untuk cerita Dekiru; null = cerita legacy
+  point       Int?     // Nomor poin cerita dalam bab (1-3); null = cerita legacy
   totalReads  Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@unique([chapter, point])
 }
 
 // ─────────────────────────────────────────

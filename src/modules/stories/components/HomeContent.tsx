@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { buttonVariants, Chip, Tabs } from "@heroui/react";
+import { buttonVariants, Tabs } from "@heroui/react";
 
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { StoryPickerModal } from "@/src/modules/stories/components/StoryPickerModal";
@@ -15,6 +15,7 @@ import {
   getAllKotobaLookupMap,
   isKotobaProgressKey,
   type KotobaLookupEntry,
+  type DekiruChapter,
 } from "@/src/modules/prep/lib/kotoba-lookup";
 
 // ─────────────────────────────────────────
@@ -28,6 +29,8 @@ export interface StoryRow {
   focus: string | null;
   totalReads: number;
   createdAt: Date;
+  chapter: number | null;
+  point: number | null;
 }
 
 export type ProgressRecord = {
@@ -47,6 +50,7 @@ export type KotobaProgressRecord = {
 interface HomeContentProps {
   recommendedStories: StoryRow[];
   stories: StoryRow[];
+  dekiruChapters: DekiruChapter[];
   totalClicks: number;
   totalWrong: number;
   totalDebt: number;
@@ -116,6 +120,102 @@ function KotobaProgressCard({ record }: { record: KotobaProgressRecord }) {
         <span className="text-[11px] leading-relaxed text-muted">
           {record.entry.meaning}
         </span>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────
+// DekiruStoriesSection — cerita dikelompokkan per bab (1 cerita × 3 poin)
+// ─────────────────────────────────────────
+
+function DekiruStoriesSection({
+  stories,
+  chapters,
+}: {
+  stories: StoryRow[];
+  chapters: DekiruChapter[];
+}) {
+  const { t } = useLanguage();
+
+  // Group stories by chapter (only those with chapter != null)
+  const grouped = useMemo(() => {
+    const map = new Map<number, StoryRow[]>();
+    for (const story of stories) {
+      if (story.chapter == null) continue;
+      const list = map.get(story.chapter) ?? [];
+      list.push(story);
+      map.set(story.chapter, list);
+    }
+    // sort by point inside each chapter
+    for (const [, list] of map) list.sort((a, b) => (a.point ?? 0) - (b.point ?? 0));
+    return map;
+  }, [stories]);
+
+  if (chapters.length === 0) return null;
+  // Don't render if no chapters have stories
+  if (grouped.size === 0) return null;
+
+  return (
+    <div className="mb-8 mt-2">
+      {/* Section header */}
+      <div className="mb-4 flex items-baseline justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-foreground">
+            📚 {t.dekiruStoriesTitle}
+          </p>
+          <p className="text-[11px] text-muted mt-0.5">
+            {t.dekiruStoriesDesc}
+          </p>
+        </div>
+      </div>
+
+      {/* Chapter list — horizontal scroll */}
+      <div className="flex flex-col gap-5">
+        {chapters.map((ch) => {
+          const list = grouped.get(ch.chapter);
+          if (!list || list.length === 0) return null;
+          return (
+            <section key={ch.chapter}>
+              <header className="mb-2 flex items-center gap-2">
+                <span className="rounded-md bg-orange-100 dark:bg-orange-900/40 px-2 py-0.5 text-[11px] font-bold text-orange-700 dark:text-orange-300 tabular-nums">
+                  {ch.chapterLabel}
+                </span>
+                <span className="font-jp text-sm font-semibold text-foreground truncate">
+                  {ch.title}
+                </span>
+              </header>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {list.map((story) => (
+                  <Link
+                    key={story.id}
+                    href={`/read/${story.id}`}
+                    className="group flex flex-col gap-1.5 rounded-xl border border-orange-200/70 dark:border-orange-800/40 bg-orange-50/40 dark:bg-orange-950/20 px-3 py-2.5 shadow-sm transition-all duration-150 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-jp text-sm font-semibold text-foreground leading-snug line-clamp-1 group-hover:text-orange-600 dark:group-hover:text-orange-300 transition-colors">
+                        {story.title}
+                      </span>
+                      {story.point != null && (
+                        <span className="shrink-0 text-[10px] font-bold text-orange-600 dark:text-orange-400 tabular-nums">
+                          #{story.point}
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-jp text-[11px] text-muted line-clamp-1">
+                      {story.content}
+                    </p>
+                    {story.focus && (
+                      <p className="text-[10px] font-jp text-orange-700/80 dark:text-orange-400/80 line-clamp-1">
+                        🎯 {story.focus}
+                      </p>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
     </div>
   );
@@ -206,6 +306,7 @@ function GuestStatsRow() {
 export function HomeContent({
   recommendedStories,
   stories,
+  dekiruChapters,
   totalClicks,
   totalWrong,
   totalDebt,
@@ -382,6 +483,9 @@ export function HomeContent({
               </Tabs.ListContainer>
 
               <Tabs.Panel id="stories" className="pt-2">
+                {/* Dekiru stories grouped by chapter (Bab 1-15) */}
+                <DekiruStoriesSection stories={stories} chapters={dekiruChapters} />
+
                 {/* Start Reading CTA */}
                 {stories.length > 0 && (
                   <div className="mb-8">
