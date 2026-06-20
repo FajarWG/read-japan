@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useCallback, useTransition } from "react";
+import { useState, useCallback, useTransition, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Popover } from "@heroui/react";
 import { parseJapaneseText } from "@/src/shared/lib/parser";
 import type { ParsedUnit, KanaInfo } from "@/src/shared/lib/parser";
+import { parseStoryText } from "@/src/modules/prep/lib/kotoba-lookup";
+import type { StoryToken } from "@/src/modules/prep/lib/kotoba-lookup";
+import { KotobaToken, useKotobaClickRecorder } from "@/src/modules/stories/components/KotobaToken";
 import {
   recordClick,
   recordWrongReads,
@@ -340,12 +343,14 @@ interface ReaderProps {
   storyContent: string;
   translation?: string;
   storyId: number;
+  chapter: number | null;
 }
 
 export default function Reader({
   storyContent,
   translation,
   storyId,
+  chapter,
 }: ReaderProps) {
   const router = useRouter();
   const { t } = useLanguage();
@@ -361,6 +366,14 @@ export default function Reader({
   const [isSubmitting, startSubmitTransition] = useTransition();
 
   const units = parseJapaneseText(storyContent);
+  // Story tokens (with kotoba detection) — only used in reading mode
+  const storyTokens = useMemo<StoryToken[]>(
+    () => parseStoryText(storyContent, chapter),
+    [storyContent, chapter],
+  );
+
+  // Kotoba click recorder (handles guest vs logged-in)
+  const handleKotobaClick = useKotobaClickRecorder();
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -570,20 +583,38 @@ export default function Reader({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Teks cerita */}
+      {/* Teks cerita — kana + kanji dari bab chapter bisa diklik */}
       <p className="text-xl md:text-3xl leading-14 tracking-wider font-medium overflow-visible">
-        {units.map((unit, index) => {
-          if (!unit.info) {
+        {storyTokens.map((token, index) => {
+          if (token.type === "plain") {
             return (
               <span key={index} className="text-foreground">
-                {unit.char}
+                {token.char}
+              </span>
+            );
+          }
+          if (token.type === "kotoba") {
+            return (
+              <KotobaToken
+                key={index}
+                entry={token.entry}
+                surface={token.char}
+                onRecordOpen={handleKotobaClick}
+              />
+            );
+          }
+          // kana
+          if (!token.info) {
+            return (
+              <span key={index} className="text-foreground">
+                {token.char}
               </span>
             );
           }
           return (
             <KanaToken
               key={index}
-              unit={unit}
+              unit={{ char: token.char, info: token.info }}
               fromLabel={t.fromOrigin}
               onRecordOpen={handleKanaRecord}
             />

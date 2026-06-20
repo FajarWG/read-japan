@@ -206,6 +206,7 @@ export function ReadPageContent({
                   storyContent={story.content}
                   translation={story.translation ?? undefined}
                   storyId={story.id}
+                  chapter={story.chapter}
                 />
               </article>
 

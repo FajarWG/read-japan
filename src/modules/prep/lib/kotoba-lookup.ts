@@ -1,8 +1,30 @@
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
+import { kanaMap, KanaEntry } from "@/src/modules/kana/lib/kana-map";
 
 const KANJI_LOOKUP_PREFIX = "kotoba:";
 const KANJI_PATTERN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff々]/;
 const OPTIONAL_GROUP_PATTERN = /[（(]([^()（）]+)[）)]/;
+
+// ─────────────────────────────────────────
+// Small combining kana (untuk yōon / kombinasi)
+// Disalin dari parser.ts karena tidak di-export.
+// ─────────────────────────────────────────
+const COMBINING_SMALL_KANA = new Set<string>([
+  "ゃ", "ゅ", "ょ",
+  "ャ", "ュ", "ョ",
+  "ぁ", "ぃ", "ぅ", "ぇ", "ぉ",
+  "ァ", "ィ", "ゥ", "ェ", "ォ",
+  "ゎ", "ヮ",
+]);
+
+function isKanaCodePoint(ch: string): boolean {
+  const cp = ch.codePointAt(0) ?? 0;
+  return (
+    (cp >= 0x3040 && cp <= 0x309f) ||
+    (cp >= 0x30a0 && cp <= 0x30ff) ||
+    (cp >= 0x31f0 && cp <= 0x31ff)
+  );
+}
 
 export interface KotobaSourceItem {
   kanji: string;
@@ -279,4 +301,199 @@ export function matchKotobaInText(
   }
 
   return Array.from(out.values()).sort((a, b) => a.firstIndex - b.firstIndex);
+}
+
+// ─────────────────────────────────────────
+// Story parsing — kanji di cerita jadi clickable
+// ─────────────────────────────────────────
+
+export interface StoryKanaToken {
+  type: "kana";
+  char: string;
+  info: KanaEntry;
+}
+
+export interface StoryKotobaToken {
+  type: "kotoba";
+  char: string;
+  entry: KotobaLookupEntry;
+  /** Bab tempat entry ini cocok (untuk display) */
+  matchedChapter: number;
+}
+
+export interface StoryPlainToken {
+  type: "plain";
+  char: string;
+}
+
+export type StoryToken =
+  | StoryKanaToken
+  | StoryKotobaToken
+  | StoryPlainToken;
+
+interface AliasEntryWithChapter {
+  entry: KotobaLookupEntry;
+  chapter: number;
+}
+
+/**
+ * Bangun alias map fallback dari SEMUA bab (untuk handle kanji yang
+ * tidak ada di bab spesifik cerita).
+ */
+function getGlobalKotobaAliasMapWithChapter(): Map<
+  string,
+  AliasEntryWithChapter
+> {
+  const map = new Map<string, AliasEntryWithChapter>();
+  const chapters = DekiruNihongoGroups as Array<{
+    sections?: Array<{ examples?: KotobaSourceItem[] }>;
+  }>;
+  for (let ci = 0; ci < chapters.length; ci++) {
+    const group = chapters[ci];
+    const chapter = ci + 1;
+    const deduped = new Map<string, KotobaLookupEntry>();
+    for (const section of group.sections || []) {
+      for (const item of section.examples || []) {
+        const entry = createKotobaLookupEntry(item);
+        if (entry && !deduped.has(entry.progressKey)) {
+          deduped.set(entry.progressKey, entry);
+        }
+      }
+    }
+    for (const entry of deduped.values()) {
+      for (const alias of entry.aliases) {
+        const existing = map.get(alias);
+        if (
+          !existing ||
+          // Preferir kanji lebih panjang ATAU entry dari bab yg lebih spesifik
+          (entry.kanji.length === existing.entry.kanji.length &&
+            chapter === existing.chapter)
+        ) {
+          if (
+            !existing ||
+            entry.kanji.length > existing.entry.kanji.length ||
+            (entry.kanji.length === existing.entry.kanji.length &&
+              chapter < existing.chapter)
+          ) {
+            map.set(alias, { entry, chapter });
+          }
+        }
+      }
+    }
+  }
+  return map;
+}
+
+/**
+ * Tokenisasi teks cerita menjadi array `StoryToken`:
+ *   - `kana`  : unit kana (1-2 char dengan romaji)
+ *   - `kotoba`: run karakter Jepang yang cocok dengan KotobaLookupEntry
+ *   - `plain` : karakter lain (latin, angka, tanda baca)
+ *
+ * Prioritas pencocokan (longest-match wins):
+ *   1. Alias map bab spesifik cerita (preferred)
+ *   2. Alias map global (fallback untuk kanji dari bab lain)
+ *   3. Kana + combining small kana
+ *   4. Single character
+ */
+export function parseStoryText(
+  text: string,
+  chapter: number | null,
+): StoryToken[] {
+  const result: StoryToken[] = [];
+
+  // Build chapter-specific alias map
+  const chapterAliasMap =
+    chapter != null ? getKotobaAliasMapForChapter(chapter).aliasMap : new Map();
+  // Build global alias map (fallback)
+  const globalAliasMap = getGlobalKotobaAliasMapWithChapter();
+
+  const chapterMaxLen = Math.max(
+    0,
+    ...Array.from(chapterAliasMap.keys()).map((k) => k.length),
+  );
+  const globalMaxLen = Math.max(
+    0,
+    ...Array.from(globalAliasMap.keys()).map((k) => k.length),
+  );
+
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+
+    // ── 1. Try chapter-specific kotoba (longest first) ──
+    if (chapterMaxLen > 0) {
+      let matched = false;
+      for (let len = chapterMaxLen; len >= 1; len--) {
+        if (i + len > text.length) continue;
+        const slice = text.slice(i, i + len);
+        const entry = chapterAliasMap.get(slice);
+        if (entry) {
+          result.push({
+            type: "kotoba",
+            char: slice,
+            entry,
+            matchedChapter: chapter!,
+          });
+          i += len;
+          matched = true;
+          break;
+        }
+      }
+      if (matched) continue;
+    }
+
+    // ── 2. Try global kotoba fallback (longest first) ──
+    if (globalMaxLen > 0) {
+      let matched = false;
+      for (let len = globalMaxLen; len >= 1; len--) {
+        if (i + len > text.length) continue;
+        const slice = text.slice(i, i + len);
+        const hit = globalAliasMap.get(slice);
+        if (hit && (!chapter || hit.chapter !== chapter)) {
+          // Only use global fallback if not in current chapter
+          result.push({
+            type: "kotoba",
+            char: slice,
+            entry: hit.entry,
+            matchedChapter: hit.chapter,
+          });
+          i += len;
+          matched = true;
+          break;
+        }
+      }
+      if (matched) continue;
+    }
+
+    // ── 3. Kana dengan combining small kana ──
+    const next = text[i + 1];
+    if (
+      next !== undefined &&
+      COMBINING_SMALL_KANA.has(next) &&
+      isKanaCodePoint(ch)
+    ) {
+      const cluster = ch + next;
+      result.push({
+        type: "kana",
+        char: cluster,
+        info: kanaMap[cluster] ?? kanaMap[ch],
+      });
+      i += 2;
+      continue;
+    }
+
+    // ── 4. Single kana ──
+    if (isKanaCodePoint(ch)) {
+      result.push({ type: "kana", char: ch, info: kanaMap[ch] });
+      i += 1;
+      continue;
+    }
+
+    // ── 5. Plain char ──
+    result.push({ type: "plain", char: ch });
+    i += 1;
+  }
+
+  return result;
 }
