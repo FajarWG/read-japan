@@ -154,66 +154,7 @@ function StatCard({
   );
 }
 
-// ─────────────────────────────────────────────────────────
-// Achievements grid
-// ─────────────────────────────────────────────────────────
 
-function AchievementsGrid({
-  unlocked,
-  locked,
-}: {
-  unlocked: ProgressStats["achievements"]["unlocked"];
-  locked: ProgressStats["achievements"]["locked"];
-}) {
-  const { t, lang } = useLanguage();
-  const isEn = lang === "en";
-
-  return (
-    <div className="rounded-2xl border border-border bg-surface px-5 py-4 shadow-sm">
-      <div className="mb-3 flex items-baseline justify-between">
-        <p className="text-sm font-semibold text-foreground">
-          🏆 {t.progressAchievementsTitle}
-        </p>
-        <p className="text-xs text-muted">
-          {unlocked.length} {t.progressAchievementsUnlocked} ·{" "}
-          {locked.length} {t.progressAchievementsLocked}
-        </p>
-      </div>
-      {unlocked.length === 0 && locked.length === 0 ? (
-        <p className="text-sm text-muted italic py-4 text-center">
-          {t.progressAchievementsNone}
-        </p>
-      ) : (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-          {unlocked.map((a) => (
-            <div
-              key={`u-${a.id}`}
-              className="flex flex-col items-center gap-1 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/20 px-3 py-3 text-center shadow-sm"
-              title={isEn ? a.descEn : a.descId}
-            >
-              <span className="text-2xl">{a.icon}</span>
-              <p className="text-xs font-bold text-foreground leading-tight">
-                {isEn ? a.titleEn : a.titleId}
-              </p>
-            </div>
-          ))}
-          {locked.map((a) => (
-            <div
-              key={`l-${a.id}`}
-              className="flex flex-col items-center gap-1 rounded-xl border border-border bg-surface-muted/50 px-3 py-3 text-center opacity-50"
-              title={isEn ? a.descEn : a.descId}
-            >
-              <span className="text-2xl grayscale">{a.icon}</span>
-              <p className="text-xs font-medium text-muted leading-tight">
-                🔒 {isEn ? a.titleEn : a.titleId}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────
 // Anki chapter breakdown
@@ -399,11 +340,7 @@ export function ProgressDashboard({ stats }: { stats: ProgressStats }) {
         </section>
       )}
 
-      {/* Achievements */}
-      <AchievementsGrid
-        unlocked={stats.achievements.unlocked}
-        locked={stats.achievements.locked}
-      />
+
     </div>
   );
 }

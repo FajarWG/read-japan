@@ -162,7 +162,7 @@ export default async function AdminDashboard() {
             <ol className="mt-2 space-y-1 text-[11px] text-muted leading-relaxed">
               <li>
                 1. Buka cerita → klik kanji yang belum bisa diklik (artinya
-                "no lookup match")
+                &quot;no lookup match&quot;)
               </li>
               <li>2. Catat kanji + cara baca + artinya</li>
               <li>

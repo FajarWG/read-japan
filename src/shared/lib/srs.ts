@@ -43,16 +43,19 @@ export function applySrsRating(prev: SrsInput, rating: SrsRating): SrsState {
     ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)),
   );
 
+  let intervalDays = interval;
   if (rating === 1) {
     // Lupa total → reset repetitions, interval pendek (10 menit ~ 0.007 hari)
     repetitions = 0;
-    interval = 0.007;
+    intervalDays = 0.007;
+    interval = 0;
   } else if (rating === 2) {
     // Hard → interval tidak bertambah banyak, repetitions++
     repetitions += 1;
     if (repetitions === 1) interval = 1;
     else if (repetitions === 2) interval = 3;
     else interval = Math.round(interval * 1.2);
+    intervalDays = interval;
   } else {
     // Good (3) atau Easy (4) → gunakan ease multiplier
     repetitions += 1;
@@ -61,9 +64,10 @@ export function applySrsRating(prev: SrsInput, rating: SrsRating): SrsState {
     else interval = Math.round(interval * ease);
     // Easy bonus
     if (rating === 4) interval = Math.round(interval * 1.3);
+    intervalDays = interval;
   }
 
-  const dueDate = new Date(now.getTime() + interval * DAY_MS);
+  const dueDate = new Date(now.getTime() + intervalDays * DAY_MS);
   return { ease, interval, repetitions, dueDate };
 }
 

@@ -40,6 +40,7 @@ export function PracticeQuiz() {
   // Initialize first question
   useEffect(() => {
     generateQuestion();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jlptFilter, formFilter]);
 
   // Handle focus when switching to text mode
@@ -50,7 +51,7 @@ export function PracticeQuiz() {
   }, [inputMode, currentQuestion, isSubmitted]);
 
   // Generate random question
-  const generateQuestion = () => {
+  function generateQuestion() {
     // 1. Filter verbs based on JLPT settings
     const availableVerbs = mockVerbs.filter(
       (v) => jlptFilter === "all" || v.jlpt === jlptFilter
@@ -108,7 +109,7 @@ export function PracticeQuiz() {
     setIsSubmitted(false);
     setIsCorrect(false);
     setIsFlipped(false);
-  };
+  }
 
   // Submit user answer
   const handleSubmitAnswer = (answer: string) => {

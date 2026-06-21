@@ -14,12 +14,6 @@ import type {
 interface HomeDashboardProps {
   summary: DashboardSummary;
   progressStats: ProgressStats;
-  recommendedStories: Array<{
-    id: number;
-    title: string;
-    content: string;
-    totalReads: number;
-  }>;
 }
 
 /**
@@ -34,7 +28,6 @@ interface HomeDashboardProps {
 export function HomeDashboard({
   summary,
   progressStats,
-  recommendedStories,
 }: HomeDashboardProps) {
   const { t } = useLanguage();
 
@@ -73,59 +66,10 @@ export function HomeDashboard({
           {/* Continue Hero */}
           <ContinueHero
             summary={summary}
-            stories={recommendedStories}
             progressAnchor="progress-section"
           />
 
-          {/* Rekomendasi cerita — quick links */}
-          {recommendedStories.length > 0 && (
-            <section className="mb-6">
-              <div className="mb-3 flex items-baseline justify-between">
-                <p className="text-sm font-semibold text-foreground">
-                  📖 {t.recommendedStories}
-                </p>
-                <Link
-                  href="/stories"
-                  className="text-xs text-muted hover:text-accent transition-colors"
-                >
-                  {t.recommendedStoriesDesc} →
-                </Link>
-              </div>
-              <div className="flex flex-col gap-2">
-                {recommendedStories.slice(0, 2).map((story) => (
-                  <Link
-                    key={story.id}
-                    href={`/stories/read/${story.id}`}
-                    className="group flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 shadow-sm transition-all duration-150 hover:border-accent/50 hover:bg-surface-muted hover:shadow-md"
-                  >
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <p className="font-jp text-sm font-semibold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
-                        {story.title}
-                      </p>
-                      <p className="font-jp text-xs text-muted line-clamp-1">
-                        {story.content}
-                      </p>
-                      <span className="text-[10px] text-muted mt-0.5">
-                        📖 {story.totalReads}{t.timesRead}
-                      </span>
-                    </div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="h-4 w-4 shrink-0 text-muted group-hover:text-accent transition-colors"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
+
 
           {/* Full Progress Dashboard */}
           <section id="progress-section" className="scroll-mt-4">

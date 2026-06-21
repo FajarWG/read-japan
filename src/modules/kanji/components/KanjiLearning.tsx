@@ -93,14 +93,13 @@ export function KanjiLearning() {
 
   // ── Learn mode: walk through kanji satu per satu ──
   const startLearn = () => {
-    // Mulai dari kanji yang belum pernah dipelajari
-    const unlearned = KANJI_N5.filter((k) => !learnedSet.has(k.kanji));
-    if (unlearned.length === 0) {
+    // Mulai dari kanji pertama yang belum pernah dipelajari
+    const unlearnedIndex = KANJI_N5.findIndex((k) => !learnedSet.has(k.kanji));
+    if (unlearnedIndex === -1) {
       // Semua sudah dipelajari → mulai dari awal
       setStudyIdx(0);
     } else {
-      // Start dari urutan awal, scroll nanti
-      setStudyIdx(0);
+      setStudyIdx(unlearnedIndex);
     }
     setRevealedStudy(false);
     setStudyRating(null);
