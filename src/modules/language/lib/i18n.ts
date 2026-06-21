@@ -146,6 +146,12 @@ export const translations = {
     kanaDakuten: "Dakuten & Handakuten",
     kanaYoon: "Combinations (Yōon)",
 
+    // ── Kana Practice (Phase 4) ──────────────────────────────
+    kanaPracticeTitle: "Kana Practice (SRS)",
+    kanaPracticeDesc: "Train kana with spaced repetition. 10 questions per session.",
+    kanaPracticeStart: "Start Session",
+    kanaPracticeNext: "Next",
+
     // ── Read page ───────────────────────────────────────────
     readingModeTitle: "📖 Reading Mode",
     readingModeDesc:
@@ -441,6 +447,12 @@ export const translations = {
     kanaBasic: "Dasar",
     kanaDakuten: "Dakuten & Handakuten",
     kanaYoon: "Kombinasi (Yōon)",
+
+    // ── Kana Practice (Phase 4) ──────────────────────────────
+    kanaPracticeTitle: "Latihan Kana (SRS)",
+    kanaPracticeDesc: "Latih kana dengan spaced repetition. 10 soal per sesi.",
+    kanaPracticeStart: "Mulai Sesi",
+    kanaPracticeNext: "Lanjut",
 
     // ── Read page ───────────────────────────────────────────
     readingModeTitle: "📖 Mode Membaca",

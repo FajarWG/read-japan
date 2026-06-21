@@ -5,6 +5,7 @@ import { useLanguage } from "@/src/modules/language/components/LanguageProvider"
 import { kanaMap } from "@/src/modules/kana/lib/kana-map";
 import type { KanaEntry, KanaType } from "@/src/modules/kana/lib/kana-map";
 import { Tabs } from "@heroui/react";
+import { KanaPractice } from "@/src/modules/kana/components/KanaPractice";
 
 // ─────────────────────────────────────────
 // Grouping helper
@@ -140,7 +141,7 @@ export default function KanaPage() {
                 aria-label="Pilih jenis kana"
                 className={[
                   "w-fit",
-                  "*:h-8 *:px-8 *:text-sm *:font-medium",
+                  "*:h-8 *:px-6 *:text-sm *:font-medium",
                   "*:data-[selected=true]:text-accent-foreground",
                 ].join(" ")}
               >
@@ -152,6 +153,10 @@ export default function KanaPage() {
                   Katakana
                   <Tabs.Indicator className="bg-accent" />
                 </Tabs.Tab>
+                <Tabs.Tab id="practice">
+                  🎴 Latihan
+                  <Tabs.Indicator className="bg-accent" />
+                </Tabs.Tab>
               </Tabs.List>
             </Tabs.ListContainer>
 
@@ -161,6 +166,10 @@ export default function KanaPage() {
 
             <Tabs.Panel id="katakana">
               <KanaSection groups={katakanaGroups} />
+            </Tabs.Panel>
+
+            <Tabs.Panel id="practice">
+              <KanaPractice />
             </Tabs.Panel>
           </Tabs>
         </main>
