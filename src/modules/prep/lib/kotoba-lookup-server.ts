@@ -113,7 +113,7 @@ export async function parseStoryTextAsync(
       continue;
     }
 
-    result.push({ type: "plain", char: ch });
+    result.push({ type: "plain", char: ch, charIndex: i });
     i += 1;
   }
 

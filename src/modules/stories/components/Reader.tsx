@@ -9,6 +9,7 @@ import { parseStoryText } from "@/src/modules/prep/lib/kotoba-lookup";
 import type { StoryToken } from "@/src/modules/prep/lib/kotoba-lookup";
 import { KotobaToken, useKotobaClickRecorder } from "@/src/modules/stories/components/KotobaToken";
 import { VocabularyReview } from "@/src/modules/stories/components/VocabularyReview";
+import { AddKanjiModal, type AddKanjiPrefill } from "@/src/modules/stories/components/AddKanjiModal";
 import {
   recordClick,
   recordWrongReads,
@@ -20,6 +21,45 @@ import { useAuth } from "@/src/modules/auth/components/AuthProvider";
 import { AudioButton } from "@/src/shared/components/AudioButton";
 
 type ReaderMode = "reading" | "review" | "result" | "vocabReview";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helper: extract context sentence around a click position
+// ─────────────────────────────────────────────────────────────────────────────
+
+const JP_SENTENCE_END = /[。!?！？\n]/g;
+
+/** Ambil kalimat (diakhiri 。!? atau newline) yang mengandung charIndex. */
+function getContextSentence(
+  text: string,
+  charIndex: number,
+  length: number,
+): string {
+  if (!text) return "";
+  // Cari akhir kalimat sebelumnya
+  let start = 0;
+  for (let i = charIndex - 1; i >= 0; i--) {
+    if (JP_SENTENCE_END.test(text[i] ?? "")) {
+      start = i + 1;
+      break;
+    }
+  }
+  // Cari akhir kalimat setelah charIndex+length
+  let end = text.length;
+  for (let i = charIndex + length; i < text.length; i++) {
+    if (JP_SENTENCE_END.test(text[i] ?? "")) {
+      end = i + 1;
+      break;
+    }
+  }
+  const slice = text.slice(start, end).trim();
+  // Trim panjang jika terlalu panjang
+  if (slice.length > 80) {
+    const ellipsis = "…";
+    const trimmed = slice.slice(0, 80).trim();
+    return `${trimmed}${ellipsis}`;
+  }
+  return slice;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // KanaToken — satu huruf kana (reading mode)
@@ -458,7 +498,16 @@ export default function Reader({
 }: ReaderProps) {
   const router = useRouter();
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
   const [mode, setMode] = useState<ReaderMode>("reading");
+
+  // AddKanji modal state (only used when isAdmin)
+  const [addKanjiOpen, setAddKanjiOpen] = useState(false);
+  const [addKanjiPrefill, setAddKanjiPrefill] = useState<AddKanjiPrefill | null>(null);
+
+  // Track which kanji have been added in this session (for visual "✓" badge)
+  const [addedKanji, setAddedKanji] = useState<Set<string>>(new Set());
 
   // Transition for recording story read
   const [, startRecordTransition] = useTransition();
@@ -729,6 +778,19 @@ export default function Reader({
         </div>
       </div>
 
+      {/* Admin hint — kanji yang belum ada di dictionary bisa diklik untuk ditambah */}
+      {isAdmin && (
+        <div className="rounded-xl border border-blue-200 dark:border-blue-800/40 bg-blue-50/50 dark:bg-blue-950/10 px-4 py-2.5">
+          <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">
+            🛠️ Mode Admin
+          </p>
+          <p className="text-[10px] text-muted">
+            Klik kanji/character apapun untuk menambah ke dictionary
+            (manual atau via AI Gemini).
+          </p>
+        </div>
+      )}
+
       {/* Audio bar — play whole story */}
       <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50/40 dark:bg-emerald-950/10 px-4 py-2.5">
         <div className="flex flex-col gap-0.5">
@@ -740,10 +802,42 @@ export default function Reader({
         <AudioButton text={storyContent} rate={0.85} variant="primary" label="▶ Putar cerita" />
       </div>
 
-      {/* Teks cerita — kana + kanji dari bab chapter bisa diklik */}
+      {/* Teks cerita — kana + kanji + plain tokens */}
       <p className="text-xl md:text-3xl leading-14 tracking-wider font-medium overflow-visible">
         {storyTokens.map((token, index) => {
           if (token.type === "plain") {
+            // Plain token: untuk ADMIN, render sebagai button klik untuk
+            // menambah kanji ke KanjiDictionary.
+            if (isAdmin) {
+              const char = token.char;
+              const isAdded = addedKanji.has(char);
+              const context = getContextSentence(storyContent, token.charIndex, char.length);
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => {
+                    setAddKanjiPrefill({
+                      kanji: char,
+                      context,
+                      chapter: chapter ?? undefined,
+                    });
+                    setAddKanjiOpen(true);
+                  }}
+                  aria-label={`Tambah kanji ${char} ke dictionary`}
+                  title={`Admin: klik untuk menambah ${char}`}
+                  className={[
+                    "inline cursor-pointer rounded px-0.5 transition-all duration-100",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1",
+                    isAdded
+                      ? "text-emerald-600 dark:text-emerald-400 underline decoration-emerald-400 decoration-1 underline-offset-4"
+                      : "text-foreground hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-700 dark:hover:text-blue-300 hover:underline decoration-blue-300 decoration-dotted decoration-1 underline-offset-4",
+                  ].join(" ")}
+                >
+                  {char}
+                </button>
+              );
+            }
             return (
               <span key={index} className="text-foreground">
                 {token.char}
@@ -800,6 +894,24 @@ export default function Reader({
           </button>
         </div>
       </div>
+
+      {/* Modal Tambah Kanji (admin only) */}
+      <AddKanjiModal
+        open={addKanjiOpen}
+        prefill={addKanjiPrefill}
+        onClose={() => setAddKanjiOpen(false)}
+        onSaved={() => {
+          if (addKanjiPrefill) {
+            setAddedKanji((prev) => {
+              const next = new Set(prev);
+              next.add(addKanjiPrefill.kanji);
+              return next;
+            });
+            // Reload page agar precomputedTokens di-refresh dari server
+            router.refresh();
+          }
+        }}
+      />
     </div>
   );
 }

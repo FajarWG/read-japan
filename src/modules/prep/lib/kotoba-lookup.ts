@@ -336,6 +336,8 @@ export interface StoryKotobaToken {
 export interface StoryPlainToken {
   type: "plain";
   char: string;
+  /** Posisi karakter dalam teks asli (untuk highlight, search, dsb.) */
+  charIndex: number;
 }
 
 export type StoryToken =
@@ -503,7 +505,7 @@ export function parseStoryText(
     }
 
     // ── 5. Plain char ──
-    result.push({ type: "plain", char: ch });
+    result.push({ type: "plain", char: ch, charIndex: i });
     i += 1;
   }
 
