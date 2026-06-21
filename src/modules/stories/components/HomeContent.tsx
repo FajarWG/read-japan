@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { buttonVariants, Tabs } from "@heroui/react";
+import { buttonVariants } from "@heroui/react";
 
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { StoryPickerModal } from "@/src/modules/stories/components/StoryPickerModal";
+import { ProgressDashboard } from "@/src/modules/dashboard/components/ProgressDashboard";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { useAuth } from "@/src/modules/auth/components/AuthProvider";
 import { kanaMap } from "@/src/modules/kana/lib/kana-map";
@@ -12,7 +13,10 @@ import {
   type KotobaLookupEntry,
   type DekiruChapter,
 } from "@/src/modules/prep/lib/kotoba-lookup";
-import type { DashboardSummary } from "@/src/modules/dashboard/lib/dashboard";
+import type {
+  DashboardSummary,
+  ProgressStats,
+} from "@/src/modules/dashboard/lib/dashboard";
 
 export interface StoryRow {
   id: number;
@@ -41,6 +45,7 @@ export type KotobaProgressRecord = {
 
 interface HomeContentProps {
   summary: DashboardSummary;
+  progressStats?: ProgressStats;
   recommendedStories: StoryRow[];
   stories: StoryRow[];
   dekiruChapters: DekiruChapter[];
@@ -341,7 +346,7 @@ function ContinueHero({
           </Link>
         )}
         <Link
-          href="/progress"
+          href="#full-progress"
           className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/10 transition-colors"
         >
           📊 {t.dashboardViewProgress}
@@ -364,6 +369,7 @@ function ContinueHero({
 
 export function HomeContent({
   summary,
+  progressStats,
   recommendedStories,
   stories,
   dekiruChapters,
@@ -460,209 +466,190 @@ export function HomeContent({
             </div>
           )}
 
-          <Tabs className="w-full mt-4" variant="primary">
-            <Tabs.ListContainer className="sticky top-0 z-30 bg-background py-2">
-              <Tabs.List
-                aria-label="Pilih jenis"
-                className={[
-                  "w-fit",
-                  "*:h-8 *:px-8 *:text-sm *:font-medium",
-                  "*:data-[selected=true]:text-accent-foreground",
-                ].join(" ")}
-              >
-                <Tabs.Tab id="stories">
-                  {t.navStories}
-                  <Tabs.Indicator className="bg-accent" />
-                </Tabs.Tab>
-                <Tabs.Tab id="progress">
-                  {t.navProgress}
-                  <Tabs.Indicator className="bg-accent" />
-                </Tabs.Tab>
-              </Tabs.List>
-            </Tabs.ListContainer>
+          {/* ── Stories Section ─────────────────────────────── */}
+          <section id="stories-section" className="mb-8">
+            <DekiruStoriesSection stories={stories} chapters={dekiruChapters} />
 
-            <Tabs.Panel id="stories" className="pt-2">
-              <DekiruStoriesSection stories={stories} chapters={dekiruChapters} />
-
-              {/* Recommended stories list */}
-              {recommendedStories.length > 0 && (
-                <div className="mb-6">
-                  <div className="mb-3 flex items-baseline justify-between">
-                    <p className="text-sm font-semibold text-foreground">
-                      {t.recommendedStories}
-                    </p>
-                    <p className="text-xs text-muted">{t.recommendedStoriesDesc}</p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    {recommendedStories.map((story) => (
-                      <Link
-                        key={story.id}
-                        href={`/stories/read/${story.id}`}
-                        className="group flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 shadow-sm transition-all duration-150 hover:border-accent/50 hover:bg-surface-muted hover:shadow-md"
-                      >
-                        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                          <p className="font-jp text-sm font-semibold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
-                            {story.title}
-                          </p>
-                          <p className="font-jp text-xs text-muted line-clamp-1">
-                            {story.content}
-                          </p>
-                          <div className="mt-1 flex items-center gap-2">
-                            <span className="text-[10px] text-muted">
-                              📖 {story.totalReads}
-                              {t.timesRead}
-                            </span>
-                            <span className="text-[10px] text-muted">
-                              ✍️ {countKana(story.content)} kana
-                            </span>
-                            {story.focus && (
-                              <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] font-medium text-accent max-w-[12ch] sm:max-w-none truncate">
-                                {story.focus}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="h-4 w-4 shrink-0 text-muted group-hover:text-accent transition-colors"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </Link>
-                    ))}
-                  </div>
+            {/* Recommended stories list */}
+            {recommendedStories.length > 0 && (
+              <div className="mb-6">
+                <div className="mb-3 flex items-baseline justify-between">
+                  <p className="text-sm font-semibold text-foreground">
+                    {t.recommendedStories}
+                  </p>
+                  <p className="text-xs text-muted">{t.recommendedStoriesDesc}</p>
                 </div>
-              )}
-
-              {stories.length === 0 && (
-                <div className="flex flex-col items-center gap-5 py-28 text-center">
-                  <span className="font-jp select-none text-7xl opacity-20">
-                    本
-                  </span>
-                  <div className="flex flex-col gap-1">
-                    <p className="font-semibold text-foreground">
-                      {t.noStoriesTitle}
-                    </p>
-                    <p className="text-sm text-muted">{t.noStoriesDesc}</p>
-                  </div>
-                  {user?.role === "ADMIN" && (
+                <div className="flex flex-col gap-2">
+                  {recommendedStories.map((story) => (
                     <Link
-                      href="/stories/new"
-                      className={buttonVariants({ variant: "primary" })}
+                      key={story.id}
+                      href={`/stories/read/${story.id}`}
+                      className="group flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 shadow-sm transition-all duration-150 hover:border-accent/50 hover:bg-surface-muted hover:shadow-md"
                     >
-                      {t.addFirstStory}
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <p className="font-jp text-sm font-semibold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                          {story.title}
+                        </p>
+                        <p className="font-jp text-xs text-muted line-clamp-1">
+                          {story.content}
+                        </p>
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-[10px] text-muted">
+                            📖 {story.totalReads}
+                            {t.timesRead}
+                          </span>
+                          <span className="text-[10px] text-muted">
+                            ✍️ {countKana(story.content)} kana
+                          </span>
+                          {story.focus && (
+                            <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-[9px] font-medium text-accent max-w-[12ch] sm:max-w-none truncate">
+                              {story.focus}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="h-4 w-4 shrink-0 text-muted group-hover:text-accent transition-colors"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </Link>
-                  )}
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              {stories.length > 0 && (
-                <div className="flex justify-center -mt-2 mb-4">
-                  <StoryPickerModal stories={stories} />
+            {stories.length === 0 && (
+              <div className="flex flex-col items-center gap-5 py-28 text-center">
+                <span className="font-jp select-none text-7xl opacity-20">
+                  本
+                </span>
+                <div className="flex flex-col gap-1">
+                  <p className="font-semibold text-foreground">
+                    {t.noStoriesTitle}
+                  </p>
+                  <p className="text-sm text-muted">{t.noStoriesDesc}</p>
                 </div>
-              )}
-
-              {user?.role === "ADMIN" && (
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                  <Link
-                    href="/stories/admin"
-                    className={buttonVariants({
-                      variant: "secondary",
-                      size: "md",
-                      className: "font-semibold shadow-sm cursor-pointer",
-                    })}
-                  >
-                    🛠️ Admin Dashboard
-                  </Link>
+                {user?.role === "ADMIN" && (
                   <Link
                     href="/stories/new"
-                    className={buttonVariants({
-                      variant: "primary",
-                      size: "md",
-                      className: "font-semibold shadow-sm cursor-pointer",
-                    })}
+                    className={buttonVariants({ variant: "primary" })}
                   >
-                    {t.addStory}
+                    {t.addFirstStory}
                   </Link>
-                </div>
-              )}
-            </Tabs.Panel>
+                )}
+              </div>
+            )}
 
-            <Tabs.Panel id="progress" className="pt-2">
-              {enriched.length === 0 && kotobaEnriched.length === 0 ? (
-                <div className="flex flex-col items-center gap-5 py-20 text-center animate-in fade-in duration-200">
-                  <span className="font-jp select-none text-7xl opacity-20">
-                    あ
-                  </span>
-                  <div className="flex flex-col gap-1">
-                    <p className="font-semibold text-foreground">
-                      {t.noProgressTitle}
-                    </p>
-                    <p className="text-sm text-muted">{t.noProgressDesc}</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-8 animate-in fade-in duration-200">
-                  {hasWrong && (
-                    <section>
-                      <h2 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
-                        {t.needsReview}
-                        <span className="text-xs font-normal text-muted">
-                          ({enriched.filter((r) => r.wrongCount > 0).length}{" "}
-                          {t.characters})
-                        </span>
-                      </h2>
-                      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-                        {enriched
-                          .filter((r) => r.wrongCount > 0)
-                          .map((r) => (
-                            <KanaProgressCard key={r.character} record={r} />
-                          ))}
-                      </div>
-                    </section>
-                  )}
+            {stories.length > 0 && (
+              <div className="flex justify-center -mt-2 mb-4">
+                <StoryPickerModal stories={stories} />
+              </div>
+            )}
 
-                  {enriched.length > 0 && (
-                    <section>
-                      <h2 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
-                        {t.allLookedUp}
-                        <span className="text-xs font-normal text-muted">
-                          ({enriched.length} {t.characters})
-                        </span>
-                      </h2>
-                      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-                        {enriched.map((r) => (
+            {user?.role === "ADMIN" && (
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <Link
+                  href="/stories/admin"
+                  className={buttonVariants({
+                    variant: "secondary",
+                    size: "md",
+                    className: "font-semibold shadow-sm cursor-pointer",
+                  })}
+                >
+                  🛠️ Admin Dashboard
+                </Link>
+                <Link
+                  href="/stories/new"
+                  className={buttonVariants({
+                    variant: "primary",
+                    size: "md",
+                    className: "font-semibold shadow-sm cursor-pointer",
+                  })}
+                >
+                  {t.addStory}
+                </Link>
+              </div>
+            )}
+          </section>
+
+          {/* ── Per-character Learning Progress ──────────────── */}
+          {(enriched.length > 0 || kotobaEnriched.length > 0) && (
+            <section id="learning-progress" className="mb-8">
+              <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+                📊 {t.navProgress}
+              </h2>
+              <div className="flex flex-col gap-6 animate-in fade-in duration-200">
+                {hasWrong && (
+                  <section>
+                    <h3 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
+                      {t.needsReview}
+                      <span className="text-xs font-normal text-muted">
+                        ({enriched.filter((r) => r.wrongCount > 0).length}{" "}
+                        {t.characters})
+                      </span>
+                    </h3>
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                      {enriched
+                        .filter((r) => r.wrongCount > 0)
+                        .map((r) => (
                           <KanaProgressCard key={r.character} record={r} />
                         ))}
-                      </div>
-                    </section>
-                  )}
+                    </div>
+                  </section>
+                )}
 
-                  {kotobaEnriched.length > 0 && (
-                    <section>
-                      <h2 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
-                        {t.kanjiLookedUp}
-                        <span className="text-xs font-normal text-muted">
-                          ({kotobaEnriched.length} kata)
-                        </span>
-                      </h2>
-                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
-                        {kotobaEnriched.map((r) => (
-                          <KotobaProgressCard key={r.character} record={r} />
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                </div>
-              )}
-            </Tabs.Panel>
-          </Tabs>
+                {enriched.length > 0 && (
+                  <section>
+                    <h3 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
+                      {t.allLookedUp}
+                      <span className="text-xs font-normal text-muted">
+                        ({enriched.length} {t.characters})
+                      </span>
+                    </h3>
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                      {enriched.map((r) => (
+                        <KanaProgressCard key={r.character} record={r} />
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {kotobaEnriched.length > 0 && (
+                  <section>
+                    <h3 className="mb-3 text-sm font-semibold text-foreground flex items-center gap-2">
+                      {t.kanjiLookedUp}
+                      <span className="text-xs font-normal text-muted">
+                        ({kotobaEnriched.length} kata)
+                      </span>
+                    </h3>
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+                      {kotobaEnriched.map((r) => (
+                        <KotobaProgressCard key={r.character} record={r} />
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* ── Full Progress Dashboard ──────────────────────── */}
+          {progressStats && (
+            <section id="full-progress" className="mb-8">
+              <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
+                📈 {t.progressTitle}
+              </h2>
+              <ProgressDashboard stats={progressStats} />
+            </section>
+          )}
         </main>
       </div>
     </div>

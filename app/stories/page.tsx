@@ -11,7 +11,10 @@ import {
   isKotobaProgressKey,
   getDekiruChapters,
 } from "@/src/modules/prep/lib/kotoba-lookup";
-import { getDashboardSummary } from "@/src/modules/dashboard/lib/dashboard";
+import {
+  getDashboardSummary,
+  getProgressStats,
+} from "@/src/modules/dashboard/lib/dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -28,8 +31,9 @@ export default async function StoriesPage() {
     return null;
   }
 
-  const [summary, stories] = await Promise.all([
+  const [summary, progressStats, stories] = await Promise.all([
     getDashboardSummary(),
+    getProgressStats(),
     prisma.story.findMany({
       orderBy: [{ totalReads: "asc" }, { createdAt: "desc" }],
     }),
@@ -81,6 +85,7 @@ export default async function StoriesPage() {
   return (
     <HomeContent
       summary={summary}
+      progressStats={progressStats ?? undefined}
       recommendedStories={stories.slice(0, 2)}
       stories={stories}
       dekiruChapters={dekiruChapters}
