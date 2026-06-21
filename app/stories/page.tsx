@@ -11,6 +11,7 @@ import {
   isKotobaProgressKey,
   getDekiruChapters,
 } from "@/src/modules/prep/lib/kotoba-lookup";
+import { getDashboardSummary } from "@/src/modules/dashboard/lib/dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -21,16 +22,22 @@ export const metadata: Metadata = {
 };
 
 export default async function StoriesPage() {
-  // Middleware menjamin session ada. getSession() dipakai untuk ambil userId.
   const session = await getSession();
   if (!session) {
     // Seharusnya tidak terjadi karena middleware, tapi safety net.
     return null;
   }
 
-  const stories = await prisma.story.findMany({
-    orderBy: [{ totalReads: "asc" }, { createdAt: "desc" }],
-  });
+  const [summary, stories] = await Promise.all([
+    getDashboardSummary(),
+    prisma.story.findMany({
+      orderBy: [{ totalReads: "asc" }, { createdAt: "desc" }],
+    }),
+  ]);
+
+  if (!summary) {
+    return null;
+  }
 
   const records = await prisma.learningProgress.findMany({
     where: {
@@ -73,6 +80,7 @@ export default async function StoriesPage() {
 
   return (
     <HomeContent
+      summary={summary}
       recommendedStories={stories.slice(0, 2)}
       stories={stories}
       dekiruChapters={dekiruChapters}

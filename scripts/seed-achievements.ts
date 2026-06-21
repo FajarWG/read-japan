@@ -152,10 +152,9 @@ const ACHIEVEMENTS: AchievementSeed[] = [
 
 async function main() {
   let created = 0;
-  let updated = 0;
 
   for (const a of ACHIEVEMENTS) {
-    const result = await prisma.achievement.upsert({
+    await prisma.achievement.upsert({
       where: { code: a.code },
       update: {
         titleEn: a.titleEn,
@@ -168,10 +167,7 @@ async function main() {
       },
       create: a,
     });
-    if (result.id) {
-      // upsert doesn't tell us created vs updated; just count
-      created += 1;
-    }
+    created += 1;
   }
 
   const total = await prisma.achievement.count();
