@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
   // Refresh halaman yang menampilkan kanji ini
   revalidatePath("/stories/admin/kanji");
   revalidatePath("/stories");
-  revalidatePath("/stories/read");
+  revalidatePath("/stories/read/[id]", "page");
 
   return NextResponse.json({ ok: true, id: result.id });
 }

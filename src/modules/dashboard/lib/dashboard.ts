@@ -138,22 +138,38 @@ export async function getDashboardSummary(): Promise<DashboardSummary | null> {
   const session = await getSession();
   if (!session) return null;
 
-  const [streakDays, kanaAgg, lastStoryLog, ankiDue, bookmarksCount] =
-    await Promise.all([
-      computeStreakDays(session.id),
-      prisma.learningProgress.aggregate({
-        where: { userId: session.id },
-        _sum: { clickCount: true, wrongCount: true },
-      }),
-      prisma.activityLog.findFirst({
-        where: { userId: session.id, type: "story_read" },
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.ankiProgress.count({
-        where: { userId: session.id, dueDate: { lte: new Date() } },
-      }),
-      prisma.bookmark.count({ where: { userId: session.id } }),
-    ]);
+  const todayStart = new Date();
+  todayStart.setUTCHours(0, 0, 0, 0);
+
+  const [
+    streakDays,
+    kanaAgg,
+    lastStoryLog,
+    ankiDue,
+    bookmarksCount,
+    uniqueWords,
+    todayActivityCount,
+  ] = await Promise.all([
+    computeStreakDays(session.id),
+    prisma.learningProgress.aggregate({
+      where: { userId: session.id },
+      _sum: { clickCount: true, wrongCount: true },
+    }),
+    prisma.activityLog.findFirst({
+      where: { userId: session.id, type: "story_read" },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.ankiProgress.count({
+      where: { userId: session.id, dueDate: { lte: new Date() } },
+    }),
+    prisma.bookmark.count({ where: { userId: session.id } }),
+    prisma.learningProgress.count({
+      where: { userId: session.id, clickCount: { gt: 0 } },
+    }),
+    prisma.activityLog.count({
+      where: { userId: session.id, createdAt: { gte: todayStart } },
+    }),
+  ]);
 
   // Last story detail
   let lastStory: DashboardSummary["lastStory"] = null;
@@ -174,18 +190,6 @@ export async function getDashboardSummary(): Promise<DashboardSummary | null> {
       }
     }
   }
-
-  // Unique words = unique character di LearningProgress dengan clickCount > 0
-  const uniqueWords = await prisma.learningProgress.count({
-    where: { userId: session.id, clickCount: { gt: 0 } },
-  });
-
-  // Today's activity count
-  const todayStart = new Date();
-  todayStart.setUTCHours(0, 0, 0, 0);
-  const todayActivityCount = await prisma.activityLog.count({
-    where: { userId: session.id, createdAt: { gte: todayStart } },
-  });
 
   return {
     user: { id: session.id, username: session.username },

@@ -8,7 +8,13 @@ import { useAuth } from "@/src/modules/auth/components/AuthProvider";
 import { logoutAction } from "@/src/modules/auth/actions";
 import { SearchOverlay } from "@/src/shared/components/SearchOverlay";
 
-export function SettingsDropdown() {
+export function SettingsDropdown({
+  adminModeActive,
+  onAdminModeToggle,
+}: {
+  adminModeActive?: boolean;
+  onAdminModeToggle?: (active: boolean) => void;
+} = {}) {
   const { lang, t, toggleLang } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
@@ -51,6 +57,26 @@ export function SettingsDropdown() {
       </Popover.Trigger>
       <Popover.Content className="w-56 p-2 rounded-xl bg-white dark:bg-zinc-900 border border-border shadow-xl" placement="bottom end">
         <Popover.Dialog className="flex flex-col gap-1">
+          {/* Admin Mode Toggle (conditional) */}
+          {user?.role === "ADMIN" && onAdminModeToggle !== undefined && adminModeActive !== undefined && (
+            <>
+              <div className="flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-surface-muted transition-colors">
+                <span className="text-xs font-semibold text-foreground flex items-center gap-2 select-none">
+                  🛠️ {lang === "en" ? "Admin Mode" : "Mode Admin"}
+                </span>
+                <label className="relative inline-flex items-center cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={adminModeActive}
+                    onChange={(e) => onAdminModeToggle(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-8 h-4 bg-zinc-300 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+              <div className="h-px bg-border my-1" />
+            </>
+          )}
           {/* Language Row */}
           <div className="flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-surface-muted transition-colors">
             <span className="text-xs font-semibold text-foreground flex items-center gap-2 select-none">

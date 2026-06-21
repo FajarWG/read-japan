@@ -6,6 +6,8 @@ import { ReadPageContent } from "@/src/modules/read/components/ReadPageContent";
 import { getDekiruChapters } from "@/src/modules/prep/lib/kotoba-lookup";
 import { parseStoryTextAsync } from "@/src/modules/prep/lib/kotoba-lookup-server";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {

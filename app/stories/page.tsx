@@ -28,24 +28,23 @@ export default async function StoriesPage() {
     return null;
   }
 
-  const [summary, stories] = await Promise.all([
+  const [summary, stories, records] = await Promise.all([
     getDashboardSummary(),
     prisma.story.findMany({
       orderBy: [{ totalReads: "asc" }, { createdAt: "desc" }],
+    }),
+    prisma.learningProgress.findMany({
+      where: {
+        userId: session.id,
+        OR: [{ clickCount: { gt: 0 } }, { wrongCount: { gt: 0 } }],
+      },
+      orderBy: [{ wrongCount: "desc" }, { clickCount: "desc" }],
     }),
   ]);
 
   if (!summary) {
     return null;
   }
-
-  const records = await prisma.learningProgress.findMany({
-    where: {
-      userId: session.id,
-      OR: [{ clickCount: { gt: 0 } }, { wrongCount: { gt: 0 } }],
-    },
-    orderBy: [{ wrongCount: "desc" }, { clickCount: "desc" }],
-  });
 
   const totalClicks = records.reduce((sum, r) => sum + r.clickCount, 0);
   const totalWrong = records.reduce((sum, r) => sum + r.wrongCount, 0);

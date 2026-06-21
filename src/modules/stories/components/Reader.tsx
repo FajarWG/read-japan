@@ -1,15 +1,27 @@
 "use client";
 
-import { useState, useCallback, useTransition, useMemo, useEffect } from "react";
+import {
+  useState,
+  useCallback,
+  useTransition,
+  useMemo,
+  useEffect,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Popover } from "@heroui/react";
 import { parseJapaneseText } from "@/src/shared/lib/parser";
 import type { ParsedUnit, KanaInfo } from "@/src/shared/lib/parser";
 import { parseStoryText } from "@/src/modules/prep/lib/kotoba-lookup";
 import type { StoryToken } from "@/src/modules/prep/lib/kotoba-lookup";
-import { KotobaToken, useKotobaClickRecorder } from "@/src/modules/stories/components/KotobaToken";
+import {
+  KotobaToken,
+  useKotobaClickRecorder,
+} from "@/src/modules/stories/components/KotobaToken";
 import { VocabularyReview } from "@/src/modules/stories/components/VocabularyReview";
-import { AddKanjiModal, type AddKanjiPrefill } from "@/src/modules/stories/components/AddKanjiModal";
+import {
+  AddKanjiModal,
+  type AddKanjiPrefill,
+} from "@/src/modules/stories/components/AddKanjiModal";
 import {
   recordClick,
   recordWrongReads,
@@ -323,7 +335,8 @@ function ResultView({
           body: JSON.stringify({
             storyId,
             items: vocabulary.map((v) => ({
-              kanji: v.entry.kanji && v.entry.kanji !== "-" ? v.entry.kanji : null,
+              kanji:
+                v.entry.kanji && v.entry.kanji !== "-" ? v.entry.kanji : null,
               hiragana: v.entry.hiragana,
               meaning: v.entry.meaning,
               surface: v.surface,
@@ -486,6 +499,7 @@ interface ReaderProps {
   storyTitle?: string;
   /** Pre-computed story tokens from server (includes KanjiDictionary). */
   precomputedTokens?: StoryToken[];
+  adminModeActive?: boolean;
 }
 
 export default function Reader({
@@ -495,6 +509,7 @@ export default function Reader({
   chapter,
   storyTitle,
   precomputedTokens,
+  adminModeActive = true,
 }: ReaderProps) {
   const router = useRouter();
   const { t } = useLanguage();
@@ -504,7 +519,8 @@ export default function Reader({
 
   // AddKanji modal state (only used when isAdmin)
   const [addKanjiOpen, setAddKanjiOpen] = useState(false);
-  const [addKanjiPrefill, setAddKanjiPrefill] = useState<AddKanjiPrefill | null>(null);
+  const [addKanjiPrefill, setAddKanjiPrefill] =
+    useState<AddKanjiPrefill | null>(null);
 
   // Track which kanji have been added in this session (for visual "✓" badge)
   const [addedKanji, setAddedKanji] = useState<Set<string>>(new Set());
@@ -762,35 +778,8 @@ export default function Reader({
 
   // ── READING MODE ───────────────────────────────────────────────────────────
 
-  const kanaCount = units.filter((u) => u.info).length;
-  const kanjiCount = storyTokens.filter((t) => t.type === "kotoba").length;
-
   return (
     <div className="flex flex-col gap-5">
-      {/* Reading hint + stats */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50/50 dark:bg-indigo-950/10 px-4 py-2.5">
-        <p className="text-xs text-indigo-700 dark:text-indigo-300">
-          💡 {t.readingHint}
-        </p>
-        <div className="flex items-center gap-3 text-[11px] text-muted tabular-nums">
-          <span>✍️ {kanaCount} kana</span>
-          <span>🈶 {kanjiCount} kanji</span>
-        </div>
-      </div>
-
-      {/* Admin hint — kanji yang belum ada di dictionary bisa diklik untuk ditambah */}
-      {isAdmin && (
-        <div className="rounded-xl border border-blue-200 dark:border-blue-800/40 bg-blue-50/50 dark:bg-blue-950/10 px-4 py-2.5">
-          <p className="text-xs font-semibold text-blue-700 dark:text-blue-300">
-            🛠️ Mode Admin
-          </p>
-          <p className="text-[10px] text-muted">
-            Klik kanji/character apapun untuk menambah ke dictionary
-            (manual atau via AI Gemini).
-          </p>
-        </div>
-      )}
-
       {/* Audio bar — play whole story */}
       <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50/40 dark:bg-emerald-950/10 px-4 py-2.5">
         <div className="flex flex-col gap-0.5">
@@ -799,7 +788,12 @@ export default function Reader({
           </p>
           <p className="text-[10px] text-muted">Web Speech API · voice ja-JP</p>
         </div>
-        <AudioButton text={storyContent} rate={0.85} variant="primary" label="▶ Putar cerita" />
+        <AudioButton
+          text={storyContent}
+          rate={0.85}
+          variant="primary"
+          label="▶ Putar cerita"
+        />
       </div>
 
       {/* Teks cerita — kana + kanji + plain tokens */}
@@ -807,11 +801,15 @@ export default function Reader({
         {storyTokens.map((token, index) => {
           if (token.type === "plain") {
             // Plain token: untuk ADMIN, render sebagai button klik untuk
-            // menambah kanji ke KanjiDictionary.
-            if (isAdmin) {
+            // menambah kanji ke KanjiDictionary jika mode admin aktif.
+            if (isAdmin && adminModeActive) {
               const char = token.char;
               const isAdded = addedKanji.has(char);
-              const context = getContextSentence(storyContent, token.charIndex, char.length);
+              const context = getContextSentence(
+                storyContent,
+                token.charIndex,
+                char.length,
+              );
               return (
                 <button
                   key={index}
@@ -875,9 +873,7 @@ export default function Reader({
 
       {/* Selesai membaca button + bookmark */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border">
-        <p className="text-xs text-muted">
-          {t.readingTip}
-        </p>
+        <p className="text-xs text-muted">{t.readingTip}</p>
         <div className="flex items-center gap-2 shrink-0">
           <BookmarkButton
             storyId={storyId}
@@ -939,7 +935,11 @@ function BookmarkButton({
         const res = await fetch(`/api/bookmarks?storyId=${storyId}`);
         if (!res.ok || cancelled) return;
         const data = await res.json();
-        if ((data.bookmarks as Array<{ charIndex: number }>).some((b) => b.charIndex === 0)) {
+        if (
+          (data.bookmarks as Array<{ charIndex: number }>).some(
+            (b) => b.charIndex === 0,
+          )
+        ) {
           setSaved(true);
         }
       } catch {

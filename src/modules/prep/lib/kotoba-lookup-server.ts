@@ -32,6 +32,34 @@ export async function parseStoryTextAsync(
 
   const chapterAliasMap =
     chapter != null ? getKotobaAliasMapForChapter(chapter).aliasMap : new Map();
+
+  // Add current chapter KanjiDictionary entries to chapterAliasMap
+  if (chapter != null) {
+    try {
+      const currentChapterAdminEntries = await prisma.kanjiDictionary.findMany({
+        where: { chapter },
+      });
+      for (const item of currentChapterAdminEntries) {
+        const synthetic = createKotobaLookupEntry({
+          kanji: item.kanji,
+          hiragana: item.hiragana,
+          translations: {
+            id: item.meaningId ?? "",
+            en: item.meaningEn ?? "",
+          },
+        });
+        if (!synthetic) continue;
+        for (const alias of synthetic.aliases) {
+          if (!chapterAliasMap.has(alias) || synthetic.kanji.length > chapterAliasMap.get(alias)!.kanji.length) {
+            chapterAliasMap.set(alias, synthetic);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("[parseStoryTextAsync] Gagal load KanjiDictionary untuk bab:", err);
+    }
+  }
+
   const globalAliasMap = await getGlobalKotobaAliasMapWithChapterAsync();
 
   const chapterMaxLen = Math.max(

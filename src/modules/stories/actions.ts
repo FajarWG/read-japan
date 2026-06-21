@@ -249,6 +249,8 @@ export async function createKanji(
   });
 
   revalidatePath("/stories/admin/kanji");
+  revalidatePath("/stories");
+  revalidatePath("/stories/read/[id]", "page");
   return { id: result.id };
 }
 
@@ -275,4 +277,6 @@ export async function createManyKanji(
 export async function deleteKanji(id: number): Promise<void> {
   await prisma.kanjiDictionary.delete({ where: { id } });
   revalidatePath("/stories/admin/kanji");
+  revalidatePath("/stories");
+  revalidatePath("/stories/read/[id]", "page");
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   buttonVariants,
@@ -59,6 +60,7 @@ export function ReadPageContent({
   chapterTitle?: string;
 }) {
   const { lang, t } = useLanguage();
+  const [adminModeActive, setAdminModeActive] = useState(true);
 
   const kanaCount = countKanaChars(story.content);
   const mins = Math.ceil(story.content.length / 300);
@@ -100,7 +102,10 @@ export function ReadPageContent({
 
             {/* Right: Actions */}
             <div className="flex items-center justify-end gap-2">
-              <SettingsDropdown />
+              <SettingsDropdown
+                adminModeActive={adminModeActive}
+                onAdminModeToggle={setAdminModeActive}
+              />
             </div>
           </div>
         </header>
@@ -212,6 +217,7 @@ export function ReadPageContent({
                   chapter={story.chapter}
                   storyTitle={story.title}
                   precomputedTokens={story.storyTokens}
+                  adminModeActive={adminModeActive}
                 />
               </article>
 
