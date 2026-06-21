@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
+import { checkAchievements, logActivityAndCheck } from "@/src/modules/achievements/lib/achievements";
 
 // ─────────────────────────────────────────
 // Types
@@ -119,6 +120,11 @@ export async function recordStoryRead(storyId: number): Promise<void> {
     where: { id: storyId },
     data: { totalReads: { increment: 1 } },
   });
+  // ActivityLog + achievement check
+  const session = await getSession();
+  if (session) {
+    await logActivityAndCheck(session.id, "story_read", String(storyId));
+  }
   revalidatePath("/");
 }
 
@@ -131,6 +137,8 @@ export async function recordClick(char: string): Promise<void> {
     update: { clickCount: { increment: 1 } },
     create: { character: char, clickCount: 1, userId: session.id },
   });
+  // Check achievement for unique words
+  await checkAchievements(session.id);
   revalidatePath("/learn");
   revalidatePath("/stories");
   revalidatePath("/");
@@ -194,6 +202,8 @@ export async function recordPerfectRead(chars: string[]): Promise<void> {
     });
 
   await Promise.all(updates);
+  // Log perfect_read activity for achievement
+  await logActivityAndCheck(session.id, "perfect_read");
   revalidatePath("/learn");
   revalidatePath("/stories");
   revalidatePath("/");

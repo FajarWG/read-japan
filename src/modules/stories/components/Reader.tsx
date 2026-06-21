@@ -17,6 +17,7 @@ import {
 } from "@/src/modules/stories/actions";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { useAuth } from "@/src/modules/auth/components/AuthProvider";
+import { AudioButton } from "@/src/shared/components/AudioButton";
 
 type ReaderMode = "reading" | "review" | "result" | "vocabReview";
 
@@ -221,6 +222,12 @@ interface ResultViewProps {
   translation?: string;
   hasVocabulary: boolean;
   onStartVocabReview: () => void;
+  storyId: number;
+  vocabulary: Array<{
+    entry: import("@/src/modules/prep/lib/kotoba-lookup").KotobaLookupEntry;
+    surface: string;
+    matchedChapter: number;
+  }>;
   t: {
     resultOf: string;
     kanaReadCorrectly: string;
@@ -244,6 +251,8 @@ function ResultView({
   translation,
   hasVocabulary,
   onStartVocabReview,
+  storyId,
+  vocabulary,
   t,
 }: ResultViewProps) {
   const kanaUnits = units.filter((u) => u.info);
@@ -252,6 +261,8 @@ function ResultView({
   const correctCount = totalKana - wrongCount;
   const score =
     totalKana > 0 ? Math.round((correctCount / totalKana) * 100) : 100;
+  const [minedCount, setMinedCount] = useState<number | null>(null);
+  const [mining, startMining] = useTransition();
 
   // Deduplicate wrong chars
   const wrongCharsMap = new Map<string, KanaInfo>();
@@ -261,6 +272,33 @@ function ResultView({
       wrongCharsMap.set(unit.char, unit.info);
     }
   }
+
+  const handleMineAll = () => {
+    if (mining || minedCount !== null) return;
+    startMining(async () => {
+      try {
+        const res = await fetch("/api/mine", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            storyId,
+            items: vocabulary.map((v) => ({
+              kanji: v.entry.kanji && v.entry.kanji !== "-" ? v.entry.kanji : null,
+              hiragana: v.entry.hiragana,
+              meaning: v.entry.meaning,
+              surface: v.surface,
+            })),
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setMinedCount(data.count ?? vocabulary.length);
+        }
+      } catch (err) {
+        console.error("[Mine]", err);
+      }
+    });
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -353,6 +391,32 @@ function ResultView({
             </svg>
           </div>
         </button>
+      )}
+
+      {/* Sentence Mining */}
+      {hasVocabulary && (
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50/40 dark:bg-emerald-950/10 px-5 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                ⛏️ Mine ke Anki (deck &ldquo;Mined&rdquo;)
+              </p>
+              <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-0.5">
+                {minedCount !== null
+                  ? `✓ ${minedCount} kartu ditambahkan`
+                  : `Tambah ${t.vocabCount} vocab dari cerita ini ke SRS`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleMineAll}
+              disabled={mining || minedCount !== null}
+              className="shrink-0 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3 py-2 text-xs font-semibold transition-colors disabled:bg-emerald-400 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {mining ? "..." : minedCount !== null ? "✓ Saved" : "⛏️ Mine"}
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Go home */}
@@ -522,6 +586,8 @@ export default function Reader({
         translation={translation}
         hasVocabulary={uniqueVocabulary.length > 0}
         onStartVocabReview={() => setMode("vocabReview")}
+        storyId={storyId}
+        vocabulary={uniqueVocabulary}
         t={{
           resultOf: t.resultOf,
           kanaReadCorrectly: t.resultKanaRead,
@@ -661,6 +727,17 @@ export default function Reader({
           <span>✍️ {kanaCount} kana</span>
           <span>🈶 {kanjiCount} kanji</span>
         </div>
+      </div>
+
+      {/* Audio bar — play whole story */}
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50/40 dark:bg-emerald-950/10 px-4 py-2.5">
+        <div className="flex flex-col gap-0.5">
+          <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+            🔊 Dengarkan cerita
+          </p>
+          <p className="text-[10px] text-muted">Web Speech API · voice ja-JP</p>
+        </div>
+        <AudioButton text={storyContent} rate={0.85} variant="primary" label="▶ Putar cerita" />
       </div>
 
       {/* Teks cerita — kana + kanji dari bab chapter bisa diklik */}
