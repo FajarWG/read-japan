@@ -30,8 +30,8 @@ function isNeonUrl(url: string): boolean {
 }
 
 function createPrismaClient(): PrismaClient {
-  const url = process.env.DATABASE_URL!;
-  if (!url) throw new Error("DATABASE_URL is not set");
+  const url = process.env.DATABASE_URL_VPS!;
+  if (!url) throw new Error("DATABASE_URL_VPS is not set");
 
   if (isNeonUrl(url)) {
     return new PrismaClient({ adapter: new PrismaNeonHttp(url, {}) });
@@ -45,8 +45,8 @@ async function main() {
 
   console.log(`📦 Loaded ${stories.length} stories from ${filePath}`);
 
-  if (!process.env.DATABASE_URL) {
-    console.error("❌ DATABASE_URL is not set");
+  if (!process.env.DATABASE_URL_VPS) {
+    console.error("❌ DATABASE_URL_VPS is not set");
     process.exit(1);
   }
 

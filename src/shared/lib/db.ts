@@ -10,10 +10,14 @@ import { PrismaPg } from "@prisma/adapter-pg";
  * `globalThis` agar tetap di-reuse antar reload.
  *
  * Strategi adapter:
- * - Jika DATABASE_URL指向 NeonDB (ada `neon.tech` di hostname)
+ * - Jika DATABASE_URL_VPS指向 NeonDB (ada `neon.tech` di hostname)
  *   → pakai `PrismaNeonHttp` (HTTP-based, stateless — untuk serverless).
  * - Selainnya (VPS / PostgreSQL biasa)
  *   → pakai `PrismaPg` (node-postgres, untuk koneksi TCP langsung).
+ *
+ * Catatan: nama env `DATABASE_URL_VPS` (bukan `DATABASE_URL`) agar
+ * tidak bentrok dengan konvensi Vercel/Next.js yang otomatis memetakan
+ * `DATABASE_URL`. Dengan nama khusus ini, .env lokal punya kontrol eksplisit.
  *
  * Referensi: https://www.prisma.io/docs/guides/other/troubleshooting-orm/help-articles/nextjs-prisma-client-dev-practices
  */
@@ -26,9 +30,9 @@ function isNeonUrl(url: string): boolean {
 }
 
 function createPrismaClient(): PrismaClient {
-  const connectionString = process.env.DATABASE_URL!;
+  const connectionString = process.env.DATABASE_URL_VPS!;
   if (!connectionString) {
-    throw new Error("DATABASE_URL is not set");
+    throw new Error("DATABASE_URL_VPS is not set");
   }
 
   if (isNeonUrl(connectionString)) {

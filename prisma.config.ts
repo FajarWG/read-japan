@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Pakai DATABASE_URL_VPS (bukan DATABASE_URL) agar tidak konflik
+    // dengan env standar Vercel/Next.js dan mudah di-audit.
+    url: process.env["DATABASE_URL_VPS"],
   },
 });

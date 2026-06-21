@@ -52,12 +52,14 @@ bun install
 Create a `.env` file at the project root:
 
 ```env
-DATABASE_URL="postgresql://..."
+DATABASE_URL_VPS="postgresql://..."
 JWT_SECRET="your-secret-key"
+GEMINI_API_KEY="..." # optional, untuk fitur AI Chat
 ```
 
-- `DATABASE_URL` — your PostgreSQL connection string (e.g. from [Neon](https://neon.tech))
-- `JWT_SECRET` — any strong random string used to sign session tokens
+- `DATABASE_URL_VPS` — PostgreSQL connection string (VPS/Neon/managed Postgres). Nama env ini sengaja **bukan** `DATABASE_URL` agar tidak konflik dengan env standar Vercel/Next.js dan mudah diaudit.
+- `JWT_SECRET` — string random untuk sign session JWT.
+- `GEMINI_API_KEY` — opsional, hanya untuk fitur AI Chat (Phase 7).
 
 ### 3. Set up the database
 
