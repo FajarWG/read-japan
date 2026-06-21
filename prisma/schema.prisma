@@ -32,6 +32,9 @@ model Story {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  bookmarks   Bookmark[]
+  highlights  Highlight[]
+
   @@unique([chapter, point])
 }
 
@@ -47,13 +50,22 @@ enum Role {
 // Tabel: User
 // ─────────────────────────────────────────
 model User {
-  id        Int                @id @default(autoincrement())
-  username  String             @unique
-  password  String
-  role      Role               @default(USER)
-  createdAt DateTime           @default(now())
-  progress  LearningProgress[]
-  ankiProgress AnkiProgress[]
+  id              Int                @id @default(autoincrement())
+  username        String             @unique
+  password        String
+  role            Role               @default(USER)
+  createdAt       DateTime           @default(now())
+
+  progress        LearningProgress[]
+  ankiProgress    AnkiProgress[]
+  kanaProgress    KanaProgress[]
+  kanjiProgress   KanjiProgress[]
+  bookmarks       Bookmark[]
+  highlights      Highlight[]
+  activity        ActivityLog[]
+  jlptAttempts    JLPTAttempt[]
+  achievements    UserAchievement[]
+  chatMessages    ChatMessage[]
 }
 
 // ─────────────────────────────────────────
@@ -132,4 +144,196 @@ model KanjiDictionary {
   updatedAt DateTime @updatedAt
 
   @@unique([kanji, hiragana])
+}
+
+// ═════════════════════════════════════════
+// Phase 2 — Models baru untuk fitur Phase 3+
+// ═════════════════════════════════════════
+
+// ─────────────────────────────────────────
+// Tabel: ActivityLog
+// Mencatat event pembelajaran per user
+// (untuk streak, dashboard stats, achievements).
+// ─────────────────────────────────────────
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // "story_read" | "anki_review" | "kana_practice" | "kanji_study" | "login" | "prep_open" | "jlpt_mock" | "chat_message"
+  refId     String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, type])
+  @@index([type, createdAt])
+}
+
+// ─────────────────────────────────────────
+// Tabel: Bookmark
+// Bookmark kalimat / kata dari cerita.
+// ─────────────────────────────────────────
+model Bookmark {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storyId     Int
+  story       Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  sentence    String
+  hiragana    String?
+  translation String?
+  charIndex   Int
+  length      Int      @default(1)
+  note        String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, storyId])
+  @@index([userId, createdAt])
+}
+
+// ─────────────────────────────────────────
+// Tabel: Highlight
+// Highlight range karakter dalam cerita.
+// ─────────────────────────────────────────
+model Highlight {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storyId   Int
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  charIndex Int
+  length    Int      @default(1)
+  color     String   @default("yellow")
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, storyId])
+}
+
+// ─────────────────────────────────────────
+// Tabel: KanjiProgress
+// SRS state per kanji per user.
+// ─────────────────────────────────────────
+model KanjiProgress {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kanji       String
+  ease        Float    @default(2.5)
+  interval    Int      @default(0)
+  repetitions Int      @default(0)
+  dueDate     DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, kanji])
+  @@index([userId, dueDate])
+}
+
+// ─────────────────────────────────────────
+// Tabel: KanaProgress
+// SRS state per kana per user (untuk Kana Practice Mode).
+// ─────────────────────────────────────────
+model KanaProgress {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kana        String
+  ease        Float    @default(2.5)
+  interval    Int      @default(0)
+  repetitions Int      @default(0)
+  dueDate     DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, kana])
+  @@index([userId, dueDate])
+}
+
+// ─────────────────────────────────────────
+// Tabel: JLPTQuestion
+// Bank soal JLPT (N5/N4/N3) per section.
+// ─────────────────────────────────────────
+model JLPTQuestion {
+  id          Int      @id @default(autoincrement())
+  level       String
+  section     String
+  question    String
+  prompt      String?
+  choices     Json
+  answer      String
+  explanation String?
+  createdAt   DateTime @default(now())
+
+  @@index([level, section])
+}
+
+// ─────────────────────────────────────────
+// Tabel: JLPTAttempt
+// Hasil pengerjaan mock test per user.
+// ─────────────────────────────────────────
+model JLPTAttempt {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level     String
+  score     Int
+  total     Int
+  duration  Int
+  detail    Json
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, level])
+}
+
+// ─────────────────────────────────────────
+// Tabel: Achievement
+// Definisi achievement (catalog).
+// ─────────────────────────────────────────
+model Achievement {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  titleEn    String
+  titleId    String
+  descEn     String
+  descId     String
+  icon       String
+  threshold  Int?
+  metric     String?
+
+  unlocks    UserAchievement[]
+}
+
+// ─────────────────────────────────────────
+// Tabel: UserAchievement
+// Relasi user → achievement yang sudah dibuka.
+// ─────────────────────────────────────────
+model UserAchievement {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId Int
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  unlockedAt    DateTime @default(now())
+
+  @@unique([userId, achievementId])
+  @@index([userId, unlockedAt])
+}
+
+// ─────────────────────────────────────────
+// Tabel: ChatMessage
+// History percakapan user dengan AI Chat (Gemini).
+// ─────────────────────────────────────────
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String
+  content   String   @db.Text
+  level     String   @default("N5")
+  tokens    Int?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
