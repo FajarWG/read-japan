@@ -6,6 +6,7 @@ import { useLanguage } from "@/src/modules/language/components/LanguageProvider"
 import { useTheme } from "@/src/modules/theme/components/ThemeProvider";
 import { useAuth } from "@/src/modules/auth/components/AuthProvider";
 import { logoutAction } from "@/src/modules/auth/actions";
+import { SearchOverlay } from "@/src/shared/components/SearchOverlay";
 
 export function SettingsDropdown() {
   const { lang, t, toggleLang } = useLanguage();
@@ -13,6 +14,7 @@ export function SettingsDropdown() {
   const { user } = useAuth();
   const [isPending, startLogout] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const handleLogout = () => {
     setIsOpen(false);
@@ -77,7 +79,16 @@ export function SettingsDropdown() {
 
           <div className="h-px bg-border my-1" />
 
-
+          {/* Search */}
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              setSearchOpen(true);
+            }}
+            className="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs font-semibold text-foreground hover:bg-surface-muted rounded-lg transition-colors cursor-pointer"
+          >
+            🔍 Search
+          </button>
 
           {/* About Button */}
           <button
@@ -110,6 +121,7 @@ export function SettingsDropdown() {
           </button>
         </Popover.Dialog>
       </Popover.Content>
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </Popover>
   );
 }

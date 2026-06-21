@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useTransition, useMemo } from "react";
+import { useState, useCallback, useTransition, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Popover } from "@heroui/react";
 import { parseJapaneseText } from "@/src/shared/lib/parser";
@@ -702,20 +702,106 @@ export default function Reader({
         })}
       </p>
 
-      {/* Selesai membaca button */}
+      {/* Selesai membaca button + bookmark */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border">
         <p className="text-xs text-muted">
           {t.readingTip}
         </p>
-        <button
-          type="button"
-          onClick={handleFinishReading}
-          className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold transition-colors shadow-sm flex items-center gap-2"
-        >
-          <span>✅</span>
-          <span>{t.finishReading}</span>
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <BookmarkButton
+            storyId={storyId}
+            storyContent={storyContent}
+            translation={translation}
+          />
+          <button
+            type="button"
+            onClick={handleFinishReading}
+            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold transition-colors shadow-sm flex items-center gap-2"
+          >
+            <span>✅</span>
+            <span>{t.finishReading}</span>
+          </button>
+        </div>
       </div>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────
+// BookmarkButton — save entire story as one bookmark
+// ─────────────────────────────────────────
+
+function BookmarkButton({
+  storyId,
+  storyContent,
+  translation,
+}: {
+  storyId: number;
+  storyContent: string;
+  translation?: string | null;
+}) {
+  const [saved, setSaved] = useState(false);
+  const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/bookmarks?storyId=${storyId}`);
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if ((data.bookmarks as Array<{ charIndex: number }>).some((b) => b.charIndex === 0)) {
+          setSaved(true);
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [storyId]);
+
+  const handleBookmark = () => {
+    if (saved || pending) return;
+    startTransition(async () => {
+      try {
+        const res = await fetch("/api/bookmarks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            storyId,
+            sentence: storyContent,
+            translation: translation ?? undefined,
+            charIndex: 0,
+            length: storyContent.length,
+          }),
+        });
+        if (res.ok) setSaved(true);
+      } catch (err) {
+        console.error("[BookmarkButton]", err);
+      }
+    });
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleBookmark}
+      disabled={saved || pending}
+      aria-label="Bookmark cerita"
+      title={saved ? "Tersimpan" : "Bookmark cerita ini"}
+      className={[
+        "px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center gap-2 border",
+        saved
+          ? "bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/50 cursor-default"
+          : "bg-surface text-foreground border-border hover:bg-surface-muted",
+      ].join(" ")}
+    >
+      <span>{saved ? "🔖" : "📑"}</span>
+      <span className="hidden sm:inline">
+        {saved ? "Tersimpan" : pending ? "..." : "Bookmark"}
+      </span>
+    </button>
   );
 }
