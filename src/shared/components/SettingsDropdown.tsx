@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useTransition, useState } from "react";
 import { Popover } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
@@ -91,35 +90,24 @@ export function SettingsDropdown() {
             ❓ {t.creditsAbout}
           </button>
 
-          {/* Auth Section */}
-          {!user ? (
-            <Link
-              href="/login"
-              onClick={() => setIsOpen(false)}
-              className="w-full text-center block text-xs font-semibold text-white bg-accent hover:bg-accent/90 py-2 rounded-lg transition-colors cursor-pointer mt-1"
-            >
-              {t.authLogin}
-            </Link>
-          ) : (
-            <>
-              <div className="h-px bg-border my-1" />
-              <div className="px-2.5 py-1.5 flex flex-col">
-                <span className="text-[10px] text-muted uppercase tracking-wider select-none font-bold">
-                  User
-                </span>
-                <span className="text-xs font-bold text-foreground truncate select-none">
-                  {user.username} {user.role === "ADMIN" && `(${t.admin})`}
-                </span>
-              </div>
-              <button
-                onClick={handleLogout}
-                disabled={isPending}
-                className="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
-              >
-                🚪 {isPending ? t.saving : t.authLogout}
-              </button>
-            </>
-          )}
+          {/* Auth Section — middleware menjamin user selalu ada */}
+          <div className="h-px bg-border my-1" />
+          <div className="px-2.5 py-1.5 flex flex-col">
+            <span className="text-[10px] text-muted uppercase tracking-wider select-none font-bold">
+              User
+            </span>
+            <span className="text-xs font-bold text-foreground truncate select-none">
+              {user?.username ?? "—"}
+              {user?.role === "ADMIN" && ` (${t.admin})`}
+            </span>
+          </div>
+          <button
+            onClick={handleLogout}
+            disabled={isPending}
+            className="w-full flex items-center gap-2 px-2.5 py-2 text-left text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+          >
+            🚪 {isPending ? t.saving : t.authLogout}
+          </button>
         </Popover.Dialog>
       </Popover.Content>
     </Popover>

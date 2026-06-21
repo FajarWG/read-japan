@@ -6,8 +6,6 @@ import { Button, Card, Popover, Tabs } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
-import { useAuth } from "@/src/modules/auth/components/AuthProvider";
-import { recordGuestClick } from "@/src/shared/lib/guest-progress";
 import { recordKotobaLookup } from "@/src/modules/stories/actions";
 import {
   buildKotobaAliasMap,
@@ -165,7 +163,6 @@ const getPlaceholderJson = (chapter: number, point: number) => {
 
 export function PrepContent({ username, role }: PrepContentProps) {
   const { lang, t } = useLanguage();
-  const { user } = useAuth();
 
   // State pemilihan bab & poin
   const [chapter, setChapter] = useState<number>(1);
@@ -465,11 +462,6 @@ export function PrepContent({ username, role }: PrepContentProps) {
   );
 
   const handleKanjiLookup = async (progressKey: string) => {
-    if (!user) {
-      recordGuestClick(progressKey);
-      return;
-    }
-
     await recordKotobaLookup(progressKey);
   };
 
@@ -753,7 +745,7 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                   </p>
                 </div>
                 
-                {role && role !== "GUEST" && (
+                {role && (
                   <Button
                     variant="primary"
                     className="font-semibold shadow-sm cursor-pointer"
@@ -1021,7 +1013,7 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                     </h2>
                   </div>
 
-                  {role && role !== "GUEST" && (
+                  {role && (
                     <Button
                       size="sm"
                       variant="secondary"

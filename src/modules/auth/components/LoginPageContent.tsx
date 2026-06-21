@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Button,
   Card,
@@ -12,7 +11,6 @@ import {
   Label,
   Input,
   FieldError,
-  Separator,
   Tabs,
 } from "@heroui/react";
 import { loginAction, registerAction } from "@/src/modules/auth/actions";
@@ -29,7 +27,6 @@ const idle: AuthResult = { success: false, error: "" };
 
 export function LoginPageContent() {
   const { t } = useLanguage();
-  const router = useRouter();
   const [loginResult, loginDispatch, loginPending] = useActionState(
     loginAction,
     idle,
@@ -224,27 +221,6 @@ export function LoginPageContent() {
               </form>
             </Tabs.Panel>
           </Tabs>
-
-          {/* Divider */}
-          <div className="my-5 flex items-center gap-3">
-            <Separator className="flex-1" />
-            <span className="text-xs text-muted">{t.authOr}</span>
-            <Separator className="flex-1" />
-          </div>
-
-          {/* Guest option */}
-          <div className="flex flex-col gap-2">
-            <Button
-              variant="secondary"
-              className="w-full"
-              onPress={() => router.push("/")}
-            >
-              {t.authContinueGuest}
-            </Button>
-            <p className="text-center text-[11px] text-amber-600 dark:text-amber-400 leading-snug px-2">
-              ⚠️ {t.authGuestWarning}
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

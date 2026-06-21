@@ -2,6 +2,7 @@
 
 import { prisma } from "@/src/shared/lib/db";
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import {
   createSession,
   deleteSession,
@@ -10,6 +11,28 @@ import {
 import { redirect } from "next/navigation";
 
 export type AuthResult = { success: true } | { success: false; error: string };
+
+/**
+ * Sanitasi tujuan redirect dari `?next=` agar tidak menjadi open-redirect.
+ * Hanya izinkan path absolut yang dimulai dengan "/" dan BUKAN "//"
+ * (protocol-relative URL).
+ */
+async function safeNextPath(): Promise<string> {
+  try {
+    const h = await headers();
+    // Next.js menyusun URL penuh di header `referer` saat form dipost
+    // — kita ambil path saja dari situ.
+    const ref = h.get("referer");
+    if (ref) {
+      const u = new URL(ref);
+      const next = u.searchParams.get("next");
+      if (next && next.startsWith("/") && !next.startsWith("//")) return next;
+    }
+  } catch {
+    /* ignore */
+  }
+  return "/";
+}
 
 // ─────────────────────────────────────────
 // Login
@@ -44,7 +67,7 @@ export async function loginAction(
     role: user.role,
   });
 
-  redirect("/");
+  redirect(await safeNextPath());
 }
 
 // ─────────────────────────────────────────
@@ -86,7 +109,7 @@ export async function registerAction(
     role: user.role,
   });
 
-  redirect("/");
+  redirect(await safeNextPath());
 }
 
 // ─────────────────────────────────────────

@@ -21,31 +21,29 @@ export const metadata: Metadata = {
 };
 
 export default async function StoriesPage() {
+  // Middleware menjamin session ada. getSession() dipakai untuk ambil userId.
   const session = await getSession();
+  if (!session) {
+    // Seharusnya tidak terjadi karena middleware, tapi safety net.
+    return null;
+  }
 
   const stories = await prisma.story.findMany({
     orderBy: [{ totalReads: "asc" }, { createdAt: "desc" }],
   });
 
-  let records: any[] = [];
-  let totalClicks = 0;
-  let totalWrong = 0;
-  let totalDebt = 0;
+  const records = await prisma.learningProgress.findMany({
+    where: {
+      userId: session.id,
+      OR: [{ clickCount: { gt: 0 } }, { wrongCount: { gt: 0 } }],
+    },
+    orderBy: [{ wrongCount: "desc" }, { clickCount: "desc" }],
+  });
+
+  const totalClicks = records.reduce((sum, r) => sum + r.clickCount, 0);
+  const totalWrong = records.reduce((sum, r) => sum + r.wrongCount, 0);
+  const totalDebt = totalClicks + totalWrong;
   const kotobaLookupMap = getAllKotobaLookupMap();
-
-  if (session) {
-    records = await prisma.learningProgress.findMany({
-      where: {
-        userId: session.id,
-        OR: [{ clickCount: { gt: 0 } }, { wrongCount: { gt: 0 } }],
-      },
-      orderBy: [{ wrongCount: "desc" }, { clickCount: "desc" }],
-    });
-
-    totalClicks = records.reduce((sum, r) => sum + r.clickCount, 0);
-    totalWrong = records.reduce((sum, r) => sum + r.wrongCount, 0);
-    totalDebt = totalClicks + totalWrong;
-  }
 
   const kanaProgress = records
     .filter((r) => !isKotobaProgressKey(r.character))
@@ -81,7 +79,6 @@ export default async function StoriesPage() {
       totalClicks={totalClicks}
       totalWrong={totalWrong}
       totalDebt={totalDebt}
-      isGuest={!session}
       kanaProgress={kanaProgress}
       kotobaProgress={kotobaProgress}
       hasWrong={hasWrong}

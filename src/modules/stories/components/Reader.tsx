@@ -17,11 +17,6 @@ import {
 } from "@/src/modules/stories/actions";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { useAuth } from "@/src/modules/auth/components/AuthProvider";
-import {
-  recordGuestClick,
-  recordGuestWrong,
-  recordGuestPerfect,
-} from "@/src/shared/lib/guest-progress";
 
 type ReaderMode = "reading" | "review" | "result" | "vocabReview";
 
@@ -399,8 +394,6 @@ export default function Reader({
 }: ReaderProps) {
   const router = useRouter();
   const { t } = useLanguage();
-  const { user } = useAuth();
-  const isGuest = !user;
   const [mode, setMode] = useState<ReaderMode>("reading");
 
   // Transition for recording story read
@@ -446,7 +439,7 @@ export default function Reader({
     return Array.from(seen.values());
   }, [storyTokens]);
 
-  // Kotoba click recorder (handles guest vs logged-in)
+  // Kotoba click recorder (selalu catat ke DB)
   const handleKotobaClick = useKotobaClickRecorder();
 
   // ── Handlers ───────────────────────────────────────────────────────────────
@@ -462,18 +455,11 @@ export default function Reader({
 
   /**
    * Called when a kana token popover opens.
-   * Guest → localStorage, logged-in → server action.
+   * Selalu tercatat ke DB (semua user wajib login per middleware).
    */
-  const handleKanaRecord = useCallback(
-    async (char: string) => {
-      if (isGuest) {
-        recordGuestClick(char);
-      } else {
-        await recordClick(char);
-      }
-    },
-    [isGuest],
-  );
+  const handleKanaRecord = useCallback(async (char: string) => {
+    await recordClick(char);
+  }, []);
 
   const handleFinishReading = () => {
     setWrongIndices(new Set());
@@ -496,17 +482,6 @@ export default function Reader({
     const allKanaChars = [
       ...new Set(units.filter((u) => u.info).map((u) => u.char)),
     ];
-
-    if (isGuest) {
-      // Guest: synchronous localStorage update
-      if (wrongChars.length === 0) {
-        recordGuestPerfect(allKanaChars);
-      } else {
-        recordGuestWrong(wrongChars);
-      }
-      setMode("result");
-      return;
-    }
 
     startSubmitTransition(async () => {
       try {

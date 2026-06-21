@@ -18,14 +18,6 @@ export const translations = {
     authLoggingIn: "Logging in\u2026",
     authRegistering: "Registering\u2026",
     authOr: "or",
-    authContinueGuest: "Continue without login",
-    authGuestWarning:
-      "Guest data is stored in this browser only and will be lost if you clear browser data. We recommend logging in.",
-    authGuestModeTitle: "Guest Mode",
-    authGuestModeDesc:
-      "Your progress is stored in this browser only \u2014 it will be lost if you clear browser data.",
-    authLoginRecommended: "Log in to save permanently.",
-
     // ── Common ──────────────────────────────────────────────
     home: "\uD83C\uDFE0 Home",
     back: "← Back",
@@ -272,14 +264,6 @@ export const translations = {
     authLoggingIn: "Sedang masuk\u2026",
     authRegistering: "Sedang mendaftar\u2026",
     authOr: "atau",
-    authContinueGuest: "Lanjut tanpa login",
-    authGuestWarning:
-      "Data tamu hanya tersimpan di browser ini dan akan hilang jika browser dibersihkan. Kami sarankan untuk login.",
-    authGuestModeTitle: "Mode Tamu",
-    authGuestModeDesc:
-      "Progresmu hanya tersimpan di browser ini \u2014 akan hilang jika browser dibersihkan.",
-    authLoginRecommended: "Login untuk simpan secara permanen.",
-
     // ── Common ──────────────────────────────────────────────
     home: "\uD83C\uDFE0 Beranda",
     back: "← Kembali",

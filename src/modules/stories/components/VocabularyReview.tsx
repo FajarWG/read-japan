@@ -5,9 +5,7 @@ import { Button } from "@heroui/react";
 
 import type { KotobaLookupEntry } from "@/src/modules/prep/lib/kotoba-lookup";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
-import { useAuth } from "@/src/modules/auth/components/AuthProvider";
 import { recordKotobaLookup } from "@/src/modules/stories/actions";
-import { recordGuestClick, recordGuestWrong } from "@/src/shared/lib/guest-progress";
 
 // ─────────────────────────────────────────
 // VocabularyReview — Anki-style card flip untuk vocab di cerita
@@ -29,8 +27,6 @@ export function VocabularyReview({
   onExit,
 }: VocabularyReviewProps) {
   const { t } = useLanguage();
-  const { user } = useAuth();
-  const isGuest = !user;
 
   const total = vocabulary.length;
   const [index, setIndex] = useState(0);
@@ -46,49 +42,40 @@ export function VocabularyReview({
   const handleKnown = useCallback(async () => {
     if (!current) return;
     setKnown((prev) => new Set(prev).add(current.entry.progressKey));
-    // Record click (positive)
-    if (isGuest) {
-      recordGuestClick(current.entry.progressKey);
-    } else {
-      startTransition(async () => {
-        try {
-          await recordKotobaLookup(current.entry.progressKey);
-        } catch (err) {
-          console.error("[VocabularyReview] recordKotobaLookup gagal:", err);
-        }
-      });
-    }
+    // Record click (positive) ke DB
+    startTransition(async () => {
+      try {
+        await recordKotobaLookup(current.entry.progressKey);
+      } catch (err) {
+        console.error("[VocabularyReview] recordKotobaLookup gagal:", err);
+      }
+    });
     setFlipped(false);
     if (index + 1 >= total) {
       setFinished(true);
     } else {
       setIndex((i) => i + 1);
     }
-  }, [current, index, total, isGuest]);
+  }, [current, index, total]);
 
   const handleUnknown = useCallback(async () => {
     if (!current) return;
     setUnknown((prev) => new Set(prev).add(current.entry.progressKey));
     // Record as wrong / needs review
-    if (isGuest) {
-      recordGuestClick(current.entry.progressKey);
-      recordGuestWrong([current.entry.progressKey]);
-    } else {
-      startTransition(async () => {
-        try {
-          await recordKotobaLookup(current.entry.progressKey);
-        } catch (err) {
-          console.error("[VocabularyReview] recordKotobaLookup gagal:", err);
-        }
-      });
-    }
+    startTransition(async () => {
+      try {
+        await recordKotobaLookup(current.entry.progressKey);
+      } catch (err) {
+        console.error("[VocabularyReview] recordKotobaLookup gagal:", err);
+      }
+    });
     setFlipped(false);
     if (index + 1 >= total) {
       setFinished(true);
     } else {
       setIndex((i) => i + 1);
     }
-  }, [current, index, total, isGuest]);
+  }, [current, index, total]);
 
   const handleSkip = useCallback(() => {
     setFlipped(false);

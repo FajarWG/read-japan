@@ -124,7 +124,7 @@ export async function recordStoryRead(storyId: number): Promise<void> {
 
 export async function recordClick(char: string): Promise<void> {
   const session = await getSession();
-  if (!session) return; // guest: handled client-side via localStorage
+  if (!session) throw new Error("recordClick: tidak ada session (middleware harusnya mengarahkan ke /login).");
 
   await prisma.learningProgress.upsert({
     where: { character_userId: { character: char, userId: session.id } },
@@ -143,7 +143,7 @@ export async function recordKotobaLookup(progressKey: string): Promise<void> {
 export async function recordWrongReads(chars: string[]): Promise<void> {
   if (chars.length === 0) return;
   const session = await getSession();
-  if (!session) return; // guest: handled client-side
+  if (!session) throw new Error("recordWrongReads: tidak ada session (middleware harusnya mengarahkan ke /login).");
 
   await Promise.all(
     chars.map((char) =>
@@ -167,7 +167,7 @@ export async function recordWrongReads(chars: string[]): Promise<void> {
 export async function recordPerfectRead(chars: string[]): Promise<void> {
   if (chars.length === 0) return;
   const session = await getSession();
-  if (!session) return; // guest: handled client-side
+  if (!session) throw new Error("recordPerfectRead: tidak ada session (middleware harusnya mengarahkan ke /login).");
 
   const records = await prisma.learningProgress.findMany({
     where: { character: { in: chars }, userId: session.id },

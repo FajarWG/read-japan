@@ -4,9 +4,7 @@ import { useTransition } from "react";
 import { Popover } from "@heroui/react";
 
 import type { KotobaLookupEntry } from "@/src/modules/prep/lib/kotoba-lookup";
-import { useAuth } from "@/src/modules/auth/components/AuthProvider";
 import { recordKotobaLookup } from "@/src/modules/stories/actions";
-import { recordGuestClick } from "@/src/shared/lib/guest-progress";
 
 // ─────────────────────────────────────────
 // KotobaToken — kanji / kata dalam cerita yang bisa diklik
@@ -17,7 +15,7 @@ interface KotobaTokenProps {
   entry: KotobaLookupEntry;
   /** Teks surface yang muncul di cerita (bisa berbeda dari kanji form) */
   surface: string;
-  /** Called when the popover opens — records a click (DB or localStorage) */
+  /** Called when the popover opens — records a click to DB */
   onRecordOpen: (progressKey: string) => void;
 }
 
@@ -75,18 +73,12 @@ export function KotobaToken({ entry, surface, onRecordOpen }: KotobaTokenProps) 
 }
 
 // ─────────────────────────────────────────
-// Hook untuk handler klik kotoba (DB atau localStorage)
+// Hook untuk handler klik kotoba (DB).
+// Setelah Phase 1, semua user wajib login → selalu catat ke server.
 // ─────────────────────────────────────────
 
 export function useKotobaClickRecorder() {
-  const { user } = useAuth();
-  const isGuest = !user;
-
   return async (progressKey: string): Promise<void> => {
-    if (isGuest) {
-      recordGuestClick(progressKey);
-    } else {
-      await recordKotobaLookup(progressKey);
-    }
+    await recordKotobaLookup(progressKey);
   };
 }
