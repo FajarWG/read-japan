@@ -73,6 +73,26 @@ export const translations = {
     progressAchievementsNone: "No achievements yet — keep learning!",
     progressExport: "Export CSV",
 
+    // ── Chat (Phase 7) ───────────────────────────────────────
+    chatTitle: "AI Chat Tutor",
+    chatSubtitle: "Gemini · Powered by Google",
+    chatPlaceholder: "Type message... (Enter to send, Shift+Enter for newline)",
+    chatSend: "Send",
+    chatQuotaLow: "Rate limit hampir habis",
+    chatQuotaLowEn: "Rate limit almost reached",
+
+    // ── JLPT (Phase 7) ───────────────────────────────────────
+    jlptTitle: "JLPT Mock Test",
+    jlptSubtitle: "Choose level and start practicing",
+    jlptHistory: "Attempt History",
+    jlptResult: "Result",
+    jlptSubmit: "Submit",
+    jlptNext: "Next",
+    jlptPrev: "Previous",
+    jlptPassed: "Pass!",
+    jlptFailed: "Not pass — minimum 80% to pass",
+    jlptBreakdown: "Per-question breakdown",
+
     // ── Stats ───────────────────────────────────────────────
     totalClicks: "total clicks",
     totalWrong: "total wrong",
@@ -372,6 +392,26 @@ export const translations = {
     progressAchievementsLocked: "Terkunci",
     progressAchievementsNone: "Belum ada achievement — terus belajar!",
     progressExport: "Export CSV",
+
+    // ── Chat (Phase 7) ───────────────────────────────────────
+    chatTitle: "Tutor AI Chat",
+    chatSubtitle: "Gemini · oleh Google",
+    chatPlaceholder: "Ketik pesan... (Enter untuk kirim, Shift+Enter untuk newline)",
+    chatSend: "Kirim",
+    chatQuotaLow: "Batas hampir habis",
+    chatQuotaLowEn: "Rate limit almost reached",
+
+    // ── JLPT (Phase 7) ───────────────────────────────────────
+    jlptTitle: "JLPT Mock Test",
+    jlptSubtitle: "Pilih level dan mulai latihan",
+    jlptHistory: "Riwayat attempt",
+    jlptResult: "Hasil",
+    jlptSubmit: "Submit",
+    jlptNext: "Lanjut",
+    jlptPrev: "Sebelumnya",
+    jlptPassed: "Lulus!",
+    jlptFailed: "Belum lulus — minimal 80% untuk lulus",
+    jlptBreakdown: "Breakdown per soal",
 
     // ── Stats ───────────────────────────────────────────────
     totalClicks: "total klik",

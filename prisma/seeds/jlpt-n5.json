@@ -1,0 +1,314 @@
+[
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "What does \"水\" (みず) mean?",
+    "choices": [{"id":"a","text":"fire"},{"id":"b","text":"water"},{"id":"c","text":"tree"},{"id":"d","text":"gold"}],
+    "answer": "b",
+    "explanation": "水 (みず / mizu) means 'water'. It is read with kun'yomi."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "What does \"食べる\" (たべる) mean?",
+    "choices": [{"id":"a","text":"to drink"},{"id":"b","text":"to read"},{"id":"c","text":"to eat"},{"id":"d","text":"to sleep"}],
+    "answer": "c",
+    "explanation": "食べる (たべる / taberu) is a group-2 ichidan verb meaning 'to eat'."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "Choose the correct reading of \"人\":",
+    "choices": [{"id":"a","text":"ひと (hito)"},{"id":"b","text":"にん (nin)"},{"id":"c","text":"Both readings are correct"},{"id":"d","text":"ねこ (neko)"}],
+    "answer": "c",
+    "explanation": "人 has two readings: kun'yomi ひと (hito) and on'yomi にん (nin, e.g. in 日本人 nihonjin)."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "What does \"大きい\" mean?",
+    "choices": [{"id":"a","text":"small"},{"id":"b","text":"big"},{"id":"c","text":"new"},{"id":"d","text":"old"}],
+    "answer": "b",
+    "explanation": "大きい (おおきい / ookii) is an i-adjective meaning 'big'."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "\"傘\" (かさ) means:",
+    "choices": [{"id":"a","text":"bag"},{"id":"b","text":"umbrella"},{"id":"c","text":"key"},{"id":"d","text":"shoes"}],
+    "answer": "b",
+    "explanation": "傘 (かさ / kasa) means 'umbrella'."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "Choose the correct word for \"teacher\":",
+    "choices": [{"id":"a","text":"学生"},{"id":"b","text":"先生"},{"id":"c","text":"学校"},{"id":"d","text":"会社"}],
+    "answer": "b",
+    "explanation": "先生 (せんせい / sensei) means 'teacher'. 学生 means 'student'."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "What is the meaning of \"本\"?",
+    "choices": [{"id":"a","text":"pen"},{"id":"b","text":"paper"},{"id":"c","text":"book"},{"id":"d","text":"page"}],
+    "answer": "c",
+    "explanation": "本 (ほん / hon) means 'book'. Also used in 日本 (にほん / Nihon, Japan)."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "\"明日\" (あした) means:",
+    "choices": [{"id":"a","text":"today"},{"id":"b","text":"yesterday"},{"id":"c","text":"tomorrow"},{"id":"d","text":"now"}],
+    "answer": "c",
+    "explanation": "明日 (あした / ashita) means 'tomorrow'. Also read as あす (asu) or みょうにち (myounichi)."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "What does \"家\" mean?",
+    "choices": [{"id":"a","text":"family"},{"id":"b","text":"house"},{"id":"c","text":"school"},{"id":"d","text":"car"}],
+    "answer": "b",
+    "explanation": "家 (いえ / ie or か / ka) means 'house' or 'home'."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "\"ありがとう\" is:",
+    "choices": [{"id":"a","text":"goodbye"},{"id":"b","text":"thank you"},{"id":"c","text":"please"},{"id":"d","text":"sorry"}],
+    "answer": "b",
+    "explanation": "ありがとう means 'thank you'. Polite: ありがとうございます."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "What does \"行く\" (いく) mean?",
+    "choices": [{"id":"a","text":"to come"},{"id":"b","text":"to go"},{"id":"c","text":"to return"},{"id":"d","text":"to walk"}],
+    "answer": "b",
+    "explanation": "行く (いく / iku) is a group-1 verb meaning 'to go'."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "Choose the word for \"morning\":",
+    "choices": [{"id":"a","text":"朝"},{"id":"b","text":"昼"},{"id":"c","text":"夜"},{"id":"d","text":"晩"}],
+    "answer": "a",
+    "explanation": "朝 (あさ / asa) means 'morning'. 昼 = noon/daytime, 夜 = night."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "\"安い\" (やすい) means:",
+    "choices": [{"id":"a","text":"expensive"},{"id":"b","text":"cheap"},{"id":"c","text":"good"},{"id":"d","text":"fast"}],
+    "answer": "b",
+    "explanation": "安い (やすい / yasui) is an i-adjective meaning 'cheap' (the opposite is 高い takai)."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "What does \"駅\" (えき) mean?",
+    "choices": [{"id":"a","text":"airport"},{"id":"b","text":"station"},{"id":"c","text":"bus stop"},{"id":"d","text":"hotel"}],
+    "answer": "b",
+    "explanation": "駅 (えき / eki) means 'station' (usually train station)."
+  },
+  {
+    "level": "N5",
+    "section": "vocab",
+    "question": "\"友達\" (ともだち) means:",
+    "choices": [{"id":"a","text":"family"},{"id":"b","text":"teacher"},{"id":"c","text":"friend"},{"id":"d","text":"colleague"}],
+    "answer": "c",
+    "explanation": "友達 (ともだち / tomodachi) means 'friend'."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Watashi ___ gakusei desu. (I am a student.)",
+    "choices": [{"id":"a","text":"wa"},{"id":"b","text":"ga"},{"id":"c","text":"wo"},{"id":"d","text":"ni"}],
+    "answer": "a",
+    "explanation": "Use the topic marker は (wa) to introduce a topic: 私は学生です."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Kyou wa ___ kaimasu. (Today I buy it.)",
+    "choices": [{"id":"a","text":"kore wo"},{"id":"b","text":"kore ga"},{"id":"c","text":"kore ni"},{"id":"d","text":"kore de"}],
+    "answer": "a",
+    "explanation": "Use を (wo/o) for the direct object marker: これを買います."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Ashita ___ tenisu o shimasu. (I will play tennis tomorrow.)",
+    "choices": [{"id":"a","text":"wa"},{"id":"b","text":"ni"},{"id":"c","text":"de"},{"id":"d","text":"to"}],
+    "answer": "a",
+    "explanation": "Time words like 明日 (tomorrow) take the topic marker は: 明日はテニスをします."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Which particle goes here? Gakkou ___ ikimasu. (I go to school.)",
+    "choices": [{"id":"a","text":"wo"},{"id":"b","text":"ga"},{"id":"c","text":"ni"},{"id":"d","text":"wa"}],
+    "answer": "c",
+    "explanation": "Use に (ni) for direction/destination: 学校に行きます."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Pen ___ kaite kudasai. (Please write with a pen.)",
+    "choices": [{"id":"a","text":"ni"},{"id":"b","text":"wo"},{"id":"c","text":"de"},{"id":"d","text":"to"}],
+    "answer": "c",
+    "explanation": "Use で (de) for the means/instrument: ペンで書いてください."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Tanaka-san ___ Amerika no kata desu. (Mr. Tanaka is from America.)",
+    "choices": [{"id":"a","text":"wa"},{"id":"b","text":"ga"},{"id":"c","text":"wo"},{"id":"d","text":"de"}],
+    "answer": "a",
+    "explanation": "Use は (wa) for topic: 田中さんはアメリカのカタです."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Sensei ___ nihongo o oshiete imasu. (The teacher is teaching Japanese.)",
+    "choices": [{"id":"a","text":"wa"},{"id":"b","text":"ga"},{"id":"c","text":"wo"},{"id":"d","text":"to"}],
+    "answer": "b",
+    "explanation": "Use が (ga) for the subject of a descriptive/neutral sentence: 先生が日本語を教えています."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Watashi wa ___ oishii desu. (My mom's cooking is delicious.)",
+    "choices": [{"id":"a","text":"okaasan no ryouri ga"},{"id":"b","text":"okaasan no ryouri wo"},{"id":"c","text":"okaasan ni ryouri ga"},{"id":"d","text":"okaasan de ryouri wo"}],
+    "answer": "a",
+    "explanation": "母の料理が美味しい — 'ga' marks the subject being described."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Choose the correct negative form of \"ikimasu\" (to go):",
+    "choices": [{"id":"a","text":"ikimasen"},{"id":"b","text":"ikimasu"},{"id":"c","text":"ikanai"},{"id":"d","text":"ikan"}],
+    "answer": "a",
+    "explanation": "Polite negative of 行く (group-1): 行きません. Casual: 行かない."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Kore ___ kudtasa i. (Please give me this.)",
+    "choices": [{"id":"a","text":"wo"},{"id":"b","text":"ga"},{"id":"c","text":"ni"},{"id":"d","text":"to"}],
+    "answer": "a",
+    "explanation": "Use を for the object: これをください."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Doko ___ ikimasu ka. (Where are you going?)",
+    "choices": [{"id":"a","text":"wo"},{"id":"b","text":"ga"},{"id":"c","text":"ni"},{"id":"d","text":"de"}],
+    "answer": "c",
+    "explanation": "Use に with motion verbs for destination: どこに行きますか."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Choose the correct past tense of \"tabemasu\" (to eat):",
+    "choices": [{"id":"a","text":"tabemashita"},{"id":"b","text":"tabemasu"},{"id":"c","text":"tabete"},{"id":"d","text":"taberarenai"}],
+    "answer": "a",
+    "explanation": "Polite past of 食べる (group-2): 食べました. Casual past: 食べた."
+  },
+  {
+    "level": "N5",
+    "section": "grammar",
+    "question": "Watashi ___ tegami o kakimasu. (I write a letter.)",
+    "choices": [{"id":"a","text":"wa"},{"id":"b","text":"ga"},{"id":"c","text":"wo"},{"id":"d","text":"ni"}],
+    "answer": "a",
+    "explanation": "Topic marker は: 私は手紙を書きます."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "What is the reading of \"今日\"?",
+    "choices": [{"id":"a","text":"きのう"},{"id":"b","text":"きょう"},{"id":"c","text":"あした"},{"id":"d","text":"いま"}],
+    "answer": "b",
+    "explanation": "今日 (きょう / kyou) means 'today'. 昨日 (きのう kinou) = yesterday."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "Read \"山\":",
+    "choices": [{"id":"a","text":"かわ"},{"id":"b","text":"うみ"},{"id":"c","text":"やま"},{"id":"d","text":"もり"}],
+    "answer": "c",
+    "explanation": "山 (やま / yama) means 'mountain'."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "What does \"時間\" mean?",
+    "choices": [{"id":"a","text":"location"},{"id":"b","text":"time"},{"id":"c","text":"date"},{"id":"d","text":"weather"}],
+    "answer": "b",
+    "explanation": "時間 (じかん / jikan) means 'time' or 'hour'."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "What is the reading of \"日本\"?",
+    "choices": [{"id":"a","text":"にほん"},{"id":"b","text":"にっぽん"},{"id":"c","text":"both A and B"},{"id":"d","text":"ちゅうごく"}],
+    "answer": "c",
+    "explanation": "日本 can be read as にほん (nihon) or にっぽん (nippon). ちゅうごく is 'China'."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "Read \"会社\":",
+    "choices": [{"id":"a","text":"かいしゃ"},{"id":"b","text":"がっこう"},{"id":"c","text":"えき"},{"id":"d","text":"みせ"}],
+    "answer": "a",
+    "explanation": "会社 (かいしゃ / kaisha) means 'company'."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "What does \"電話\" mean?",
+    "choices": [{"id":"a","text":"mail"},{"id":"b","text":"phone"},{"id":"c","text":"letter"},{"id":"d","text":"newspaper"}],
+    "answer": "b",
+    "explanation": "電話 (でんわ / denwa) means 'telephone'."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "Read \"学生\":",
+    "choices": [{"id":"a","text":"がくせい"},{"id":"b","text":"がくしゃ"},{"id":"c","text":"せいと"},{"id":"d","text":"こうせい"}],
+    "answer": "a",
+    "explanation": "学生 (がくせい / gakusei) means 'student'."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "What does \"右\" mean?",
+    "choices": [{"id":"a","text":"left"},{"id":"b","text":"right"},{"id":"c","text":"up"},{"id":"d","text":"down"}],
+    "answer": "b",
+    "explanation": "右 (みぎ / migi) means 'right'. 左 (hidari) = left."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "Read \"高い\":",
+    "choices": [{"id":"a","text":"やすい"},{"id":"b","text":"たかい"},{"id":"c","text":"おもい"},{"id":"d","text":"ひろい"}],
+    "answer": "b",
+    "explanation": "高い (たかい / takai) means 'tall' or 'expensive'. やすい (yasui) = cheap."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "What does \"車\" mean?",
+    "choices": [{"id":"a","text":"train"},{"id":"b","text":"bicycle"},{"id":"c","text":"car"},{"id":"d","text":"bus"}],
+    "answer": "c",
+    "explanation": "車 (くるま / kuruma) means 'car'."
+  },
+  {
+    "level": "N5",
+    "section": "kanji",
+    "question": "Read \"上手\":",
+    "choices": [{"id":"a","text":"じょうず"},{"id":"b","text":"へた"},{"id":"c","text":"うまい"},{"id":"d","text":"できる"}],
+    "answer": "a",
+    "explanation": "上手 (じょうず / jouzu) means 'good at' / 'skilled'."
+  }
+]
