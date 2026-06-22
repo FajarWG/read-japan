@@ -1,6 +1,7 @@
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { PrismaNeonHttp } from "@prisma/adapter-neon";
 import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 
 /**
  * Singleton Prisma Client.
@@ -40,7 +41,13 @@ function createPrismaClient(): PrismaClient {
     return new PrismaClient({ adapter });
   }
 
-  const adapter = new PrismaPg({ connectionString });
+  const pool = new pg.Pool({
+    connectionString,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  });
+  const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }
 

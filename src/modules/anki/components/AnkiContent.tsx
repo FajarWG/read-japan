@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Button, Card, Chip } from "@heroui/react";
+import { Button, Card, Chip, Modal } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
@@ -30,7 +30,7 @@ interface VocabularyCard {
 }
 
 export function AnkiContent({ username }: AnkiContentProps) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   // Filter pilihan
   const [filterChapter, setFilterChapter] = useState<string>("all");
@@ -50,13 +50,16 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [sessionFinished, setSessionFinished] = useState<boolean>(false);
   const [ankiMode, setAnkiMode] = useState<"srs" | "quick">("srs");
 
-  // Guide state
-  const [showGuide, setShowGuide] = useState<boolean>(false);
-
-  // Learned Kanji states
-  const [kanjiProgress, setKanjiProgress] = useState<any[]>([]);
-  const [kanjiTab, setKanjiTab] = useState<"vocab" | "n5">("vocab");
+  // Learned Kanji state (derived from vocabulary progress)
   const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
+  const [showReadings, setShowReadings] = useState<boolean>(false);
+
+  // Reset showReadings state when selecting a new Kanji
+  useEffect(() => {
+    if (selectedKanji) {
+      setShowReadings(false);
+    }
+  }, [selectedKanji]);
 
   // Ambil progres SRS pengguna saat pertama kali masuk
   useEffect(() => {
@@ -78,20 +81,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       }
     }
 
-    async function fetchKanjiProgress() {
-      try {
-        const res = await fetch("/api/kanji");
-        if (res.ok) {
-          const json = await res.json();
-          setKanjiProgress(json.progress || []);
-        }
-      } catch (err) {
-        console.error("Gagal mengambil progres Kanji:", err);
-      }
-    }
-
     fetchAnkiProgress();
-    fetchKanjiProgress();
   }, []);
 
   // Ekstrak semua kosakata yang cocok dengan filter
@@ -162,15 +152,27 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
   // Ekstrak karakter Kanji unik yang dipelajari dari kosakata (anki progress)
   const learnedVocabKanji = useMemo(() => {
-    const kanjiMap = new Map<string, { character: string; vocabWords: Array<{ word: string; meaning: string; reps: number; interval: number }> }>();
+    const kanjiMap = new Map<
+      string,
+      {
+        character: string;
+        vocabWords: Array<{
+          word: string;
+          reading: string;
+          meaning: string;
+          reps: number;
+          interval: number;
+        }>;
+      }
+    >();
 
     // Buat lookup untuk memetakan kanji-hiragana ke detail kosakata
     const vocabLookup = new Map<string, VocabularyCard>();
-    filteredVocabulary.forEach(card => {
+    filteredVocabulary.forEach((card) => {
       vocabLookup.set(`${card.kanji}-${card.hiragana}`, card);
     });
 
-    Object.keys(progressMap).forEach(key => {
+    Object.keys(progressMap).forEach((key) => {
       const parts = key.split("-");
       if (parts.length >= 4) {
         const kanjiWord = parts[2];
@@ -188,12 +190,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 kanjiMap.set(char, { character: char, vocabWords: [] });
               }
               const kData = kanjiMap.get(char)!;
-              if (!kData.vocabWords.some(w => w.word === kanjiWord)) {
+              if (!kData.vocabWords.some((w) => w.word === kanjiWord)) {
                 kData.vocabWords.push({
                   word: kanjiWord,
+                  reading: hiragana,
                   meaning,
                   reps: progress.repetitions,
-                  interval: progress.interval
+                  interval: progress.interval,
                 });
               }
             }
@@ -205,29 +208,16 @@ export function AnkiContent({ username }: AnkiContentProps) {
     return Array.from(kanjiMap.values());
   }, [progressMap, filteredVocabulary]);
 
-  // Karakter N5 yang sudah dipelajari
-  const learnedN5Kanji = useMemo(() => {
-    const studiedSet = new Set(kanjiProgress.map(p => p.kanji));
-    return KANJI_N5.filter(k => studiedSet.has(k.kanji)).map(k => {
-      const progressItem = kanjiProgress.find(p => p.kanji === k.kanji);
-      return {
-        ...k,
-        reps: progressItem?.repetitions ?? 0,
-        interval: progressItem?.interval ?? 0,
-      };
-    });
-  }, [kanjiProgress]);
-
   // Detail Kanji yang terpilih
   const selectedKanjiDetail = useMemo(() => {
     if (!selectedKanji) return null;
+    return learnedVocabKanji.find((k) => k.character === selectedKanji) || null;
+  }, [selectedKanji, learnedVocabKanji]);
 
-    if (kanjiTab === "vocab") {
-      return learnedVocabKanji.find(k => k.character === selectedKanji) || null;
-    } else {
-      return learnedN5Kanji.find(k => k.kanji === selectedKanji) || null;
-    }
-  }, [selectedKanji, kanjiTab, learnedVocabKanji, learnedN5Kanji]);
+  const kanjiDbInfo = useMemo(() => {
+    if (!selectedKanji) return null;
+    return KANJI_N5.find((k) => k.kanji === selectedKanji) || null;
+  }, [selectedKanji]);
 
   // Mulai sesi belajar
   const startSession = (mode: "due" | "all" | "quick") => {
@@ -399,9 +389,81 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   Anki
                 </span>
               </h1>
-              <p className="text-[10px] sm:text-xs text-muted line-clamp-1 truncate">{t.ankiSubtitle}</p>
+              <p className="text-[10px] sm:text-xs text-muted line-clamp-1 truncate">
+                {t.ankiSubtitle}
+              </p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2">
+              <Modal>
+                <button
+                  type="button"
+                  className="flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer text-sm font-bold shrink-0"
+                  title={t.ankiGuideTitle || "Panduan Penilaian SRS"}
+                >
+                  ❗
+                </button>
+                <Modal.Backdrop>
+                  <Modal.Container>
+                    <Modal.Dialog className="sm:max-w-lg">
+                      <Modal.CloseTrigger />
+                      <Modal.Header>
+                        <Modal.Heading>
+                          💡 {t.ankiGuideTitle || "Panduan Penilaian SRS"}
+                        </Modal.Heading>
+                      </Modal.Header>
+                      <Modal.Body className="text-xs leading-relaxed flex flex-col gap-3">
+                        <p className="text-muted mb-1">
+                          {t.ankiGuideDesc ||
+                            "Pelajari bagaimana pilihan spaced repetition memengaruhi interval kartu."}
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/5">
+                            <span className="shrink-0 bg-red-500 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                              Again
+                            </span>
+                            <span className="text-foreground">
+                              {t.ankiGuideAgain ||
+                                "Ulangi (Again): Lupa total. Repetisi direset ke 0, interval menjadi 1 hari, nilai ease berkurang."}
+                            </span>
+                          </div>
+                          <div className="flex items-start gap-2.5 p-3 rounded-xl border border-amber-500/20 bg-amber-500/5">
+                            <span className="shrink-0 bg-amber-500 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                              Hard
+                            </span>
+                            <span className="text-foreground">
+                              {t.ankiGuideHard ||
+                                "Susah (Hard): Ingat dengan sulit. Interval lebih pendek (1.2x), nilai ease berkurang sedikit."}
+                            </span>
+                          </div>
+                          <div className="flex items-start gap-2.5 p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5">
+                            <span className="shrink-0 bg-indigo-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                              Good
+                            </span>
+                            <span className="text-foreground">
+                              {t.ankiGuideGood ||
+                                "Biasa (Good): Ingat dengan wajar. Interval dikalikan nilai ease, nilai ease tetap."}
+                            </span>
+                          </div>
+                          <div className="flex items-start gap-2.5 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+                            <span className="shrink-0 bg-emerald-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                              Easy
+                            </span>
+                            <span className="text-foreground">
+                              {t.ankiGuideEasy ||
+                                "Mudah (Easy): Ingat sangat cepat. Interval dikalikan nilai ease & bonus (1.3x), nilai ease bertambah."}
+                            </span>
+                          </div>
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button slot="close" variant="primary" size="sm" className="font-semibold cursor-pointer">
+                          Tutup
+                        </Button>
+                      </Modal.Footer>
+                    </Modal.Dialog>
+                  </Modal.Container>
+                </Modal.Backdrop>
+              </Modal>
               <SettingsDropdown />
             </div>
           </div>
@@ -437,12 +499,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   </Card>
                 )}
 
-                {/* Filter Setup */}
                 <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
-                  <h3 className="text-sm font-bold text-foreground border-b border-border pb-3 uppercase tracking-wider">
-                    ⚙️ Halo {username}, Atur Sesi Belajar
-                  </h3>
-
                   {/* Switcher Mode Belajar */}
                   <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
                     <button
@@ -604,242 +661,49 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   )}
                 </Card>
 
-                {/* Petunjuk Penilaian SRS Card */}
-                <Card className="border border-border bg-surface p-4 shadow-sm flex flex-col gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowGuide(!showGuide)}
-                    className="flex w-full items-center justify-between font-bold text-foreground text-sm cursor-pointer border-none bg-transparent outline-none p-1"
-                  >
-                    <span className="flex items-center gap-2">
-                      💡 {t.ankiGuideTitle || "Panduan Penilaian SRS"}
-                    </span>
-                    <span className="text-muted text-xs">
-                      {showGuide ? "▲ Sembunyikan" : "▼ Tampilkan"}
-                    </span>
-                  </button>
-                  {showGuide && (
-                    <div className="flex flex-col gap-2 border-t border-border pt-3 text-xs leading-relaxed animate-in fade-in duration-200">
-                      <p className="text-muted mb-2">
-                        {t.ankiGuideDesc || "Pelajari bagaimana pilihan spaced repetition memengaruhi interval kartu."}
-                      </p>
-                      <div className="grid grid-cols-1 gap-2">
-                        <div className="flex items-start gap-2.5 p-2.5 rounded-xl border border-red-500/20 bg-red-500/5">
-                          <span className="shrink-0 bg-red-500 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
-                            Again
-                          </span>
-                          <span className="text-foreground">
-                            {t.ankiGuideAgain || "Ulangi (Again): Lupa total. Repetisi direset ke 0, interval menjadi 1 hari, nilai ease berkurang."}
-                          </span>
-                        </div>
-                        <div className="flex items-start gap-2.5 p-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5">
-                          <span className="shrink-0 bg-amber-500 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
-                            Hard
-                          </span>
-                          <span className="text-foreground">
-                            {t.ankiGuideHard || "Susah (Hard): Ingat dengan sulit. Interval lebih pendek (1.2x), nilai ease berkurang sedikit."}
-                          </span>
-                        </div>
-                        <div className="flex items-start gap-2.5 p-2.5 rounded-xl border border-indigo-500/20 bg-indigo-500/5">
-                          <span className="shrink-0 bg-indigo-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
-                            Good
-                          </span>
-                          <span className="text-foreground">
-                            {t.ankiGuideGood || "Biasa (Good): Ingat dengan wajar. Interval dikalikan nilai ease, nilai ease tetap."}
-                          </span>
-                        </div>
-                        <div className="flex items-start gap-2.5 p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
-                          <span className="shrink-0 bg-emerald-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
-                            Easy
-                          </span>
-                          <span className="text-foreground">
-                            {t.ankiGuideEasy || "Mudah (Easy): Ingat sangat cepat. Interval dikalikan nilai ease & bonus (1.3x), nilai ease bertambah."}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Card>
-
                 {/* List Kanji yang Sudah Dipelajari */}
                 <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
                   <div className="flex flex-col gap-1 border-b border-border pb-3">
                     <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                      🈶 {t.ankiLearnedKanjiTitle || "Daftar Kanji yang Dipelajari"}
+                      🈶{" "}
+                      {t.ankiLearnedKanjiTitle ||
+                        "Daftar Kanji yang Dipelajari"}
                     </h3>
                     <p className="text-[10px] text-muted">
-                      {t.ankiLearnedKanjiDesc || "Karakter kanji dari kosakata yang telah Anda pelajari."}
+                      {t.ankiLearnedKanjiDesc ||
+                        "Karakter kanji dari kosakata yang telah Anda pelajari."}
                     </p>
                   </div>
 
-                  {/* Switcher Tab Kanji */}
-                  <div className="flex rounded-lg bg-surface-muted p-1 border border-border text-xs">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setKanjiTab("vocab");
-                        setSelectedKanji(null);
-                      }}
-                      className={[
-                        "flex-1 rounded-md py-1.5 text-center font-semibold transition-all duration-200 cursor-pointer border-none",
-                        kanjiTab === "vocab"
-                          ? "bg-surface text-foreground shadow-xs"
-                          : "text-muted hover:text-foreground",
-                      ].join(" ")}
-                    >
-                      📖 {t.ankiLearnedKanjiTabVocab || "Kanji Kosakata"} ({learnedVocabKanji.length})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setKanjiTab("n5");
-                        setSelectedKanji(null);
-                      }}
-                      className={[
-                        "flex-1 rounded-md py-1.5 text-center font-semibold transition-all duration-200 cursor-pointer border-none",
-                        kanjiTab === "n5"
-                          ? "bg-surface text-foreground shadow-xs"
-                          : "text-muted hover:text-foreground",
-                      ].join(" ")}
-                    >
-                      ✏️ {t.ankiLearnedKanjiTabN5 || "Karakter N5"} ({learnedN5Kanji.length})
-                    </button>
-                  </div>
-
                   {/* List Grid Kanji */}
-                  {kanjiTab === "vocab" ? (
-                    learnedVocabKanji.length === 0 ? (
-                      <p className="text-xs text-muted text-center py-6">
-                        {t.ankiLearnedKanjiEmpty || "Belum ada kanji yang dipelajari. Mulai pelajari kosakata untuk melihatnya di sini!"}
-                      </p>
-                    ) : (
-                      <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
-                        {learnedVocabKanji.map(k => (
-                          <button
-                            key={k.character}
-                            type="button"
-                            onClick={() => setSelectedKanji(selectedKanji === k.character ? null : k.character)}
-                            className={[
-                              "rounded-xl border-2 px-2 py-3 text-center transition-all cursor-pointer font-jp text-xl font-bold leading-none",
-                              selectedKanji === k.character
-                                ? "border-indigo-500 bg-indigo-500/10 text-indigo-500"
-                                : "border-border bg-surface text-foreground hover:border-accent/50"
-                            ].join(" ")}
-                          >
-                            {k.character}
-                          </button>
-                        ))}
-                      </div>
-                    )
+                  {learnedVocabKanji.length === 0 ? (
+                    <p className="text-xs text-muted text-center py-6">
+                      {t.ankiLearnedKanjiEmpty ||
+                        "Belum ada kanji yang dipelajari. Mulai pelajari kosakata untuk melihatnya di sini!"}
+                    </p>
                   ) : (
-                    learnedN5Kanji.length === 0 ? (
-                      <p className="text-xs text-muted text-center py-6">
-                        Belum ada kanji N5 yang dipelajari. Silakan pelajari di menu Kanji!
-                      </p>
-                    ) : (
-                      <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
-                        {learnedN5Kanji.map(k => (
-                          <button
-                            key={k.kanji}
-                            type="button"
-                            onClick={() => setSelectedKanji(selectedKanji === k.kanji ? null : k.kanji)}
-                            className={[
-                              "rounded-xl border-2 px-2 py-3 text-center transition-all cursor-pointer font-jp text-xl font-bold leading-none",
-                              selectedKanji === k.kanji
-                                ? "border-indigo-500 bg-indigo-500/10 text-indigo-500"
-                                : "border-border bg-surface text-foreground hover:border-accent/50"
-                            ].join(" ")}
-                          >
-                            {k.kanji}
-                          </button>
-                        ))}
-                      </div>
-                    )
-                  )}
-
-                  {/* Detail Panel */}
-                  {selectedKanji && selectedKanjiDetail && (
-                    <div className="border-t border-border pt-4 mt-2 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-200 text-xs">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-xl border-2 border-indigo-500/30 bg-indigo-500/5 w-14 h-14 flex items-center justify-center">
-                          <span className="font-jp text-3xl font-bold text-foreground">{selectedKanji}</span>
-                        </div>
-                        <div>
-                          <p className="font-bold text-sm text-foreground">
-                            {kanjiTab === "vocab"
-                              ? `Kanji "${selectedKanji}"`
-                              : `${selectedKanji} - ${(selectedKanjiDetail as any).meaningId || (selectedKanjiDetail as any).meaningEn}`}
-                          </p>
-                          <p className="text-[10px] text-muted mt-0.5">
-                            {kanjiTab === "vocab"
-                              ? `Ditemukan di ${(selectedKanjiDetail as any).vocabWords.length} kosakata yang sedang dipelajari`
-                              : `${(selectedKanjiDetail as any).strokes} goresan · JLPT ${(selectedKanjiDetail as any).jlpt}`}
-                          </p>
-                        </div>
-                      </div>
-
-                      {kanjiTab === "vocab" ? (
-                        <div className="flex flex-col gap-2 mt-1">
-                          <p className="font-semibold text-muted uppercase tracking-wider text-[9px]">Kosakata Terkait:</p>
-                          <div className="grid grid-cols-1 gap-2">
-                            {(selectedKanjiDetail as any).vocabWords.map((v: any, idx: number) => (
-                              <div key={idx} className="flex flex-col gap-1 p-2 rounded-xl bg-surface-muted/50 border border-border">
-                                <div className="flex items-center justify-between">
-                                  <span className="font-jp font-bold text-sm text-foreground">{v.word}</span>
-                                  <div className="flex gap-1.5 text-[8px] font-bold">
-                                    <span className="bg-indigo-500/10 text-indigo-500 px-1.5 py-0.5 rounded-full">
-                                      Rep: {v.reps}
-                                    </span>
-                                    <span className="bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-full">
-                                      Int: {v.interval} hari
-                                    </span>
-                                  </div>
-                                </div>
-                                <span className="text-muted text-[10px]">{v.meaning}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col gap-2.5 mt-1 border-t border-border/50 pt-2.5">
-                          <div className="grid grid-cols-2 gap-3 bg-surface-muted/30 p-2.5 rounded-xl border border-border/30">
-                            <div>
-                              <p className="text-[9px] text-muted uppercase font-bold tracking-wider">On&apos;yomi (音読み)</p>
-                              <p className="font-jp text-sm font-bold text-foreground mt-0.5">{(selectedKanjiDetail as any).onyomi || "—"}</p>
-                            </div>
-                            <div>
-                              <p className="text-[9px] text-muted uppercase font-bold tracking-wider">Kun&apos;yomi (訓読み)</p>
-                              <p className="font-jp text-sm font-bold text-foreground mt-0.5">
-                                {(selectedKanjiDetail as any).kunyomi?.length > 0 ? (selectedKanjiDetail as any).kunyomi.join(" · ") : "—"}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex gap-2.5 text-[10px] font-semibold">
-                            <span className="bg-indigo-500/10 text-indigo-500 px-2 py-1 rounded-md">
-                              Repetisi: {(selectedKanjiDetail as any).reps}
-                            </span>
-                            <span className="bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded-md">
-                              Interval: {(selectedKanjiDetail as any).interval} hari
-                            </span>
-                          </div>
-
-                          {((selectedKanjiDetail as any).examples?.length > 0) && (
-                            <div className="mt-1">
-                              <p className="text-[9px] text-muted uppercase font-bold tracking-wider mb-1.5">Contoh:</p>
-                              <div className="flex flex-col gap-1.5">
-                                {(selectedKanjiDetail as any).examples.slice(0, 2).map((ex: any, idx: number) => (
-                                  <div key={idx} className="flex items-baseline gap-2 bg-surface-muted/50 p-2 rounded-xl border border-border">
-                                    <span className="font-jp font-bold text-foreground">{ex.word}</span>
-                                    <span className="font-jp text-[11px] text-indigo-500">{ex.reading}</span>
-                                    <span className="text-[10px] text-muted flex-1 text-right">{ex.meaningId || ex.meaningEn}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                    <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
+                      {learnedVocabKanji.map((k) => (
+                        <button
+                          key={k.character}
+                          type="button"
+                          onClick={() =>
+                            setSelectedKanji(
+                              selectedKanji === k.character
+                                ? null
+                                : k.character,
+                            )
+                          }
+                          className={[
+                            "rounded-xl border-2 px-2 py-3 text-center transition-all cursor-pointer font-jp text-xl font-bold leading-none",
+                            selectedKanji === k.character
+                              ? "border-indigo-500 bg-indigo-500/10 text-indigo-500"
+                              : "border-border bg-surface text-foreground hover:border-accent/50",
+                          ].join(" ")}
+                        >
+                          {k.character}
+                        </button>
+                      ))}
                     </div>
                   )}
                 </Card>
@@ -1059,6 +923,132 @@ export function AnkiContent({ username }: AnkiContentProps) {
           </main>
         )}
       </div>
+
+      {/* Modal Detail Kanji */}
+      <Modal isOpen={selectedKanji !== null} onOpenChange={(open) => { if (!open) setSelectedKanji(null); }}>
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog className="sm:max-w-md">
+              <Modal.CloseTrigger />
+              <Modal.Header className="flex items-center justify-between gap-4">
+                <Modal.Heading className="flex items-center gap-2">
+                  🈶 Detail Kanji
+                </Modal.Heading>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="font-semibold text-xs border border-border bg-surface hover:bg-surface-muted cursor-pointer shrink-0 py-1 h-7 min-w-0 px-2.5 rounded-lg"
+                  onPress={() => setShowReadings(!showReadings)}
+                >
+                  {showReadings ? "👁️ Sembunyikan" : "👁️ Tampilkan"}
+                </Button>
+              </Modal.Header>
+              <Modal.Body className="flex flex-col gap-4">
+                {selectedKanji && selectedKanjiDetail && (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-xl border-2 border-indigo-500/30 bg-indigo-500/5 w-14 h-14 flex items-center justify-center">
+                        <span className="font-jp text-3xl font-bold text-foreground">
+                          {selectedKanji}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm text-foreground">
+                          Kanji "{selectedKanji}"
+                        </p>
+                        <p className="text-[10px] text-muted mt-0.5">
+                          Ditemukan di {(selectedKanjiDetail as any).vocabWords.length} kosakata yang sedang dipelajari
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Informasi Kanji dari database static (jika ada) */}
+                    {kanjiDbInfo && (
+                      <div className="flex flex-col gap-2 p-3 rounded-xl border border-border bg-surface-muted/35 text-xs animate-in fade-in duration-200">
+                        <p className="font-semibold text-muted uppercase tracking-wider text-[9px] mb-1">
+                          Informasi Kanji:
+                        </p>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                          <div>
+                            <span className="text-muted font-medium block text-[10px]">Kunyomi (訓読み):</span>
+                            <span className={[
+                              "font-jp font-semibold text-foreground text-xs transition-all duration-200",
+                              showReadings ? "" : "blur-sm select-none"
+                            ].join(" ")}>
+                              {kanjiDbInfo.kunyomi.join(", ") || "-"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted font-medium block text-[10px]">Onyomi (音読み):</span>
+                            <span className={[
+                              "font-jp font-semibold text-foreground text-xs transition-all duration-200",
+                              showReadings ? "" : "blur-sm select-none"
+                            ].join(" ")}>
+                              {kanjiDbInfo.onyomi || "-"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="border-t border-border/60 mt-1.5 pt-1.5">
+                          <span className="text-muted font-medium block text-[10px]">Arti (Meaning):</span>
+                          <span className="font-medium text-foreground text-xs">
+                            {lang === "id" ? kanjiDbInfo.meaningId : kanjiDbInfo.meaningEn}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col gap-2 mt-1 max-h-[300px] overflow-y-auto pr-1">
+                      <p className="font-semibold text-muted uppercase tracking-wider text-[9px]">
+                        Kosakata Terkait:
+                      </p>
+                      <div className="grid grid-cols-1 gap-2">
+                        {(selectedKanjiDetail as any).vocabWords.map((v: any, idx: number) => (
+                          <div
+                            key={idx}
+                            className="flex flex-col gap-1 p-2.5 rounded-xl bg-surface-muted/50 border border-border"
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-jp font-bold text-sm text-foreground">
+                                    {v.word}
+                                  </span>
+                                  <span className={[
+                                    "font-jp text-xs text-indigo-500 font-semibold transition-all duration-200",
+                                    showReadings ? "" : "blur-sm select-none"
+                                  ].join(" ")}>
+                                    〔{v.reading}〕
+                                  </span>
+                                </div>
+                                <span className="text-muted text-[10px]">
+                                  {v.meaning}
+                                </span>
+                              </div>
+                              <div className="flex shrink-0 gap-1 text-[8px] font-bold mt-1">
+                                <span className="bg-indigo-500/10 text-indigo-500 px-1.5 py-0.5 rounded-full">
+                                  Rep: {v.reps}
+                                </span>
+                                <span className="bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-full">
+                                  Int: {v.interval} hari
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button slot="close" variant="primary" size="sm" className="font-semibold cursor-pointer">
+                  Tutup
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </div>
   );
 }
