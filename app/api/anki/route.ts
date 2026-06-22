@@ -13,6 +13,13 @@ export async function GET() {
   try {
     const progressList = await prisma.ankiProgress.findMany({
       where: { userId: session.id },
+      select: {
+        cardKey: true,
+        dueDate: true,
+        interval: true,
+        repetitions: true,
+        ease: true,
+      },
     });
 
     return NextResponse.json({ progress: progressList });
