@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Button, Card, Chip, Modal } from "@heroui/react";
+import { Button, Card, Chip, Modal, Label, ListBox, Select } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
@@ -32,9 +32,64 @@ interface VocabularyCard {
 export function AnkiContent({ username }: AnkiContentProps) {
   const { t, lang } = useLanguage();
 
-  // Filter pilihan
-  const [filterChapter, setFilterChapter] = useState<string>("all");
-  const [filterPoint, setFilterPoint] = useState<string>("all");
+  // Filter pilihan (multiple selection mode using Selection type from React Aria / HeroUI)
+  const [filterChapters, setFilterChapters] = useState<any>(new Set<string>(["all"]));
+  const [filterPoints, setFilterPoints] = useState<any>(new Set<string>(["all"]));
+
+  // Handler untuk sinkronisasi multiselect: klik "all" mereset opsi lain, klik opsi lain menghapus "all"
+  const handleChapterSelectionChange = (keys: any) => {
+    if (keys === "all") {
+      setFilterChapters(new Set(["all"]));
+      setFilterPoints(new Set(["all"]));
+      return;
+    }
+    const set = new Set(keys);
+    if (set.has("all") && set.size > 1) {
+      set.delete("all");
+    }
+    setFilterChapters(set);
+    setFilterPoints(new Set(["all"])); // reset points ketika bab berubah
+  };
+
+  const handlePointSelectionChange = (keys: any) => {
+    if (keys === "all") {
+      setFilterPoints(new Set(["all"]));
+      return;
+    }
+    const set = new Set(keys);
+    if (set.has("all") && set.size > 1) {
+      set.delete("all");
+    }
+    setFilterPoints(set);
+  };
+
+  // Dapatkan opsi poin yang tersedia berdasarkan bab yang dipilih
+  const availablePointsOptions = useMemo(() => {
+    const showAllChaps =
+      filterChapters === "all" ||
+      (filterChapters as Set<any>).has("all") ||
+      (filterChapters as Set<any>).size === 0;
+
+    if (showAllChaps || (filterChapters as Set<any>).size > 1) {
+      return [
+        { id: "1", title: "Poin 1" },
+        { id: "2", title: "Poin 2" },
+        { id: "3", title: "Poin 3" },
+        { id: "4", title: "Poin 4 / もう一度聞こう" },
+      ];
+    }
+
+    // Tampilkan sections spesifik jika hanya ada 1 bab yang dipilih
+    const chapNumStr = Array.from(filterChapters as Set<any>)[0];
+    const chapIdx = parseInt(chapNumStr) - 1;
+    const chap = DekiruNihongoGroups[chapIdx];
+    if (!chap) return [];
+
+    return chap.sections.map((sect, sIdx) => ({
+      id: String(sIdx + 1),
+      title: `Poin ${sIdx + 1}: ${sect.title}`,
+    }));
+  }, [filterChapters]);
 
   // Progres dari database
   const [progressMap, setProgressMap] = useState<Record<string, SRSProgress>>(
@@ -90,18 +145,24 @@ export function AnkiContent({ username }: AnkiContentProps) {
   // Ekstrak semua kosakata yang cocok dengan filter
   const filteredVocabulary = useMemo(() => {
     const list: VocabularyCard[] = [];
+    const showAllChaps =
+      filterChapters === "all" ||
+      (filterChapters as Set<any>).has("all") ||
+      (filterChapters as Set<any>).size === 0;
+    const showAllPts =
+      filterPoints === "all" ||
+      (filterPoints as Set<any>).has("all") ||
+      (filterPoints as Set<any>).size === 0;
 
     DekiruNihongoGroups.forEach((chap, cIdx) => {
-      // Filter bab jika bukan "all"
-      // Cocokkan chapter index (e.g. Bab 1 -> cIdx = 0)
       const chapterNumber = cIdx + 1;
-      if (filterChapter !== "all" && filterChapter !== String(chapterNumber)) {
+      if (!showAllChaps && !(filterChapters as Set<any>).has(String(chapterNumber))) {
         return;
       }
 
       chap.sections.forEach((sect, sIdx) => {
         const pointNumber = sIdx + 1;
-        if (filterPoint !== "all" && filterPoint !== String(pointNumber)) {
+        if (!showAllPts && !(filterPoints as Set<any>).has(String(pointNumber))) {
           return;
         }
 
@@ -130,7 +191,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     });
 
     return list;
-  }, [filterChapter, filterPoint]);
+  }, [filterChapters, filterPoints]);
 
   // Klasifikasikan kartu menjadi: Due (Review) atau New (Baru)
   const cardStats = useMemo(() => {
@@ -519,58 +580,56 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Filter Bab */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-muted">
-                        {t.ankiFilterChapter || "Filter Bab"}
-                      </label>
-                      <select
-                        value={filterChapter}
-                        onChange={(e) => {
-                          setFilterChapter(e.target.value);
-                          setFilterPoint("all"); // reset point filter
-                        }}
-                        className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden"
-                      >
-                        <option value="all">
-                          {t.ankiAllChapters || "Semua Bab"}
-                        </option>
-                        {Array.from({ length: 15 }, (_, i) => (
-                          <option key={i + 1} value={i + 1}>
-                            Bab {i + 1} — {DekiruNihongoGroups[i]?.title || ""}
-                          </option>
-                        ))}
-                      </select>
+                      <Select className="w-full" placeholder={t.ankiFilterChapter || "Filter Bab"} selectionMode="multiple">
+                        <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterChapter || "Filter Bab"}</Label>
+                        <Select.Trigger className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px]">
+                          <Select.Value className="truncate text-left" />
+                          <Select.Indicator className="text-muted ml-2" />
+                        </Select.Trigger>
+                        <Select.Popover className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
+                          <ListBox selectionMode="multiple" selectedKeys={filterChapters} onSelectionChange={handleChapterSelectionChange}>
+                            <ListBox.Item id="all" textValue={t.ankiAllChapters || "Semua Bab"}>
+                              {t.ankiAllChapters || "Semua Bab"}
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                            {Array.from({ length: 15 }, (_, i) => {
+                              const chapNum = String(i + 1);
+                              const title = `Bab ${chapNum} — ${DekiruNihongoGroups[i]?.title || ""}`;
+                              return (
+                                <ListBox.Item key={chapNum} id={chapNum} textValue={title}>
+                                  {title}
+                                  <ListBox.ItemIndicator />
+                                </ListBox.Item>
+                              );
+                            })}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
                     </div>
 
                     {/* Filter Poin */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold text-muted">
-                        {t.ankiFilterPoint || "Filter Poin"}
-                      </label>
-                      <select
-                        value={filterPoint}
-                        onChange={(e) => setFilterPoint(e.target.value)}
-                        className="rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden"
-                      >
-                        <option value="all">
-                          {t.ankiAllPoints || "Semua Poin"}
-                        </option>
-                        {filterChapter === "all" ? (
-                          <>
-                            <option value="1">Poin 1</option>
-                            <option value="2">Poin 2</option>
-                            <option value="3">Poin 3</option>
-                            <option value="4">Poin 4 / もう一度聞こう</option>
-                          </>
-                        ) : (
-                          DekiruNihongoGroups[
-                            parseInt(filterChapter) - 1
-                          ]?.sections.map((sect, sIdx) => (
-                            <option key={sIdx} value={String(sIdx + 1)}>
-                              Poin {sIdx + 1}: {sect.title}
-                            </option>
-                          ))
-                        )}
-                      </select>
+                      <Select className="w-full" placeholder={t.ankiFilterPoint || "Filter Poin"} selectionMode="multiple">
+                        <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterPoint || "Filter Poin"}</Label>
+                        <Select.Trigger className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px]">
+                          <Select.Value className="truncate text-left" />
+                          <Select.Indicator className="text-muted ml-2" />
+                        </Select.Trigger>
+                        <Select.Popover className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
+                          <ListBox selectionMode="multiple" selectedKeys={filterPoints} onSelectionChange={handlePointSelectionChange}>
+                            <ListBox.Item id="all" textValue={t.ankiAllPoints || "Semua Poin"}>
+                              {t.ankiAllPoints || "Semua Poin"}
+                              <ListBox.ItemIndicator />
+                            </ListBox.Item>
+                            {availablePointsOptions.map((opt) => (
+                              <ListBox.Item key={opt.id} id={opt.id} textValue={opt.title}>
+                                {opt.title}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
                     </div>
                   </div>
 
