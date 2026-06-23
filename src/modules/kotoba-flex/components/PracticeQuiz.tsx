@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { mockVerbs, Verb } from "../data/verbs";
 import { Flashcard } from "./Flashcard";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { HighlightedConjugation } from "./HighlightedConjugation";
 
 type ConjugationType = "masu" | "te" | "nai" | "ta";
 
@@ -18,7 +19,6 @@ export function PracticeQuiz() {
   const { lang } = useLanguage();
 
   // Settings
-  const [jlptFilter, setJlptFilter] = useState<string>("all");
   const [formFilter, setFormFilter] = useState<string>("all");
   const [inputMode, setInputMode] = useState<"choice" | "text">("choice");
 
@@ -41,7 +41,7 @@ export function PracticeQuiz() {
   useEffect(() => {
     generateQuestion();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [jlptFilter, formFilter]);
+  }, [formFilter]);
 
   // Handle focus when switching to text mode
   useEffect(() => {
@@ -52,10 +52,8 @@ export function PracticeQuiz() {
 
   // Generate random question
   function generateQuestion() {
-    // 1. Filter verbs based on JLPT settings
-    const availableVerbs = mockVerbs.filter(
-      (v) => jlptFilter === "all" || v.jlpt === jlptFilter
-    );
+    // 1. Available verbs
+    const availableVerbs = mockVerbs;
 
     if (availableVerbs.length === 0) {
       setCurrentQuestion(null);
@@ -242,24 +240,7 @@ export function PracticeQuiz() {
     <div className="flex flex-col gap-6">
       {/* Quiz Configuration Panel */}
       <div className="rounded-2xl border border-border bg-surface p-5 shadow-xs flex flex-col gap-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {/* JLPT Selector */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-xs font-bold text-muted uppercase tracking-wider select-none">
-              JLPT Range
-            </span>
-            <select
-              value={jlptFilter}
-              onChange={(e) => setJlptFilter(e.target.value)}
-              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden focus:ring-1 focus:ring-accent cursor-pointer"
-            >
-              <option value="all">{lang === "en" ? "All Levels (N5 - N3)" : "Semua Level (N5 - N3)"}</option>
-              <option value="N5">N5 Only</option>
-              <option value="N4">N4 Only</option>
-              <option value="N3">N3 Only</option>
-            </select>
-          </div>
-
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Form Selector */}
           <div className="flex flex-col gap-1.5">
             <span className="text-xs font-bold text-muted uppercase tracking-wider select-none">
@@ -367,9 +348,6 @@ export function PracticeQuiz() {
                       {lang === "en" ? "Practice Conjugation" : "Latihan Perubahan"}
                     </span>
                     <div className="flex gap-1">
-                      <span className="rounded-sm bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold text-accent select-none">
-                        {currentQuestion.verb.jlpt}
-                      </span>
                       <span className="rounded-sm bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold text-amber-500 select-none">
                         Gr. {currentQuestion.verb.group}
                       </span>
@@ -382,10 +360,21 @@ export function PracticeQuiz() {
                       {lang === "en" ? "Conjugate this verb:" : "Ubah kata kerja berikut:"}
                     </span>
                     <h2 className="text-3xl font-bold text-foreground font-jp mb-1">
-                      {currentQuestion.verb.kanji}
+                      <HighlightedConjugation
+                        verb={currentQuestion.verb}
+                        formKey="dictionary"
+                        textType="kanji"
+                        highlightClass="text-accent/80 font-bold"
+                      />
                     </h2>
                     <span className="text-sm font-semibold text-indigo-500 font-mono">
-                      {currentQuestion.verb.romaji} ({lang === "en" ? currentQuestion.verb.english : currentQuestion.verb.indonesian})
+                      <HighlightedConjugation
+                        verb={currentQuestion.verb}
+                        formKey="dictionary"
+                        textType="romaji"
+                        highlightClass="text-indigo-600 dark:text-indigo-400 font-bold"
+                      />{" "}
+                      ({lang === "en" ? currentQuestion.verb.english : currentQuestion.verb.indonesian})
                     </span>
 
                     <div className="mt-4 px-4 py-2 bg-accent/5 dark:bg-accent/10 border border-accent/20 rounded-xl">
@@ -433,25 +422,53 @@ export function PracticeQuiz() {
                   </div>
 
                   {/* Correct Answer Details */}
-                  <div className="flex flex-col items-center justify-center my-auto py-2 text-center">
-                    <span className="text-xs text-muted mb-0.5 select-none">
-                      {lang === "en" ? "Correct Answer:" : "Jawaban Benar:"}
-                    </span>
-                    <h2 className="text-2xl font-bold text-foreground font-jp mb-1">
-                      {currentQuestion.correctAnswer.kanji}
-                    </h2>
-                    <span className="text-xs text-muted font-mono leading-none">
-                      {currentQuestion.correctAnswer.kana} · {currentQuestion.correctAnswer.romaji}
-                    </span>
+                  {(() => {
+                    const quizHighlightClass = {
+                      te: "text-indigo-600 dark:text-indigo-400 font-bold",
+                      ta: "text-amber-600 dark:text-amber-400 font-bold",
+                      nai: "text-rose-600 dark:text-rose-400 font-bold",
+                      masu: "text-emerald-600 dark:text-emerald-400 font-bold",
+                    }[currentQuestion.targetForm] || "text-accent font-bold";
 
-                    {/* Short grammar rule explanation */}
-                    <p className="mt-3 px-3 py-2.5 bg-background border border-border/50 text-[11px] text-muted leading-relaxed rounded-xl max-w-sm">
-                      <span className="font-bold text-foreground block mb-0.5 select-none">
-                        💡 {lang === "en" ? "Grammar Explanation:" : "Penjelasan Aturan:"}
-                      </span>
-                      {getConjugationExplanation(currentQuestion.verb, currentQuestion.targetForm)}
-                    </p>
-                  </div>
+                    return (
+                      <div className="flex flex-col items-center justify-center my-auto py-2 text-center">
+                        <span className="text-xs text-muted mb-0.5 select-none">
+                          {lang === "en" ? "Correct Answer:" : "Jawaban Benar:"}
+                        </span>
+                        <h2 className="text-2xl font-bold text-foreground font-jp mb-1">
+                          <HighlightedConjugation
+                            verb={currentQuestion.verb}
+                            formKey={currentQuestion.targetForm}
+                            textType="kanji"
+                            highlightClass={quizHighlightClass}
+                          />
+                        </h2>
+                        <span className="text-xs text-muted font-mono leading-none">
+                          <HighlightedConjugation
+                            verb={currentQuestion.verb}
+                            formKey={currentQuestion.targetForm}
+                            textType="kana"
+                            highlightClass={quizHighlightClass}
+                          />
+                          {" · "}
+                          <HighlightedConjugation
+                            verb={currentQuestion.verb}
+                            formKey={currentQuestion.targetForm}
+                            textType="romaji"
+                            highlightClass={quizHighlightClass}
+                          />
+                        </span>
+
+                        {/* Short grammar rule explanation */}
+                        <p className="mt-3 px-3 py-2.5 bg-background border border-border/50 text-[11px] text-muted leading-relaxed rounded-xl max-w-sm mx-auto text-left">
+                          <span className="font-bold text-foreground block mb-0.5 select-none">
+                            💡 {lang === "en" ? "Grammar Explanation:" : "Penjelasan Aturan:"}
+                          </span>
+                          {getConjugationExplanation(currentQuestion.verb, currentQuestion.targetForm)}
+                        </p>
+                      </div>
+                    );
+                  })()}
 
                   {/* Action button to continue */}
                   <div className="flex justify-center mt-2">

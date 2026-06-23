@@ -17,7 +17,7 @@ export function KotobaFlexDashboard() {
   const content = {
     en: {
       title: "Kotoba Flex",
-      subtitle: "Learn Japanese verb conjugations across JLPT levels (N5 to N3)",
+      subtitle: "Learn Japanese verb conjugations",
       tabConjugator: "Conjugator",
       tabGuide: "Step Guide",
       tabPractice: "Practice Quiz",
@@ -25,7 +25,7 @@ export function KotobaFlexDashboard() {
     },
     id: {
       title: "Kotoba Flex",
-      subtitle: "Pelajari konjugasi/perubahan kata kerja bahasa Jepang dari JLPT N5 sampai N3",
+      subtitle: "Pelajari konjugasi/perubahan kata kerja bahasa Jepang",
       tabConjugator: "Konjugator",
       tabGuide: "Panduan Aturan",
       tabPractice: "Latihan Kuis",

@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { mockVerbs, Verb } from "../data/verbs";
+import { mockVerbs, Verb, VerbConjugations } from "../data/verbs";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { HighlightedConjugation } from "./HighlightedConjugation";
 
 export function VerbConjugator() {
   const { lang } = useLanguage();
   const [search, setSearch] = useState("");
-  const [jlptFilter, setJlptFilter] = useState<string>("all");
   const [groupFilter, setGroupFilter] = useState<string>("all");
   const [showRomaji, setShowRomaji] = useState(true);
   const [showKana, setShowKana] = useState(true);
@@ -21,17 +21,16 @@ export function VerbConjugator() {
       verb.english.toLowerCase().includes(search.toLowerCase()) ||
       verb.indonesian.toLowerCase().includes(search.toLowerCase());
 
-    const matchesJlpt = jlptFilter === "all" || verb.jlpt === jlptFilter;
     const matchesGroup = groupFilter === "all" || verb.group.toString() === groupFilter;
 
-    return matchesSearch && matchesJlpt && matchesGroup;
+    return matchesSearch && matchesGroup;
   });
 
   return (
     <div className="flex flex-col gap-6">
       {/* Filters Card */}
       <div className="rounded-2xl border border-border bg-surface p-5 shadow-xs">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Search Box */}
           <div className="flex flex-col gap-1.5">
             <label htmlFor="verb-search" className="text-xs font-bold text-muted uppercase tracking-wider">
@@ -55,24 +54,6 @@ export function VerbConjugator() {
                 </button>
               )}
             </div>
-          </div>
-
-          {/* JLPT Dropdown */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="jlpt-filter" className="text-xs font-bold text-muted uppercase tracking-wider">
-              JLPT Level
-            </label>
-            <select
-              id="jlpt-filter"
-              value={jlptFilter}
-              onChange={(e) => setJlptFilter(e.target.value)}
-              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground transition-all focus:border-accent focus:outline-hidden focus:ring-1 focus:ring-accent cursor-pointer"
-            >
-              <option value="all">{lang === "en" ? "All Levels" : "Semua Level"}</option>
-              <option value="N5">N5</option>
-              <option value="N4">N4</option>
-              <option value="N3">N3</option>
-            </select>
           </div>
 
           {/* Group Dropdown */}
@@ -150,9 +131,6 @@ export function VerbConjugator() {
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-foreground font-jp">{verb.kanji}</span>
-                          <span className="rounded-sm bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent">
-                            {verb.jlpt}
-                          </span>
                           <span className="rounded-sm bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-500 dark:text-amber-400">
                             Gr. {verb.group}
                           </span>
@@ -165,19 +143,19 @@ export function VerbConjugator() {
 
                     {/* Conjugation Columns */}
                     <td className="px-4 py-3">
-                      <ConjugationCell cell={verb.conjugations.dictionary} showKana={showKana} showRomaji={showRomaji} />
+                      <ConjugationCell verb={verb} formKey="dictionary" showKana={showKana} showRomaji={showRomaji} />
                     </td>
                     <td className="px-4 py-3">
-                      <ConjugationCell cell={verb.conjugations.masu} showKana={showKana} showRomaji={showRomaji} />
+                      <ConjugationCell verb={verb} formKey="masu" showKana={showKana} showRomaji={showRomaji} />
                     </td>
                     <td className="px-4 py-3">
-                      <ConjugationCell cell={verb.conjugations.te} showKana={showKana} showRomaji={showRomaji} isTe />
+                      <ConjugationCell verb={verb} formKey="te" showKana={showKana} showRomaji={showRomaji} isTe />
                     </td>
                     <td className="px-4 py-3">
-                      <ConjugationCell cell={verb.conjugations.nai} showKana={showKana} showRomaji={showRomaji} isNai />
+                      <ConjugationCell verb={verb} formKey="nai" showKana={showKana} showRomaji={showRomaji} isNai />
                     </td>
                     <td className="px-4 py-3">
-                      <ConjugationCell cell={verb.conjugations.ta} showKana={showKana} showRomaji={showRomaji} isTa />
+                      <ConjugationCell verb={verb} formKey="ta" showKana={showKana} showRomaji={showRomaji} isTa />
                     </td>
                   </tr>
                 ))}
@@ -197,9 +175,6 @@ export function VerbConjugator() {
                   <div className="flex flex-col">
                     <div className="flex items-center gap-1.5">
                       <h4 className="text-lg font-bold text-foreground font-jp">{verb.kanji}</h4>
-                      <span className="rounded-sm bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold text-accent">
-                        {verb.jlpt}
-                      </span>
                       <span className="rounded-sm bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-bold text-amber-500 dark:text-amber-400">
                         G{verb.group}
                       </span>
@@ -221,23 +196,23 @@ export function VerbConjugator() {
                     <span className="font-bold text-muted text-[10px] uppercase select-none">
                       {lang === "en" ? "Dictionary" : "Kamus"}
                     </span>
-                    <ConjugationCell cell={verb.conjugations.dictionary} showKana={showKana} showRomaji={showRomaji} />
+                    <ConjugationCell verb={verb} formKey="dictionary" showKana={showKana} showRomaji={showRomaji} />
                   </div>
                   <div className="flex flex-col gap-0.5">
                     <span className="font-bold text-muted text-[10px] uppercase select-none">Masu (~masu)</span>
-                    <ConjugationCell cell={verb.conjugations.masu} showKana={showKana} showRomaji={showRomaji} />
+                    <ConjugationCell verb={verb} formKey="masu" showKana={showKana} showRomaji={showRomaji} />
                   </div>
                   <div className="flex flex-col gap-0.5">
                     <span className="font-bold text-muted text-[10px] uppercase select-none">Te Form (~te)</span>
-                    <ConjugationCell cell={verb.conjugations.te} showKana={showKana} showRomaji={showRomaji} isTe />
+                    <ConjugationCell verb={verb} formKey="te" showKana={showKana} showRomaji={showRomaji} isTe />
                   </div>
                   <div className="flex flex-col gap-0.5">
                     <span className="font-bold text-muted text-[10px] uppercase select-none">Nai Form (~nai)</span>
-                    <ConjugationCell cell={verb.conjugations.nai} showKana={showKana} showRomaji={showRomaji} isNai />
+                    <ConjugationCell verb={verb} formKey="nai" showKana={showKana} showRomaji={showRomaji} isNai />
                   </div>
                   <div className="flex flex-col gap-0.5 col-span-2">
                     <span className="font-bold text-muted text-[10px] uppercase select-none">Past (~ta)</span>
-                    <ConjugationCell cell={verb.conjugations.ta} showKana={showKana} showRomaji={showRomaji} isTa />
+                    <ConjugationCell verb={verb} formKey="ta" showKana={showKana} showRomaji={showRomaji} isTa />
                   </div>
                 </div>
               </div>
@@ -251,7 +226,8 @@ export function VerbConjugator() {
 
 // Subcomponent for displaying conjugation cells
 interface ConjugationCellProps {
-  cell: { kanji: string; kana: string; romaji: string };
+  verb: Verb;
+  formKey: keyof VerbConjugations;
   showKana: boolean;
   showRomaji: boolean;
   isTe?: boolean;
@@ -259,20 +235,32 @@ interface ConjugationCellProps {
   isTa?: boolean;
 }
 
-function ConjugationCell({ cell, showKana, showRomaji, isTe, isNai, isTa }: ConjugationCellProps) {
+function ConjugationCell({ verb, formKey, showKana, showRomaji, isTe, isNai, isTa }: ConjugationCellProps) {
   // Style markers differently depending on the type of conjugation for easier visual scan
-  let highlightColor = "text-foreground";
-  if (isTe) highlightColor = "text-indigo-600 dark:text-indigo-400 font-semibold";
-  else if (isNai) highlightColor = "text-rose-600 dark:text-rose-400 font-semibold";
-  else if (isTa) highlightColor = "text-amber-600 dark:text-amber-400 font-semibold";
+  let highlightClass = "text-accent font-bold";
+  if (isTe) highlightClass = "text-indigo-600 dark:text-indigo-400 font-bold";
+  else if (isNai) highlightClass = "text-rose-600 dark:text-rose-400 font-bold";
+  else if (isTa) highlightClass = "text-amber-600 dark:text-amber-400 font-bold";
+  else if (formKey === "masu") highlightClass = "text-emerald-600 dark:text-emerald-400 font-bold";
+  else if (formKey === "dictionary") highlightClass = "text-muted font-semibold";
+
+  const cell = verb.conjugations[formKey];
 
   return (
     <div className="flex flex-col">
-      <span className={`text-[14px] font-jp leading-tight ${highlightColor}`}>{cell.kanji}</span>
+      <span className="text-[14px] font-jp leading-tight text-foreground">
+        <HighlightedConjugation verb={verb} formKey={formKey} textType="kanji" highlightClass={highlightClass} />
+      </span>
       {showKana && cell.kanji !== cell.kana && (
-        <span className="text-[11px] text-muted leading-tight mt-0.5">{cell.kana}</span>
+        <span className="text-[11px] text-muted leading-tight mt-0.5">
+          <HighlightedConjugation verb={verb} formKey={formKey} textType="kana" highlightClass={highlightClass} />
+        </span>
       )}
-      {showRomaji && <span className="text-[10px] text-muted/80 leading-none mt-0.5 font-mono">{cell.romaji}</span>}
+      {showRomaji && (
+        <span className="text-[10px] text-muted/80 leading-none mt-0.5 font-mono">
+          <HighlightedConjugation verb={verb} formKey={formKey} textType="romaji" highlightClass={highlightClass} />
+        </span>
+      )}
     </div>
   );
 }

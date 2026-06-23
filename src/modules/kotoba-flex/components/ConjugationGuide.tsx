@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Flashcard } from "./Flashcard";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { mockVerbs, VerbConjugations } from "../data/verbs";
+import { HighlightedConjugation } from "./HighlightedConjugation";
 
 interface RuleSectionProps {
   title: string;
@@ -11,6 +13,32 @@ interface RuleSectionProps {
   group2Rules: { suffix: string; change: string; romajiChange: string; examples: { base: string; baseRomaji: string; conj: string; conjRomaji: string; meaning: string }[] }[];
   group3Rules: { suffix: string; change: string; romajiChange: string; examples: { base: string; baseRomaji: string; conj: string; conjRomaji: string; meaning: string }[] }[];
   lang: string;
+}
+
+interface ExampleTextProps {
+  baseWithParen: string;
+  baseRomaji: string;
+  formKey: keyof VerbConjugations;
+  textType: "kanji" | "romaji";
+  highlightClass?: string;
+}
+
+function ExampleText({ baseWithParen, baseRomaji, formKey, textType, highlightClass }: ExampleTextProps) {
+  const kanjiBase = baseWithParen.split(" ")[0];
+  const verb = mockVerbs.find((v) => v.romaji === baseRomaji || v.kanji === kanjiBase);
+
+  if (!verb) {
+    return <span>{textType === "kanji" ? kanjiBase : baseRomaji}</span>;
+  }
+
+  return (
+    <HighlightedConjugation
+      verb={verb}
+      formKey={formKey}
+      textType={textType}
+      highlightClass={highlightClass}
+    />
+  );
 }
 
 export function ConjugationGuide() {
@@ -311,6 +339,13 @@ export function ConjugationGuide() {
 
   const rulesData = getActiveRules();
 
+  const exampleHighlightClass = {
+    te: "text-indigo-600 dark:text-indigo-400 font-bold",
+    ta: "text-amber-600 dark:text-amber-400 font-bold",
+    nai: "text-rose-600 dark:text-rose-400 font-bold",
+    masu: "text-emerald-600 dark:text-emerald-400 font-bold",
+  }[activeForm] || "text-indigo-600 dark:text-indigo-400 font-bold";
+
   return (
     <div className="flex flex-col gap-6">
       {/* Sub-navigation for conjugation forms */}
@@ -404,8 +439,12 @@ export function ConjugationGuide() {
                               </span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-base font-bold font-jp text-foreground">{example.base}</span>
-                              <span className="text-[10px] text-muted font-mono">{example.baseRomaji}</span>
+                              <span className="text-base font-bold font-jp text-foreground">
+                                <ExampleText baseWithParen={example.base} baseRomaji={example.baseRomaji} formKey="dictionary" textType="kanji" highlightClass="text-accent/80 font-bold" />
+                              </span>
+                              <span className="text-[10px] text-muted font-mono">
+                                <ExampleText baseWithParen={example.base} baseRomaji={example.baseRomaji} formKey="dictionary" textType="romaji" highlightClass="text-indigo-600 dark:text-indigo-400 font-bold" />
+                              </span>
                             </div>
                           </div>
                         }
@@ -420,8 +459,12 @@ export function ConjugationGuide() {
                               </span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-base font-bold font-jp text-indigo-600 dark:text-indigo-400">{example.conj}</span>
-                              <span className="text-[10px] text-muted font-mono">{example.conjRomaji}</span>
+                              <span className="text-base font-bold font-jp text-indigo-600 dark:text-indigo-400">
+                                <ExampleText baseWithParen={example.base} baseRomaji={example.baseRomaji} formKey={activeForm} textType="kanji" highlightClass={exampleHighlightClass} />
+                              </span>
+                              <span className="text-[10px] text-muted font-mono">
+                                <ExampleText baseWithParen={example.base} baseRomaji={example.baseRomaji} formKey={activeForm} textType="romaji" highlightClass={exampleHighlightClass} />
+                              </span>
                             </div>
                           </div>
                         }
@@ -483,8 +526,12 @@ export function ConjugationGuide() {
                                 </span>
                               </div>
                               <div className="flex flex-col">
-                                <span className="text-base font-bold font-jp text-foreground">{example.base}</span>
-                                <span className="text-[10px] text-muted font-mono">{example.baseRomaji}</span>
+                                <span className="text-base font-bold font-jp text-foreground">
+                                  <ExampleText baseWithParen={example.base} baseRomaji={example.baseRomaji} formKey="dictionary" textType="kanji" highlightClass="text-accent/80 font-bold" />
+                                </span>
+                                <span className="text-[10px] text-muted font-mono">
+                                  <ExampleText baseWithParen={example.base} baseRomaji={example.baseRomaji} formKey="dictionary" textType="romaji" highlightClass="text-indigo-600 dark:text-indigo-400 font-bold" />
+                                </span>
                               </div>
                             </div>
                           }
@@ -499,8 +546,12 @@ export function ConjugationGuide() {
                                 </span>
                               </div>
                               <div className="flex flex-col">
-                                <span className="text-base font-bold font-jp text-indigo-600 dark:text-indigo-400">{example.conj}</span>
-                                <span className="text-[10px] text-muted font-mono">{example.conjRomaji}</span>
+                                <span className="text-base font-bold font-jp text-indigo-600 dark:text-indigo-400">
+                                  <ExampleText baseWithParen={example.base} baseRomaji={example.baseRomaji} formKey={activeForm} textType="kanji" highlightClass={exampleHighlightClass} />
+                                </span>
+                                <span className="text-[10px] text-muted font-mono">
+                                  <ExampleText baseWithParen={example.base} baseRomaji={example.baseRomaji} formKey={activeForm} textType="romaji" highlightClass={exampleHighlightClass} />
+                                </span>
                               </div>
                             </div>
                           }
@@ -552,8 +603,12 @@ export function ConjugationGuide() {
                               </span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-base font-bold font-jp text-foreground">{rule.examples[0].base}</span>
-                              <span className="text-[10px] text-muted font-mono">{rule.examples[0].baseRomaji}</span>
+                              <span className="text-base font-bold font-jp text-foreground">
+                                <ExampleText baseWithParen={rule.examples[0].base} baseRomaji={rule.examples[0].baseRomaji} formKey="dictionary" textType="kanji" highlightClass="text-accent/80 font-bold" />
+                              </span>
+                              <span className="text-[10px] text-muted font-mono">
+                                <ExampleText baseWithParen={rule.examples[0].base} baseRomaji={rule.examples[0].baseRomaji} formKey="dictionary" textType="romaji" highlightClass="text-indigo-600 dark:text-indigo-400 font-bold" />
+                              </span>
                             </div>
                           </div>
                         }
@@ -568,8 +623,12 @@ export function ConjugationGuide() {
                               </span>
                             </div>
                             <div className="flex flex-col">
-                              <span className="text-base font-bold font-jp text-indigo-600 dark:text-indigo-400">{rule.examples[0].conj}</span>
-                              <span className="text-[10px] text-muted font-mono">{rule.examples[0].conjRomaji}</span>
+                              <span className="text-base font-bold font-jp text-indigo-600 dark:text-indigo-400">
+                                <ExampleText baseWithParen={rule.examples[0].base} baseRomaji={rule.examples[0].baseRomaji} formKey={activeForm} textType="kanji" highlightClass={exampleHighlightClass} />
+                              </span>
+                              <span className="text-[10px] text-muted font-mono">
+                                <ExampleText baseWithParen={rule.examples[0].base} baseRomaji={rule.examples[0].baseRomaji} formKey={activeForm} textType="romaji" highlightClass={exampleHighlightClass} />
+                              </span>
                             </div>
                           </div>
                         }
