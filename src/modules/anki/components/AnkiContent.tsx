@@ -49,6 +49,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [reviewedCount, setReviewedCount] = useState<number>(0);
   const [sessionFinished, setSessionFinished] = useState<boolean>(false);
   const [ankiMode, setAnkiMode] = useState<"srs" | "quick">("srs");
+  const [pendingReviews, setPendingReviews] = useState<
+    Array<{ cardKey: string; chapter: string; sectionIndex: number; rating: number }>
+  >([]);
 
   // Learned Kanji state (derived from vocabulary progress)
   const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
@@ -260,6 +263,41 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setFlipped(false);
     setReviewedCount(0);
     setSessionFinished(false);
+    setPendingReviews([]);
+  };
+
+  // Kirim semua review yang tertunda ke API dalam satu batch
+  const triggerSaveBatch = async (reviewsToSave: typeof pendingReviews) => {
+    if (reviewsToSave.length === 0) return;
+    try {
+      const res = await fetch("/api/anki", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reviewsToSave),
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        // Perbarui cache progress lokal dengan semua data baru
+        setProgressMap((prev) => {
+          const nextMap = { ...prev };
+          (json.progress || []).forEach((item: SRSProgress) => {
+            nextMap[item.cardKey] = item;
+          });
+          return nextMap;
+        });
+      }
+    } catch (err) {
+      console.error("Gagal menyimpan progres batch:", err);
+    }
+    setPendingReviews([]);
+  };
+
+  const handleCancelSession = async () => {
+    await triggerSaveBatch(pendingReviews);
+    setSessionQueue([]);
   };
 
   // Jawaban untuk Quick Memorization Mode (Sudah Tahu / Tidak Tahu)
@@ -271,35 +309,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setFlipped(false);
     setReviewedCount((prev) => prev + 1);
 
-    // Kirim progres ke API:
     // Sudah Tahu -> rating 2 (Hard, bobot paling kecil untuk sukses)
     // Tidak Tahu -> rating 1 (Again, lupa)
     const rating = knows ? 2 : 1;
-    try {
-      const res = await fetch("/api/anki", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          cardKey: currentCard.cardKey,
-          chapter: currentCard.chapter,
-          sectionIndex: currentCard.sectionIndex,
-          rating,
-        }),
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        // Perbarui cache progress lokal
-        setProgressMap((prev) => ({
-          ...prev,
-          [currentCard.cardKey]: json.progress,
-        }));
-      }
-    } catch (err) {
-      console.error("Gagal menyimpan penilaian kartu (quick):", err);
-    }
+    const nextReviews = [
+      ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
+      {
+        cardKey: currentCard.cardKey,
+        chapter: currentCard.chapter,
+        sectionIndex: currentCard.sectionIndex,
+        rating,
+      },
+    ];
+    setPendingReviews(nextReviews);
 
     if (!knows) {
       // Tidak tahu: masukkan kartu ke akhir antrean sesi agar diulang terus
@@ -310,6 +332,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       // Sudah tahu: lanjut ke kartu berikutnya (keluarkan dari sisa sesi)
       if (currentIndex + 1 >= sessionQueue.length) {
         setSessionFinished(true);
+        await triggerSaveBatch(nextReviews);
       } else {
         setCurrentIndex((prev) => prev + 1);
       }
@@ -323,35 +346,18 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
     // Animasi balik kartu direset
     setFlipped(false);
-
-    // Kirim progres ke API
-    try {
-      const res = await fetch("/api/anki", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          cardKey: currentCard.cardKey,
-          chapter: currentCard.chapter,
-          sectionIndex: currentCard.sectionIndex,
-          rating,
-        }),
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        // Perbarui cache progress lokal
-        setProgressMap((prev) => ({
-          ...prev,
-          [currentCard.cardKey]: json.progress,
-        }));
-      }
-    } catch (err) {
-      console.error("Gagal menyimpan penilaian kartu:", err);
-    }
-
     setReviewedCount((prev) => prev + 1);
+
+    const nextReviews = [
+      ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
+      {
+        cardKey: currentCard.cardKey,
+        chapter: currentCard.chapter,
+        sectionIndex: currentCard.sectionIndex,
+        rating,
+      },
+    ];
+    setPendingReviews(nextReviews);
 
     // LOGIKA ANKI: Jika memilih "Again" (1), kartu akan dimasukkan kembali ke antrean akhir sesi
     if (rating === 1) {
@@ -362,6 +368,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       // Pindah ke kartu berikutnya
       if (currentIndex + 1 >= sessionQueue.length) {
         setSessionFinished(true);
+        await triggerSaveBatch(nextReviews);
       } else {
         setCurrentIndex((prev) => prev + 1);
       }
@@ -480,25 +487,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
             {/* TAMPILAN SELEKSI DECK / FILTER (Jika sesi belajar belum aktif) */}
             {sessionQueue.length === 0 || sessionFinished ? (
               <div className="flex flex-col gap-6">
-                {/* Panel Sesi Selesai */}
-                {sessionFinished && (
-                  <Card className="border border-border bg-surface p-6 shadow-sm text-center flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-200">
-                    <span className="text-5xl">🎉</span>
-                    <div className="flex flex-col gap-1">
-                      <h3 className="font-bold text-foreground text-lg">
-                        {t.ankiFinishedTitle || "Sesi Selesai!"}
-                      </h3>
-                      <p className="text-sm text-muted">
-                        {t.ankiFinishedDesc ||
-                          "Kamu telah mereview semua kartu dalam sesi ini."}
-                      </p>
-                    </div>
-                    <div className="text-xs bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 px-3 py-1.5 rounded-full font-bold">
-                      Reviewed: {reviewedCount} Cards
-                    </div>
-                  </Card>
-                )}
-
                 <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
                   {/* Switcher Mode Belajar */}
                   <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
@@ -729,7 +717,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     size="sm"
                     variant="danger-soft"
                     className="font-semibold h-8 min-w-16"
-                    onClick={() => setSessionQueue([])}
+                    onClick={handleCancelSession}
                   >
                     Batal
                   </Button>
@@ -1042,6 +1030,37 @@ export function AnkiContent({ username }: AnkiContentProps) {
               </Modal.Body>
               <Modal.Footer>
                 <Button slot="close" variant="primary" size="sm" className="font-semibold cursor-pointer">
+                  Tutup
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
+
+      {/* Modal Sesi Selesai */}
+      <Modal isOpen={sessionFinished} onOpenChange={(open) => { if (!open) { setSessionQueue([]); setSessionFinished(false); } }}>
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog className="sm:max-w-[360px]">
+              <Modal.CloseTrigger />
+              <Modal.Header className="flex flex-col items-center text-center pt-6">
+                <span className="text-5xl mb-2">🎉</span>
+                <Modal.Heading className="font-bold text-foreground text-xl">
+                  {t.ankiFinishedTitle || "Sesi Selesai!"}
+                </Modal.Heading>
+              </Modal.Header>
+              <Modal.Body className="flex flex-col items-center text-center gap-4 py-4">
+                <p className="text-sm text-muted">
+                  {t.ankiFinishedDesc ||
+                    "Kamu telah mereview semua kartu dalam sesi ini."}
+                </p>
+                <div className="text-xs bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 px-3 py-1.5 rounded-full font-bold">
+                  Reviewed: {reviewedCount} Cards
+                </div>
+              </Modal.Body>
+              <Modal.Footer className="flex justify-center pb-6">
+                <Button slot="close" variant="primary" className="w-full font-semibold cursor-pointer">
                   Tutup
                 </Button>
               </Modal.Footer>

@@ -40,92 +40,180 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { cardKey, chapter, sectionIndex, rating } = body;
 
-    if (
-      !cardKey ||
-      !chapter ||
-      typeof sectionIndex !== "number" ||
-      typeof rating !== "number" ||
-      rating < 1 ||
-      rating > 4
-    ) {
-      return NextResponse.json(
-        { error: "Invalid parameters" },
-        { status: 400 }
-      );
-    }
-
-    // Ambil data progres lama jika ada
-    const existing = await prisma.ankiProgress.findUnique({
-      where: {
-        userId_cardKey: {
+    if (Array.isArray(body)) {
+      // BATCH MODE
+      const cardKeys = body.map((item: any) => item.cardKey);
+      const existingRecords = await prisma.ankiProgress.findMany({
+        where: {
           userId: session.id,
-          cardKey,
+          cardKey: { in: cardKeys },
         },
-      },
-    });
+      });
+      const existingMap = new Map(existingRecords.map((r) => [r.cardKey, r]));
 
-    let ease = existing?.ease ?? 2.5;
-    let repetitions = existing?.repetitions ?? 0;
-    let interval = existing?.interval ?? 0;
+      const upserts = [];
+      for (const item of body) {
+        const { cardKey, chapter, sectionIndex, rating } = item;
+        if (
+          !cardKey ||
+          !chapter ||
+          typeof sectionIndex !== "number" ||
+          typeof rating !== "number" ||
+          rating < 1 ||
+          rating > 4
+        ) {
+          continue; // skip invalid entries
+        }
 
-    // Hitung berdasarkan algoritma SM-2
-    if (rating === 1) {
-      // Again
-      repetitions = 0;
-      interval = 1; // Ulangi besok (atau taruh dalam antrean sesi sekarang)
-      ease = Math.max(1.3, ease - 0.2);
-    } else if (rating === 2) {
-      // Hard
-      repetitions += 1;
-      interval =
-        repetitions === 1 ? 1 : repetitions === 2 ? 3 : Math.ceil(interval * 1.2);
-      ease = Math.max(1.3, ease - 0.15);
-    } else if (rating === 3) {
-      // Good
-      repetitions += 1;
-      interval =
-        repetitions === 1 ? 1 : repetitions === 2 ? 6 : Math.ceil(interval * ease);
-      // ease tetap
+        const existing = existingMap.get(cardKey);
+        let ease = existing?.ease ?? 2.5;
+        let repetitions = existing?.repetitions ?? 0;
+        let interval = existing?.interval ?? 0;
+
+        // Hitung berdasarkan algoritma SM-2
+        if (rating === 1) {
+          // Again
+          repetitions = 0;
+          interval = 1;
+          ease = Math.max(1.3, ease - 0.2);
+        } else if (rating === 2) {
+          // Hard
+          repetitions += 1;
+          interval = repetitions === 1 ? 1 : repetitions === 2 ? 3 : Math.ceil(interval * 1.2);
+          ease = Math.max(1.3, ease - 0.15);
+        } else if (rating === 3) {
+          // Good
+          repetitions += 1;
+          interval = repetitions === 1 ? 1 : repetitions === 2 ? 6 : Math.ceil(interval * ease);
+        } else {
+          // Easy (4)
+          repetitions += 1;
+          interval = repetitions === 1 ? 4 : repetitions === 2 ? 10 : Math.ceil(interval * ease * 1.3);
+          ease += 0.15;
+        }
+
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + interval);
+
+        upserts.push(
+          prisma.ankiProgress.upsert({
+            where: {
+              userId_cardKey: {
+                userId: session.id,
+                cardKey,
+              },
+            },
+            update: {
+              interval,
+              ease,
+              repetitions,
+              dueDate,
+            },
+            create: {
+              userId: session.id,
+              cardKey,
+              chapter,
+              sectionIndex,
+              interval,
+              ease,
+              repetitions,
+              dueDate,
+            },
+          })
+        );
+      }
+
+      const results = await prisma.$transaction(upserts);
+      return NextResponse.json({ success: true, progress: results });
     } else {
-      // Easy (4)
-      repetitions += 1;
-      interval =
-        repetitions === 1 ? 4 : repetitions === 2 ? 10 : Math.ceil(interval * ease * 1.3);
-      ease += 0.15;
-    }
+      // SINGLE MODE
+      const { cardKey, chapter, sectionIndex, rating } = body;
 
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + interval);
+      if (
+        !cardKey ||
+        !chapter ||
+        typeof sectionIndex !== "number" ||
+        typeof rating !== "number" ||
+        rating < 1 ||
+        rating > 4
+      ) {
+        return NextResponse.json(
+          { error: "Invalid parameters" },
+          { status: 400 }
+        );
+      }
 
-    // Simpan progres baru
-    const updated = await prisma.ankiProgress.upsert({
-      where: {
-        userId_cardKey: {
+      // Ambil data progres lama jika ada
+      const existing = await prisma.ankiProgress.findUnique({
+        where: {
+          userId_cardKey: {
+            userId: session.id,
+            cardKey,
+          },
+        },
+      });
+
+      let ease = existing?.ease ?? 2.5;
+      let repetitions = existing?.repetitions ?? 0;
+      let interval = existing?.interval ?? 0;
+
+      // Hitung berdasarkan algoritma SM-2
+      if (rating === 1) {
+        // Again
+        repetitions = 0;
+        interval = 1;
+        ease = Math.max(1.3, ease - 0.2);
+      } else if (rating === 2) {
+        // Hard
+        repetitions += 1;
+        interval =
+          repetitions === 1 ? 1 : repetitions === 2 ? 3 : Math.ceil(interval * 1.2);
+        ease = Math.max(1.3, ease - 0.15);
+      } else if (rating === 3) {
+        // Good
+        repetitions += 1;
+        interval =
+          repetitions === 1 ? 1 : repetitions === 2 ? 6 : Math.ceil(interval * ease);
+      } else {
+        // Easy (4)
+        repetitions += 1;
+        interval =
+          repetitions === 1 ? 4 : repetitions === 2 ? 10 : Math.ceil(interval * ease * 1.3);
+        ease += 0.15;
+      }
+
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + interval);
+
+      // Simpan progres baru
+      const updated = await prisma.ankiProgress.upsert({
+        where: {
+          userId_cardKey: {
+            userId: session.id,
+            cardKey,
+          },
+        },
+        update: {
+          interval,
+          ease,
+          repetitions,
+          dueDate,
+        },
+        create: {
           userId: session.id,
           cardKey,
+          chapter,
+          sectionIndex,
+          interval,
+          ease,
+          repetitions,
+          dueDate,
         },
-      },
-      update: {
-        interval,
-        ease,
-        repetitions,
-        dueDate,
-      },
-      create: {
-        userId: session.id,
-        cardKey,
-        chapter,
-        sectionIndex,
-        interval,
-        ease,
-        repetitions,
-        dueDate,
-      },
-    });
+      });
 
-    return NextResponse.json({ success: true, progress: updated });
+      return NextResponse.json({ success: true, progress: updated });
+    }
   } catch (error) {
     console.error("Error saving Anki progress:", error);
     return NextResponse.json(
