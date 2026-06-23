@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import { TextArea } from "@heroui/react";
 
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 
@@ -175,7 +176,7 @@ export default function ChatPage() {
 
           {/* Input */}
           <div className="border-t border-border pt-3 flex items-end gap-2">
-            <textarea
+            <TextArea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -186,7 +187,8 @@ export default function ChatPage() {
               }}
               placeholder="Ketik pesan... (Enter untuk kirim, Shift+Enter untuk newline)"
               rows={2}
-              className="flex-1 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+              variant="primary"
+              className="flex-1"
             />
             <button
               type="button"

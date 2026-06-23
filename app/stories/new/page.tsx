@@ -489,7 +489,7 @@ function BatchStoryForm({
             </span>
           )}
         </label>
-        <textarea
+        <TextArea
           value={jsonText}
           onChange={(e) => {
             setJsonText(e.target.value);
@@ -500,13 +500,9 @@ function BatchStoryForm({
           placeholder={
             '[\n  {\n    "title": "はじめての日本語",\n    "content": "きょうはいいてんきですね。",\n    "translation": "Today the weather is nice.",\n    "focus": "あいうえお"\n  }\n]'
           }
-          spellCheck={false}
-          className={[
-            "w-full rounded-xl border bg-surface px-4 py-3 font-mono text-sm leading-relaxed text-foreground",
-            "placeholder:text-muted resize-none outline-none transition-colors",
-            "focus:border-accent focus:ring-2 focus:ring-accent-soft-hover",
-            error ? "border-red-400 dark:border-red-600" : "border-border",
-          ].join(" ")}
+          variant="primary"
+          fullWidth
+          className="font-mono text-sm leading-relaxed text-foreground"
         />
       </div>
 

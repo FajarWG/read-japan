@@ -10,7 +10,7 @@
     "pwa:icons": "bun scripts/generate-pwa-icons.mjs"
   },
   "dependencies": {
-    "@heroui/react": "^3.0.0-beta.7",
+    "@heroui/react": "^3.2.1",
     "@heroui/styles": "^3.0.0-beta.7",
     "@prisma/adapter-neon": "^7.4.1",
     "@prisma/adapter-pg": "^7.8.0",

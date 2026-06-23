@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { Button, Card, Popover, Tabs } from "@heroui/react";
+import { Button, Card, Popover, Tabs, Select, Label, ListBox, TextArea, Input, Spinner } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
@@ -161,13 +161,144 @@ const getPlaceholderJson = (chapter: number, point: number) => {
   }, null, 2);
 };
 
+function RenderMarkdown({ content }: { content: string }) {
+  if (!content) return null;
+
+  const lines = content.split("\n");
+  let inTable = false;
+  let tableHeaders: string[] = [];
+  let tableRows: string[][] = [];
+
+  const renderedElements: React.ReactNode[] = [];
+
+  const parseInlineStyles = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*|`.*?`)/);
+    return parts.map((part, idx) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <strong key={idx} className="font-bold text-foreground">{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith("`") && part.endsWith("`")) {
+        return <code key={idx} className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded font-mono text-[11px] text-indigo-500 dark:text-indigo-400">{part.slice(1, -1)}</code>;
+      }
+      return part;
+    });
+  };
+
+  const flushTable = (key: number) => {
+    if (tableHeaders.length === 0 && tableRows.length === 0) return null;
+    const el = (
+      <div key={`table-${key}`} className="my-4 overflow-x-auto rounded-xl border border-border bg-background">
+        <table className="w-full border-collapse text-left text-xs sm:text-sm text-foreground">
+          <thead className="bg-slate-50 dark:bg-slate-900 font-semibold border-b border-border">
+            <tr>
+              {tableHeaders.map((h, i) => (
+                <th key={i} className="px-3 py-2 border-r border-border last:border-r-0 whitespace-nowrap">
+                  {parseInlineStyles(h)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {tableRows.map((row, i) => (
+              <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/50">
+                {row.map((cell, j) => (
+                  <td key={j} className="px-3 py-2 border-r border-border last:border-r-0">
+                    {parseInlineStyles(cell)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+    tableHeaders = [];
+    tableRows = [];
+    inTable = false;
+    return el;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (line.startsWith("|")) {
+      inTable = true;
+      const cells = line.split("|").map(c => c.trim()).filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+      if (cells.every(c => c.match(/^:-*-?:?$/) || c.match(/^-+$/))) {
+        continue;
+      }
+      if (tableHeaders.length === 0) {
+        tableHeaders = cells;
+      } else {
+        tableRows.push(cells);
+      }
+      continue;
+    } else if (inTable) {
+      const tableEl = flushTable(i);
+      if (tableEl) renderedElements.push(tableEl);
+    }
+
+    if (line.startsWith("### ")) {
+      renderedElements.push(
+        <h4 key={i} className="text-sm sm:text-base font-bold text-indigo-500 font-jp mt-5 mb-2 border-b border-border pb-1">
+          {parseInlineStyles(line.slice(4))}
+        </h4>
+      );
+    } else if (line.startsWith("## ")) {
+      renderedElements.push(
+        <h3 key={i} className="text-base sm:text-lg font-bold text-foreground font-jp mt-6 mb-3">
+          {parseInlineStyles(line.slice(3))}
+        </h3>
+      );
+    } else if (line.startsWith("# ")) {
+      renderedElements.push(
+        <h2 key={i} className="text-lg sm:text-xl font-bold text-foreground font-jp mt-8 mb-4">
+          {parseInlineStyles(line.slice(2))}
+        </h2>
+      );
+    } else if (line.startsWith("- ") || line.startsWith("* ")) {
+      renderedElements.push(
+        <li key={i} className="ml-4 list-disc text-xs sm:text-sm text-foreground leading-relaxed my-1">
+          {parseInlineStyles(line.slice(2))}
+        </li>
+      );
+    } else if (line.match(/^\d+\.\s/)) {
+      const match = line.match(/^(\d+)\.\s(.*)/);
+      renderedElements.push(
+        <li key={i} className="ml-4 list-decimal text-xs sm:text-sm text-foreground leading-relaxed my-1">
+          {parseInlineStyles(match ? match[2] : line)}
+        </li>
+      );
+    } else if (line.length > 0) {
+      renderedElements.push(
+        <p key={i} className="text-xs sm:text-sm text-foreground leading-relaxed my-2">
+          {parseInlineStyles(line)}
+        </p>
+      );
+    }
+  }
+
+  if (inTable) {
+    const tableEl = flushTable(lines.length);
+    if (tableEl) renderedElements.push(tableEl);
+  }
+
+  return <div className="space-y-0.5">{renderedElements}</div>;
+}
+
 export function PrepContent({ username, role }: PrepContentProps) {
   const { lang, t } = useLanguage();
 
-  // State pemilihan bab & poin
+  // State pemilihan bab & poin & mode
+  const [studyMode, setStudyMode] = useState<"biasa" | "ujian" | null>(null);
   const [chapter, setChapter] = useState<number>(1);
   const [point, setPoint] = useState<number>(1);
+  const [examGroup, setExamGroup] = useState<number>(1);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+  // State data materi tambahan
+  const [generating, setGenerating] = useState<boolean>(false);
+  const [examTitleInput, setExamTitleInput] = useState<string>("");
 
   // State data materi
   const [data, setData] = useState<PrepDataPayload | null>(null);
@@ -234,11 +365,19 @@ export function PrepContent({ username, role }: PrepContentProps) {
   useEffect(() => {
     const storedChapter = localStorage.getItem("rj-prep-chapter");
     const storedPoint = localStorage.getItem("rj-prep-point");
+    const storedStudyMode = localStorage.getItem("rj-prep-studymode") as "biasa" | "ujian" | null;
+    const storedExamGroup = localStorage.getItem("rj-prep-examgroup");
     if (storedChapter) {
       setChapter(Number(storedChapter));
     }
     if (storedPoint) {
       setPoint(Number(storedPoint));
+    }
+    if (storedStudyMode) {
+      setStudyMode(storedStudyMode);
+    }
+    if (storedExamGroup) {
+      setExamGroup(Number(storedExamGroup));
     }
     setIsLoaded(true);
   }, []);
@@ -248,12 +387,17 @@ export function PrepContent({ username, role }: PrepContentProps) {
     if (isLoaded) {
       localStorage.setItem("rj-prep-chapter", String(chapter));
       localStorage.setItem("rj-prep-point", String(point));
+      if (studyMode) {
+        localStorage.setItem("rj-prep-studymode", studyMode);
+      }
+      localStorage.setItem("rj-prep-examgroup", String(examGroup));
     }
-  }, [chapter, point, isLoaded]);
+  }, [chapter, point, studyMode, examGroup, isLoaded]);
 
   // Ambil data persiapan dari database saat chapter/point berubah
   useEffect(() => {
     if (!isLoaded) return;
+    if (!studyMode) return;
     async function fetchPrepData() {
       setLoading(true);
       setIsEditing(false);
@@ -261,8 +405,12 @@ export function PrepContent({ username, role }: PrepContentProps) {
       setUserAnswers({});
       setShowAnswerFor({});
       setShowDialogTranslationFor({});
+
+      const queryChapter = studyMode === "ujian" ? examGroup : chapter;
+      const queryPoint = studyMode === "ujian" ? 0 : point;
+
       try {
-        const res = await fetch(`/api/prep?chapter=${chapter}&point=${point}`);
+        const res = await fetch(`/api/prep?chapter=${queryChapter}&point=${queryPoint}`);
         if (res.ok) {
           const json = await res.json();
           if (json.data) {
@@ -281,7 +429,7 @@ export function PrepContent({ username, role }: PrepContentProps) {
       }
     }
     fetchPrepData();
-  }, [chapter, point, isLoaded]);
+  }, [chapter, point, examGroup, studyMode, isLoaded]);
 
   // Validasi JSON secara real-time saat jsonInput berubah
   useEffect(() => {
@@ -593,6 +741,163 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
     }
   };
 
+  // Copy exam prompt containing aggregated grammar & vocabulary data
+  const handleCopyExamPrompt = async () => {
+    // 1. Aggregasi data kosakata dari DekiruNihongoGroups
+    let vocabText = "";
+    for (let c = examGroup; c <= examGroup + 2; c++) {
+      const chapData = DekiruNihongoGroups[c - 1];
+      if (chapData && chapData.sections) {
+        vocabText += `\n### Kosakata Bab ${c}:\n`;
+        chapData.sections.forEach((sect: any) => {
+          if (sect.examples) {
+            sect.examples.slice(0, 30).forEach((item: any) => {
+              const kanjiStr = item.kanji === "-" ? "" : ` (${item.kanji})`;
+              const meaning = item.translations?.id || item.translations?.en || "Tidak ada terjemahan";
+              vocabText += `- ${item.hiragana}${kanjiStr}: ${meaning}\n`;
+            });
+          }
+        });
+      }
+    }
+
+    // 2. Aggregasi tata bahasa dari DB (fetch 3 bab)
+    let grammarText = "";
+    try {
+      const promises = [];
+      for (let c = examGroup; c <= examGroup + 2; c++) {
+        for (let p = 1; p <= 3; p++) {
+          promises.push(
+            fetch(`/api/prep?chapter=${c}&point=${p}`)
+              .then((res) => (res.ok ? res.json() : null))
+              .then((json) => json?.data)
+              .catch(() => null)
+          );
+        }
+      }
+      const results = await Promise.all(promises);
+      const validResults = results.filter(Boolean);
+      
+      validResults.forEach((pd: any) => {
+        grammarText += `\n### Bab ${pd.chapter} Poin ${pd.point}: ${pd.title}\n`;
+        if (pd.sections) {
+          pd.sections.forEach((sect: any) => {
+            grammarText += `- Bagian: ${sect.title}\n`;
+            if (sect.grammar) {
+              sect.grammar.forEach((g: any) => {
+                grammarText += `  * Pola: ${g.pattern}\n  * Penjelasan: ${g.explanation}\n`;
+              });
+            }
+          });
+        }
+      });
+    } catch (e) {
+      console.error("Gagal memuat data tata bahasa untuk prompt:", e);
+    }
+
+    const promptText = `Anda adalah asisten AI bahasa Jepang. Tolong buatkan Rangkuman Ujian yang komprehensif untuk persiapan ujian Dekiru Nihongo Bab ${examGroup} sampai Bab ${examGroup + 2}.
+Tulis tanggapan Anda seluruhnya dalam Bahasa Indonesia yang alami, rapi, dan mudah dipahami oleh pembelajar.
+Format keluaran wajib berupa Markdown yang indah (gunakan judul, daftar poin, dan tabel).
+
+## ACUAN MATERI TATA BAHASA & PERCAKAPAN:
+${grammarText || "Tidak ada data tata bahasa khusus. Gunakan standar materi Dekiru Nihongo."}
+
+## ACUAN DAFTAR KOSAKATA:
+${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru Nihongo."}
+
+---
+
+## FORMAT RANGKUMAN UJIAN YANG HARUS DIHASILKAN:
+1. **Ringkasan Partikel & Tata Bahasa Penting**: Rangkum partikel dan pola tata bahasa kunci dari Bab ${examGroup} - ${examGroup + 2}. Jelaskan fungsinya dan berikan contoh kalimat bahasa Jepang beserta artinya.
+2. **Ungkapan & Kalimat Kunci Percakapan**: Rangkum ungkapan praktis dan kalimat penting yang sering keluar dalam dialog sehari-hari di Bab ${examGroup} - ${examGroup + 2} beserta artinya.
+3. **Daftar Kosakata Esensial**: Sajikan daftar kosakata paling penting dari ketiga bab ini yang wajib dihafal sebelum ujian (Jepang, bacaan hiragana, arti).`;
+
+    navigator.clipboard.writeText(promptText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Generate summary automatically with Gemini 3.5 Flash
+  const handleGenerateSummary = async () => {
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/prep/summary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ startChapter: examGroup }),
+      });
+      
+      if (res.ok) {
+        const result = await res.json();
+        if (result.summary) {
+          setJsonInput(result.summary);
+          setExamTitleInput(`Rangkuman Ujian Bab ${examGroup}-${examGroup + 2}`);
+          setIsEditing(true);
+        } else {
+          alert("Gagal men-generate rangkuman: Format tanggapan AI tidak sesuai.");
+        }
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        alert(`Gagal men-generate rangkuman: ${errJson.error || "Terjadi kesalahan pada server."}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan koneksi saat men-generate rangkuman.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  // Save exam summary to DB
+  const handleSaveExamSummary = async () => {
+    if (!jsonInput.trim()) {
+      alert("Rangkuman tidak boleh kosong!");
+      return;
+    }
+    const finalTitle = examTitleInput.trim() || `Rangkuman Ujian Bab ${examGroup}-${examGroup + 2}`;
+
+    try {
+      const payload = {
+        chapter: examGroup,
+        point: 0,
+        title: finalTitle,
+        sections: { summaryText: jsonInput }
+      };
+
+      const res = await fetch("/api/prep", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        setData(result.data);
+        setIsEditing(false);
+        alert("Rangkuman berhasil disimpan!");
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        alert(`Gagal menyimpan: ${errJson.error || "Terjadi kesalahan"}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan saat menyimpan.");
+    }
+  };
+
+  // Start editing exam summary
+  const startEditingExam = () => {
+    setExamTitleInput(data?.title || `Rangkuman Ujian Bab ${examGroup}-${examGroup + 2}`);
+    const sectionsObj = data?.sections as any;
+    const existingMarkdown = sectionsObj?.summaryText || "";
+    setJsonInput(existingMarkdown);
+    setIsEditing(true);
+  };
+
   // Putar/Pause audio preview di uploader
   const handleTogglePreviewAudio = (url: string) => {
     if (previewAudioUrl === url) {
@@ -651,6 +956,71 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
 
   const filteredAudios = getFilteredAudios();
 
+  if (studyMode === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+        <div className="flex w-full max-w-3xl flex-col gap-8">
+          <header className="text-center">
+            <h1 className="font-jp text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl animate-pulse">
+              日本語フロー
+            </h1>
+            <p className="mt-3 text-sm sm:text-base text-muted">
+              Pilih mode belajar untuk melanjutkan persiapan bahasa Jepang Anda
+            </p>
+          </header>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Card Belajar Biasa */}
+            <Card
+              onClick={() => setStudyMode("biasa")}
+              className="group border border-border bg-surface p-6 shadow-sm hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between h-64 rounded-2xl"
+            >
+              <div className="flex flex-col gap-3">
+                <span className="text-4xl">📖</span>
+                <h2 className="font-jp text-lg font-bold text-foreground group-hover:text-indigo-500 transition-colors">
+                  Belajar Biasa
+                </h2>
+                <p className="text-xs text-muted leading-relaxed">
+                  Pelajari tata bahasa, dialog percakapan, latihan soal, dan dengarkan audio per bab dan poin secara bertahap.
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                className="w-full font-semibold bg-indigo-500/10 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors cursor-pointer rounded-xl"
+                onClick={() => setStudyMode("biasa")}
+              >
+                Mulai Belajar
+              </Button>
+            </Card>
+
+            {/* Card Ujian (Summary) */}
+            <Card
+              onClick={() => setStudyMode("ujian")}
+              className="group border border-border bg-surface p-6 shadow-sm hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between h-64 rounded-2xl"
+            >
+              <div className="flex flex-col gap-3">
+                <span className="text-4xl">📝</span>
+                <h2 className="font-jp text-lg font-bold text-foreground group-hover:text-indigo-500 transition-colors">
+                  Rangkuman Ujian
+                </h2>
+                <p className="text-xs text-muted leading-relaxed">
+                  Pelajari rangkuman materi gabungan per 3 bab. Ringkasan partikel, kosakata esensial, dan ungkapan kunci percakapan.
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                className="w-full font-semibold bg-indigo-500/10 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors cursor-pointer rounded-xl"
+                onClick={() => setStudyMode("ujian")}
+              >
+                Mulai Ujian
+              </Button>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="flex w-full max-w-3xl flex-col">
@@ -661,79 +1031,143 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
               <h1 className="font-jp text-base sm:text-lg font-bold leading-tight text-foreground flex items-center gap-2 truncate">
                 <span>日本語フロー</span>
                 <span className="font-sans text-[10px] sm:text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">
-                  Prep
+                  {studyMode === "biasa" ? "Prep" : "Ujian"}
                 </span>
               </h1>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="text-xs font-semibold cursor-pointer border border-border bg-background rounded-xl"
+                onClick={() => {
+                  setStudyMode(null);
+                  setIsEditing(false);
+                }}
+              >
+                ← Menu Utama
+              </Button>
               <SettingsDropdown />
             </div>
           </div>
         </header>
 
-        {/* Kontrol Seleksi Bab & Poin */}
-        <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          {/* Pemilih Bab */}
-          <div className="flex flex-1 flex-col gap-1.5">
-            <label className="text-xs font-semibold text-muted uppercase tracking-wider">
-              {t.prepSelectChapter}
-            </label>
-            <select
-              value={chapter}
-              onChange={(e) => setChapter(parseInt(e.target.value))}
-              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden"
-            >
-              {Array.from({ length: 15 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  Bab {i + 1} — {DekiruNihongoGroups[i]?.title || ""}
-                </option>
-              ))}
-            </select>
-          </div>
+        {/* Kontrol Seleksi Bab & Poin (Belajar Biasa) */}
+        {studyMode === "biasa" && (
+          <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            {/* Pemilih Bab */}
+            <div className="flex flex-1 flex-col gap-1.5">
+              <Select
+                className="w-full"
+                selectedKey={String(chapter)}
+                onSelectionChange={(key) => {
+                  if (key) setChapter(Number(key));
+                }}
+              >
+                <Label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">{t.prepSelectChapter}</Label>
+                <Select.Trigger className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px]">
+                  <Select.Value className="truncate text-left" />
+                  <Select.Indicator className="text-muted ml-2 font-xs">▼</Select.Indicator>
+                </Select.Trigger>
+                <Select.Popover className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
+                  <ListBox>
+                    {Array.from({ length: 15 }, (_, i) => {
+                      const chapNum = String(i + 1);
+                      const title = `Bab ${chapNum} — ${DekiruNihongoGroups[i]?.title || ""}`;
+                      return (
+                        <ListBox.Item key={chapNum} id={chapNum} textValue={title} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm">
+                          {title}
+                          <ListBox.ItemIndicator />
+                        </ListBox.Item>
+                      );
+                    })}
+                  </ListBox>
+                </Select.Popover>
+              </Select>
+            </div>
 
-          {/* Pemilih Poin */}
-          <div className="flex flex-col gap-1.5 sm:w-60">
-            <label className="text-xs font-semibold text-muted uppercase tracking-wider">
-              {t.prepSelectPoint}
-            </label>
-            <Tabs
-              selectedKey={String(point)}
-              onSelectionChange={(key) => setPoint(Number(key))}
-              variant="primary"
-              className="w-full"
-            >
-              <Tabs.ListContainer>
-                <Tabs.List
-                  aria-label={t.prepSelectPoint}
-                  className={[
-                    "w-full flex",
-                    "*:h-8 *:px-3 *:text-xs *:font-semibold",
-                    "*:data-[selected=true]:text-accent-foreground",
-                  ].join(" ")}
-                >
-                  {[1, 2, 3].map((p) => (
-                    <Tabs.Tab key={p} id={String(p)} className="flex-1 text-center cursor-pointer">
-                      Poin {p}
-                      <Tabs.Indicator className="bg-accent" />
-                    </Tabs.Tab>
-                  ))}
-                </Tabs.List>
-              </Tabs.ListContainer>
-            </Tabs>
+            {/* Pemilih Poin */}
+            <div className="flex flex-col gap-1.5 sm:w-60">
+              <label className="text-xs font-bold text-muted uppercase tracking-wider">
+                {t.prepSelectPoint}
+              </label>
+              <Tabs
+                selectedKey={String(point)}
+                onSelectionChange={(key) => setPoint(Number(key))}
+                variant="primary"
+                className="w-full"
+              >
+                <Tabs.ListContainer>
+                  <Tabs.List
+                    aria-label={t.prepSelectPoint}
+                    className={[
+                      "w-full flex",
+                      "*:h-8 *:px-3 *:text-xs *:font-semibold",
+                      "*:data-[selected=true]:text-accent-foreground",
+                    ].join(" ")}
+                  >
+                    {[1, 2, 3].map((p) => (
+                      <Tabs.Tab key={p} id={String(p)} className="flex-1 text-center cursor-pointer">
+                        Poin {p}
+                        <Tabs.Indicator className="bg-accent" />
+                      </Tabs.Tab>
+                    ))}
+                  </Tabs.List>
+                </Tabs.ListContainer>
+              </Tabs>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Kontrol Seleksi Bab Ujian (Ujian) */}
+        {studyMode === "ujian" && (
+          <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm">
+            <div className="flex flex-col gap-1.5">
+              <Select
+                className="w-full"
+                selectedKey={String(examGroup)}
+                onSelectionChange={(key) => {
+                  if (key) setExamGroup(Number(key));
+                }}
+              >
+                <Label className="text-xs font-bold text-muted uppercase tracking-wider block mb-1.5">Pilih Bab Ujian (Rangkuman 3 Bab)</Label>
+                <Select.Trigger className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px]">
+                  <Select.Value className="truncate text-left" />
+                  <Select.Indicator className="text-muted ml-2 font-xs">▼</Select.Indicator>
+                </Select.Trigger>
+                <Select.Popover className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
+                  <ListBox>
+                    {[
+                      { id: "1", title: "Bab 1 - 3 — Rangkuman Ujian" },
+                      { id: "4", title: "Bab 4 - 6 — Rangkuman Ujian" },
+                      { id: "7", title: "Bab 7 - 9 — Rangkuman Ujian" },
+                      { id: "10", title: "Bab 10 - 12 — Rangkuman Ujian" },
+                      { id: "13", title: "Bab 13 - 15 — Rangkuman Ujian" }
+                    ].map((g) => (
+                      <ListBox.Item key={g.id} id={g.id} textValue={g.title} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm">
+                        {g.title}
+                        <ListBox.ItemIndicator />
+                      </ListBox.Item>
+                    ))}
+                  </ListBox>
+                </Select.Popover>
+              </Select>
+            </div>
+          </div>
+        )}
 
         {/* LOADING STATE */}
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-32 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-            <p className="text-sm text-muted">Memuat data persiapan...</p>
+            <Spinner size="lg" color="accent" />
+            <p className="text-sm text-muted">Memuat data...</p>
           </div>
         ) : (
           <main className="mt-6">
-            
-            {/* TAMPILAN JIKA MATERI BELUM ADA & BUKAN EDIT MODE */}
-            {!data && !isEditing ? (
+            {studyMode === "biasa" && (
+              <>
+                {/* TAMPILAN JIKA MATERI BELUM ADA & BUKAN EDIT MODE */}
+                {!data && !isEditing ? (
               <div className="flex flex-col items-center gap-6 py-16 text-center rounded-2xl border border-dashed border-border bg-surface/50 px-6">
                 <span className="font-jp text-6xl select-none opacity-20">書</span>
                 <div className="max-w-md flex flex-col gap-2">
@@ -841,12 +1275,13 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
                       </button>
                     </div>
                   </label>
-                  <textarea
+                  <TextArea
                     value={jsonInput}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJsonInput(e.target.value)}
                     placeholder={getPlaceholderJson(chapter, point)}
                     rows={12}
-                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-mono text-foreground focus:border-accent focus:outline-hidden"
+                    variant="secondary"
+                    className="font-mono text-xs bg-background border border-border rounded-xl p-2.5 resize-y leading-relaxed"
                   />
                   {jsonError && (
                     <p className="text-[11px] text-red-500 font-medium bg-red-50 dark:bg-red-950/10 p-2 rounded-lg border border-red-100 dark:border-red-950/30">
@@ -1601,6 +2036,177 @@ Tolong ekstrak materi pelajaran pada foto tersebut dan buatkan data JSON terstru
 
               </div>
             ) : null}
+              </>
+            )}
+
+            {studyMode === "ujian" && (
+              <>
+                {/* UJIAN: MATERI BELUM ADA */}
+                {!data && !isEditing ? (
+                  <div className="flex flex-col items-center gap-6 py-16 text-center rounded-2xl border border-dashed border-border bg-surface/50 px-6">
+                    <span className="font-jp text-6xl select-none opacity-20">試</span>
+                    <div className="max-w-md flex flex-col gap-2">
+                      <h3 className="font-bold text-foreground text-lg">
+                        Rangkuman Ujian Belum Tersedia
+                      </h3>
+                      <p className="text-sm text-muted">
+                        Belum ada rangkuman ujian untuk Bab {examGroup} - {examGroup + 2} di database. Anda dapat men-generate otomatis dengan AI Gemini 3.5 Flash atau memasukkannya secara manual.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 w-full justify-center max-w-md mt-2">
+                      {generating ? (
+                        <Button variant="secondary" className="flex-1 font-semibold cursor-not-allowed bg-indigo-500/20 text-indigo-500 rounded-xl" isDisabled>
+                          <Spinner size="sm" color="current" className="mr-2" /> Men-generate Rangkuman...
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="primary"
+                          className="flex-1 font-semibold shadow-sm cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-xl"
+                          onClick={handleGenerateSummary}
+                        >
+                          🤖 Generate Rangkuman (AI)
+                        </Button>
+                      )}
+
+                      {role && (
+                        <Button
+                          variant="secondary"
+                          className="flex-1 font-semibold shadow-sm cursor-pointer rounded-xl"
+                          onClick={() => {
+                            setExamTitleInput(`Rangkuman Ujian Bab ${examGroup}-${examGroup + 2}`);
+                            setJsonInput("");
+                            setIsEditing(true);
+                          }}
+                        >
+                          ✍️ Tulis Manual
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* AI Prompt Area */}
+                    <div className="w-full max-w-lg mt-4 border border-border rounded-xl bg-surface p-4 text-left">
+                      <div className="flex items-center justify-between gap-4 mb-2">
+                        <span className="text-xs font-bold text-foreground">
+                          📋 Prompt AI Rangkuman Ujian (Termasuk 3 Bab Data)
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="text-[10px] h-6 px-2.5 font-bold bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-colors cursor-pointer border-none rounded-lg"
+                          onClick={handleCopyExamPrompt}
+                        >
+                          {copied ? "✓ Tersalin!" : "Salin Prompt"}
+                        </Button>
+                      </div>
+                      <p className="text-[11px] text-muted leading-relaxed">
+                        Salin prompt ini untuk dikirimkan secara manual ke ChatGPT, Claude, atau Gemini. Prompt ini berisi instruksi and data kosakata serta tata bahasa esensial dari bab {examGroup} sampai {examGroup + 2}.
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* UJIAN: FORM EDIT */}
+                {isEditing ? (
+                  <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6 rounded-2xl">
+                    <div className="flex items-center justify-between border-b border-border pb-4">
+                      <h2 className="text-md font-bold text-foreground">
+                        ⚙️ Edit Rangkuman Ujian (Bab {examGroup} - {examGroup + 2}) — {username} ({role})
+                      </h2>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="font-semibold text-red-500 hover:text-red-600 cursor-pointer rounded-xl"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        {t.cancel}
+                      </Button>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-xs font-bold text-foreground">
+                        Judul Rangkuman
+                      </Label>
+                      <Input
+                        value={examTitleInput}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setExamTitleInput(e.target.value)}
+                        placeholder={`Rangkuman Ujian Bab ${examGroup}-${examGroup + 2}`}
+                        variant="secondary"
+                        className="font-sans text-xs bg-background border border-border rounded-xl p-2.5"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-xs font-bold text-foreground">
+                        Konten Rangkuman (Format Markdown)
+                      </Label>
+                      <TextArea
+                        value={jsonInput}
+                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setJsonInput(e.target.value)}
+                        placeholder="Tulis rangkuman Anda di sini..."
+                        rows={16}
+                        variant="secondary"
+                        className="font-mono text-xs bg-background border border-border rounded-xl p-2.5 resize-y leading-relaxed"
+                      />
+                    </div>
+
+                    <div className="flex gap-3 justify-end border-t border-border pt-4">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="cursor-pointer rounded-xl"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        {t.cancel}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        className="font-semibold shadow-xs cursor-pointer rounded-xl"
+                        onClick={handleSaveExamSummary}
+                        isDisabled={!jsonInput.trim()}
+                      >
+                        Simpan Rangkuman
+                      </Button>
+                    </div>
+                  </Card>
+                ) : null}
+
+                {/* UJIAN: TAMPILAN MATERI JIKA DATA SUDAH TERSEDIA */}
+                {data && !isEditing ? (
+                  <div className="flex flex-col gap-6">
+                    
+                    {/* Judul Rangkuman */}
+                    <div className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-500">
+                          Rangkuman Ujian Bab {examGroup} - {examGroup + 2}
+                        </span>
+                        <h2 className="font-jp text-xl font-bold text-foreground mt-0.5">
+                          {data.title}
+                        </h2>
+                      </div>
+
+                      {role && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="font-semibold self-start sm:self-center shrink-0 cursor-pointer rounded-xl"
+                          onClick={startEditingExam}
+                        >
+                          ✏️ Edit Rangkuman
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Markdown Viewer */}
+                    <Card className="border border-border bg-surface p-6 shadow-sm rounded-2xl">
+                      <RenderMarkdown content={(data.sections as any)?.summaryText || ""} />
+                    </Card>
+                  </div>
+                ) : null}
+              </>
+            )}
 
           </main>
         )}

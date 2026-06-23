@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
+import { Prisma } from "@/app/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -46,9 +47,52 @@ export async function POST(request: NextRequest) {
     const parsedChapter = parseInt(chapter);
     const parsedPoint = parseInt(point);
 
+    if (isNaN(parsedChapter) || isNaN(parsedPoint)) {
+      return NextResponse.json(
+        { error: "Invalid data format" },
+        { status: 400 }
+      );
+    }
+
+    if (parsedPoint === 0) {
+      if (!title) {
+        return NextResponse.json(
+          { error: "Judul rangkuman wajib diisi." },
+          { status: 400 }
+        );
+      }
+
+      const data = await prisma.prepData.upsert({
+        where: {
+          chapter_point: {
+            chapter: parsedChapter,
+            point: 0,
+          },
+        },
+        update: {
+          title,
+          conversations: Prisma.JsonNull,
+          grammar: [],
+          exercises: Prisma.JsonNull,
+          sections: (sections as any) ?? Prisma.JsonNull,
+          audioFiles: [],
+        },
+        create: {
+          chapter: parsedChapter,
+          point: 0,
+          title,
+          conversations: Prisma.JsonNull,
+          grammar: [],
+          exercises: Prisma.JsonNull,
+          sections: (sections as any) ?? Prisma.JsonNull,
+          audioFiles: [],
+        },
+      });
+
+      return NextResponse.json({ success: true, data });
+    }
+
     if (
-      isNaN(parsedChapter) ||
-      isNaN(parsedPoint) ||
       !title ||
       (grammar !== undefined && grammar !== null && !Array.isArray(grammar)) ||
       !Array.isArray(audioFiles)
