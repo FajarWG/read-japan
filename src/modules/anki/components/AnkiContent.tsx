@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Button, Card, Chip, Modal, Label, ListBox, Select } from "@heroui/react";
+import { Button, Card, Chip, Popover, Modal, Label, ListBox } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
@@ -616,60 +616,74 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Filter Bab */}
                     <div className="flex flex-col gap-1.5">
-                      <Select className="w-full" placeholder={t.ankiFilterChapter || "Filter Bab"} selectionMode="multiple">
-                        <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterChapter || "Filter Bab"}</Label>
-                        <Select.Trigger className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px]">
-                          <Select.Value className="truncate text-left">
-                            {selectedChaptersText}
-                          </Select.Value>
-                          <Select.Indicator className="text-muted ml-2" />
-                        </Select.Trigger>
-                        <Select.Popover className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
-                          <ListBox selectionMode="multiple" selectedKeys={filterChapters} onSelectionChange={handleChapterSelectionChange}>
-                            <ListBox.Item id="all" textValue={t.ankiAllChapters || "Semua Bab"}>
-                              {t.ankiAllChapters || "Semua Bab"}
-                              <ListBox.ItemIndicator />
-                            </ListBox.Item>
-                            {Array.from({ length: 15 }, (_, i) => {
-                              const chapNum = String(i + 1);
-                              const title = `Bab ${chapNum} — ${DekiruNihongoGroups[i]?.title || ""}`;
-                              return (
-                                <ListBox.Item key={chapNum} id={chapNum} textValue={title}>
-                                  {title}
-                                  <ListBox.ItemIndicator />
-                                </ListBox.Item>
-                              );
-                            })}
-                          </ListBox>
-                        </Select.Popover>
-                      </Select>
+                      <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterChapter || "Filter Bab"}</Label>
+                      <Popover>
+                        <Popover.Trigger>
+                          <button
+                            type="button"
+                            className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground hover:bg-surface-muted/50 focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px] text-left"
+                          >
+                            <span className="truncate">
+                              {selectedChaptersText}
+                            </span>
+                            <span className="text-muted ml-2 text-xs">▼</span>
+                          </button>
+                        </Popover.Trigger>
+                        <Popover.Content placement="bottom start" className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
+                          <Popover.Dialog className="outline-none">
+                            <ListBox selectionMode="multiple" selectedKeys={filterChapters} onSelectionChange={handleChapterSelectionChange}>
+                              <ListBox.Item id="all" textValue={t.ankiAllChapters || "Semua Bab"} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
+                                {t.ankiAllChapters || "Semua Bab"}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                              {Array.from({ length: 15 }, (_, i) => {
+                                const chapNum = String(i + 1);
+                                const title = `Bab ${chapNum} — ${DekiruNihongoGroups[i]?.title || ""}`;
+                                return (
+                                  <ListBox.Item key={chapNum} id={chapNum} textValue={title} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
+                                    {title}
+                                    <ListBox.ItemIndicator />
+                                  </ListBox.Item>
+                                );
+                              })}
+                            </ListBox>
+                          </Popover.Dialog>
+                        </Popover.Content>
+                      </Popover>
                     </div>
 
                     {/* Filter Poin */}
                     <div className="flex flex-col gap-1.5">
-                      <Select className="w-full" placeholder={t.ankiFilterPoint || "Filter Poin"} selectionMode="multiple">
-                        <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterPoint || "Filter Poin"}</Label>
-                        <Select.Trigger className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px]">
-                          <Select.Value className="truncate text-left">
-                            {selectedPointsText}
-                          </Select.Value>
-                          <Select.Indicator className="text-muted ml-2" />
-                        </Select.Trigger>
-                        <Select.Popover className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
-                          <ListBox selectionMode="multiple" selectedKeys={filterPoints} onSelectionChange={handlePointSelectionChange}>
-                            <ListBox.Item id="all" textValue={t.ankiAllPoints || "Semua Poin"}>
-                              {t.ankiAllPoints || "Semua Poin"}
-                              <ListBox.ItemIndicator />
-                            </ListBox.Item>
-                            {availablePointsOptions.map((opt) => (
-                              <ListBox.Item key={opt.id} id={opt.id} textValue={opt.title}>
-                                {opt.title}
+                      <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterPoint || "Filter Poin"}</Label>
+                      <Popover>
+                        <Popover.Trigger>
+                          <button
+                            type="button"
+                            className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground hover:bg-surface-muted/50 focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px] text-left"
+                          >
+                            <span className="truncate">
+                              {selectedPointsText}
+                            </span>
+                            <span className="text-muted ml-2 text-xs">▼</span>
+                          </button>
+                        </Popover.Trigger>
+                        <Popover.Content placement="bottom start" className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
+                          <Popover.Dialog className="outline-none">
+                            <ListBox selectionMode="multiple" selectedKeys={filterPoints} onSelectionChange={handlePointSelectionChange}>
+                              <ListBox.Item id="all" textValue={t.ankiAllPoints || "Semua Poin"} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
+                                {t.ankiAllPoints || "Semua Poin"}
                                 <ListBox.ItemIndicator />
                               </ListBox.Item>
-                            ))}
-                          </ListBox>
-                        </Select.Popover>
-                      </Select>
+                              {availablePointsOptions.map((opt) => (
+                                <ListBox.Item key={opt.id} id={opt.id} textValue={opt.title} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
+                                  {opt.title}
+                                  <ListBox.ItemIndicator />
+                                </ListBox.Item>
+                              ))}
+                            </ListBox>
+                          </Popover.Dialog>
+                        </Popover.Content>
+                      </Popover>
                     </div>
                   </div>
 
