@@ -580,14 +580,14 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Filter Bab */}
                     <div className="flex flex-col gap-1.5">
-                      <Select className="w-full" placeholder={t.ankiFilterChapter || "Filter Bab"} selectionMode="multiple">
+                      <Select className="w-full" placeholder={t.ankiFilterChapter || "Filter Bab"} selectionMode="multiple" selectedKeys={filterChapters} onSelectionChange={handleChapterSelectionChange}>
                         <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterChapter || "Filter Bab"}</Label>
                         <Select.Trigger className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px]">
                           <Select.Value className="truncate text-left" />
                           <Select.Indicator className="text-muted ml-2" />
                         </Select.Trigger>
                         <Select.Popover className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
-                          <ListBox selectionMode="multiple" selectedKeys={filterChapters} onSelectionChange={handleChapterSelectionChange}>
+                          <ListBox>
                             <ListBox.Item id="all" textValue={t.ankiAllChapters || "Semua Bab"}>
                               {t.ankiAllChapters || "Semua Bab"}
                               <ListBox.ItemIndicator />
@@ -609,14 +609,14 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
                     {/* Filter Poin */}
                     <div className="flex flex-col gap-1.5">
-                      <Select className="w-full" placeholder={t.ankiFilterPoint || "Filter Poin"} selectionMode="multiple">
+                      <Select className="w-full" placeholder={t.ankiFilterPoint || "Filter Poin"} selectionMode="multiple" selectedKeys={filterPoints} onSelectionChange={handlePointSelectionChange}>
                         <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterPoint || "Filter Poin"}</Label>
                         <Select.Trigger className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px]">
                           <Select.Value className="truncate text-left" />
                           <Select.Indicator className="text-muted ml-2" />
                         </Select.Trigger>
                         <Select.Popover className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
-                          <ListBox selectionMode="multiple" selectedKeys={filterPoints} onSelectionChange={handlePointSelectionChange}>
+                          <ListBox>
                             <ListBox.Item id="all" textValue={t.ankiAllPoints || "Semua Poin"}>
                               {t.ankiAllPoints || "Semua Poin"}
                               <ListBox.ItemIndicator />
