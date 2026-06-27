@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { buttonVariants } from "@heroui/react";
 
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
-import type { ProgressStats } from "@/src/modules/dashboard/lib/dashboard";
+import type { ProgressStats, ChapterProgressItem } from "@/src/modules/dashboard/lib/dashboard";
 
 // ─────────────────────────────────────────────────────────
 // Activity bar chart — 7 hari terakhir (SVG, no external lib)
@@ -157,44 +158,111 @@ function StatCard({
 
 
 // ─────────────────────────────────────────────────────────
-// Anki chapter breakdown
+// Chapter progress details
 // ─────────────────────────────────────────────────────────
 
-function AnkiByChapter({
-  data,
-}: {
-  data: Array<{ chapter: number; count: number }>;
-}) {
-  const { t } = useLanguage();
-  if (data.length === 0) return null;
-  const max = Math.max(1, ...data.map((d) => d.count));
+function ChapterProgressCard({ item }: { item: ChapterProgressItem }) {
+  const prepDone = item.prepOpenedPoints === item.totalPrepPoints;
+  const prepProgressText = `${item.prepOpenedPoints}/${item.totalPrepPoints}`;
+
+  const storiesDone = item.totalStoriesCount > 0 && item.storiesReadCount === item.totalStoriesCount;
+  const storiesProgressText = item.totalStoriesCount > 0 
+    ? `${item.storiesReadCount}/${item.totalStoriesCount}`
+    : "—";
 
   return (
-    <div className="rounded-2xl border border-border bg-surface px-5 py-4 shadow-sm">
-      <p className="mb-3 text-sm font-semibold text-foreground">
-        📚 {t.progressAnkiChapterBreakdown}
-      </p>
-      <div className="flex flex-col gap-1.5">
-        {data.map((d) => {
-          const pct = Math.round((d.count / max) * 100);
-          return (
-            <div key={d.chapter} className="flex items-center gap-2">
-              <span className="w-12 shrink-0 text-xs font-bold text-muted tabular-nums">
-                Bab {d.chapter}
-              </span>
-              <div className="h-5 flex-1 overflow-hidden rounded-full bg-surface-muted">
-                <div
-                  className="h-full rounded-full bg-accent/70 transition-all"
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-              <span className="w-10 text-right text-xs font-bold text-foreground tabular-nums">
-                {d.count}
-              </span>
-            </div>
-          );
-        })}
+    <div className="rounded-xl border border-border bg-surface px-3 py-2.5 shadow-xs flex flex-col justify-between gap-2 transition-all hover:border-accent/40">
+      <div className="min-w-0">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="rounded-md bg-indigo-500/10 text-indigo-500 px-1.5 py-0.5 text-[9px] font-bold tabular-nums whitespace-nowrap">
+            Bab {item.chapter}
+          </span>
+          <span className="font-jp text-xs font-semibold text-foreground truncate block" title={item.title}>
+            {item.title}
+          </span>
+        </div>
       </div>
+
+      <div className="grid grid-cols-3 gap-1 text-[10px] text-center">
+        {/* Prep */}
+        <div className="flex flex-col items-center justify-center py-1.5 rounded-lg border border-border bg-slate-50 dark:bg-slate-900/50">
+          <span className="text-[8px] text-muted block mb-0.5 font-bold uppercase tracking-wider">Prep</span>
+          <span className={[
+            "font-semibold tabular-nums",
+            prepDone ? "text-emerald-500" : item.prepOpenedPoints > 0 ? "text-indigo-500" : "text-muted"
+          ].join(" ")}>
+            {prepDone ? "✅" : prepProgressText}
+          </span>
+        </div>
+
+        {/* Stories */}
+        <div className="flex flex-col items-center justify-center py-1.5 rounded-lg border border-border bg-slate-50 dark:bg-slate-900/50">
+          <span className="text-[8px] text-muted block mb-0.5 font-bold uppercase tracking-wider">Cerita</span>
+          <span className={[
+            "font-semibold tabular-nums",
+            storiesDone ? "text-emerald-500" : item.storiesReadCount > 0 ? "text-indigo-500" : "text-muted"
+          ].join(" ")}>
+            {storiesDone ? "✅" : storiesProgressText}
+          </span>
+        </div>
+
+        {/* Anki */}
+        <div className="flex flex-col items-center justify-center py-1.5 rounded-lg border border-border bg-slate-50 dark:bg-slate-900/50">
+          <span className="text-[8px] text-muted block mb-0.5 font-bold uppercase tracking-wider">Anki</span>
+          <span className={[
+            "font-semibold tabular-nums",
+            item.ankiCardsCount > 0 ? "text-indigo-500 font-bold" : "text-muted"
+          ].join(" ")}>
+            🃏 {item.ankiCardsCount}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChapterProgressSection({ data }: { data: ChapterProgressItem[] }) {
+  const { lang } = useLanguage();
+  const [showAll, setShowAll] = useState(false);
+
+  // Filter out chapters with absolutely no progress to show first
+  const activeChapters = data.filter(
+    (item) => item.prepOpenedPoints > 0 || item.storiesReadCount > 0 || item.ankiCardsCount > 0
+  );
+
+  const chaptersToRender = showAll ? data : activeChapters.length > 0 ? activeChapters : data.slice(0, 3);
+
+  const titleText = lang === "en" ? "Chapter Study Status" : "Progres Belajar per Bab";
+  const descText = lang === "en" 
+    ? "Track which chapters you have studied (Prep sheet opened, Stories read, Anki cards)."
+    : "Lacak bab mana saja yang sudah Anda pelajari (Membuka Prep, Membaca Cerita, Kartu Anki).";
+
+  return (
+    <div className="rounded-2xl border border-border bg-surface px-5 py-4 shadow-sm flex flex-col gap-3">
+      <div>
+        <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+          📚 {titleText}
+        </p>
+        <p className="text-[10px] text-muted mt-0.5">{descText}</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        {chaptersToRender.map((item) => (
+          <ChapterProgressCard key={item.chapter} item={item} />
+        ))}
+      </div>
+
+      {data.length > activeChapters.length && (
+        <button
+          type="button"
+          onClick={() => setShowAll(!showAll)}
+          className="mt-2 text-center text-xs font-semibold text-accent hover:underline cursor-pointer"
+        >
+          {showAll 
+            ? (lang === "en" ? "Show Less" : "Sembunyikan bab belum dipelajari") 
+            : (lang === "en" ? `Show All 15 Chapters` : `Tampilkan semua 15 Bab (termasuk yang belum dipelajari)`)}
+        </button>
+      )}
     </div>
   );
 }
@@ -294,8 +362,8 @@ export function ProgressDashboard({ stats }: { stats: ProgressStats }) {
         </section>
       </div>
 
-      {/* Anki by chapter */}
-      <AnkiByChapter data={stats.byChapter} />
+      {/* Chapter Study Status */}
+      {stats.chaptersProgress && <ChapterProgressSection data={stats.chaptersProgress} />}
 
       {/* Stories */}
       <section className="rounded-2xl border border-border bg-surface px-5 py-4 shadow-sm">

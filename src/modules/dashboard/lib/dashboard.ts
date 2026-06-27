@@ -7,10 +7,21 @@
 
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
+import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
 
 // ─────────────────────────────────────────────────────────
 // Tipe data
 // ─────────────────────────────────────────────────────────
+
+export interface ChapterProgressItem {
+  chapter: number;
+  title: string;
+  prepOpenedPoints: number;
+  totalPrepPoints: number;
+  storiesReadCount: number;
+  totalStoriesCount: number;
+  ankiCardsCount: number;
+}
 
 export interface DashboardSummary {
   user: { id: number; username: string };
@@ -40,6 +51,7 @@ export interface ProgressStats {
   ankiDueNow: number;
   byDay: Array<{ date: string; count: number }>; // 7 hari terakhir
   byChapter: Array<{ chapter: number; count: number }>;
+  chaptersProgress: ChapterProgressItem[];
   weakWords: Array<{
     character: string;
     wrongCount: number;
@@ -255,19 +267,107 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     count,
   }));
 
-  // By chapter — ambil dari AnkiProgress per chapter
-  const chapterGroups = await prisma.ankiProgress.groupBy({
-    by: ["chapter"],
-    where: { userId: session.id },
-    _count: { _all: true },
+  // Fetch detailed chapter progress (Prep, Stories, Anki)
+  const [prepLogs, readLogs, allStories, chapterGroups] = await Promise.all([
+    prisma.activityLog.findMany({
+      where: { userId: session.id, type: "prep_open" },
+      select: { refId: true },
+    }),
+    prisma.activityLog.findMany({
+      where: { userId: session.id, type: "story_read" },
+      select: { refId: true },
+    }),
+    prisma.story.findMany({
+      where: { NOT: { chapter: null } },
+      select: { id: true, chapter: true },
+    }),
+    prisma.ankiProgress.groupBy({
+      by: ["chapter"],
+      where: { userId: session.id },
+      _count: { _all: true },
+    }),
+  ]);
+
+  // 1. Compile Prep opened points map
+  const prepMap = new Map<number, Set<number>>();
+  prepLogs.forEach((log) => {
+    if (log.refId) {
+      const parts = log.refId.split("-");
+      if (parts.length === 2) {
+        const c = parseInt(parts[0]);
+        const p = parseInt(parts[1]);
+        if (!isNaN(c) && !isNaN(p)) {
+          if (!prepMap.has(c)) {
+            prepMap.set(c, new Set());
+          }
+          prepMap.get(c)!.add(p);
+        }
+      }
+    }
   });
-  const byChapter = chapterGroups
-    .map((g) => ({
-      chapter: Number(g.chapter.replace(/\D/g, "")) || 0,
-      count: g._count._all,
-    }))
-    .filter((g) => g.chapter > 0)
-    .sort((a, b) => a.chapter - b.chapter);
+
+  // 2. Compile read stories map
+  const readStoryIds = readLogs.map((l) => Number(l.refId)).filter((id) => !isNaN(id));
+  const readStories = await prisma.story.findMany({
+    where: { id: { in: readStoryIds }, NOT: { chapter: null } },
+    select: { id: true, chapter: true },
+  });
+  const readStoryMap = new Map<number, Set<number>>();
+  readStories.forEach((s) => {
+    if (s.chapter != null) {
+      if (!readStoryMap.has(s.chapter)) {
+        readStoryMap.set(s.chapter, new Set());
+      }
+      readStoryMap.get(s.chapter)!.add(s.id);
+    }
+  });
+
+  // 3. Compile total stories per chapter map
+  const totalStoriesMap = new Map<number, Set<number>>();
+  allStories.forEach((s) => {
+    if (s.chapter != null) {
+      if (!totalStoriesMap.has(s.chapter)) {
+        totalStoriesMap.set(s.chapter, new Set());
+      }
+      totalStoriesMap.get(s.chapter)!.add(s.id);
+    }
+  });
+
+  // 4. Compile Anki counts per chapter map
+  const ankiMap = new Map<number, number>();
+  chapterGroups.forEach((g) => {
+    const chapNum = Number(g.chapter.replace(/\D/g, "")) || 0;
+    if (chapNum > 0) {
+      ankiMap.set(chapNum, (ankiMap.get(chapNum) ?? 0) + g._count._all);
+    }
+  });
+
+  // 5. Construct full chaptersProgress
+  const chaptersProgress: ChapterProgressItem[] = [];
+  for (let c = 1; c <= 15; c++) {
+    const group = DekiruNihongoGroups[c - 1];
+    const title = group?.title ?? "";
+    const totalPrepPoints = group?.sections?.length ?? 3;
+    const prepOpenedPoints = prepMap.get(c)?.size ?? 0;
+    const storiesReadCount = readStoryMap.get(c)?.size ?? 0;
+    const totalStoriesCount = totalStoriesMap.get(c)?.size ?? 0;
+    const ankiCardsCount = ankiMap.get(c) ?? 0;
+
+    chaptersProgress.push({
+      chapter: c,
+      title,
+      prepOpenedPoints,
+      totalPrepPoints,
+      storiesReadCount,
+      totalStoriesCount,
+      ankiCardsCount,
+    });
+  }
+
+  const byChapter = chaptersProgress.map((cp) => ({
+    chapter: cp.chapter,
+    count: cp.ankiCardsCount,
+  }));
 
   // Weak words — top wrongCount, exclude kotoba: prefix
   const weakRecords = await prisma.learningProgress.findMany({
@@ -338,6 +438,7 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     ankiDueNow: dueNow,
     byDay,
     byChapter,
+    chaptersProgress,
     weakWords,
     achievements,
   };

@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import { Button, Card, Chip, Popover, Modal, Label, ListBox } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
-import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
 
 interface AnkiContentProps {
@@ -64,7 +63,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   };
 
   // Dapatkan opsi poin yang tersedia berdasarkan bab yang dipilih
-  const availablePointsOptions = useMemo(() => {
+  const availablePointsOptions = useMemo<Array<{ id: string; title: string }>>(() => {
     const showAllChaps =
       filterChapters === "all" ||
       (filterChapters as Set<any>).has("all") ||
@@ -82,10 +81,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
     // Tampilkan sections spesifik jika hanya ada 1 bab yang dipilih
     const chapNumStr = Array.from(filterChapters as Set<any>)[0];
     const chapIdx = parseInt(chapNumStr) - 1;
-    const chap = DekiruNihongoGroups[chapIdx];
+    const chap = dekiruGroups[chapIdx];
     if (!chap) return [];
 
-    return chap.sections.map((sect, sIdx) => ({
+    return chap.sections.map((sect: any, sIdx: number) => ({
       id: String(sIdx + 1),
       title: `Poin ${sIdx + 1}: ${sect.title}`,
     }));
@@ -121,7 +120,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
     return sortedPoints
       .map((ptId) => {
-        const opt = availablePointsOptions.find((o) => o.id === String(ptId));
+        const opt = availablePointsOptions.find((o: any) => o.id === String(ptId));
         return opt ? opt.title : `Poin ${ptId}`;
       })
       .join(", ");
@@ -148,6 +147,23 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
   const [showReadings, setShowReadings] = useState<boolean>(false);
 
+  // Settings
+  const [dekiruGroups, setDekiruGroups] = useState<any[]>([]);
+  const [postMode, setPostMode] = useState<"session" | "card">("session");
+
+  // Load post mode preference
+  useEffect(() => {
+    const savedMode = localStorage.getItem("anki_post_mode");
+    if (savedMode === "session" || savedMode === "card") {
+      setPostMode(savedMode);
+    }
+  }, []);
+
+  const handlePostModeChange = (mode: "session" | "card") => {
+    setPostMode(mode);
+    localStorage.setItem("anki_post_mode", mode);
+  };
+
   // Reset showReadings state when selecting a new Kanji
   useEffect(() => {
     if (selectedKanji) {
@@ -155,10 +171,14 @@ export function AnkiContent({ username }: AnkiContentProps) {
     }
   }, [selectedKanji]);
 
-  // Ambil progres SRS pengguna saat pertama kali masuk
+  // Ambil progres SRS pengguna dan kurikulum Dekiru Nihongo secara dinamis saat masuk
   useEffect(() => {
-    async function fetchAnkiProgress() {
+    async function initAnki() {
       try {
+        // Dynamic import DekiruNihongoGroup to reduce bundle size
+        const mod = await import("@/src/helper/DekiruNihongoGroup");
+        setDekiruGroups(mod.DekiruNihongoGroups);
+
         const res = await fetch("/api/anki");
         if (res.ok) {
           const json = await res.json();
@@ -169,13 +189,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
           setProgressMap(pMap);
         }
       } catch (err) {
-        console.error("Gagal mengambil progres SRS:", err);
+        console.error("Gagal menginisialisasi Anki:", err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchAnkiProgress();
+    initAnki();
   }, []);
 
   // Ekstrak semua kosakata yang cocok dengan filter
@@ -190,13 +210,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
       (filterPoints as Set<any>).has("all") ||
       (filterPoints as Set<any>).size === 0;
 
-    DekiruNihongoGroups.forEach((chap, cIdx) => {
+    dekiruGroups.forEach((chap: any, cIdx: number) => {
       const chapterNumber = cIdx + 1;
       if (!showAllChaps && !(filterChapters as Set<any>).has(String(chapterNumber))) {
         return;
       }
 
-      chap.sections.forEach((sect, sIdx) => {
+      chap.sections.forEach((sect: any, sIdx: number) => {
         const pointNumber = sIdx + 1;
         if (!showAllPts && !(filterPoints as Set<any>).has(String(pointNumber))) {
           return;
@@ -364,7 +384,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   };
 
   // Kirim semua review yang tertunda ke API dalam satu batch
-  const triggerSaveBatch = async (reviewsToSave: typeof pendingReviews) => {
+  const triggerSaveBatch = async (reviewsToSave: typeof pendingReviews, isFullBatch = true) => {
     if (reviewsToSave.length === 0) return;
     try {
       const res = await fetch("/api/anki", {
@@ -380,7 +400,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
         // Perbarui cache progress lokal dengan semua data baru
         setProgressMap((prev) => {
           const nextMap = { ...prev };
-          (json.progress || []).forEach((item: SRSProgress) => {
+          const progressList = Array.isArray(json.progress) 
+            ? json.progress 
+            : json.progress 
+              ? [json.progress] 
+              : [];
+          progressList.forEach((item: SRSProgress) => {
             nextMap[item.cardKey] = item;
           });
           return nextMap;
@@ -389,11 +414,15 @@ export function AnkiContent({ username }: AnkiContentProps) {
     } catch (err) {
       console.error("Gagal menyimpan progres batch:", err);
     }
-    setPendingReviews([]);
+    if (isFullBatch) {
+      setPendingReviews([]);
+    }
   };
 
   const handleCancelSession = async () => {
-    await triggerSaveBatch(pendingReviews);
+    if (postMode === "session") {
+      await triggerSaveBatch(pendingReviews);
+    }
     setSessionQueue([]);
   };
 
@@ -409,16 +438,21 @@ export function AnkiContent({ username }: AnkiContentProps) {
     // Sudah Tahu -> rating 2 (Hard, bobot paling kecil untuk sukses)
     // Tidak Tahu -> rating 1 (Again, lupa)
     const rating = knows ? 2 : 1;
-    const nextReviews = [
-      ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
-      {
-        cardKey: currentCard.cardKey,
-        chapter: currentCard.chapter,
-        sectionIndex: currentCard.sectionIndex,
-        rating,
-      },
-    ];
-    setPendingReviews(nextReviews);
+    const cardReview = {
+      cardKey: currentCard.cardKey,
+      chapter: currentCard.chapter,
+      sectionIndex: currentCard.sectionIndex,
+      rating,
+    };
+
+    if (postMode === "card") {
+      await triggerSaveBatch([cardReview], false);
+    } else {
+      setPendingReviews((prev) => [
+        ...prev.filter((r) => r.cardKey !== currentCard.cardKey),
+        cardReview,
+      ]);
+    }
 
     if (!knows) {
       // Tidak tahu: masukkan kartu ke akhir antrean sesi agar diulang terus
@@ -429,7 +463,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
       // Sudah tahu: lanjut ke kartu berikutnya (keluarkan dari sisa sesi)
       if (currentIndex + 1 >= sessionQueue.length) {
         setSessionFinished(true);
-        await triggerSaveBatch(nextReviews);
+        if (postMode === "session") {
+          const nextReviews = [
+            ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
+            cardReview,
+          ];
+          await triggerSaveBatch(nextReviews);
+        }
       } else {
         setCurrentIndex((prev) => prev + 1);
       }
@@ -445,16 +485,21 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setFlipped(false);
     setReviewedCount((prev) => prev + 1);
 
-    const nextReviews = [
-      ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
-      {
-        cardKey: currentCard.cardKey,
-        chapter: currentCard.chapter,
-        sectionIndex: currentCard.sectionIndex,
-        rating,
-      },
-    ];
-    setPendingReviews(nextReviews);
+    const cardReview = {
+      cardKey: currentCard.cardKey,
+      chapter: currentCard.chapter,
+      sectionIndex: currentCard.sectionIndex,
+      rating,
+    };
+
+    if (postMode === "card") {
+      await triggerSaveBatch([cardReview], false);
+    } else {
+      setPendingReviews((prev) => [
+        ...prev.filter((r) => r.cardKey !== currentCard.cardKey),
+        cardReview,
+      ]);
+    }
 
     // LOGIKA ANKI: Jika memilih "Again" (1), kartu akan dimasukkan kembali ke antrean akhir sesi
     if (rating === 1) {
@@ -465,7 +510,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
       // Pindah ke kartu berikutnya
       if (currentIndex + 1 >= sessionQueue.length) {
         setSessionFinished(true);
-        await triggerSaveBatch(nextReviews);
+        if (postMode === "session") {
+          const nextReviews = [
+            ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
+            cardReview,
+          ];
+          await triggerSaveBatch(nextReviews);
+        }
       } else {
         setCurrentIndex((prev) => prev + 1);
       }
@@ -638,7 +689,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                               </ListBox.Item>
                               {Array.from({ length: 15 }, (_, i) => {
                                 const chapNum = String(i + 1);
-                                const title = `Bab ${chapNum} — ${DekiruNihongoGroups[i]?.title || ""}`;
+                               const title = `Bab ${chapNum} — ${dekiruGroups[i]?.title || ""}`;
                                 return (
                                   <ListBox.Item key={chapNum} id={chapNum} textValue={title} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
                                     {title}
@@ -684,6 +735,37 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           </Popover.Dialog>
                         </Popover.Content>
                       </Popover>
+                    </div>
+                  </div>
+
+                  {/* Mode Penyimpanan Progres */}
+                  <div className="flex flex-col gap-1.5 border-t border-border pt-4">
+                    <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiPostSettingLabel || "Mode Penyimpanan Progres"}</Label>
+                    <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
+                      <button
+                        type="button"
+                        onClick={() => handlePostModeChange("session")}
+                        className={[
+                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                          postMode === "session"
+                            ? "bg-surface text-foreground shadow-sm"
+                            : "text-muted hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        💾 {t.ankiPostSettingSession || "Simpan Selesai Sesi"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePostModeChange("card")}
+                        className={[
+                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                          postMode === "card"
+                            ? "bg-surface text-foreground shadow-sm"
+                            : "text-muted hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        ⚡ {t.ankiPostSettingCard || "Simpan Langsung Per Kartu"}
+                      </button>
                     </div>
                   </div>
 

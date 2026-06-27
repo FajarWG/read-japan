@@ -15,6 +15,31 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Log prep_open activity
+    const session = await getSession();
+    if (session) {
+      const refId = `${chapter}-${point}`;
+      const existing = await prisma.activityLog.findFirst({
+        where: {
+          userId: session.id,
+          type: "prep_open",
+          refId,
+          createdAt: {
+            gte: new Date(Date.now() - 5 * 60 * 1000),
+          },
+        },
+      });
+      if (!existing) {
+        await prisma.activityLog.create({
+          data: {
+            userId: session.id,
+            type: "prep_open",
+            refId,
+          },
+        });
+      }
+    }
+
     const data = await prisma.prepData.findUnique({
       where: {
         chapter_point: {
