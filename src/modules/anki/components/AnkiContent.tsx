@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Button, Card, Chip, Popover, Modal, Label, ListBox } from "@heroui/react";
+import {
+  Button,
+  Card,
+  Chip,
+  Popover,
+  Modal,
+  Label,
+  ListBox,
+} from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
@@ -31,9 +39,21 @@ interface VocabularyCard {
 export function AnkiContent({ username }: AnkiContentProps) {
   const { t, lang } = useLanguage();
 
+  // Settings states defined at the top to resolve scope issues
+  const [dekiruGroups, setDekiruGroups] = useState<any[]>([]);
+  const [postMode, setPostMode] = useState<"session" | "card">("session");
+  const [dailyNewCardsLimit, setDailyNewCardsLimit] = useState<number>(20);
+  const [dailyReviewLimit, setDailyReviewLimit] = useState<string>("unlimited");
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
+
   // Filter pilihan (multiple selection mode using Selection type from React Aria / HeroUI)
-  const [filterChapters, setFilterChapters] = useState<any>(new Set<string>(["all"]));
-  const [filterPoints, setFilterPoints] = useState<any>(new Set<string>(["all"]));
+  const [filterChapters, setFilterChapters] = useState<any>(
+    new Set<string>(["all"]),
+  );
+  const [filterPoints, setFilterPoints] = useState<any>(
+    new Set<string>(["all"]),
+  );
 
   // Handler untuk sinkronisasi multiselect: klik "all" mereset opsi lain, klik opsi lain menghapus "all"
   const handleChapterSelectionChange = (keys: any) => {
@@ -63,13 +83,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
   };
 
   // Dapatkan opsi poin yang tersedia berdasarkan bab yang dipilih
-  const availablePointsOptions = useMemo<Array<{ id: string; title: string }>>(() => {
+  const availablePointsOptions = useMemo<
+    Array<{ id: string; title: string }>
+  >(() => {
     const showAllChaps =
       filterChapters === "all" ||
-      (filterChapters as Set<any>).has("all") ||
-      (filterChapters as Set<any>).size === 0;
+      !(filterChapters instanceof Set) ||
+      filterChapters.has("all") ||
+      filterChapters.size === 0;
 
-    if (showAllChaps || (filterChapters as Set<any>).size > 1) {
+    if (
+      showAllChaps ||
+      !(filterChapters instanceof Set) ||
+      filterChapters.size > 1
+    ) {
       return [
         { id: "1", title: "Poin 1" },
         { id: "2", title: "Poin 2" },
@@ -79,8 +106,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
     }
 
     // Tampilkan sections spesifik jika hanya ada 1 bab yang dipilih
-    const chapNumStr = Array.from(filterChapters as Set<any>)[0];
-    const chapIdx = parseInt(chapNumStr) - 1;
+    const chapNumStr = Array.from(filterChapters)[0];
+    const chapIdx = parseInt(chapNumStr as string) - 1;
     const chap = dekiruGroups[chapIdx];
     if (!chap) return [];
 
@@ -88,18 +115,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
       id: String(sIdx + 1),
       title: `Poin ${sIdx + 1}: ${sect.title}`,
     }));
-  }, [filterChapters]);
+  }, [filterChapters, dekiruGroups]);
 
   // Selected chapters text helper for Select.Value
   const selectedChaptersText = useMemo(() => {
     const showAll =
       filterChapters === "all" ||
-      (filterChapters as Set<any>).has("all") ||
-      (filterChapters as Set<any>).size === 0;
+      !(filterChapters instanceof Set) ||
+      filterChapters.has("all") ||
+      filterChapters.size === 0;
     if (showAll) {
       return t.ankiAllChapters || "Semua Bab";
     }
-    const sortedChaps = Array.from(filterChapters as Set<any>)
+    const sortedChaps = Array.from(filterChapters)
       .map(Number)
       .sort((a, b) => a - b);
     return sortedChaps.map((chap) => `Bab ${chap}`).join(", ");
@@ -109,18 +137,21 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const selectedPointsText = useMemo(() => {
     const showAll =
       filterPoints === "all" ||
-      (filterPoints as Set<any>).has("all") ||
-      (filterPoints as Set<any>).size === 0;
+      !(filterPoints instanceof Set) ||
+      filterPoints.has("all") ||
+      filterPoints.size === 0;
     if (showAll) {
       return t.ankiAllPoints || "Semua Poin";
     }
-    const sortedPoints = Array.from(filterPoints as Set<any>)
+    const sortedPoints = Array.from(filterPoints)
       .map(Number)
       .sort((a, b) => a - b);
 
     return sortedPoints
       .map((ptId) => {
-        const opt = availablePointsOptions.find((o: any) => o.id === String(ptId));
+        const opt = availablePointsOptions.find(
+          (o: any) => o.id === String(ptId),
+        );
         return opt ? opt.title : `Poin ${ptId}`;
       })
       .join(", ");
@@ -140,7 +171,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [sessionFinished, setSessionFinished] = useState<boolean>(false);
   const [ankiMode, setAnkiMode] = useState<"srs" | "quick">("srs");
   const [pendingReviews, setPendingReviews] = useState<
-    Array<{ cardKey: string; chapter: string; sectionIndex: number; rating: number }>
+    Array<{
+      cardKey: string;
+      chapter: string;
+      sectionIndex: number;
+      rating: number;
+    }>
   >([]);
 
   // Learned Kanji state (derived from vocabulary progress)
@@ -148,20 +184,36 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [showReadings, setShowReadings] = useState<boolean>(false);
 
   // Settings
-  const [dekiruGroups, setDekiruGroups] = useState<any[]>([]);
-  const [postMode, setPostMode] = useState<"session" | "card">("session");
 
-  // Load post mode preference
+  // Load settings from localStorage
   useEffect(() => {
     const savedMode = localStorage.getItem("anki_post_mode");
     if (savedMode === "session" || savedMode === "card") {
       setPostMode(savedMode);
+    }
+    const savedNewLimit = localStorage.getItem("anki_daily_new_limit");
+    if (savedNewLimit) {
+      setDailyNewCardsLimit(Number(savedNewLimit));
+    }
+    const savedReviewLimit = localStorage.getItem("anki_daily_review_limit");
+    if (savedReviewLimit) {
+      setDailyReviewLimit(savedReviewLimit);
     }
   }, []);
 
   const handlePostModeChange = (mode: "session" | "card") => {
     setPostMode(mode);
     localStorage.setItem("anki_post_mode", mode);
+  };
+
+  const handleNewCardsLimitChange = (limit: number) => {
+    setDailyNewCardsLimit(limit);
+    localStorage.setItem("anki_daily_new_limit", String(limit));
+  };
+
+  const handleReviewLimitChange = (limit: string) => {
+    setDailyReviewLimit(limit);
+    localStorage.setItem("anki_daily_review_limit", limit);
   };
 
   // Reset showReadings state when selecting a new Kanji
@@ -203,22 +255,32 @@ export function AnkiContent({ username }: AnkiContentProps) {
     const list: VocabularyCard[] = [];
     const showAllChaps =
       filterChapters === "all" ||
-      (filterChapters as Set<any>).has("all") ||
-      (filterChapters as Set<any>).size === 0;
+      !(filterChapters instanceof Set) ||
+      filterChapters.has("all") ||
+      filterChapters.size === 0;
     const showAllPts =
       filterPoints === "all" ||
-      (filterPoints as Set<any>).has("all") ||
-      (filterPoints as Set<any>).size === 0;
+      !(filterPoints instanceof Set) ||
+      filterPoints.has("all") ||
+      filterPoints.size === 0;
 
     dekiruGroups.forEach((chap: any, cIdx: number) => {
       const chapterNumber = cIdx + 1;
-      if (!showAllChaps && !(filterChapters as Set<any>).has(String(chapterNumber))) {
+      if (
+        !showAllChaps &&
+        filterChapters instanceof Set &&
+        !filterChapters.has(String(chapterNumber))
+      ) {
         return;
       }
 
       chap.sections.forEach((sect: any, sIdx: number) => {
         const pointNumber = sIdx + 1;
-        if (!showAllPts && !(filterPoints as Set<any>).has(String(pointNumber))) {
+        if (
+          !showAllPts &&
+          filterPoints instanceof Set &&
+          !filterPoints.has(String(pointNumber))
+        ) {
           return;
         }
 
@@ -247,7 +309,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     });
 
     return list;
-  }, [filterChapters, filterPoints]);
+  }, [filterChapters, filterPoints, dekiruGroups]);
 
   // Klasifikasikan kartu menjadi: Due (Review) atau New (Baru)
   const cardStats = useMemo(() => {
@@ -350,23 +412,30 @@ export function AnkiContent({ username }: AnkiContentProps) {
       const now = new Date();
       if (mode === "due") {
         // Ambil yang jatuh tempo saja
-        queue = filteredVocabulary.filter((card) => {
+        let dueCards = filteredVocabulary.filter((card) => {
           const prog = progressMap[card.cardKey];
           if (!prog) return false; // Abaikan yang baru
           return new Date(prog.dueDate) <= now;
         });
+        if (dailyReviewLimit !== "unlimited") {
+          dueCards = dueCards.slice(0, Number(dailyReviewLimit));
+        }
+        queue = dueCards;
       } else {
-        // Campur: Ambil yang jatuh tempo dahulu, baru yang Baru (maksimal 20 kartu baru)
-        const dueCards = filteredVocabulary.filter((card) => {
+        // Campur: Ambil yang jatuh tempo dahulu, baru yang Baru (maksimal limit kartu baru)
+        let dueCards = filteredVocabulary.filter((card) => {
           const prog = progressMap[card.cardKey];
           return prog && new Date(prog.dueDate) <= now;
         });
+        if (dailyReviewLimit !== "unlimited") {
+          dueCards = dueCards.slice(0, Number(dailyReviewLimit));
+        }
 
         const newCards = filteredVocabulary
           .filter((card) => {
             return !progressMap[card.cardKey];
           })
-          .slice(0, 20); // Batasi 20 kartu baru per sesi
+          .slice(0, dailyNewCardsLimit); // Batasi kartu baru per sesi berdasarkan konfigurasi
 
         queue = [...dueCards, ...newCards];
       }
@@ -384,7 +453,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
   };
 
   // Kirim semua review yang tertunda ke API dalam satu batch
-  const triggerSaveBatch = async (reviewsToSave: typeof pendingReviews, isFullBatch = true) => {
+  const triggerSaveBatch = async (
+    reviewsToSave: typeof pendingReviews,
+    isFullBatch = true,
+  ) => {
     if (reviewsToSave.length === 0) return;
     try {
       const res = await fetch("/api/anki", {
@@ -400,10 +472,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
         // Perbarui cache progress lokal dengan semua data baru
         setProgressMap((prev) => {
           const nextMap = { ...prev };
-          const progressList = Array.isArray(json.progress) 
-            ? json.progress 
-            : json.progress 
-              ? [json.progress] 
+          const progressList = Array.isArray(json.progress)
+            ? json.progress
+            : json.progress
+              ? [json.progress]
               : [];
           progressList.forEach((item: SRSProgress) => {
             nextMap[item.cardKey] = item;
@@ -549,76 +621,14 @@ export function AnkiContent({ username }: AnkiContentProps) {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Modal>
-                <button
-                  type="button"
-                  className="flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer text-sm font-bold shrink-0"
-                  title={t.ankiGuideTitle || "Panduan Penilaian SRS"}
-                >
-                  ❗
-                </button>
-                <Modal.Backdrop>
-                  <Modal.Container>
-                    <Modal.Dialog className="sm:max-w-lg">
-                      <Modal.CloseTrigger />
-                      <Modal.Header>
-                        <Modal.Heading>
-                          💡 {t.ankiGuideTitle || "Panduan Penilaian SRS"}
-                        </Modal.Heading>
-                      </Modal.Header>
-                      <Modal.Body className="text-xs leading-relaxed flex flex-col gap-3">
-                        <p className="text-muted mb-1">
-                          {t.ankiGuideDesc ||
-                            "Pelajari bagaimana pilihan spaced repetition memengaruhi interval kartu."}
-                        </p>
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/5">
-                            <span className="shrink-0 bg-red-500 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
-                              Again
-                            </span>
-                            <span className="text-foreground">
-                              {t.ankiGuideAgain ||
-                                "Ulangi (Again): Lupa total. Repetisi direset ke 0, interval menjadi 1 hari, nilai ease berkurang."}
-                            </span>
-                          </div>
-                          <div className="flex items-start gap-2.5 p-3 rounded-xl border border-amber-500/20 bg-amber-500/5">
-                            <span className="shrink-0 bg-amber-500 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
-                              Hard
-                            </span>
-                            <span className="text-foreground">
-                              {t.ankiGuideHard ||
-                                "Susah (Hard): Ingat dengan sulit. Interval lebih pendek (1.2x), nilai ease berkurang sedikit."}
-                            </span>
-                          </div>
-                          <div className="flex items-start gap-2.5 p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5">
-                            <span className="shrink-0 bg-indigo-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
-                              Good
-                            </span>
-                            <span className="text-foreground">
-                              {t.ankiGuideGood ||
-                                "Biasa (Good): Ingat dengan wajar. Interval dikalikan nilai ease, nilai ease tetap."}
-                            </span>
-                          </div>
-                          <div className="flex items-start gap-2.5 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
-                            <span className="shrink-0 bg-emerald-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
-                              Easy
-                            </span>
-                            <span className="text-foreground">
-                              {t.ankiGuideEasy ||
-                                "Mudah (Easy): Ingat sangat cepat. Interval dikalikan nilai ease & bonus (1.3x), nilai ease bertambah."}
-                            </span>
-                          </div>
-                        </div>
-                      </Modal.Body>
-                      <Modal.Footer>
-                        <Button slot="close" variant="primary" size="sm" className="font-semibold cursor-pointer">
-                          Tutup
-                        </Button>
-                      </Modal.Footer>
-                    </Modal.Dialog>
-                  </Modal.Container>
-                </Modal.Backdrop>
-              </Modal>
+              <button
+                type="button"
+                onClick={() => setIsGuideOpen(true)}
+                className="flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer text-sm font-bold shrink-0"
+                title={t.ankiGuideTitle || "Panduan Penilaian SRS"}
+              >
+                ❗
+              </button>
               <SettingsDropdown />
             </div>
           </div>
@@ -667,7 +677,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Filter Bab */}
                     <div className="flex flex-col gap-1.5">
-                      <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterChapter || "Filter Bab"}</Label>
+                      <Label className="text-xs font-semibold text-muted block mb-1.5">
+                        {t.ankiFilterChapter || "Filter Bab"}
+                      </Label>
                       <Popover>
                         <Popover.Trigger>
                           <button
@@ -680,18 +692,34 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             <span className="text-muted ml-2 text-xs">▼</span>
                           </button>
                         </Popover.Trigger>
-                        <Popover.Content placement="bottom start" className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
+                        <Popover.Content
+                          placement="bottom start"
+                          className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50"
+                        >
                           <Popover.Dialog className="outline-none">
-                            <ListBox selectionMode="multiple" selectedKeys={filterChapters} onSelectionChange={handleChapterSelectionChange}>
-                              <ListBox.Item id="all" textValue={t.ankiAllChapters || "Semua Bab"} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
+                            <ListBox
+                              selectionMode="multiple"
+                              selectedKeys={filterChapters}
+                              onSelectionChange={handleChapterSelectionChange}
+                            >
+                              <ListBox.Item
+                                id="all"
+                                textValue={t.ankiAllChapters || "Semua Bab"}
+                                className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                              >
                                 {t.ankiAllChapters || "Semua Bab"}
                                 <ListBox.ItemIndicator />
                               </ListBox.Item>
                               {Array.from({ length: 15 }, (_, i) => {
                                 const chapNum = String(i + 1);
-                               const title = `Bab ${chapNum} — ${dekiruGroups[i]?.title || ""}`;
+                                const title = `Bab ${chapNum} — ${dekiruGroups[i]?.title || ""}`;
                                 return (
-                                  <ListBox.Item key={chapNum} id={chapNum} textValue={title} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
+                                  <ListBox.Item
+                                    key={chapNum}
+                                    id={chapNum}
+                                    textValue={title}
+                                    className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                                  >
                                     {title}
                                     <ListBox.ItemIndicator />
                                   </ListBox.Item>
@@ -705,7 +733,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
                     {/* Filter Poin */}
                     <div className="flex flex-col gap-1.5">
-                      <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiFilterPoint || "Filter Poin"}</Label>
+                      <Label className="text-xs font-semibold text-muted block mb-1.5">
+                        {t.ankiFilterPoint || "Filter Poin"}
+                      </Label>
                       <Popover>
                         <Popover.Trigger>
                           <button
@@ -718,15 +748,31 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             <span className="text-muted ml-2 text-xs">▼</span>
                           </button>
                         </Popover.Trigger>
-                        <Popover.Content placement="bottom start" className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50">
+                        <Popover.Content
+                          placement="bottom start"
+                          className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50"
+                        >
                           <Popover.Dialog className="outline-none">
-                            <ListBox selectionMode="multiple" selectedKeys={filterPoints} onSelectionChange={handlePointSelectionChange}>
-                              <ListBox.Item id="all" textValue={t.ankiAllPoints || "Semua Poin"} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
+                            <ListBox
+                              selectionMode="multiple"
+                              selectedKeys={filterPoints}
+                              onSelectionChange={handlePointSelectionChange}
+                            >
+                              <ListBox.Item
+                                id="all"
+                                textValue={t.ankiAllPoints || "Semua Poin"}
+                                className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                              >
                                 {t.ankiAllPoints || "Semua Poin"}
                                 <ListBox.ItemIndicator />
                               </ListBox.Item>
                               {availablePointsOptions.map((opt) => (
-                                <ListBox.Item key={opt.id} id={opt.id} textValue={opt.title} className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none">
+                                <ListBox.Item
+                                  key={opt.id}
+                                  id={opt.id}
+                                  textValue={opt.title}
+                                  className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                                >
                                   {opt.title}
                                   <ListBox.ItemIndicator />
                                 </ListBox.Item>
@@ -738,36 +784,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     </div>
                   </div>
 
-                  {/* Mode Penyimpanan Progres */}
-                  <div className="flex flex-col gap-1.5 border-t border-border pt-4">
-                    <Label className="text-xs font-semibold text-muted block mb-1.5">{t.ankiPostSettingLabel || "Mode Penyimpanan Progres"}</Label>
-                    <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
-                      <button
-                        type="button"
-                        onClick={() => handlePostModeChange("session")}
-                        className={[
-                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
-                          postMode === "session"
-                            ? "bg-surface text-foreground shadow-sm"
-                            : "text-muted hover:text-foreground",
-                        ].join(" ")}
-                      >
-                        💾 {t.ankiPostSettingSession || "Simpan Selesai Sesi"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handlePostModeChange("card")}
-                        className={[
-                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
-                          postMode === "card"
-                            ? "bg-surface text-foreground shadow-sm"
-                            : "text-muted hover:text-foreground",
-                        ].join(" ")}
-                      >
-                        ⚡ {t.ankiPostSettingCard || "Simpan Langsung Per Kartu"}
-                      </button>
-                    </div>
-                  </div>
+                  {/* Inline settings removed (moved to settings modal) */}
 
                   {ankiMode === "srs" ? (
                     <>
@@ -792,22 +809,22 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       </div>
 
                       {/* Tombol Mulai Sesi SRS */}
-                      <div className="flex flex-col sm:flex-row gap-3 border-t border-border pt-4">
+                      <div className="flex flex-row gap-3 border-t border-border pt-4">
                         <Button
                           variant="secondary"
-                          className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer"
+                          className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer text-xs sm:text-sm"
                           onClick={() => startSession("due")}
                           isDisabled={cardStats.due === 0}
                         >
-                          🚀 Review Kartu Jatuh Tempo ({cardStats.due})
+                          🚀 Review ({cardStats.due})
                         </Button>
                         <Button
                           variant="primary"
-                          className="font-semibold shadow-xs flex-1 cursor-pointer"
+                          className="font-semibold shadow-xs flex-1 cursor-pointer text-xs sm:text-sm"
                           onClick={() => startSession("all")}
                           isDisabled={filteredVocabulary.length === 0}
                         >
-                          ✨ Pelajari Campuran / Semua (
+                          ✨ Pelajari (
                           {Math.min(
                             filteredVocabulary.length,
                             cardStats.due + 20,
@@ -842,6 +859,17 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       </div>
                     </>
                   )}
+
+                  {/* Button Pengaturan Anki */}
+                  <div className="flex border-t border-border pt-4">
+                    <Button
+                      variant="secondary"
+                      className="font-semibold shadow-xs w-full cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-foreground border border-border"
+                      onClick={() => setIsSettingsOpen(true)}
+                    >
+                      ⚙️ Pengaturan Sesi Anki
+                    </Button>
+                  </div>
                 </Card>
 
                 {/* List Kanji yang Sudah Dipelajari */}
@@ -1108,7 +1136,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
       </div>
 
       {/* Modal Detail Kanji */}
-      <Modal isOpen={selectedKanji !== null} onOpenChange={(open) => { if (!open) setSelectedKanji(null); }}>
+      <Modal
+        isOpen={selectedKanji !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedKanji(null);
+        }}
+      >
         <Modal.Backdrop>
           <Modal.Container>
             <Modal.Dialog className="sm:max-w-md">
@@ -1140,7 +1173,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           Kanji "{selectedKanji}"
                         </p>
                         <p className="text-[10px] text-muted mt-0.5">
-                          Ditemukan di {(selectedKanjiDetail as any).vocabWords.length} kosakata yang sedang dipelajari
+                          Ditemukan di{" "}
+                          {(selectedKanjiDetail as any).vocabWords.length}{" "}
+                          kosakata yang sedang dipelajari
                         </p>
                       </div>
                     </div>
@@ -1153,28 +1188,40 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         </p>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
                           <div>
-                            <span className="text-muted font-medium block text-[10px]">Kunyomi (訓読み):</span>
-                            <span className={[
-                              "font-jp font-semibold text-foreground text-xs transition-all duration-200",
-                              showReadings ? "" : "blur-sm select-none"
-                            ].join(" ")}>
+                            <span className="text-muted font-medium block text-[10px]">
+                              Kunyomi (訓読み):
+                            </span>
+                            <span
+                              className={[
+                                "font-jp font-semibold text-foreground text-xs transition-all duration-200",
+                                showReadings ? "" : "blur-sm select-none",
+                              ].join(" ")}
+                            >
                               {kanjiDbInfo.kunyomi.join(", ") || "-"}
                             </span>
                           </div>
                           <div>
-                            <span className="text-muted font-medium block text-[10px]">Onyomi (音読み):</span>
-                            <span className={[
-                              "font-jp font-semibold text-foreground text-xs transition-all duration-200",
-                              showReadings ? "" : "blur-sm select-none"
-                            ].join(" ")}>
+                            <span className="text-muted font-medium block text-[10px]">
+                              Onyomi (音読み):
+                            </span>
+                            <span
+                              className={[
+                                "font-jp font-semibold text-foreground text-xs transition-all duration-200",
+                                showReadings ? "" : "blur-sm select-none",
+                              ].join(" ")}
+                            >
                               {kanjiDbInfo.onyomi || "-"}
                             </span>
                           </div>
                         </div>
                         <div className="border-t border-border/60 mt-1.5 pt-1.5">
-                          <span className="text-muted font-medium block text-[10px]">Arti (Meaning):</span>
+                          <span className="text-muted font-medium block text-[10px]">
+                            Arti (Meaning):
+                          </span>
                           <span className="font-medium text-foreground text-xs">
-                            {lang === "id" ? kanjiDbInfo.meaningId : kanjiDbInfo.meaningEn}
+                            {lang === "id"
+                              ? kanjiDbInfo.meaningId
+                              : kanjiDbInfo.meaningEn}
                           </span>
                         </div>
                       </div>
@@ -1185,46 +1232,57 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         Kosakata Terkait:
                       </p>
                       <div className="grid grid-cols-1 gap-2">
-                        {(selectedKanjiDetail as any).vocabWords.map((v: any, idx: number) => (
-                          <div
-                            key={idx}
-                            className="flex flex-col gap-1 p-2.5 rounded-xl bg-surface-muted/50 border border-border"
-                          >
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex flex-col gap-0.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-jp font-bold text-sm text-foreground">
-                                    {v.word}
-                                  </span>
-                                  <span className={[
-                                    "font-jp text-xs text-indigo-500 font-semibold transition-all duration-200",
-                                    showReadings ? "" : "blur-sm select-none"
-                                  ].join(" ")}>
-                                    〔{v.reading}〕
+                        {(selectedKanjiDetail as any).vocabWords.map(
+                          (v: any, idx: number) => (
+                            <div
+                              key={idx}
+                              className="flex flex-col gap-1 p-2.5 rounded-xl bg-surface-muted/50 border border-border"
+                            >
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex flex-col gap-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-jp font-bold text-sm text-foreground">
+                                      {v.word}
+                                    </span>
+                                    <span
+                                      className={[
+                                        "font-jp text-xs text-indigo-500 font-semibold transition-all duration-200",
+                                        showReadings
+                                          ? ""
+                                          : "blur-sm select-none",
+                                      ].join(" ")}
+                                    >
+                                      〔{v.reading}〕
+                                    </span>
+                                  </div>
+                                  <span className="text-muted text-[10px]">
+                                    {v.meaning}
                                   </span>
                                 </div>
-                                <span className="text-muted text-[10px]">
-                                  {v.meaning}
-                                </span>
-                              </div>
-                              <div className="flex shrink-0 gap-1 text-[8px] font-bold mt-1">
-                                <span className="bg-indigo-500/10 text-indigo-500 px-1.5 py-0.5 rounded-full">
-                                  Rep: {v.reps}
-                                </span>
-                                <span className="bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-full">
-                                  Int: {v.interval} hari
-                                </span>
+                                <div className="flex shrink-0 gap-1 text-[8px] font-bold mt-1">
+                                  <span className="bg-indigo-500/10 text-indigo-500 px-1.5 py-0.5 rounded-full">
+                                    Rep: {v.reps}
+                                  </span>
+                                  <span className="bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded-full">
+                                    Int: {v.interval} hari
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ),
+                        )}
                       </div>
                     </div>
                   </>
                 )}
               </Modal.Body>
               <Modal.Footer>
-                <Button slot="close" variant="primary" size="sm" className="font-semibold cursor-pointer">
+                <Button
+                  slot="close"
+                  variant="primary"
+                  size="sm"
+                  className="font-semibold cursor-pointer"
+                >
                   Tutup
                 </Button>
               </Modal.Footer>
@@ -1234,7 +1292,15 @@ export function AnkiContent({ username }: AnkiContentProps) {
       </Modal>
 
       {/* Modal Sesi Selesai */}
-      <Modal isOpen={sessionFinished} onOpenChange={(open) => { if (!open) { setSessionQueue([]); setSessionFinished(false); } }}>
+      <Modal
+        isOpen={sessionFinished}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSessionQueue([]);
+            setSessionFinished(false);
+          }
+        }}
+      >
         <Modal.Backdrop>
           <Modal.Container>
             <Modal.Dialog className="sm:max-w-[360px]">
@@ -1255,7 +1321,190 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 </div>
               </Modal.Body>
               <Modal.Footer className="flex justify-center pb-6">
-                <Button slot="close" variant="primary" className="w-full font-semibold cursor-pointer">
+                <Button
+                  slot="close"
+                  variant="primary"
+                  className="w-full font-semibold cursor-pointer"
+                >
+                  Tutup
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
+
+      {/* Modal Pengaturan Anki */}
+      <Modal
+        isOpen={isSettingsOpen}
+        onOpenChange={(open) => setIsSettingsOpen(open)}
+      >
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog className="sm:max-w-md">
+              <Modal.CloseTrigger />
+              <Modal.Header>
+                <Modal.Heading>⚙️ Pengaturan Sesi Anki</Modal.Heading>
+              </Modal.Header>
+              <Modal.Body className="flex flex-col gap-4 text-xs">
+                {/* Mode Penyimpanan Progres */}
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs font-semibold text-muted block mb-1">
+                    Mode Penyimpanan Progres
+                  </Label>
+                  <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
+                    <button
+                      type="button"
+                      onClick={() => handlePostModeChange("session")}
+                      className={[
+                        "flex-1 rounded-lg py-1.5 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                        postMode === "session"
+                          ? "bg-surface text-foreground shadow-sm"
+                          : "text-muted hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      💾 Simpan Selesai Sesi
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handlePostModeChange("card")}
+                      className={[
+                        "flex-1 rounded-lg py-1.5 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                        postMode === "card"
+                          ? "bg-surface text-foreground shadow-sm"
+                          : "text-muted hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      ⚡ Simpan Per Kartu
+                    </button>
+                  </div>
+                </div>
+
+                {/* Daily New Cards Limit */}
+                <div className="flex flex-col gap-1.5 border-t border-border pt-3">
+                  <Label className="text-xs font-semibold text-muted block mb-1">
+                    Daily New Cards (Limit Kartu Baru Per Hari)
+                  </Label>
+                  <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
+                    {[10, 20, 30].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => handleNewCardsLimitChange(num)}
+                        className={[
+                          "flex-1 rounded-lg py-1.5 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                          dailyNewCardsLimit === num
+                            ? "bg-surface text-foreground shadow-sm"
+                            : "text-muted hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        {num}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Daily Review Limit */}
+                <div className="flex flex-col gap-1.5 border-t border-border pt-3">
+                  <Label className="text-xs font-semibold text-muted block mb-1">
+                    Daily Review Limit (Batas Review Per Hari)
+                  </Label>
+                  <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
+                    {["50", "100", "unlimited"].map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => handleReviewLimitChange(val)}
+                        className={[
+                          "flex-1 rounded-lg py-1.5 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                          dailyReviewLimit === val
+                            ? "bg-surface text-foreground shadow-sm"
+                            : "text-muted hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        {val === "unlimited" ? "Unlimited" : val}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  slot="close"
+                  variant="primary"
+                  size="sm"
+                  className="font-semibold cursor-pointer"
+                >
+                  Tutup
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
+
+      {/* Modal Panduan Penilaian SRS */}
+      <Modal isOpen={isGuideOpen} onOpenChange={setIsGuideOpen}>
+        <Modal.Backdrop>
+          <Modal.Container>
+            <Modal.Dialog className="sm:max-w-lg">
+              <Modal.CloseTrigger />
+              <Modal.Header>
+                <Modal.Heading>
+                  💡 {t.ankiGuideTitle || "Panduan Penilaian SRS"}
+                </Modal.Heading>
+              </Modal.Header>
+              <Modal.Body className="text-xs leading-relaxed flex flex-col gap-3">
+                <p className="text-muted mb-1">
+                  {t.ankiGuideDesc ||
+                    "Pelajari bagaimana pilihan spaced repetition memengaruhi interval kartu."}
+                </p>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/5">
+                    <span className="shrink-0 bg-red-500 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                      Again
+                    </span>
+                    <span className="text-foreground">
+                      {t.ankiGuideAgain ||
+                        "Ulangi (Again): Lupa total. Repetisi direset ke 0, interval menjadi 1 hari, nilai ease berkurang."}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2.5 p-3 rounded-xl border border-amber-500/20 bg-amber-500/5">
+                    <span className="shrink-0 bg-amber-500 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                      Hard
+                    </span>
+                    <span className="text-foreground">
+                      {t.ankiGuideHard ||
+                        "Susah (Hard): Ingat dengan sulit. Interval lebih pendek (1.2x), nilai ease berkurang sedikit."}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2.5 p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5">
+                    <span className="shrink-0 bg-indigo-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                      Good
+                    </span>
+                    <span className="text-foreground">
+                      {t.ankiGuideGood ||
+                        "Biasa (Good): Ingat dengan wajar. Interval dikalikan nilai ease, nilai ease tetap."}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2.5 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+                    <span className="shrink-0 bg-emerald-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                      Easy
+                    </span>
+                    <span className="text-foreground">
+                      {t.ankiGuideEasy ||
+                        "Mudah (Easy): Ingat sangat cepat. Interval dikalikan nilai ease & bonus (1.3x), nilai ease bertambah."}
+                    </span>
+                  </div>
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  slot="close"
+                  variant="primary"
+                  size="sm"
+                  className="font-semibold cursor-pointer"
+                >
                   Tutup
                 </Button>
               </Modal.Footer>
