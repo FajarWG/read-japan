@@ -227,11 +227,14 @@ export function AnkiContent({ username }: AnkiContentProps) {
   useEffect(() => {
     async function initAnki() {
       try {
-        // Dynamic import DekiruNihongoGroup to reduce bundle size
-        const mod = await import("@/src/helper/DekiruNihongoGroup");
+        // Fetch DekiruNihongoGroup and user progress in parallel to speed up initialization
+        const [mod, res] = await Promise.all([
+          import("@/src/helper/DekiruNihongoGroup"),
+          fetch("/api/anki"),
+        ]);
+
         setDekiruGroups(mod.DekiruNihongoGroups);
 
-        const res = await fetch("/api/anki");
         if (res.ok) {
           const json = await res.json();
           const pMap: Record<string, SRSProgress> = {};
@@ -636,10 +639,62 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
         {/* LOADING STATE */}
         {loading ? (
-          <div className="flex flex-col items-center gap-3 py-32 text-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-            <p className="text-sm text-muted">Memuat progres flashcard...</p>
-          </div>
+          <main className="mt-6 flex flex-col gap-6">
+            {/* Main Selection Card Skeleton */}
+            <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
+              {/* Switcher Mode Belajar Skeleton */}
+              <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
+                <div className="flex-1 h-8 rounded-lg bg-border/40 dark:bg-zinc-800/40 animate-pulse"></div>
+                <div className="w-1"></div>
+                <div className="flex-1 h-8 rounded-lg bg-border/40 dark:bg-zinc-800/40 animate-pulse"></div>
+              </div>
+
+              {/* Grid Filter Skeleton */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <div className="h-3 w-16 bg-border/40 dark:bg-zinc-800/40 rounded-sm animate-pulse mb-1.5"></div>
+                  <div className="h-[38px] w-full bg-border/40 dark:bg-zinc-800/40 rounded-xl animate-pulse"></div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <div className="h-3 w-16 bg-border/40 dark:bg-zinc-800/40 rounded-sm animate-pulse mb-1.5"></div>
+                  <div className="h-[38px] w-full bg-border/40 dark:bg-zinc-800/40 rounded-xl animate-pulse"></div>
+                </div>
+              </div>
+
+              {/* Stats Skeleton */}
+              <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
+                <div className="h-16 rounded-xl bg-surface-muted/50 border border-border flex flex-col items-center justify-center gap-1.5 p-3">
+                  <div className="h-4 w-8 bg-border/40 dark:bg-zinc-800/40 rounded-md animate-pulse"></div>
+                  <div className="h-2 w-16 bg-border/40 dark:bg-zinc-800/40 rounded-md animate-pulse"></div>
+                </div>
+                <div className="h-16 rounded-xl bg-surface-muted/50 border border-border flex flex-col items-center justify-center gap-1.5 p-3">
+                  <div className="h-4 w-8 bg-border/40 dark:bg-zinc-800/40 rounded-md animate-pulse"></div>
+                  <div className="h-2 w-12 bg-border/40 dark:bg-zinc-800/40 rounded-md animate-pulse"></div>
+                </div>
+              </div>
+
+              {/* Buttons Skeleton */}
+              <div className="flex flex-row gap-3 border-t border-border pt-4">
+                <div className="h-9 flex-1 bg-border/40 dark:bg-zinc-800/40 rounded-xl animate-pulse"></div>
+                <div className="h-9 flex-1 bg-border/40 dark:bg-zinc-800/40 rounded-xl animate-pulse"></div>
+              </div>
+            </Card>
+
+            {/* List Kanji Section Skeleton */}
+            <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
+              <div className="flex flex-col gap-1 border-b border-border pb-3">
+                <div className="h-4 w-48 bg-border/40 dark:bg-zinc-800/40 rounded-md animate-pulse"></div>
+                <div className="h-2 w-72 bg-border/40 dark:bg-zinc-800/40 rounded-md mt-1 animate-pulse"></div>
+              </div>
+              <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10 mt-2">
+                {Array.from({ length: 16 }).map((_, i) => (
+                  <div key={i} className="aspect-square min-h-[48px] rounded-xl border border-border bg-surface/50 animate-pulse flex items-center justify-center">
+                    <div className="h-5 w-5 bg-border/30 dark:bg-zinc-800/30 rounded-md"></div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </main>
         ) : (
           <main className="mt-6">
             {/* TAMPILAN SELEKSI DECK / FILTER (Jika sesi belajar belum aktif) */}
