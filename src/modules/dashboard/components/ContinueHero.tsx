@@ -92,18 +92,18 @@ export function ContinueHero({
             </div>
           </Link>
 
-          {/* Kotoba Flex */}
+          {/* Katsuyou */}
           <Link
-            href="/kotoba-flex"
+            href="/katsuyou"
             className="group flex flex-col gap-1.5 rounded-2xl border border-border bg-surface p-4 shadow-xs transition-all duration-150 hover:border-emerald-400/50 hover:bg-emerald-50/5 dark:hover:bg-emerald-950/10 hover:shadow-md cursor-pointer"
           >
             <span className="text-2xl group-hover:scale-110 transition-transform w-fit select-none">🔄</span>
             <div className="min-w-0">
               <p className="text-xs sm:text-sm font-bold text-foreground leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                Kotoba Flex
+                Katsuyou (活用)
               </p>
               <p className="text-[10px] sm:text-[11px] text-muted line-clamp-2 mt-0.5 leading-snug">
-                {lang === "en" ? "Verb conjugator practice tool." : "Alat latihan konjugasi kata kerja."}
+                {lang === "en" ? "Verb conjugation practice & SRS." : "Latihan konjugasi kata kerja & SRS."}
               </p>
             </div>
           </Link>

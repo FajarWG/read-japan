@@ -20,16 +20,24 @@ export function splitVerbConjugation(
   formKey: keyof VerbConjugations
 ): SplitConjugation {
   const conj = verb.conjugations[formKey];
+  if (!conj) {
+    return {
+      kanji: { stem: verb.kanji, suffix: "" },
+      kana: { stem: verb.kana, suffix: "" },
+      romaji: { stem: verb.romaji, suffix: "" },
+    };
+  }
 
   // 1. Group 3 Irregular Verbs (suru and kuru)
   if (verb.id === "kuru") {
-    const stems = {
+    const stemsMap: Record<string, { kanji: string; kana: string; romaji: string }> = {
       dictionary: { kanji: "来", kana: "く", romaji: "ku" },
       masu: { kanji: "来", kana: "き", romaji: "ki" },
       te: { kanji: "来", kana: "き", romaji: "ki" },
       nai: { kanji: "来", kana: "こ", romaji: "ko" },
       ta: { kanji: "来", kana: "き", romaji: "ki" },
-    }[formKey];
+    };
+    const stems = stemsMap[formKey] || { kanji: "来", kana: "こ", romaji: "ko" };
     return {
       kanji: { stem: stems.kanji, suffix: conj.kanji.slice(stems.kanji.length) },
       kana: { stem: stems.kana, suffix: conj.kana.slice(stems.kana.length) },
@@ -38,13 +46,14 @@ export function splitVerbConjugation(
   }
 
   if (verb.id === "suru") {
-    const stems = {
+    const stemsMap: Record<string, { kanji: string; kana: string; romaji: string }> = {
       dictionary: { kanji: "す", kana: "す", romaji: "su" },
       masu: { kanji: "し", kana: "し", romaji: "shi" },
       te: { kanji: "し", kana: "し", romaji: "shi" },
       nai: { kanji: "し", kana: "し", romaji: "shi" },
       ta: { kanji: "し", kana: "し", romaji: "shi" },
-    }[formKey];
+    };
+    const stems = stemsMap[formKey] || { kanji: "し", kana: "し", romaji: "shi" };
     return {
       kanji: { stem: stems.kanji, suffix: conj.kanji.slice(stems.kanji.length) },
       kana: { stem: stems.kana, suffix: conj.kana.slice(stems.kana.length) },

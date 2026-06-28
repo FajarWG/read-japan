@@ -66,6 +66,11 @@ model User {
   jlptAttempts    JLPTAttempt[]
   achievements    UserAchievement[]
   chatMessages    ChatMessage[]
+  
+  katsuyouProgress         KatsuyouLessonProgress[]
+  katsuyouReviewCards      KatsuyouReviewCard[]
+  katsuyouReviewLogs       KatsuyouReviewLog[]
+  katsuyouPracticeAttempts KatsuyouPracticeAttempt[]
 }
 
 // ─────────────────────────────────────────
@@ -337,3 +342,74 @@ model ChatMessage {
 
   @@index([userId, createdAt])
 }
+
+// ─────────────────────────────────────────
+// Tabel: KatsuyouLessonProgress
+// Melacak pelajaran konjugasi kata kerja yang selesai per user
+// ─────────────────────────────────────────
+model KatsuyouLessonProgress {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conjugationForm String   // e.g. "masu", "te", "ta", etc.
+  completed       Boolean  @default(true)
+  completedAt     DateTime @default(now())
+
+  @@unique([userId, conjugationForm])
+}
+
+// ─────────────────────────────────────────
+// Tabel: KatsuyouReviewCard
+// Melacak progres flashcard konjugasi kata kerja (SRS) per user
+// ─────────────────────────────────────────
+model KatsuyouReviewCard {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verbId          String   // e.g., "iku", "taberu"
+  conjugationForm String   // e.g., "te", "ta", "masu", etc.
+  repetitions     Int      @default(0)
+  easeFactor      Float    @default(2.5)
+  interval        Int      @default(0) // dalam hari
+  nextReview      DateTime @default(now())
+  lastReviewed    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, verbId, conjugationForm])
+  @@index([userId, nextReview])
+}
+
+// ─────────────────────────────────────────
+// Tabel: KatsuyouReviewLog
+// Menyimpan log riwayat review SRS konjugasi
+// ─────────────────────────────────────────
+model KatsuyouReviewLog {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verbId          String
+  conjugationForm String
+  rating          String   // "easy" | "good" | "hard"
+  repetitions     Int
+  easeFactor      Float
+  interval        Int
+  reviewedAt      DateTime @default(now())
+}
+
+// ─────────────────────────────────────────
+// Tabel: KatsuyouPracticeAttempt
+// Menyimpan riwayat percobaan latihan (Practice) per user
+// ─────────────────────────────────────────
+model KatsuyouPracticeAttempt {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verbId          String
+  conjugationForm String
+  exerciseType    String   // "type_a" | "type_b" | "type_c" | "type_d"
+  isCorrect       Boolean
+  userAnswer      String
+  createdAt       DateTime @default(now())
+}
+

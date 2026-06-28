@@ -16,11 +16,11 @@ export function HomeDashboard() {
       subtitle: "Choose a feature below to start your Japanese learning journey.",
       features: [
         {
-          id: "kotoba-flex",
-          title: "Kotoba Flex",
+          id: "katsuyou",
+          title: "Katsuyou (活用)",
           subtitle: "Verb Conjugation",
-          desc: "Master verb conjugations (N5-N3) with automatic conjugator, grammar guides, and flashcard practice quizzes.",
-          route: "/kotoba-flex",
+          desc: "Master Japanese verb conjugations with interactive guides, sentence examples, practice exercises, and a built-in SRS review system.",
+          route: "/katsuyou",
           icon: "🔄",
           badge: "New",
           color: "border-indigo-500/20 hover:border-indigo-500/60 dark:hover:bg-indigo-950/10 hover:shadow-indigo-500/10",
@@ -74,11 +74,11 @@ export function HomeDashboard() {
       subtitle: "Pilih fitur di bawah ini untuk memulai perjalanan belajar bahasa Jepang Anda.",
       features: [
         {
-          id: "kotoba-flex",
-          title: "Kotoba Flex",
+          id: "katsuyou",
+          title: "Katsuyou (活用)",
           subtitle: "Perubahan Kata Kerja",
-          desc: "Kuasai konjugasi kata kerja (N5-N3) dengan tabel konjugasi otomatis, panduan aturan, dan kuis kartu flashcard.",
-          route: "/kotoba-flex",
+          desc: "Kuasai konjugasi kata kerja Jepang dengan panduan interaktif, contoh kalimat, latihan kuis, dan sistem review SRS.",
+          route: "/katsuyou",
           icon: "🔄",
           badge: "Baru",
           color: "border-indigo-500/20 hover:border-indigo-500/60 dark:hover:bg-indigo-950/10 hover:shadow-indigo-500/10",
