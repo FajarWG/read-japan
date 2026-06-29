@@ -89,7 +89,7 @@ export function KatsuyouDashboard() {
       statsPractice: "Practices Logged",
     },
     id: {
-      title: "Katsuyou — Konjugasi Kata Kerja",
+      title: "Katsuyou",
       subtitle:
         "Kuasai perubahan kata kerja Jepang dengan panduan interaktif, latihan kuis, dan SRS.",
       backHome: "Kembali ke Beranda",
