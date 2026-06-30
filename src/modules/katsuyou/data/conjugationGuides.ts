@@ -99,6 +99,86 @@ export const CONJUGATION_GUIDES: Record<string, ConjugationGuideData> = {
         exampleKana: "しんぱいすることはありませんよ。",
         exampleEn: "There is no need to worry.",
         exampleId: "Tidak perlu khawatir kok."
+      },
+      {
+        pattern: "～こと",
+        jlpt: "N5",
+        descEn: "Turns a verb into a noun clause (nominalization).",
+        descId: "Mengubah kata kerja menjadi frasa kata benda (nominalisasi).",
+        exampleJp: "私の趣味は映画を見ることです。",
+        exampleKana: "わたしのしゅみはえいがをみることです。",
+        exampleEn: "My hobby is watching movies.",
+        exampleId: "Hobi saya adalah menonton film."
+      },
+      {
+        pattern: "～前に (～まえに)",
+        jlpt: "N5",
+        descEn: "Indicates that action A happens before action B.",
+        descId: "Menunjukkan bahwa tindakan A terjadi sebelum tindakan B.",
+        exampleJp: "ご飯を食べる前に、薬を飲みます。",
+        exampleKana: "ごはんをたべるまえに、くすりをのみます。",
+        exampleEn: "Before eating a meal, I take medicine.",
+        exampleId: "Sebelum makan nasi, saya minum obat."
+      },
+      {
+        pattern: "～と",
+        jlpt: "N4",
+        descEn: "Indicates a natural consequence or conditional ('When/If you do X, Y happens').",
+        descId: "Menunjukkan konsekuensi alami atau pengandaian ('Ketika/Jika melakukan X, Y akan terjadi').",
+        exampleJp: "このボタンを押すと、水が出ます。",
+        exampleKana: "このぼたんをおすと、みずがでます。",
+        exampleEn: "When you press this button, water comes out.",
+        exampleId: "Jika menekan tombol ini, air akan keluar."
+      },
+      {
+        pattern: "～と思う (意見・推量)",
+        jlpt: "N5",
+        descEn: "Expresses a personal opinion or conjecture ('I think that...').",
+        descId: "Menyatakan pendapat pribadi atau dugaan ('Saya pikir/kira...').",
+        exampleJp: "東京の地下鉄は複雑だと思います。",
+        exampleKana: "とうきょうのちかてつはふくざつだとおモいます。",
+        exampleEn: "I think Tokyo's subway system is complicated.",
+        exampleId: "Saya pikir kereta bawah tanah Tokyo rumit."
+      },
+      {
+        pattern: "～と言う (～という)",
+        jlpt: "N5",
+        descEn: "Used to report someone's words or quote a phrase ('to say that...').",
+        descId: "Digunakan untuk melaporkan perkataan seseorang atau mengutip sebuah frasa ('mengatakan bahwa...').",
+        exampleJp: "「おいしい」は英語で「delicious」と言います。",
+        exampleKana: "「おいしい」はえいごで「delicious」といいます。",
+        exampleEn: "'Oishii' is said as 'delicious' in English.",
+        exampleId: "「Oishii」 dalam bahasa Inggris diucapkan 「delicious」."
+      },
+      {
+        pattern: "～そうだ (伝聞)",
+        jlpt: "N4",
+        descEn: "Expresses hearsay or reports information heard from another source ('I heard that...').",
+        descId: "Menyatakan kabar angin atau melaporkan informasi yang didengar dari sumber lain ('Kabarnya...', 'Katanya...').",
+        exampleJp: "明日、台風が来るそうです。",
+        exampleKana: "あした、たいふうがくるそうです。",
+        exampleEn: "I heard that a typhoon is coming tomorrow.",
+        exampleId: "Kabarnya besok topan akan datang."
+      },
+      {
+        pattern: "～とき (辞書形)",
+        jlpt: "N5",
+        descEn: "Indicates the time when an action takes place.",
+        descId: "Menunjukkan waktu ketika suatu tindakan terjadi.",
+        exampleJp: "料理を作るとき、本を見ます。",
+        exampleKana: "りょうりをつくるとき、ほんをみます。",
+        exampleEn: "When I make a dish, I look at a book.",
+        exampleId: "Ketika membuat masakan, saya melihat buku."
+      },
+      {
+        pattern: "～名詞 (修飾 - 辞書形)",
+        jlpt: "N5",
+        descEn: "Modifies a noun using a verb in dictionary form.",
+        descId: "Memodifikasi kata benda menggunakan kata kerja bentuk kamus.",
+        exampleJp: "これは私がよく読む雑誌です。",
+        exampleKana: "これはわたしがよくよむざっしです。",
+        exampleEn: "This is a magazine that I read often.",
+        exampleId: "Ini adalah majalah yang sering saya baca."
       }
     ]
   },
@@ -162,6 +242,76 @@ export const CONJUGATION_GUIDES: Record<string, ConjugationGuideData> = {
         exampleKana: "このぺんはかきやすいです。",
         exampleEn: "This pen is easy to write with.",
         exampleId: "Pena ini mudah ditulis."
+      },
+      {
+        pattern: "～ます / ～ません",
+        jlpt: "N5",
+        descEn: "Expresses polite present or future action/state.",
+        descId: "Menyatakan tindakan atau keadaan masa kini atau masa depan dalam bentuk sopan.",
+        exampleJp: "アンナさんは毎日、朝ご飯を食べますか。 —— いいえ、食べません。",
+        exampleKana: "アンナさんはまいにち、あさごはんをたべますか。 —— いいえ、たべません。",
+        exampleEn: "Does Anna eat breakfast every day? —— No, she does not.",
+        exampleId: "Apakah Anna makan sarapan setiap hari? —— Tidak, dia tidak makan sarapan."
+      },
+      {
+        pattern: "～ました / ～ませんでした",
+        jlpt: "N5",
+        descEn: "Expresses polite past action/state.",
+        descId: "Menyatakan tindakan atau keadaan masa lampau dalam bentuk sopan.",
+        exampleJp: "昨日、勉強しませんでした。",
+        exampleKana: "きのう、べんきょうしませんでした。",
+        exampleEn: "Yesterday, I did not study.",
+        exampleId: "Kemarin, saya tidak belajar."
+      },
+      {
+        pattern: "～に行きます / 来ます / 帰ります",
+        jlpt: "N5",
+        descEn: "Expresses the purpose of going, coming, or returning to a place.",
+        descId: "Menyatakan tujuan pergi, datang, atau pulang ke suatu tempat.",
+        exampleJp: "週末、友達と渋谷へお酒を飲みに行きます。",
+        exampleKana: "しゅうまつ、ともだちとしぶやへおさけをのみにいきます。",
+        exampleEn: "On the weekend, I will go to Shibuya with my friend to drink alcohol.",
+        exampleId: "Akhir pekan, saya pergi ke Shibuya dengan teman untuk minum alkohol."
+      },
+      {
+        pattern: "～ませんか",
+        jlpt: "N5",
+        descEn: "Polite invitation or suggestion ('Won't you do...?').",
+        descId: "Ajakan atau saran yang sopan ('Bagaimana kalau kita...?').",
+        exampleJp: "今晩、一緒にご飯を食べに行きませんか。",
+        exampleKana: "こんばん、いっしょにごはんをたべにいきませんか。",
+        exampleEn: "Would you like to go eat a meal together tonight?",
+        exampleId: "Bagaimana kalau malam ini kita pergi makan bersama?"
+      },
+      {
+        pattern: "～ましょう",
+        jlpt: "N5",
+        descEn: "Polite proposal or agreement ('Let's do...').",
+        descId: "Ajakan atau kesepakatan yang sopan ('Mari kita...').",
+        exampleJp: "5時に会いましょう。",
+        exampleKana: "ごじにあいましょう。",
+        exampleEn: "Let's meet at 5 o'clock.",
+        exampleId: "Mari bertemu jam 5."
+      },
+      {
+        pattern: "～ましょうか",
+        jlpt: "N5",
+        descEn: "Offering to do something for the listener ('Shall I do...?').",
+        descId: "Menawarkan bantuan untuk melakukan sesuatu ('Bagaimana jika saya bantu...?').",
+        exampleJp: "手伝いましょうか。",
+        exampleKana: "てつだいまようか。",
+        exampleEn: "Shall I help you?",
+        exampleId: "Bagaimana kalau saya bantu?"
+      },
+      {
+        pattern: "～方 (～かた)",
+        jlpt: "N4",
+        descEn: "Expresses the way or method of doing something.",
+        descId: "Menyatakan cara atau metode melakukan sesuatu.",
+        exampleJp: "料理の作り方を教えてください。",
+        exampleKana: "りょうりのつくりかたをおしえてください。",
+        exampleEn: "Please teach me how to make this dish.",
+        exampleId: "Tolong ajarkan saya cara membuat masakan ini."
       }
     ]
   },
@@ -246,6 +396,56 @@ export const CONJUGATION_GUIDES: Record<string, ConjugationGuideData> = {
         exampleKana: "いま、ほんをよんでいます。",
         exampleEn: "I am reading a book right now.",
         exampleId: "Saya sedang membaca buku sekarang."
+      },
+      {
+        pattern: "～て、～",
+        jlpt: "N5",
+        descEn: "Connects multiple actions in chronological order.",
+        descId: "Menghubungkan beberapa tindakan secara berurutan.",
+        exampleJp: "週末、友達とご飯を食べて、映画を見ます。",
+        exampleKana: "しゅうまつ、ともだちとごはんをたべて、えいがをみます。",
+        exampleEn: "On the weekend, I will eat with my friend and watch a movie.",
+        exampleId: "Akhir pekan, saya makan bersama teman lalu menonton film."
+      },
+      {
+        pattern: "～てから",
+        jlpt: "N5",
+        descEn: "Indicates that action B happens after action A finishes.",
+        descId: "Menunjukkan bahwa tindakan B terjadi setelah tindakan A selesai.",
+        exampleJp: "歯を磨いてから、寝ます。",
+        exampleKana: "はをみがいてから、ねます。",
+        exampleEn: "After brushing my teeth, I go to sleep.",
+        exampleId: "Setelah menggosok gigi, saya tidur."
+      },
+      {
+        pattern: "まだ ～ていません",
+        jlpt: "N5",
+        descEn: "Expresses that an action has not been done yet.",
+        descId: "Menyatakan bahwa suatu tindakan belum dilakukan.",
+        exampleJp: "まだ昼ご飯を食べていません。",
+        exampleKana: "まだひるごはんをたべていません。",
+        exampleEn: "I have not eaten lunch yet.",
+        exampleId: "Saya belum makan siang."
+      },
+      {
+        pattern: "～てきます",
+        jlpt: "N4",
+        descEn: "Indicates doing an action and returning, or going somewhere to do something and coming back.",
+        descId: "Menunjukkan pergi untuk melakukan sesuatu lalu kembali.",
+        exampleJp: "コンビニでジュースを買ってきます。",
+        exampleKana: "こんびにでじゅーすをかってきます。",
+        exampleEn: "I will go buy some juice at the convenience store (and come back).",
+        exampleId: "Saya pergi membeli jus di minimarket sebentar (lalu kembali)."
+      },
+      {
+        pattern: "～ても",
+        jlpt: "N5",
+        descEn: "Expresses 'even if' or 'although' for concessive conditions.",
+        descId: "Menyatakan 'meskipun' atau 'walaupun' untuk kondisi konsesif.",
+        exampleJp: "雨が降っても、試合はあります。",
+        exampleKana: "あめがふっても、しあいはあります。",
+        exampleEn: "Even if it rains, there will be a match.",
+        exampleId: "Meskipun hujan turun, pertandingan tetap ada."
       }
     ]
   },
@@ -298,6 +498,46 @@ export const CONJUGATION_GUIDES: Record<string, ConjugationGuideData> = {
         exampleKana: "はやくねたほうがいいですよ。",
         exampleEn: "You should go to sleep early.",
         exampleId: "Lebih baik kamu tidur cepat."
+      },
+      {
+        pattern: "～たり ～たりする",
+        jlpt: "N5",
+        descEn: "Lists actions as examples among others, without chronological order.",
+        descId: "Menyebutkan beberapa tindakan sebagai contoh tanpa urutan kronologis.",
+        exampleJp: "休みの日、家で本を読んだり音楽を聞いたりしています。",
+        exampleKana: "やすみのひ、いえでほんをよんだりおんがくをきいたりしています。",
+        exampleEn: "On my days off, I do things like reading books and listening to music at home.",
+        exampleId: "Pada hari libur, saya membaca buku dan mendengarkan musik di rumah."
+      },
+      {
+        pattern: "～たら",
+        jlpt: "N5",
+        descEn: "Indicates conditional condition ('If/When...').",
+        descId: "Menunjukkan kondisi pengandaian ('Jika/Ketika...').",
+        exampleJp: "時間があったら、映画を見に行きませんか。",
+        exampleKana: "じかんがあったら、えいがをみにいきませんか。",
+        exampleEn: "If you have time, would you like to go watch a movie?",
+        exampleId: "Jika ada waktu, bagaimana kalau kita pergi menonton film?"
+      },
+      {
+        pattern: "～とき (タ形)",
+        jlpt: "N5",
+        descEn: "Indicates the time when an action was completed.",
+        descId: "Menunjukkan waktu ketika suatu tindakan telah selesai.",
+        exampleJp: "イタリアへ行ったとき、この帽子を買いました。",
+        exampleKana: "イタリアへいったとき、このぼうしをかいました。",
+        exampleEn: "When I went to Italy, I bought this hat.",
+        exampleId: "Ketika pergi ke Italia, saya membeli topi ini."
+      },
+      {
+        pattern: "～名詞 (修飾 - タ形)",
+        jlpt: "N5",
+        descEn: "Modifies a noun using a verb in past plain form.",
+        descId: "Memodifikasi kata benda menggunakan kata kerja bentuk lampau biasa.",
+        exampleJp: "これは私が昨日食べたケーキです。",
+        exampleKana: "これはわたしがきのうたべたケーキです。",
+        exampleEn: "This is the cake that I ate yesterday.",
+        exampleId: "Ini adalah kue yang saya makan kemarin."
       }
     ]
   },
@@ -369,6 +609,36 @@ export const CONJUGATION_GUIDES: Record<string, ConjugationGuideData> = {
         exampleKana: "むりしてこなくてもいいですよ。",
         exampleEn: "You don't have to push yourself to come.",
         exampleId: "Kamu tidak harus memaksakan diri datang."
+      },
+      {
+        pattern: "～ないほうがいい",
+        jlpt: "N4",
+        descEn: "Gives advice not to do something (it is better not to do X).",
+        descId: "Memberikan nasihat/saran untuk tidak melakukan sesuatu (lebih baik tidak melakukan X).",
+        exampleJp: "あまりお酒を飲まないほうがいいです。",
+        exampleKana: "あまりおさけをのまないほうがいいです。",
+        exampleEn: "You should not drink too much alcohol.",
+        exampleId: "Lebih baik tidak terlalu banyak minum minuman beralkohol."
+      },
+      {
+        pattern: "～とき (ナイ形)",
+        jlpt: "N5",
+        descEn: "Indicates the time when an action does not take place.",
+        descId: "Menunjukkan waktu ketika suatu tindakan tidak terjadi.",
+        exampleJp: "アルバイトがないとき、友達と遊びます。",
+        exampleKana: "アルバイトがないとき、ともだちとあそびます。",
+        exampleEn: "When there is no part-time job, I play with friends.",
+        exampleId: "Ketika tidak ada kerja paruh waktu, saya bermain dengan teman."
+      },
+      {
+        pattern: "～名詞 (修飾 - ナイ形)",
+        jlpt: "N5",
+        descEn: "Modifies a noun using a verb in negative plain form.",
+        descId: "Memodifikasi kata benda menggunakan kata kerja bentuk negatif biasa.",
+        exampleJp: "行かない場所を教えてください。",
+        exampleKana: "いかないばしょをおしえてください。",
+        exampleEn: "Please tell me the places you do not go to.",
+        exampleId: "Tolong beri tahu saya tempat yang tidak kamu datangi."
       }
     ]
   },

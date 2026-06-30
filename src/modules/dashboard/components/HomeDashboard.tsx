@@ -25,10 +25,7 @@ interface HomeDashboardProps {
  * 3. Rekomendasi cerita (top 2) — quick links
  * 4. ProgressDashboard (full) — stats, chart, achievements, weak words, etc.
  */
-export function HomeDashboard({
-  summary,
-  progressStats,
-}: HomeDashboardProps) {
+export function HomeDashboard({ summary, progressStats }: HomeDashboardProps) {
   const { t } = useLanguage();
 
   return (
@@ -50,12 +47,6 @@ export function HomeDashboard({
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <Link
-                href="/stories"
-                className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-surface-muted transition-colors"
-              >
-                📚 {t.navStories}
-              </Link>
               <SettingsDropdown />
             </div>
           </div>
@@ -64,12 +55,7 @@ export function HomeDashboard({
         {/* ── Main ────────────────────────────────────────── */}
         <main className="px-4 py-6">
           {/* Continue Hero */}
-          <ContinueHero
-            summary={summary}
-            progressAnchor="progress-section"
-          />
-
-
+          <ContinueHero summary={summary} progressAnchor="progress-section" />
 
           {/* Full Progress Dashboard */}
           <section id="progress-section" className="scroll-mt-4">

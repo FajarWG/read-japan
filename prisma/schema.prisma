@@ -71,6 +71,7 @@ model User {
   katsuyouReviewCards      KatsuyouReviewCard[]
   katsuyouReviewLogs       KatsuyouReviewLog[]
   katsuyouPracticeAttempts KatsuyouPracticeAttempt[]
+  bunpouProgress           BunpouProgress[]
 }
 
 // ─────────────────────────────────────────
@@ -411,5 +412,20 @@ model KatsuyouPracticeAttempt {
   isCorrect       Boolean
   userAnswer      String
   createdAt       DateTime @default(now())
+}
+
+// ─────────────────────────────────────────
+// Tabel: BunpouProgress
+// Melacak pola tata bahasa Bunpou yang selesai dipelajari per user
+// ─────────────────────────────────────────
+model BunpouProgress {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patternId String
+  completed Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, patternId])
 }
 

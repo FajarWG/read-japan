@@ -66,6 +66,17 @@ export function HomeDashboard() {
           color: "border-rose-500/20 hover:border-rose-500/60 dark:hover:bg-rose-950/10 hover:shadow-rose-500/10",
           iconColor: "text-rose-500",
         },
+        {
+          id: "bunpou",
+          title: "Bunpou (文法)",
+          subtitle: "Grammar & Particles",
+          desc: "Study basic textbook structures, particles, adjectives, and expressions (Chapters 1–15) with search and local progress tracking.",
+          route: "/bunpou",
+          icon: "📚",
+          badge: "New",
+          color: "border-violet-500/20 hover:border-violet-500/60 dark:hover:bg-violet-950/10 hover:shadow-violet-500/10",
+          iconColor: "text-violet-500",
+        },
       ],
       footerDesc: "Nihongo Flow is an open-source platform designed to make Japanese learning accessible.",
     },
@@ -124,6 +135,17 @@ export function HomeDashboard() {
           color: "border-rose-500/20 hover:border-rose-500/60 dark:hover:bg-rose-950/10 hover:shadow-rose-500/10",
           iconColor: "text-rose-500",
         },
+        {
+          id: "bunpou",
+          title: "Bunpou (文法)",
+          subtitle: "Tata Bahasa & Partikel",
+          desc: "Pelajari pola kalimat dasar, partikel, kata sifat, dan struktur non-konjugasi dari Bab 1–15 dengan pelacakan kemajuan mandiri.",
+          route: "/bunpou",
+          icon: "📚",
+          badge: "Baru",
+          color: "border-violet-500/20 hover:border-violet-500/60 dark:hover:bg-violet-950/10 hover:shadow-violet-500/10",
+          iconColor: "text-violet-500",
+        },
       ],
       footerDesc: "Nihongo Flow adalah platform open-source gratis untuk mempermudah belajar bahasa Jepang.",
     },
@@ -168,7 +190,7 @@ export function HomeDashboard() {
                 href={feature.route}
                 id={`feature-card-${feature.id}`}
                 className={[
-                  "group relative overflow-hidden rounded-2xl border bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between min-h-[140px]",
+                  "group relative overflow-hidden rounded-2xl border bg-surface p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between min-h-[175px]",
                   feature.color,
                 ].join(" ")}
               >
@@ -194,6 +216,13 @@ export function HomeDashboard() {
                       {feature.desc}
                     </p>
                   </div>
+                </div>
+
+                {/* Bottom Action Button */}
+                <div className="mt-4 flex items-center justify-end text-[10px] font-extrabold text-accent select-none">
+                  <span className="px-3 py-1.5 rounded-xl bg-accent/5 border border-accent/15 group-hover:bg-accent group-hover:text-accent-foreground transition-all duration-200">
+                    {lang === "en" ? "Explore →" : "Buka Fitur →"}
+                  </span>
                 </div>
               </Link>
             ))}
