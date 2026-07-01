@@ -112,8 +112,24 @@ export async function getBunpouQuestions(patternId: string) {
   }
 }
 
+// Helper to get all grammar patterns defined BEFORE the current patternId (same chapter or lower chapters)
+function getPreviousPatterns(patternId: string): string[] {
+  const list: string[] = [];
+  for (const lesson of BUNPOU_DATA) {
+    for (const p of lesson.patterns) {
+      if (p.id === patternId) {
+        return list;
+      }
+      list.push(`- "${p.pattern}" (ID: ${p.id}): ${p.descEn} / ${p.descId}`);
+    }
+  }
+  return list;
+}
+
 /**
- * Generate 10 new practice questions using Gemini, save to DB, and return.
+ * Generate 15 new practice questions using Gemini, save to DB, and return.
+ * 5 questions strictly target the pattern.
+ * 10 questions combine the pattern with previous patterns in the curriculum.
  */
 export async function generateBunpouQuestions(patternId: string) {
   const pattern = findPatternById(patternId);
@@ -121,9 +137,18 @@ export async function generateBunpouQuestions(patternId: string) {
     throw new Error(`Pattern with ID "${patternId}" not found in local data`);
   }
 
+  const previousPatternsList = getPreviousPatterns(patternId).join("\n");
+
   const systemPrompt = `You are a professional Japanese language educator.
-Generate exactly 10 sentence scrambling exercises for the Japanese grammar pattern: "${pattern.pattern}"
+Generate exactly 15 sentence scrambling exercises for the Japanese grammar pattern: "${pattern.pattern}" (ID: "${patternId}")
 Description: ${pattern.descEn} / ${pattern.descId}
+
+Pedagogical Structure:
+- Exactly 5 questions must strictly target this grammar pattern in a simple, isolated way.
+- Exactly 10 questions must target this grammar pattern, but COMBINED with one or more previous grammar patterns from earlier in the curriculum.
+
+${previousPatternsList ? `Here are the previous grammar patterns you can combine with (for the 10 combined questions):
+${previousPatternsList}` : 'No previous patterns are available (this is the first pattern in the curriculum). So all 15 questions should target this pattern.'}
 
 Each exercise MUST follow this JSON structure:
 {
@@ -138,9 +163,9 @@ Rules:
 1. The "words" array must contain the components of the "sentenceJp" in scrambled order. When joined in the correct order, they must EXACTLY match the "sentenceJp" string (excluding spaces).
 2. The "sentenceKana" must correspond exactly to the "sentenceJp" reading.
 3. The sentences should use appropriate JLPT N5/N4 vocabulary.
-4. Return the response strictly as a JSON array of exactly 10 objects. Do not include markdown formatting or explanations.`;
+4. Return the response strictly as a JSON array of exactly 15 objects. Do not include markdown formatting or explanations.`;
 
-  const userMessage = `Generate 10 sentence scrambling questions for pattern: "${patternId}" ("${pattern.pattern}").`;
+  const userMessage = `Generate exactly 15 sentence scrambling questions (5 isolated target-only, 10 combined with previous patterns if available) for: "${patternId}" ("${pattern.pattern}").`;
 
   try {
     // Call Gemini (automatic rate-limiting & fallback)

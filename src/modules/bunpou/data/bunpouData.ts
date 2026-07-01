@@ -41,16 +41,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Saya adalah seorang pelajar."
           },
           {
-            "exampleJp": "ここは私の学校です。",
-            "exampleKana": "ここはわたしのがっこうです。",
-            "exampleEn": "This place is my school.",
-            "exampleId": "Tempat ini adalah sekolah saya."
+            "exampleJp": "これは私の本です。",
+            "exampleKana": "これはわたしのほんです。",
+            "exampleEn": "This is my book.",
+            "exampleId": "Ini adalah buku saya."
           },
           {
-            "exampleJp": "彼は日本人です。",
-            "exampleKana": "かれはにほんじんです。",
-            "exampleEn": "He is Japanese.",
-            "exampleId": "Dia adalah orang Jepang."
+            "exampleJp": "それは日本の車です。",
+            "exampleKana": "それはにほんのくるまです。",
+            "exampleEn": "That is a Japanese car.",
+            "exampleId": "Itu adalah mobil Jepang."
           }
         ]
       },
@@ -62,22 +62,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan apakah N1 adalah N2.",
         "examples": [
           {
-            "exampleJp": "あなたは田中さんですか。",
-            "exampleKana": "あなたはたなかさんですか。",
-            "exampleEn": "Are you Mr./Ms. Tanaka?",
-            "exampleId": "Apakah Anda Tanaka-san?"
+            "exampleJp": "あなたは学生ですか。",
+            "exampleKana": "あなたはがくせいですか。",
+            "exampleEn": "Are you a student?",
+            "exampleId": "Apakah Anda seorang pelajar?"
           },
           {
-            "exampleJp": "それは辞書ですか。",
-            "exampleKana": "それはじしょですか。",
-            "exampleEn": "Is that a dictionary?",
-            "exampleId": "Apakah itu kamus?"
+            "exampleJp": "それはあなたの本ですか。",
+            "exampleKana": "それはあなたのほんですか。",
+            "exampleEn": "Is that your book?",
+            "exampleId": "Apakah itu buku Anda?"
           },
           {
-            "exampleJp": "これはあなたの本ですか。",
-            "exampleKana": "これはあなたのほんですか。",
-            "exampleEn": "Is this your book?",
-            "exampleId": "Apakah ini buku Anda?"
+            "exampleJp": "それは日本の車ですか。",
+            "exampleKana": "それはにほんのくるまですか。",
+            "exampleEn": "Is that a Japanese car?",
+            "exampleId": "Apakah itu mobil Jepang?"
           }
         ]
       },
@@ -89,22 +89,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan di mana / kapan / apa itu N.",
         "examples": [
           {
-            "exampleJp": "トイレはどちらですか。",
-            "exampleKana": "トイレはどちらですか。",
+            "exampleJp": "トイレはどこですか。",
+            "exampleKana": "トイレはどこですか。",
             "exampleEn": "Where is the restroom?",
             "exampleId": "Di mana toiletnya?"
           },
           {
-            "exampleJp": "誕生日はいつですか。",
-            "exampleKana": "たんじょうびはいつですか。",
+            "exampleJp": "あなたの誕生日はいつですか。",
+            "exampleKana": "あなたのたんじょうびはいつですか。",
             "exampleEn": "When is your birthday?",
             "exampleId": "Kapan ulang tahun Anda?"
           },
           {
-            "exampleJp": "趣味は何ですか。",
-            "exampleKana": "しゅみはなんですか。",
-            "exampleEn": "What is your hobby?",
-            "exampleId": "Apa hobi Anda?"
+            "exampleJp": "これは何ですか。",
+            "exampleKana": "これはなんですか。",
+            "exampleEn": "What is this?",
+            "exampleId": "Apa ini?"
           }
         ]
       },
@@ -116,22 +116,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menunjukkan kepemilikan, asal, atau hubungan.",
         "examples": [
           {
-            "exampleJp": "これは先生の傘です。",
-            "exampleKana": "これはせんせいのかさです。",
-            "exampleEn": "This is the teacher's umbrella.",
-            "exampleId": "Ini adalah payung guru."
+            "exampleJp": "これは私の先生の辞書です。",
+            "exampleKana": "これはわたしのせんせいのじしょです。",
+            "exampleEn": "This is my teacher's dictionary.",
+            "exampleId": "Ini adalah kamus guru saya."
           },
           {
-            "exampleJp": "私は日本の大学の学生です。",
-            "exampleKana": "わたしはにほんのだいがくのがくせいです。",
-            "exampleEn": "I am a student at a Japanese university.",
-            "exampleId": "Saya adalah mahasiswa universitas di Jepang."
+            "exampleJp": "それは日本の大学の本ですか。",
+            "exampleKana": "それはにほんだいがくのほんですか。",
+            "exampleEn": "Is that a book from a Japanese university?",
+            "exampleId": "Apakah itu buku dari universitas Jepang?"
           },
           {
-            "exampleJp": "それは私の友達のノートです。",
-            "exampleKana": "それはわたしのともだちのノートです。",
-            "exampleEn": "That is my friend's notebook.",
-            "exampleId": "Itu adalah buku catatan teman saya."
+            "exampleJp": "田中さんの車はどれですか。",
+            "exampleKana": "たなかさんのくるまはどれですか。",
+            "exampleEn": "Which one is Mr. Tanaka's car?",
+            "exampleId": "Yang mana mobil milik Pak Tanaka?"
           }
         ]
       },
@@ -143,22 +143,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menghubungkan kata benda ('N1 dan N2').",
         "examples": [
           {
-            "exampleJp": "机の上にペンとノートがあります。",
-            "exampleKana": "つくえのうえにぺんとのーとがあります。",
-            "exampleEn": "There is a pen and a notebook on the desk.",
-            "exampleId": "Ada pulpen dan buku catatan di atas meja."
+            "exampleJp": "ペンとノートを買いました。",
+            "exampleKana": "ぺんとのおーとをかいました。",
+            "exampleEn": "I bought a pen and a notebook.",
+            "exampleId": "Saya membeli pulpen dan buku catatan."
           },
           {
-            "exampleJp": "私はりんごとバナナが好きです。",
-            "exampleKana": "わたしはりんごとばなながすきです。",
-            "exampleEn": "I like apples and bananas.",
-            "exampleId": "Saya suka apel dan pisang."
+            "exampleJp": "机の上に本とペンがあります。",
+            "exampleKana": "つくえのうえにほんとぺんがあります。",
+            "exampleEn": "There is a book and a pen on the desk.",
+            "exampleId": "Ada buku dan pulpen di atas meja."
           },
           {
-            "exampleJp": "昨日、兄と公園へ行きました。",
-            "exampleKana": "きのう、あにとこうえんへいきました。",
-            "exampleEn": "I went to the park with my older brother yesterday.",
-            "exampleId": "Kemarin, saya pergi ke taman bersama kakak laki-laki saya."
+            "exampleJp": "明日、田中さんと佐藤さんと会います。",
+            "exampleKana": "あした、たなかさんとさとうさんとあいます。",
+            "exampleEn": "I will meet Mr. Tanaka and Mr. Sato tomorrow.",
+            "exampleId": "Besok, saya akan bertemu dengan Pak Tanaka dan Pak Sato."
           }
         ]
       },
@@ -170,22 +170,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menunjukkan arti 'juga' atau 'pun'.",
         "examples": [
           {
-            "exampleJp": "私も日本へ行きたいです。",
-            "exampleKana": "わたしもにほんへいきたいです。",
-            "exampleEn": "I also want to go to Japan.",
-            "exampleId": "Saya juga ingin pergi ke Jepang."
+            "exampleJp": "私も行きます。",
+            "exampleKana": "わたしもいきます。",
+            "exampleEn": "I will go too.",
+            "exampleId": "Saya juga akan pergi."
           },
           {
-            "exampleJp": "コーヒーも紅茶も飲みます。",
-            "exampleKana": "こーひーもこうちゃものみます。",
-            "exampleEn": "I drink both coffee and tea.",
-            "exampleId": "Saya minum kopi maupun teh."
+            "exampleJp": "ペンを買いました。ノートも買いました。",
+            "exampleKana": "ぺんをかいました。のおーともかいました。",
+            "exampleEn": "I bought a pen. I also bought a notebook.",
+            "exampleId": "Saya membeli pulpen. Saya juga membeli buku catatan."
           },
           {
-            "exampleJp": "今日は日曜日です。休みも楽しいです。",
-            "exampleKana": "きょうはにちようびです。やすみもたのしいです。",
-            "exampleEn": "Today is Sunday. A day off is also fun.",
-            "exampleId": "Hari ini hari Minggu. Hari libur juga menyenangkan."
+            "exampleJp": "机の上に本があります。ペンもあります。",
+            "exampleKana": "つくえのうえにほんがあります。ぺんもあります。",
+            "exampleEn": "There is a book on the desk. There is a pen too.",
+            "exampleId": "Ada buku di atas meja. Ada pulpen juga."
           }
         ]
       }
@@ -205,19 +205,19 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "examples": [
           {
             "exampleJp": "これは私の本です。",
-            "exampleKana": "これはわたしのほんです。",
+            "exampleKana": "これはわたし　の　ほん　です。",
             "exampleEn": "This is my book.",
             "exampleId": "Ini adalah buku saya."
           },
           {
             "exampleJp": "それは何ですか。",
-            "exampleKana": "それはなんですか。",
+            "exampleKana": "それ　は　なん　です　か。",
             "exampleEn": "What is that (near you)?",
-            "exampleId": "Itu (yang di dekatmu) apa?"
+            "exampleId": "Apa itu (di dekat Anda)?"
           },
           {
             "exampleJp": "あれは学校です。",
-            "exampleKana": "あれはがっこうです。",
+            "exampleKana": "あれ　は　がっこう　です。",
             "exampleEn": "That (over there) is the school.",
             "exampleId": "Itu (di sana) adalah sekolah."
           }
@@ -231,22 +231,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata tunjuk yang memodifikasi kata benda secara langsung.",
         "examples": [
           {
-            "exampleJp": "この傘は私のです。",
-            "exampleKana": "このかさはわたしのです。",
-            "exampleEn": "This umbrella is mine.",
-            "exampleId": "Payung ini milik saya."
+            "exampleJp": "この本は面白いです。",
+            "exampleKana": "この　ほん　は　おもしろい　です。",
+            "exampleEn": "This book is interesting.",
+            "exampleId": "Buku ini menarik."
           },
           {
             "exampleJp": "そのペンは誰のですか。",
-            "exampleKana": "そのぺんはだれのですか。",
+            "exampleKana": "その　ぺん　は　だれ　の　です　か。",
             "exampleEn": "Whose pen is that?",
             "exampleId": "Pena itu milik siapa?"
           },
           {
-            "exampleJp": "あの車は新しいです。",
-            "exampleKana": "あのくるまはあたらしいです。",
-            "exampleEn": "That car over there is new.",
-            "exampleId": "Mobil itu (di sana) baru."
+            "exampleJp": "あの車はとても速いです。",
+            "exampleKana": "あの　くるま　は　とても　はやい　です。",
+            "exampleEn": "That car over there is very fast.",
+            "exampleId": "Mobil di sana itu sangat cepat."
           }
         ]
       },
@@ -258,22 +258,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata tunjuk tempat (sini, situ, sana, mana).",
         "examples": [
           {
-            "exampleJp": "ここは私の部屋です。",
-            "exampleKana": "ここはわたしのへやです。",
-            "exampleEn": "This is my room.",
-            "exampleId": "Di sini adalah kamar saya."
+            "exampleJp": "ここは私の教室です。",
+            "exampleKana": "ここ　は　わたし　の　きょうしつ　です。",
+            "exampleEn": "This is my classroom.",
+            "exampleId": "Ini adalah ruang kelas saya."
           },
           {
-            "exampleJp": "トイレはそこです。",
-            "exampleKana": "といれはそこです。",
-            "exampleEn": "The restroom is there (near you).",
-            "exampleId": "Toilet ada di sana (dekat Anda)."
+            "exampleJp": "トイレはどこですか。",
+            "exampleKana": "といれ　は　どこ　です　か。",
+            "exampleEn": "Where is the restroom?",
+            "exampleId": "Di mana toiletnya?"
           },
           {
-            "exampleJp": "郵便局はどこですか。",
-            "exampleKana": "ゆうびんきょくはどこですか。",
-            "exampleEn": "Where is the post office?",
-            "exampleId": "Kantor pos di mana?"
+            "exampleJp": "そこはあそこより近いです。",
+            "exampleKana": "そこ　は　あそこ　より　ちかい　です。",
+            "exampleEn": "That place (near you) is closer than that place (over there).",
+            "exampleId": "Tempat di situ lebih dekat daripada tempat di sana."
           }
         ]
       },
@@ -285,22 +285,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Meminta barang secara sopan ('Tolong berikan N').",
         "examples": [
           {
-            "exampleJp": "水をお願いします。",
-            "exampleKana": "みずをおねがいします。",
-            "exampleEn": "Water, please.",
-            "exampleId": "Tolong berikan airnya."
+            "exampleJp": "水をください。",
+            "exampleKana": "みず　を　ください。",
+            "exampleEn": "Please give me water.",
+            "exampleId": "Tolong beri saya air."
           },
           {
-            "exampleJp": "このパンをください。",
-            "exampleKana": "このぱんをください。",
-            "exampleEn": "Please give me this bread.",
-            "exampleId": "Tolong berikan roti ini."
+            "exampleJp": "このペンをください。",
+            "exampleKana": "この　ぺん　を　ください。",
+            "exampleEn": "Please give me this pen.",
+            "exampleId": "Tolong beri saya pena ini."
           },
           {
-            "exampleJp": "メニューをください。",
-            "exampleKana": "めにゅーをください。",
-            "exampleEn": "Please give me the menu.",
-            "exampleId": "Tolong berikan menunya."
+            "exampleJp": "あそこのパンをください。",
+            "exampleKana": "あそこ　の　ぱん　を　ください。",
+            "exampleEn": "Please give me that bread (over there).",
+            "exampleId": "Tolong beri saya roti yang di sana itu."
           }
         ]
       },
@@ -318,16 +318,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Berapa harga kamus ini?"
           },
           {
-            "exampleJp": "そのりんごはいくらですか。",
-            "exampleKana": "そのりんごはいくらですか。",
-            "exampleEn": "How much is that apple?",
-            "exampleId": "Berapa harga apel itu?"
+            "exampleJp": "その赤い時計はいくらですか。",
+            "exampleKana": "そのあかいとけいはいくらですか。",
+            "exampleEn": "How much is that red watch?",
+            "exampleId": "Berapa harga jam tangan merah itu?"
           },
           {
-            "exampleJp": "この靴はいくらですか。",
-            "exampleKana": "このくつはいくらですか。",
-            "exampleEn": "How much are these shoes?",
-            "exampleId": "Berapa harga sepatu ini?"
+            "exampleJp": "あの新しいカメラはいくらですか。",
+            "exampleKana": "あのあたらしいかめらはいくらですか。",
+            "exampleEn": "How much is that new camera over there?",
+            "exampleId": "Berapa harga kamera baru di sana itu?"
           }
         ]
       },
@@ -339,22 +339,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan isi atau jenis ('N apa? / N tentang apa?').",
         "examples": [
           {
-            "exampleJp": "それは何の雑誌ですか。",
-            "exampleKana": "それはなんのざっしですか。",
-            "exampleEn": "What kind of magazine is that?",
-            "exampleId": "Itu majalah tentang apa?"
+            "exampleJp": "それは何の本ですか。",
+            "exampleKana": "それはなんのほんですか。",
+            "exampleEn": "What kind of book is that?",
+            "exampleId": "Itu buku tentang apa?"
           },
           {
-            "exampleJp": "これは何の鍵ですか。",
-            "exampleKana": "これはなんのかぎですか。",
-            "exampleEn": "What is this key for?",
-            "exampleId": "Ini kunci untuk apa?"
+            "exampleJp": "これは何の雑誌ですか。",
+            "exampleKana": "これはなんのざっしですか。",
+            "exampleEn": "What kind of magazine is this?",
+            "exampleId": "Ini majalah tentang apa?"
           },
           {
-            "exampleJp": "それは何の勉強ですか。",
-            "exampleKana": "それはなんのべんきょうですか。",
-            "exampleEn": "What are you studying?",
-            "exampleId": "Itu belajar tentang apa?"
+            "exampleJp": "その高い辞書は何の辞書ですか。",
+            "exampleKana": "そのたかいじしょはなんのじしょですか。",
+            "exampleEn": "What kind of dictionary is that expensive dictionary?",
+            "exampleId": "Kamus apa kamus mahal itu?"
           }
         ]
       },
@@ -366,22 +366,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan asal negara atau pembuat ('N buatan mana?').",
         "examples": [
           {
-            "exampleJp": "それはどこの国の車ですか。",
-            "exampleKana": "それはどこのくにのくるまですか。",
-            "exampleEn": "Which country is that car from?",
-            "exampleId": "Itu mobil buatan negara mana?"
-          },
-          {
-            "exampleJp": "これはどこの会社の時計ですか。",
-            "exampleKana": "これはどこのかいしゃのとけいですか。",
-            "exampleEn": "Which company is this watch from?",
-            "exampleId": "Ini jam tangan dari perusahaan mana?"
-          },
-          {
             "exampleJp": "それはどこの靴ですか。",
             "exampleKana": "それはどこのくつですか。",
             "exampleEn": "Where are those shoes from?",
-            "exampleId": "Itu sepatu dari mana?"
+            "exampleId": "Sepatu itu buatan mana?"
+          },
+          {
+            "exampleJp": "このパソコンはどこのパソコンですか。",
+            "exampleKana": "このぱそこんはどこのぱそこんですか。",
+            "exampleEn": "Where is this computer from?",
+            "exampleId": "Komputer ini buatan mana?"
+          },
+          {
+            "exampleJp": "そのどこのカメラもいくらですか。",
+            "exampleKana": "そのどこのかめらもいくらですか。",
+            "exampleEn": "How much are those cameras from anywhere?",
+            "exampleId": "Berapa harga kamera dari mana pun itu?"
           }
         ]
       },
@@ -393,22 +393,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan kepemilikan ('N milik siapa?').",
         "examples": [
           {
-            "exampleJp": "これは誰の傘ですか。",
-            "exampleKana": "これはだれのかさですか。",
-            "exampleEn": "Whose umbrella is this?",
-            "exampleId": "Ini payung milik siapa?"
+            "exampleJp": "それは誰の傘ですか。",
+            "exampleKana": "それはだれのかさですか。",
+            "exampleEn": "Whose umbrella is that?",
+            "exampleId": "Itu payung milik siapa?"
           },
           {
-            "exampleJp": "それは誰のノートですか。",
-            "exampleKana": "それはだれのノートですか。",
-            "exampleEn": "Whose notebook is that?",
-            "exampleId": "Itu buku catatan milik siapa?"
+            "exampleJp": "このどこの時計が誰の時計ですか。",
+            "exampleKana": "このどこのとけいがだれのとけいですか。",
+            "exampleEn": "Whose watch is this watch from that place?",
+            "exampleId": "Jam tangan dari tempat itu ini milik siapa?"
           },
           {
-            "exampleJp": "あれは誰の鞄ですか。",
-            "exampleKana": "あれはだれのかばんですか。",
-            "exampleEn": "Whose bag is that over there?",
-            "exampleId": "Itu tas milik siapa?"
+            "exampleJp": "その何の雑誌は誰の雑誌ですか。",
+            "exampleKana": "そのなんのざっしはだれのざっしですか。",
+            "exampleEn": "Whose magazine is that magazine about?",
+            "exampleId": "Majalah tentang itu milik siapa?"
           }
         ]
       },
@@ -421,21 +421,21 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "examples": [
           {
             "exampleJp": "日本語で話してください。",
-            "exampleKana": "にほんごではなしてください。",
+            "exampleKana": "にほんごで はなして ください。",
             "exampleEn": "Please speak in Japanese.",
             "exampleId": "Tolong bicara dalam bahasa Jepang."
           },
           {
-            "exampleJp": "この手紙は英語で書いてあります。",
-            "exampleKana": "このてがみはえいごでかいてあります。",
-            "exampleEn": "This letter is written in English.",
-            "exampleId": "Surat ini ditulis dalam bahasa Inggris."
+            "exampleJp": "この本は英語で書いてあります。",
+            "exampleKana": "この ほんは えいごで かいて あります。",
+            "exampleEn": "This book is written in English.",
+            "exampleId": "Buku ini ditulis dalam bahasa Inggris."
           },
           {
-            "exampleJp": "先生はインドネシア語で説明しました。",
-            "exampleKana": "せんせいはいんどねしあごでせつめいしました。",
-            "exampleEn": "The teacher explained in Indonesian.",
-            "exampleId": "Guru menjelaskan dalam bahasa Indonesia."
+            "exampleJp": "日本語で手紙を書きたいです。",
+            "exampleKana": "にほんごで てがみを かきたいです。",
+            "exampleEn": "I want to write a letter in Japanese.",
+            "exampleId": "Saya ingin menulis surat dalam bahasa Jepang."
           }
         ]
       }
@@ -460,16 +460,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Saya belajar bahasa Jepang setiap hari."
           },
           {
-            "exampleJp": "お酒を飲みません。",
-            "exampleKana": "おさけをのみません。",
-            "exampleEn": "I do not drink alcohol.",
-            "exampleId": "Saya tidak minum alkohol."
+            "exampleJp": "朝、コーヒーを飲みません。",
+            "exampleKana": "あさ、こーひーをのみません。",
+            "exampleEn": "I do not drink coffee in the morning.",
+            "exampleId": "Saya tidak minum kopi di pagi hari."
           },
           {
-            "exampleJp": "明日、友達に会います。",
-            "exampleKana": "あした、ともだちにあいます。",
-            "exampleEn": "I will meet a friend tomorrow.",
-            "exampleId": "Saya akan bertemu teman besok."
+            "exampleJp": "明日、新しい本を読みます。",
+            "exampleKana": "あした、あたらしいほんをよみます。",
+            "exampleEn": "I will read a new book tomorrow.",
+            "exampleId": "Saya akan membaca buku baru besok."
           }
         ]
       },
@@ -481,22 +481,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menunjukkan tempat tujuan atau arah perpindahan ('pergi ke N').",
         "examples": [
           {
-            "exampleJp": "明日、学校へ行きます。",
-            "exampleKana": "あした、がっこうへいきます。",
-            "exampleEn": "I will go to school tomorrow.",
-            "exampleId": "Besok saya pergi ke sekolah."
+            "exampleJp": "学校へ行きます。",
+            "exampleKana": "がっこうへいきます。",
+            "exampleEn": "I go to school.",
+            "exampleId": "Saya pergi ke sekolah."
           },
           {
-            "exampleJp": "先週、日本へ行きました。",
-            "exampleKana": "せんしゅう、にほんへいきました。",
-            "exampleEn": "I went to Japan last week.",
-            "exampleId": "Minggu lalu saya pergi ke Jepang."
+            "exampleJp": "図書館へ行きません。",
+            "exampleKana": "としょかんへいきません。",
+            "exampleEn": "I do not go to the library.",
+            "exampleId": "Saya tidak pergi ke perpustakaan."
           },
           {
-            "exampleJp": "一緒にデパートへ行きませんか。",
-            "exampleKana": "いっしょにデパートへいきませんか。",
-            "exampleEn": "Shall we go to the department store together?",
-            "exampleId": "Apakah Anda mau pergi ke toserba bersama?"
+            "exampleJp": "明日、友達とデパートへ行きます。",
+            "exampleKana": "あした、ともだちとでぱーとへいきます。",
+            "exampleEn": "I will go to the department store with my friend tomorrow.",
+            "exampleId": "Besok saya pergi ke toserba bersama teman."
           }
         ]
       },
@@ -509,21 +509,21 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "examples": [
           {
             "exampleJp": "パンを食べます。",
-            "exampleKana": "パンをたべます。",
+            "exampleKana": "ぱんをたべます。",
             "exampleEn": "I eat bread.",
             "exampleId": "Saya makan roti."
           },
           {
-            "exampleJp": "昨日、本を読みました。",
-            "exampleKana": "きのう、ほんをよみました。",
-            "exampleEn": "I read a book yesterday.",
-            "exampleId": "Kemarin saya membaca buku."
+            "exampleJp": "公園で手紙を書きません。",
+            "exampleKana": "こうえんでてがみをかきません。",
+            "exampleEn": "I do not write a letter at the park.",
+            "exampleId": "Saya tidak menulis surat di taman."
           },
           {
-            "exampleJp": "コーヒーを飲みます。",
-            "exampleKana": "コーヒーをのみます。",
-            "exampleEn": "I drink coffee.",
-            "exampleId": "Saya minum kopi."
+            "exampleJp": "学校へ行って、日本語の本を読みます。",
+            "exampleKana": "がっこうへいって、にほんごのほんをよみます。",
+            "exampleEn": "I go to school and read a Japanese book.",
+            "exampleId": "Saya pergi ke sekolah dan membaca buku bahasa Jepang."
           }
         ]
       },
@@ -537,20 +537,20 @@ export const BUNPOU_DATA: BunpouLesson[] = [
           {
             "exampleJp": "七時に起きます。",
             "exampleKana": "しちじにおきます。",
-            "exampleEn": "I wake up at seven o'clock.",
-            "exampleId": "Saya bangun jam tujuh."
+            "exampleEn": "I wake up at 7 o'clock.",
+            "exampleId": "Saya bangun jam 7."
           },
           {
-            "exampleJp": "日曜日に友達に会います。",
-            "exampleKana": "にちようびにともだちにあいます。",
-            "exampleEn": "I will meet a friend on Sunday.",
-            "exampleId": "Saya akan bertemu teman pada hari Minggu."
+            "exampleJp": "八時に学校へ行きません。",
+            "exampleKana": "はちじにがっこうへいきません。",
+            "exampleEn": "I do not go to school at 8 o'clock.",
+            "exampleId": "Saya tidak pergi ke sekolah jam 8."
           },
           {
-            "exampleJp": "十時に寝ます。",
-            "exampleKana": "じゅうじにねます。",
-            "exampleEn": "I go to bed at ten o'clock.",
-            "exampleId": "Saya tidur jam sepuluh."
+            "exampleJp": "九時にデパートへ行って、パンを食べます。",
+            "exampleKana": "くじにでぱーとへいって、ぱんをたべます。",
+            "exampleEn": "I go to the department store at 9 o'clock and eat bread.",
+            "exampleId": "Saya pergi ke toserba jam 9 dan makan roti."
           }
         ]
       },
@@ -562,22 +562,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menunjukkan tempat terjadinya suatu aksi.",
         "examples": [
           {
-            "exampleJp": "私は図書館で勉強します。",
-            "exampleKana": "わたしはとしょかんでべんきょうします。",
-            "exampleEn": "I study at the library.",
-            "exampleId": "Saya belajar di perpustakaan."
+            "exampleJp": "図書館で本を読みます。",
+            "exampleKana": "としょかんでほんをよみます。",
+            "exampleEn": "I read books at the library.",
+            "exampleId": "Saya membaca buku di perpustakaan."
           },
           {
-            "exampleJp": "公園で友達と遊びました。",
-            "exampleKana": "こうえんでともだちとあそびました。",
-            "exampleEn": "I played with my friend at the park.",
+            "exampleJp": "公園で友達と遊びます。",
+            "exampleKana": "こうえんでともだちとあそびます。",
+            "exampleEn": "I play with my friend at the park.",
             "exampleId": "Saya bermain dengan teman di taman."
           },
           {
-            "exampleJp": "駅で切符を買います。",
-            "exampleKana": "えきできっぷをかいます。",
-            "exampleEn": "I will buy a ticket at the station.",
-            "exampleId": "Saya akan membeli tiket di stasiun."
+            "exampleJp": "レストランで晩ご飯を食べます。",
+            "exampleKana": "れすとらんでばんごはんをたべます。",
+            "exampleEn": "I eat dinner at a restaurant.",
+            "exampleId": "Saya makan malam di restoran."
           }
         ]
       },
@@ -589,22 +589,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menunjukkan titik awal dan akhir waktu atau ruang ('dari N sampai N').",
         "examples": [
           {
-            "exampleJp": "学校は八時から三時までです。",
-            "exampleKana": "がっこうははちじからさんじまでです。",
-            "exampleEn": "School is from 8 o'clock to 3 o'clock.",
-            "exampleId": "Sekolah dari jam 8 sampai jam 3."
+            "exampleJp": "家から学校まで歩きます。",
+            "exampleKana": "いえからがっこうまであるきます。",
+            "exampleEn": "I walk from home to school.",
+            "exampleId": "Saya berjalan kaki dari rumah sampai sekolah."
           },
           {
-            "exampleJp": "ここから駅まで歩きます。",
-            "exampleKana": "ここからえきまであるきます。",
-            "exampleEn": "I will walk from here to the station.",
-            "exampleId": "Saya akan berjalan kaki dari sini sampai stasiun."
+            "exampleJp": "九時から五時まで働きます。",
+            "exampleKana": "くじからごじまではたらきます。",
+            "exampleEn": "I work from nine to five.",
+            "exampleId": "Saya bekerja dari jam sembilan sampai jam lima."
           },
           {
-            "exampleJp": "月曜日から金曜日まで働きます。",
-            "exampleKana": "げつようびからきんようびまではたらきます。",
-            "exampleEn": "I work from Monday to Friday.",
-            "exampleId": "Saya bekerja dari hari Senin sampai hari Jumat."
+            "exampleJp": "ここから駅まで歩いて行きます。",
+            "exampleKana": "ここからえきまであるいていきます。",
+            "exampleEn": "I walk from here to the station.",
+            "exampleId": "Saya berjalan kaki dari sini sampai stasiun."
           }
         ]
       },
@@ -616,22 +616,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyebutkan kata benda secara tidak menyeluruh ('N1, N2, dan lain-lain').",
         "examples": [
           {
-            "exampleJp": "かばんの中に本やノートなどがあります。",
-            "exampleKana": "かばんのなかにほんやのーとなどがあります。",
-            "exampleEn": "There are books, notebooks, etc., in the bag.",
-            "exampleId": "Di dalam tas ada buku, buku catatan, dan lain-lain."
+            "exampleJp": "カバンの中に本やペンなどがあります。",
+            "exampleKana": "かばんのなかにほんやぺんなどがあります。",
+            "exampleEn": "There are books, pens, etc., in the bag.",
+            "exampleId": "Di dalam tas ada buku, pena, dan lain-lain."
           },
           {
-            "exampleJp": "店でパンや牛乳などを買いました。",
-            "exampleKana": "みせでぱんやぎゅうにゅうなどをかいました。",
-            "exampleEn": "I bought bread, milk, etc., at the store.",
-            "exampleId": "Saya membeli roti, susu, dan lain-lain di toko."
+            "exampleJp": "デパートで服や靴などを買います。",
+            "exampleKana": "でぱーとでふくやくつなどをかいます。",
+            "exampleEn": "I buy clothes, shoes, etc., at the department store.",
+            "exampleId": "Saya membeli baju, sepatu, dan lain-lain di toserba."
           },
           {
-            "exampleJp": "部屋には机や椅子などがあります。",
-            "exampleKana": "へやにはつくえやいすなどがあります。",
-            "exampleEn": "There are desks, chairs, etc., in the room.",
-            "exampleId": "Di dalam kamar ada meja, kursi, dan lain-lain."
+            "exampleJp": "公園でリンゴやバナナなどを食べます。",
+            "exampleKana": "こうえんでりんごやばなななどをたべます。",
+            "exampleEn": "I eat apples, bananas, etc., at the park.",
+            "exampleId": "Saya makan apel, pisang, dan lain-lain di taman."
           }
         ]
       },
@@ -643,22 +643,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Penyangkalan menyeluruh terhadap benda atau tujuan ('tidak... apapun / kemanapun').",
         "examples": [
           {
-            "exampleJp": "今日、何も食べませんでした。",
-            "exampleKana": "きょう、なにもたべませんでした。",
-            "exampleEn": "I didn't eat anything today.",
-            "exampleId": "Hari ini saya tidak makan apa pun."
+            "exampleJp": "今日はどこへも行きません。",
+            "exampleKana": "きょうはどこへもいきません。",
+            "exampleEn": "I am not going anywhere today.",
+            "exampleId": "Hari ini saya tidak pergi ke mana pun."
           },
           {
-            "exampleJp": "日曜日はどこへも行きませんでした。",
-            "exampleKana": "にちようびはどこへもいきませんでした。",
-            "exampleEn": "I didn't go anywhere on Sunday.",
-            "exampleId": "Hari Minggu saya tidak pergi ke mana pun."
+            "exampleJp": "お腹がすいていませんから、何も食べません。",
+            "exampleKana": "おなかがすいていませんから、なにもたべません。",
+            "exampleEn": "I am not hungry, so I will not eat anything.",
+            "exampleId": "Karena saya tidak lapar, saya tidak makan apa pun."
           },
           {
-            "exampleJp": "昨日の夜、何も見ませんでした。",
-            "exampleKana": "きのうのよる、なにもみませんでした。",
-            "exampleEn": "I didn't watch anything last night.",
-            "exampleId": "Tadi malam saya tidak menonton apa pun."
+            "exampleJp": "どこへも行きたくないので、家で何も買いません。",
+            "exampleKana": "どこへもいきたくないので、いえでなにもかいません。",
+            "exampleEn": "I don't want to go anywhere, so I won't buy anything at home.",
+            "exampleId": "Karena saya tidak ingin pergi ke mana pun, saya tidak membeli apa pun di rumah."
           }
         ]
       }
@@ -677,22 +677,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata sifat yang menerangkan kata benda.",
         "examples": [
           {
-            "exampleJp": "この本は面白いです。",
-            "exampleKana": "このほんはおもしろいです。",
-            "exampleEn": "This book is interesting.",
-            "exampleId": "Buku ini menarik."
-          },
-          {
-            "exampleJp": "日本の夏は暑いです。",
-            "exampleKana": "にほんのなつはあついです。",
-            "exampleEn": "Summer in Japan is hot.",
-            "exampleId": "Musim panas di Jepang panas."
+            "exampleJp": "今日は暑いです。",
+            "exampleKana": "きょうはあついです。",
+            "exampleEn": "Today is hot.",
+            "exampleId": "Hari ini panas."
           },
           {
             "exampleJp": "この部屋はきれいです。",
             "exampleKana": "このへやはきれいです。",
-            "exampleEn": "This room is clean/beautiful.",
-            "exampleId": "Kamar ini bersih/indah."
+            "exampleEn": "This room is clean.",
+            "exampleId": "Kamar ini bersih."
+          },
+          {
+            "exampleJp": "その本は面白いです。",
+            "exampleKana": "そのほんはおもしろいです。",
+            "exampleEn": "That book is interesting.",
+            "exampleId": "Buku itu menarik."
           }
         ]
       },
@@ -704,22 +704,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Bentuk negatif dari kata sifat (i-adjective dan na-adjective).",
         "examples": [
           {
-            "exampleJp": "昨日の映画は面白くなかったです。",
-            "exampleKana": "きのうのえいがはおもしろくなかったです。",
-            "exampleEn": "Yesterday's movie was not interesting.",
-            "exampleId": "Film kemarin tidak menarik."
+            "exampleJp": "今日は暑くないです。",
+            "exampleKana": "きょうはあつくないです。",
+            "exampleEn": "Today is not hot.",
+            "exampleId": "Hari ini tidak panas."
           },
           {
-            "exampleJp": "この料理は辛くないです。",
-            "exampleKana": "このりょうりはからくないです。",
-            "exampleEn": "This food is not spicy.",
-            "exampleId": "Masakan ini tidak pedas."
+            "exampleJp": "この部屋はきれいじゃありません。",
+            "exampleKana": "このへやはきれいじゃありません。",
+            "exampleEn": "This room is not clean.",
+            "exampleId": "Kamar ini tidak bersih."
           },
           {
-            "exampleJp": "今日は暇じゃありません。",
-            "exampleKana": "きょうはひまじゃありません。",
-            "exampleEn": "I am not free today.",
-            "exampleId": "Hari ini saya tidak senggang."
+            "exampleJp": "その本は面白くないです。",
+            "exampleKana": "そのほんはおもしろくないです。",
+            "exampleEn": "That book is not interesting.",
+            "exampleId": "Buku itu tidak menarik."
           }
         ]
       },
@@ -731,22 +731,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata sifat yang langsung memodifikasi kata benda di depannya.",
         "examples": [
           {
-            "exampleJp": "美味しいコーヒーを飲みます。",
-            "exampleKana": "おいしいこーひーをのみます。",
-            "exampleEn": "I drink delicious coffee.",
-            "exampleId": "Saya minum kopi yang enak."
+            "exampleJp": "暑い日は水を飲みます。",
+            "exampleKana": "あついひはみずをのみます。",
+            "exampleEn": "On hot days, I drink water.",
+            "exampleId": "Pada hari yang panas, saya minum air."
           },
           {
-            "exampleJp": "ここは静かな場所です。",
-            "exampleKana": "ここはしずかなばしょです。",
-            "exampleEn": "This is a quiet place.",
-            "exampleId": "Ini adalah tempat yang tenang."
+            "exampleJp": "きれいな部屋で勉強します。",
+            "exampleKana": "きれいなへやでべんきょうします。",
+            "exampleEn": "I study in a clean room.",
+            "exampleId": "Saya belajar di kamar yang bersih."
           },
           {
-            "exampleJp": "新しい靴を買いました。",
-            "exampleKana": "あたらしいくつをかいました。",
-            "exampleEn": "I bought new shoes.",
-            "exampleId": "Saya membeli sepatu baru."
+            "exampleJp": "面白い本を読みます。",
+            "exampleKana": "おもしろいほんをよみます。",
+            "exampleEn": "I read an interesting book.",
+            "exampleId": "Saya membaca buku yang menarik."
           }
         ]
       },
@@ -758,22 +758,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menjelaskan keadaan cuaca atau musim.",
         "examples": [
           {
-            "exampleJp": "冬は寒いです。",
-            "exampleKana": "ふゆはさむいです。",
-            "exampleEn": "Winter is cold.",
-            "exampleId": "Musim dingin itu dingin."
+            "exampleJp": "夏は暑いです。",
+            "exampleKana": "なつはあついです。",
+            "exampleEn": "Summer is hot.",
+            "exampleId": "Musim panas itu panas."
           },
           {
-            "exampleJp": "八月は暑いです。",
-            "exampleKana": "はちがつはあついです。",
-            "exampleEn": "August is hot.",
-            "exampleId": "Bulan Agustus itu panas."
+            "exampleJp": "八月は暑い月です。",
+            "exampleKana": "はちがつはあついつきです。",
+            "exampleEn": "August is a hot month.",
+            "exampleId": "Agustus adalah bulan yang panas."
           },
           {
-            "exampleJp": "春は暖かいです。",
-            "exampleKana": "はるはあたたかいです。",
-            "exampleEn": "Spring is warm.",
-            "exampleId": "Musim semi itu hangat."
+            "exampleJp": "冬はきれいな雪が降ります。",
+            "exampleKana": "ふゆはきれいなゆきがふります。",
+            "exampleEn": "In winter, beautiful snow falls.",
+            "exampleId": "Pada musim dingin, salju yang indah turun."
           }
         ]
       },
@@ -785,22 +785,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata keterangan penunjuk derajat ('sangat / sedikit').",
         "examples": [
           {
-            "exampleJp": "この映画はとても面白いです。",
-            "exampleKana": "このえいがはとてもおもしろいです。",
-            "exampleEn": "This movie is very interesting.",
-            "exampleId": "Film ini sangat menarik."
+            "exampleJp": "この本はとても面白いです。",
+            "exampleKana": "このほんはとてもおもしろいです。",
+            "exampleEn": "This book is very interesting.",
+            "exampleId": "Buku ini sangat menarik."
           },
           {
-            "exampleJp": "今日は少し寒いです。",
-            "exampleKana": "きょうはすこしさむいです。",
-            "exampleEn": "It is a little cold today.",
-            "exampleId": "Hari ini sedikit dingin."
+            "exampleJp": "今日は少し暑いです。",
+            "exampleKana": "きょうはすこしあついです。",
+            "exampleEn": "It is a little hot today.",
+            "exampleId": "Hari ini sedikit panas."
           },
           {
-            "exampleJp": "この部屋はとても広いです。",
-            "exampleKana": "このへやはとてもひろいです。",
-            "exampleEn": "This room is very spacious.",
-            "exampleId": "Kamar ini sangat luas."
+            "exampleJp": "この部屋はとても広くて、少し静かです。",
+            "exampleKana": "このへやはとてもひろくて、すこししずかです。",
+            "exampleEn": "This room is very spacious and a little quiet.",
+            "exampleId": "Ruangan ini sangat luas dan sedikit tenang."
           }
         ]
       },
@@ -812,22 +812,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Penyangkalan halus yang berarti 'tidak begitu / tidak terlalu'.",
         "examples": [
           {
-            "exampleJp": "この本はあまり面白くないです。",
-            "exampleKana": "このほんはあまりおもしろくないです。",
-            "exampleEn": "This book is not very interesting.",
-            "exampleId": "Buku ini tidak begitu menarik."
+            "exampleJp": "この映画はあまり面白くないです。",
+            "exampleKana": "このえいがはあまりおもしろくないです。",
+            "exampleEn": "This movie is not very interesting.",
+            "exampleId": "Film ini tidak begitu menarik."
           },
           {
-            "exampleJp": "昨日の試験はあまり難しくありませんでした。",
-            "exampleKana": "きのうのしけんはあまりむずかしくありませんでした。",
-            "exampleEn": "Yesterday's exam was not very difficult.",
-            "exampleId": "Ujian kemarin tidak begitu sulit."
+            "exampleJp": "今日の宿題はあまり難しくありません。",
+            "exampleKana": "きょうのしゅくだいはあまりむずかしくありません。",
+            "exampleEn": "Today's homework is not very difficult.",
+            "exampleId": "PR hari ini tidak begitu sulit."
           },
           {
-            "exampleJp": "この料理はあまり辛くないです。",
-            "exampleKana": "このりょうりはあまりからくないです。",
-            "exampleEn": "This dish is not very spicy.",
-            "exampleId": "Masakan ini tidak begitu pedas."
+            "exampleJp": "その部屋はあまり広くなくて、少し寒いです。",
+            "exampleKana": "そのへやはあまりひろくなくて、すこしさむいです。",
+            "exampleEn": "That room is not very spacious and is a little cold.",
+            "exampleId": "Ruangan itu tidak begitu luas dan sedikit dingin."
           }
         ]
       },
@@ -845,16 +845,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Ada buku di atas meja."
           },
           {
-            "exampleJp": "教室に黒板があります。",
-            "exampleKana": "きょうしつにこくばんがあります。",
-            "exampleEn": "There is a blackboard in the classroom.",
-            "exampleId": "Ada papan tulis di dalam kelas."
+            "exampleJp": "部屋にとても面白い本があります。",
+            "exampleKana": "へやにとてもおもしろいほんがあります。",
+            "exampleEn": "There is a very interesting book in the room.",
+            "exampleId": "Ada buku yang sangat menarik di dalam kamar."
           },
           {
-            "exampleJp": "かばんの中に鍵があります。",
-            "exampleKana": "かばんのなかにかぎがあります。",
-            "exampleEn": "There is a key in the bag.",
-            "exampleId": "Ada kunci di dalam tas."
+            "exampleJp": "教室にあまり難しくない本があります。",
+            "exampleKana": "きょうしつにあまりむずかしくないほんがあります。",
+            "exampleEn": "There is a not-so-difficult book in the classroom.",
+            "exampleId": "Ada buku yang tidak terlalu sulit di dalam kelas."
           }
         ]
       },
@@ -866,22 +866,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan arah posisi ruang (timur, barat, dalam, dll.).",
         "examples": [
           {
-            "exampleJp": "郵便局は銀行の隣です。",
-            "exampleKana": "ゆうびんきょくはぎんこうのとなりです。",
-            "exampleEn": "The post office is next to the bank.",
-            "exampleId": "Kantor pos ada di sebelah bank."
+            "exampleJp": "本は机の中です。",
+            "exampleKana": "ほんはつくえのなかです。",
+            "exampleEn": "The book is inside the desk.",
+            "exampleId": "Bukunya ada di dalam meja."
           },
           {
-            "exampleJp": "駅は公園の北です。",
-            "exampleKana": "えきはこうえんのきたです。",
-            "exampleEn": "The station is north of the park.",
-            "exampleId": "Stasiun ada di sebelah utara taman."
+            "exampleJp": "机は部屋の右です。",
+            "exampleKana": "つくえはへやのみぎです。",
+            "exampleEn": "The desk is to the right of the room.",
+            "exampleId": "Mejanya ada di sebelah kanan ruangan."
           },
           {
-            "exampleJp": "猫は椅子の下です。",
-            "exampleKana": "ねこはいすのしたです。",
-            "exampleEn": "The cat is under the chair.",
-            "exampleId": "Kucing ada di bawah kursi."
+            "exampleJp": "とても面白い本は机の右の中にあります。",
+            "exampleKana": "とてもおもしろいほんはつくえのみぎのなかにあります。",
+            "exampleEn": "The very interesting book is inside the right side of the desk.",
+            "exampleId": "Buku yang sangat menarik itu ada di dalam bagian kanan meja."
           }
         ]
       },
@@ -893,22 +893,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan durasi atau jarak antara dua lokasi.",
         "examples": [
           {
-            "exampleJp": "家から学校までどのくらいかかりますか。",
-            "exampleKana": "いえからがっこうまでどのくらいかかりますか。",
-            "exampleEn": "How long does it take from your house to school?",
-            "exampleId": "Berapa lama waktu yang dibutuhkan dari rumah ke sekolah?"
+            "exampleJp": "家から駅までどのくらいですか。",
+            "exampleKana": "いえからえきまでどのくらいですか。",
+            "exampleEn": "How long does it take from your house to the station?",
+            "exampleId": "Dari rumah sampai stasiun berapa lama?"
           },
           {
-            "exampleJp": "東京から大阪までどのくらいですか。",
-            "exampleKana": "とうきょうからおおさかまでどのくらいですか。",
-            "exampleEn": "How far is it from Tokyo to Osaka?",
-            "exampleId": "Seberapa jauh jarak dari Tokyo ke Osaka?"
+            "exampleJp": "東京から大阪までどのくらいかかりますか。",
+            "exampleKana": "とうきょうからおおさかまでどのくらいかかりますか。",
+            "exampleEn": "How long does it take to get from Tokyo to Osaka?",
+            "exampleId": "Dari Tokyo sampai Osaka berapa lama?"
           },
           {
-            "exampleJp": "駅まで歩いてどのくらいかかりますか。",
-            "exampleKana": "えきまであるいてどのくらいかかりますか。",
-            "exampleEn": "How long does it take to walk to the station?",
-            "exampleId": "Berapa lama waktu yang dibutuhkan untuk berjalan kaki ke stasiun?"
+            "exampleJp": "学校から図書館まで、歩いてどのくらいですか。",
+            "exampleKana": "がっこうからとしょかんまで、あるいてどのくらいですか。",
+            "exampleEn": "How long does it take to walk from the school to the library?",
+            "exampleId": "Dari sekolah sampai perpustakaan, kalau jalan kaki berapa lama?"
           }
         ]
       },
@@ -920,22 +920,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menunjukkan sarana transportasi ('naik / dengan [kendaraan]').",
         "examples": [
           {
-            "exampleJp": "私は電車で会社へ行きます。",
-            "exampleKana": "わたしはでんしゃでかいしゃへいきます。",
-            "exampleEn": "I go to the office by train.",
-            "exampleId": "Saya pergi ke kantor dengan kereta."
+            "exampleJp": "バスで学校へ行きます。",
+            "exampleKana": "バスでがっこうへいきます。",
+            "exampleEn": "I go to school by bus.",
+            "exampleId": "Saya pergi ke sekolah naik bus."
           },
           {
-            "exampleJp": "バスで旅行に行きましょう。",
-            "exampleKana": "バスでりょこうにいきましょう。",
-            "exampleEn": "Let's go on a trip by bus.",
-            "exampleId": "Ayo pergi berwisata dengan bus."
+            "exampleJp": "電車で東京から大阪まで行きます。",
+            "exampleKana": "でんしゃでとうきょうからおおさかまでいきます。",
+            "exampleEn": "I go from Tokyo to Osaka by train.",
+            "exampleId": "Saya pergi dari Tokyo ke Osaka naik kereta."
           },
           {
-            "exampleJp": "自転車で学校へ行きます。",
-            "exampleKana": "じてんしゃでがっこうへいきます。",
-            "exampleEn": "I go to school by bicycle.",
-            "exampleId": "Saya pergi ke sekolah naik sepeda."
+            "exampleJp": "家から駅まで、自転車でどのくらいかかりますか。",
+            "exampleKana": "いえからえきまで、じてんしゃでどのくらいかかりますか。",
+            "exampleEn": "How long does it take to get from your house to the station by bicycle?",
+            "exampleId": "Dari rumah sampai stasiun, kalau naik sepeda berapa lama?"
           }
         ]
       },
@@ -950,19 +950,19 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleJp": "どんな食べ物が好きですか。",
             "exampleKana": "どんなたべものがすきですか。",
             "exampleEn": "What kind of food do you like?",
-            "exampleId": "Makanan seperti apa yang kamu sukai?"
+            "exampleId": "Makanan seperti apa yang kamu suka?"
           },
           {
-            "exampleJp": "どんな本を読んでいますか。",
-            "exampleKana": "どんなほんをよんでいますか。",
-            "exampleEn": "What kind of book are you reading?",
-            "exampleId": "Buku seperti apa yang sedang kamu baca?"
+            "exampleJp": "どんな電車で東京へ行きますか。",
+            "exampleKana": "どんなでんしゃでとうきょうへいきますか。",
+            "exampleEn": "What kind of train do you take to go to Tokyo?",
+            "exampleId": "Naik kereta yang seperti apa kamu pergi ke Tokyo?"
           },
           {
-            "exampleJp": "どんな町に住みたいですか。",
-            "exampleKana": "どんなまちにすみたいですか。",
-            "exampleEn": "What kind of town do you want to live in?",
-            "exampleId": "Kota seperti apa yang ingin kamu tinggali?"
+            "exampleJp": "どんな乗り物で学校から家まで帰りますか。",
+            "exampleKana": "どんなのりものでがっこうからいえまでかえりますか。",
+            "exampleEn": "What kind of transportation do you use to go home from school?",
+            "exampleId": "Naik kendaraan apa kamu pulang dari sekolah ke rumah?"
           }
         ]
       },
@@ -980,16 +980,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Bagaimana kehidupan di Jepang?"
           },
           {
-            "exampleJp": "このコーヒーはどうですか。",
-            "exampleKana": "このコーヒーはどうですか。",
-            "exampleEn": "How is this coffee?",
-            "exampleId": "Bagaimana dengan kopi ini?"
+            "exampleJp": "新しい電車はどうですか。",
+            "exampleKana": "あたらしいでんしゃはどうですか。",
+            "exampleEn": "How is the new train?",
+            "exampleId": "Bagaimana kereta yang baru itu?"
           },
           {
-            "exampleJp": "今日の天気はどうですか。",
-            "exampleKana": "きょうのてんきはどうですか。",
-            "exampleEn": "How is the weather today?",
-            "exampleId": "Bagaimana cuaca hari ini?"
+            "exampleJp": "学校から駅まで自転車で行くのはどうですか。",
+            "exampleKana": "がっこうからえきまでじてんしゃでいくのはどうですか。",
+            "exampleEn": "How about going from the school to the station by bicycle?",
+            "exampleId": "Bagaimana kalau pergi dari sekolah ke stasiun naik sepeda?"
           }
         ]
       },
@@ -1001,22 +1001,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata hubung untuk menambahkan informasi ('Dan / Lalu').",
         "examples": [
           {
-            "exampleJp": "昨日、買い物に行きました。そして、映画を見ました。",
-            "exampleKana": "きのう、かいものにいきました。そして、えいがをみました。",
-            "exampleEn": "I went shopping yesterday. And then, I watched a movie.",
-            "exampleId": "Kemarin saya pergi berbelanja. Lalu, saya menonton film."
+            "exampleJp": "私はパンを食べます。そして、コーヒーを飲みます。",
+            "exampleKana": "わたしはぱんをたべます。そして、こーひーをのみます。",
+            "exampleEn": "I eat bread. And, I drink coffee.",
+            "exampleId": "Saya makan roti. Lalu, saya minum kopi."
           },
           {
-            "exampleJp": "この料理はおいしいです。そして、安いです。",
-            "exampleKana": "このりょうりはおいしいです。そして、やすいです。",
-            "exampleEn": "This dish is delicious. And, it is cheap.",
-            "exampleId": "Masakan ini enak. Dan, harganya murah."
+            "exampleJp": "この本は面白いです。そして、とても安いです。",
+            "exampleKana": "このほんはおもしろいです。そして、とてもやすいです。",
+            "exampleEn": "This book is interesting. And, it is very cheap.",
+            "exampleId": "Buku ini menarik. Dan, harganya sangat murah."
           },
           {
-            "exampleJp": "彼は日本語を勉強しています。そして、英語も教えています。",
-            "exampleKana": "かれはにほんごをべんきょうしています。そして、えいごもおしえています。",
-            "exampleEn": "He is studying Japanese. And, he is also teaching English.",
-            "exampleId": "Dia sedang belajar bahasa Jepang. Dan, dia juga mengajar bahasa Inggris."
+            "exampleJp": "昨日、公園へ行きました。そして、友達に会いました。",
+            "exampleKana": "きのう、こうえんへいきました。そして、ともだちにあいました。",
+            "exampleEn": "I went to the park yesterday. And, I met a friend.",
+            "exampleId": "Kemarin, saya pergi ke taman. Lalu, saya bertemu teman."
           }
         ]
       },
@@ -1028,22 +1028,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata hubung pertentangan ('tetapi / namun').",
         "examples": [
           {
-            "exampleJp": "日本料理は好きですが、納豆は食べられません。",
-            "exampleKana": "にほんりょうりはすきですが、なっとうはたべられません。",
-            "exampleEn": "I like Japanese food, but I cannot eat natto.",
-            "exampleId": "Saya suka masakan Jepang, tetapi saya tidak bisa makan natto."
+            "exampleJp": "パンは食べますが、コーヒーは飲みません。",
+            "exampleKana": "ぱんはたべますが、こーひーはのみません。",
+            "exampleEn": "I eat bread, but I do not drink coffee.",
+            "exampleId": "Saya makan roti, tetapi saya tidak minum kopi."
           },
           {
-            "exampleJp": "今日はいい天気ですが、少し寒いです。",
-            "exampleKana": "きょうはいいてんきですが、すこしさむいです。",
-            "exampleEn": "The weather is nice today, but it is a little cold.",
-            "exampleId": "Cuaca hari ini bagus, tetapi agak dingin."
+            "exampleJp": "この本は面白いですが、少し難しいです。",
+            "exampleKana": "このほんはおもしろいですが、すこしむずかしいです。",
+            "exampleEn": "This book is interesting, but it is a little difficult.",
+            "exampleId": "Buku ini menarik, tetapi sedikit sulit."
           },
           {
-            "exampleJp": "一生懸命勉強しましたが、試験は難しかったです。",
-            "exampleKana": "いっしょうけんめいべんきょうしましたが、しけんはむずかしかったです。",
-            "exampleEn": "I studied very hard, but the exam was difficult.",
-            "exampleId": "Saya sudah belajar dengan giat, tetapi ujiannya sulit."
+            "exampleJp": "昨日公園へ行きましたが、友達には会いませんでした。",
+            "exampleKana": "きのうこうえんへいきましたが、ともだちにはあいませんでした。",
+            "exampleEn": "I went to the park yesterday, but I did not meet my friend.",
+            "exampleId": "Kemarin saya pergi ke taman, tetapi saya tidak bertemu teman."
           }
         ]
       },
@@ -1055,22 +1055,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Partikel akhir kalimat untuk meminta persetujuan ('ya / bukan?').",
         "examples": [
           {
-            "exampleJp": "今日は暑いですね。",
-            "exampleKana": "きょうはあついですね。",
-            "exampleEn": "It's hot today, isn't it?",
-            "exampleId": "Hari ini panas, ya."
+            "exampleJp": "パンは美味しいですね。",
+            "exampleKana": "ぱんはおいしいですね。",
+            "exampleEn": "The bread is delicious, isn't it?",
+            "exampleId": "Rotinya enak, ya."
           },
           {
-            "exampleJp": "この花はきれいですね。",
-            "exampleKana": "このはなはきれいですね。",
-            "exampleEn": "This flower is beautiful, isn't it?",
-            "exampleId": "Bunga ini indah, ya."
+            "exampleJp": "今日はとても暑いですね。",
+            "exampleKana": "きょうはとてもあついですね。",
+            "exampleEn": "It is very hot today, isn't it?",
+            "exampleId": "Hari ini sangat panas, ya."
           },
           {
-            "exampleJp": "明日、一緒に映画に行きましょうね。",
-            "exampleKana": "あした、いっしょにえいがにいきましょうね。",
-            "exampleEn": "Let's go to the movies together tomorrow, okay?",
-            "exampleId": "Besok kita pergi nonton film bersama ya."
+            "exampleJp": "昨日公園へ行きましたが、楽しかったですね。",
+            "exampleKana": "きのうこうえんへいきましたが、たのしかったですね。",
+            "exampleEn": "I went to the park yesterday, and it was fun, wasn't it?",
+            "exampleId": "Kemarin saya pergi ke taman, dan itu menyenangkan, ya."
           }
         ]
       }
@@ -1089,22 +1089,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Bentuk lampau sopan kata kerja (positif / negatif).",
         "examples": [
           {
-            "exampleJp": "昨日、映画を見ました。",
-            "exampleKana": "きのう、えいがをみました。",
-            "exampleEn": "I watched a movie yesterday.",
-            "exampleId": "Kemarin saya menonton film."
+            "exampleJp": "昨日、日本語を勉強しました。",
+            "exampleKana": "きのう、にほんごをべんきょうしました。",
+            "exampleEn": "I studied Japanese yesterday.",
+            "exampleId": "Kemarin, saya belajar bahasa Jepang."
           },
           {
-            "exampleJp": "今朝、朝ごはんを食べませんでした。",
+            "exampleJp": "今朝、朝ご飯を食べませんでした。",
             "exampleKana": "けさ、あさごはんをたべませんでした。",
             "exampleEn": "I did not eat breakfast this morning.",
-            "exampleId": "Tadi pagi saya tidak makan sarapan."
+            "exampleId": "Tadi pagi, saya tidak makan sarapan."
           },
           {
-            "exampleJp": "先週、日本へ行きました。",
-            "exampleKana": "せんしゅう、にほんへいきました。",
-            "exampleEn": "I went to Japan last week.",
-            "exampleId": "Minggu lalu saya pergi ke Jepang."
+            "exampleJp": "先週、友達と映画を見ました。",
+            "exampleKana": "せんしゅう、ともだちとえいがをみました。",
+            "exampleEn": "I watched a movie with a friend last week.",
+            "exampleId": "Minggu lalu, saya menonton film bersama teman."
           }
         ]
       },
@@ -1122,16 +1122,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Kemarin cuacanya panas."
           },
           {
-            "exampleJp": "先週は暇じゃありませんでした。",
-            "exampleKana": "せんしゅうはひまじゃありませんでした。",
-            "exampleEn": "I was not free last week.",
-            "exampleId": "Minggu lalu saya tidak senggang."
+            "exampleJp": "そのテストは簡単じゃありませんでした。",
+            "exampleKana": "そのテストはかんたんじゃありませんでした。",
+            "exampleEn": "That test was not easy.",
+            "exampleId": "Tes itu tidak mudah."
           },
           {
-            "exampleJp": "子供の時、背が高かったです。",
-            "exampleKana": "こどものとき、せがたかかったです。",
-            "exampleEn": "I was tall when I was a child.",
-            "exampleId": "Waktu kecil saya tinggi."
+            "exampleJp": "先週の休みは楽しかったです。",
+            "exampleKana": "せんしゅうのやすみはたのしかったです。",
+            "exampleEn": "Last week's holiday was fun.",
+            "exampleId": "Liburan minggu lalu menyenangkan."
           }
         ]
       },
@@ -1149,16 +1149,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Saya suka masakan Jepang."
           },
           {
-            "exampleJp": "弟は納豆が嫌いです。",
-            "exampleKana": "おとうとはなっとうがきらいです。",
-            "exampleEn": "My younger brother dislikes natto.",
-            "exampleId": "Adik laki-laki saya tidak suka natto."
+            "exampleJp": "私は辛い食べ物が嫌いです。",
+            "exampleKana": "わたしはからいたべものがきらいです。",
+            "exampleEn": "I dislike spicy food.",
+            "exampleId": "Saya tidak suka makanan pedas."
           },
           {
-            "exampleJp": "あなたはどんなスポーツが好きですか。",
-            "exampleKana": "あなたはどんなすぽーつがすきですか。",
-            "exampleEn": "What kind of sports do you like?",
-            "exampleId": "Anda suka olahraga apa?"
+            "exampleJp": "昨日食べた料理が好きでした。",
+            "exampleKana": "きのうたべたりょうりがすきでした。",
+            "exampleEn": "I liked the food that I ate yesterday.",
+            "exampleId": "Saya menyukai masakan yang saya makan kemarin."
           }
         ]
       },
@@ -1171,21 +1171,21 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "examples": [
           {
             "exampleJp": "新しいカメラがほしいです。",
-            "exampleKana": "あたらしいかめらがほしいです。",
+            "exampleKana": "あたらしいカメラがほしいです。",
             "exampleEn": "I want a new camera.",
             "exampleId": "Saya ingin kamera baru."
           },
           {
-            "exampleJp": "誕生日に何がほしいですか。",
-            "exampleKana": "たんじょうびになにがほしいですか。",
-            "exampleEn": "What do you want for your birthday?",
-            "exampleId": "Anda ingin apa untuk ulang tahun?"
+            "exampleJp": "私は新しい車がほしいですが、高いです。",
+            "exampleKana": "わたしはあたらしいくるまがほしいですが、たかいです。",
+            "exampleEn": "I want a new car, but it is expensive.",
+            "exampleId": "Saya ingin mobil baru, tapi harganya mahal."
           },
           {
-            "exampleJp": "今、冷たい水がほしいです。",
-            "exampleKana": "いま、つめたいみずがほしいです。",
-            "exampleEn": "I want some cold water now.",
-            "exampleId": "Sekarang saya ingin air dingin."
+            "exampleJp": "昨日、ほしい本を買いました。",
+            "exampleKana": "きのう、ほしいほんをかいました。",
+            "exampleEn": "I bought the book that I wanted yesterday.",
+            "exampleId": "Kemarin, saya membeli buku yang saya inginkan."
           }
         ]
       },
@@ -1197,10 +1197,10 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan keinginan melakukan suatu tindakan ('ingin melakukan V').",
         "examples": [
           {
-            "exampleJp": "私は日本へ旅行に行きたいです。",
-            "exampleKana": "わたしはにほんへりょこうにいきたいです。",
-            "exampleEn": "I want to go to Japan for a trip.",
-            "exampleId": "Saya ingin pergi berwisata ke Jepang."
+            "exampleJp": "私は新しい本が読みたいです。",
+            "exampleKana": "わたしはあたらしいほんがよみたいです。",
+            "exampleEn": "I want to read a new book.",
+            "exampleId": "Saya ingin membaca buku baru."
           },
           {
             "exampleJp": "冷たい水が飲みたいです。",
@@ -1209,10 +1209,10 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Saya ingin minum air dingin."
           },
           {
-            "exampleJp": "新しい本を読みたいです。",
-            "exampleKana": "あたらしいほんをよみたいです。",
-            "exampleEn": "I want to read a new book.",
-            "exampleId": "Saya ingin membaca buku baru."
+            "exampleJp": "今日は早く家に帰りたいです。",
+            "exampleKana": "きょうははやくうちにかえりたいです。",
+            "exampleEn": "I want to go home early today.",
+            "exampleId": "Saya ingin pulang ke rumah lebih awal hari ini."
           }
         ]
       },
@@ -1227,19 +1227,19 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleJp": "デパートへ服を買いに行きます。",
             "exampleKana": "デパートへふくをかいにいきます。",
             "exampleEn": "I am going to the department store to buy clothes.",
-            "exampleId": "Saya pergi ke departemen store untuk membeli baju."
+            "exampleId": "Saya pergi ke toserba untuk membeli pakaian."
           },
           {
             "exampleJp": "友達と映画を見に行きます。",
             "exampleKana": "ともだちとえいがをみにいきます。",
-            "exampleEn": "I am going to watch a movie with my friend.",
+            "exampleEn": "I am going to see a movie with a friend.",
             "exampleId": "Saya pergi menonton film bersama teman."
           },
           {
-            "exampleJp": "図書館へ勉強しに行きます。",
-            "exampleKana": "としょかんへべんきょうしにいきます。",
-            "exampleEn": "I am going to the library to study.",
-            "exampleId": "Saya pergi ke perpustakaan untuk belajar."
+            "exampleJp": "日本料理を食べに行きたいです。",
+            "exampleKana": "にほんりょうりをたべにいきたいです。",
+            "exampleEn": "I want to go to eat Japanese food.",
+            "exampleId": "Saya ingin pergi makan masakan Jepang."
           }
         ]
       },
@@ -1257,16 +1257,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Saya ingin pergi ke suatu tempat akhir pekan ini."
           },
           {
-            "exampleJp": "夏休みにどこかへ行きますか。",
-            "exampleKana": "なつやすみにどこかへいきますか。",
-            "exampleEn": "Are you going anywhere during summer vacation?",
-            "exampleId": "Apakah kamu akan pergi ke suatu tempat saat liburan musim panas?"
+            "exampleJp": "どこかへ涼しい所に行きたいです。",
+            "exampleKana": "どこかへすずしいところにいきたいです。",
+            "exampleEn": "I want to go somewhere cool.",
+            "exampleId": "Saya ingin pergi ke suatu tempat yang sejuk."
           },
           {
-            "exampleJp": "静かな場所へ行きたいです。",
-            "exampleKana": "しずかなばしょへいきたいです。",
-            "exampleEn": "I want to go somewhere quiet.",
-            "exampleId": "Saya ingin pergi ke suatu tempat yang tenang."
+            "exampleJp": "休みの日、どこかへ遊びに行きませんか。",
+            "exampleKana": "やすみのひ、どこかへあそびにいきませんか。",
+            "exampleEn": "Shall we go somewhere to hang out on our day off?",
+            "exampleId": "Bagaimana kalau kita pergi bermain ke suatu tempat di hari libur?"
           }
         ]
       },
@@ -1278,22 +1278,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan alasan ('Mengapa? / Kenapa?').",
         "examples": [
           {
-            "exampleJp": "どうして学校へ行かないのですか。",
-            "exampleKana": "どうしてがっこうへいかないのですか。",
-            "exampleEn": "Why are you not going to school?",
-            "exampleId": "Mengapa kamu tidak pergi ke sekolah?"
+            "exampleJp": "どうして学校へ行きますか。",
+            "exampleKana": "どうしてがっこうへいきますか。",
+            "exampleEn": "Why are you going to school?",
+            "exampleId": "Mengapa kamu pergi ke sekolah?"
           },
           {
-            "exampleJp": "どうして昨日休んだのですか。",
-            "exampleKana": "どうしてきのうやすんだのですか。",
-            "exampleEn": "Why were you absent yesterday?",
-            "exampleId": "Mengapa kamu absen kemarin?"
+            "exampleJp": "どうして日本料理を食べに行きたいですか。",
+            "exampleKana": "どうしてにほんりょうりをたべにいきたいですか。",
+            "exampleEn": "Why do you want to go to eat Japanese food?",
+            "exampleId": "Mengapa kamu ingin pergi makan masakan Jepang?"
           },
           {
-            "exampleJp": "どうして日本語を勉強していますか。",
-            "exampleKana": "どうしてにほんごをべんきょうしていますか。",
-            "exampleEn": "Why are you studying Japanese?",
-            "exampleId": "Mengapa kamu belajar bahasa Jepang?"
+            "exampleJp": "どうして週末にどこかへ行きたいですか。",
+            "exampleKana": "どうしてしゅうまつにどこかへいきたいですか。",
+            "exampleEn": "Why do you want to go somewhere on the weekend?",
+            "exampleId": "Mengapa kamu ingin pergi ke suatu tempat di akhir pekan?"
           }
         ]
       },
@@ -1305,22 +1305,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata hubung urutan waktu ('setelah itu / kemudian').",
         "examples": [
           {
-            "exampleJp": "昨日、買い物に行きました。それから、映画を見ました。",
-            "exampleKana": "きのう、かいものにいきました。それから、えいがをみました。",
-            "exampleEn": "I went shopping yesterday. After that, I watched a movie.",
-            "exampleId": "Kemarin saya pergi berbelanja. Setelah itu, saya menonton film."
+            "exampleJp": "朝ごはんを食べます。それから、学校へ行きます。",
+            "exampleKana": "あさごはんをたべます。それから、がっこうへいきます。",
+            "exampleEn": "I eat breakfast. After that, I go to school.",
+            "exampleId": "Saya makan sarapan. Setelah itu, saya pergi ke sekolah."
           },
           {
-            "exampleJp": "まず宿題をします。それから、テレビを見ます。",
-            "exampleKana": "まずしゅくだいをします。それから、テレビをみます。",
-            "exampleEn": "First, I will do my homework. Then, I will watch TV.",
-            "exampleId": "Pertama, saya akan mengerjakan PR. Kemudian, saya akan menonton TV."
+            "exampleJp": "宿題をします。それから、テレビを見ます。",
+            "exampleKana": "しゅくだいをします。それから、テレビをみます。",
+            "exampleEn": "I do my homework. Then, I watch TV.",
+            "exampleId": "Saya mengerjakan PR. Setelah itu, saya menonton TV."
           },
           {
-            "exampleJp": "朝ごはんを食べました。それから、学校へ行きました。",
-            "exampleKana": "あさごはんをたべました。それから、がっこうへいきました。",
-            "exampleEn": "I ate breakfast. Then, I went to school.",
-            "exampleId": "Saya sudah sarapan. Setelah itu, saya pergi ke sekolah."
+            "exampleJp": "本を読みました。それから、公園へ行きました。",
+            "exampleKana": "ほんをよみました。それから、こうえんへいきました。",
+            "exampleEn": "I read a book. Then, I went to the park.",
+            "exampleId": "Saya membaca buku. Setelah itu, saya pergi ke taman."
           }
         ]
       },
@@ -1332,22 +1332,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Melakukan tindakan bersama dengan orang lain.",
         "examples": [
           {
-            "exampleJp": "昨日、友達と公園へ行きました。",
-            "exampleKana": "きのう、ともだちとこうえんへいきました。",
-            "exampleEn": "I went to the park with my friend yesterday.",
-            "exampleId": "Kemarin saya pergi ke taman bersama teman."
+            "exampleJp": "友達と映画を見ます。",
+            "exampleKana": "ともだちとえいがをみます。",
+            "exampleEn": "I watch a movie with my friend.",
+            "exampleId": "Saya menonton film bersama teman."
           },
           {
-            "exampleJp": "家族と日本料理を食べます。",
-            "exampleKana": "かぞくとにほんりょうりをたべます。",
-            "exampleEn": "I will eat Japanese food with my family.",
-            "exampleId": "Saya akan makan masakan Jepang bersama keluarga."
+            "exampleJp": "友達と映画を見ます。それから、買い物をします。",
+            "exampleKana": "ともだちとえいがをみます。それから、かいものをします。",
+            "exampleEn": "I watch a movie with my friend. After that, I go shopping.",
+            "exampleId": "Saya menonton film bersama teman. Setelah itu, saya pergi berbelanja."
           },
           {
-            "exampleJp": "先生と日本語で話しました。",
-            "exampleKana": "せんせいとにほんごではなしました。",
-            "exampleEn": "I spoke in Japanese with my teacher.",
-            "exampleId": "Saya berbicara dalam bahasa Jepang dengan guru."
+            "exampleJp": "家族と日本へ行きました。それから、友達と観光しました。",
+            "exampleKana": "かぞくとにほんへいきました。それから、ともだちとかんこうしました。",
+            "exampleEn": "I went to Japan with my family. Then, I went sightseeing with my friend.",
+            "exampleId": "Saya pergi ke Jepang bersama keluarga. Setelah itu, saya berwisata bersama teman."
           }
         ]
       },
@@ -1359,22 +1359,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan sebab-akibat ('karena... maka...').",
         "examples": [
           {
-            "exampleJp": "暑いですから、窓を開けてください。",
-            "exampleKana": "あついですから、まどをあけてください。",
-            "exampleEn": "Because it is hot, please open the window.",
-            "exampleId": "Karena panas, tolong buka jendelanya."
+            "exampleJp": "時間がありませんから、タクシーで行きます。",
+            "exampleKana": "じかんがありませんから、タクシーでいきます。",
+            "exampleEn": "Because I don't have time, I will go by taxi.",
+            "exampleId": "Karena tidak ada waktu, saya pergi naik taksi."
           },
           {
-            "exampleJp": "おなかがすきましたから、何か食べましょう。",
-            "exampleKana": "おなかがすきましたから、なにかたべましょう。",
-            "exampleEn": "Because I am hungry, let's eat something.",
-            "exampleId": "Karena saya lapar, ayo kita makan sesuatu."
+            "exampleJp": "友達と遊びますから、宿題を早くします。",
+            "exampleKana": "ともだちとあそびますから、しゅくだいちはやくします。",
+            "exampleEn": "Because I will hang out with my friend, I will do my homework early.",
+            "exampleId": "Karena saya akan bermain dengan teman, saya mengerjakan PR dengan cepat."
           },
           {
-            "exampleJp": "明日試験がありますから、勉強しなければなりません。",
-            "exampleKana": "あしたしけんがありますから、べんきょうしなければなりません。",
-            "exampleEn": "Because there is an exam tomorrow, I must study.",
-            "exampleId": "Karena besok ada ujian, saya harus belajar."
+            "exampleJp": "疲れていますから、それから家で休みます。",
+            "exampleKana": "つかれていますから、それからうちでやすみます。",
+            "exampleEn": "Because I am tired, I will rest at home after that.",
+            "exampleId": "Karena saya lelah, setelah itu saya akan beristirahat di rumah."
           }
         ]
       }
@@ -1393,22 +1393,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Ajakan atau tawaran sopan ('Maukah melakukan V?').",
         "examples": [
           {
-            "exampleJp": "一緒に映画を見ませんか。",
-            "exampleKana": "いっしょにえいがをみませんか。",
-            "exampleEn": "Won't you watch a movie with me?",
-            "exampleId": "Maukah Anda menonton film bersama saya?"
+            "exampleJp": "一緒に昼ごはんを食べませんか。",
+            "exampleKana": "いっしょにひるごはんをたべませんか。",
+            "exampleEn": "Won't you eat lunch with me?",
+            "exampleId": "Maukah Anda makan siang bersama saya?"
           },
           {
-            "exampleJp": "明日、公園へ行きませんか。",
-            "exampleKana": "あした、こうえんへいきませんか。",
-            "exampleEn": "Won't you go to the park tomorrow?",
-            "exampleId": "Maukah Anda pergi ke taman besok?"
+            "exampleJp": "明日、映画を見に行きませんか。",
+            "exampleKana": "あした、えいがをみにいきませんか。",
+            "exampleEn": "Won't you go to watch a movie tomorrow?",
+            "exampleId": "Maukah Anda pergi menonton film besok?"
           },
           {
-            "exampleJp": "コーヒーを飲みませんか。",
-            "exampleKana": "コーヒーをのみませんか。",
-            "exampleEn": "Won't you have some coffee?",
-            "exampleId": "Maukah Anda minum kopi?"
+            "exampleJp": "新しいレストランへ行きませんか。",
+            "exampleKana": "あたらしいレストランへいきませんか。",
+            "exampleEn": "Won't you go to the new restaurant?",
+            "exampleId": "Maukah Anda pergi ke restoran baru itu?"
           }
         ]
       },
@@ -1420,22 +1420,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Ajakan atau kesepakatan melakukan sesuatu bersama ('Mari lakukan V').",
         "examples": [
           {
-            "exampleJp": "少し休みましょう。",
-            "exampleKana": "すこしやすみましょう。",
-            "exampleEn": "Let's take a short break.",
-            "exampleId": "Mari kita istirahat sebentar."
+            "exampleJp": "ここで少し休みましょう。",
+            "exampleKana": "ここですこしやすみましょう。",
+            "exampleEn": "Let's take a break here.",
+            "exampleId": "Mari kita istirahat sebentar di sini."
           },
           {
-            "exampleJp": "タクシーで帰りましょう。",
-            "exampleKana": "タクシーでかえりましょう。",
-            "exampleEn": "Let's go home by taxi.",
-            "exampleId": "Mari kita pulang naik taksi."
+            "exampleJp": "一緒に美味しい料理を食べましょう。",
+            "exampleKana": "いっしょにおいしいりょうりをたべましょう。",
+            "exampleEn": "Let's eat delicious food together.",
+            "exampleId": "Mari kita makan masakan enak bersama-sama."
           },
           {
-            "exampleJp": "ここで写真を撮りましょう。",
-            "exampleKana": "ここでしゃしんをとりましょう。",
-            "exampleEn": "Let's take a photo here.",
-            "exampleId": "Mari kita ambil foto di sini."
+            "exampleJp": "明日、映画を見に行きましょう。",
+            "exampleKana": "あした、えいがをみにいきましょう。",
+            "exampleEn": "Let's go to watch a movie tomorrow.",
+            "exampleId": "Mari kita pergi menonton film besok."
           }
         ]
       },
@@ -1447,22 +1447,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan berlangsungnya suatu acara atau jadwal kegiatan.",
         "examples": [
           {
-            "exampleJp": "明日、テストがあります。",
-            "exampleKana": "あした、テストがあります。",
-            "exampleEn": "There is a test tomorrow.",
+            "exampleJp": "明日、試験があります。",
+            "exampleKana": "あした、しけんがあります。",
+            "exampleEn": "There is an exam tomorrow.",
             "exampleId": "Besok ada ujian."
           },
           {
-            "exampleJp": "来週、会議があります。",
-            "exampleKana": "らいしゅう、かいぎがあります。",
-            "exampleEn": "There is a meeting next week.",
-            "exampleId": "Minggu depan ada rapat."
+            "exampleJp": "来週、日本のお祭りがあります。",
+            "exampleKana": "らいしゅう、にほんのおまつりがあります。",
+            "exampleEn": "There is a Japanese festival next week.",
+            "exampleId": "Minggu depan ada festival Jepang."
           },
           {
-            "exampleJp": "今日、誕生会があります。",
-            "exampleKana": "きょう、たんじょうかいがあります。",
-            "exampleEn": "There is a birthday party today.",
-            "exampleId": "Hari ini ada pesta ulang tahun."
+            "exampleJp": "今日、楽しいパーティーがあります。",
+            "exampleKana": "きょう、たのしいパーティーがあります。",
+            "exampleEn": "There is a fun party today.",
+            "exampleId": "Hari ini ada pesta yang menyenangkan."
           }
         ]
       },
@@ -1474,22 +1474,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan lokasi berlangsungnya suatu acara.",
         "examples": [
           {
-            "exampleJp": "体育館でコンサートがあります。",
-            "exampleKana": "たいいくかんでコンサートがあります。",
-            "exampleEn": "There is a concert at the gymnasium.",
-            "exampleId": "Ada konser di gedung olahraga."
+            "exampleJp": "公園で日本のお祭りがあります。",
+            "exampleKana": "こうえんでにほんのおまつりがあります。",
+            "exampleEn": "There is a Japanese festival at the park.",
+            "exampleId": "Ada festival Jepang di taman."
           },
           {
-            "exampleJp": "学校で日本語の試験があります。",
-            "exampleKana": "がっこうでにほんごのしけんがあります。",
-            "exampleEn": "There is a Japanese test at school.",
-            "exampleId": "Ada ujian bahasa Jepang di sekolah."
+            "exampleJp": "学校で試験があります。",
+            "exampleKana": "がっこうでしけんがあります。",
+            "exampleEn": "There is an exam at the school.",
+            "exampleId": "Ada ujian di sekolah."
           },
           {
-            "exampleJp": "駅前で夏祭りがあります。",
-            "exampleKana": "えきまえでなつまつりがあります。",
-            "exampleEn": "There is a summer festival in front of the station.",
-            "exampleId": "Ada festival musim panas di depan stasiun."
+            "exampleJp": "新しいレストランでパーティーがあります。",
+            "exampleKana": "あたらしいレストランでパーティーがあります。",
+            "exampleEn": "There is a party at the new restaurant.",
+            "exampleId": "Ada pesta di restoran baru itu."
           }
         ]
       },
@@ -1504,17 +1504,17 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleJp": "机の上に本が三冊あります。",
             "exampleKana": "つくえのうえにほんがさんさつあります。",
             "exampleEn": "There are three books on the desk.",
-            "exampleId": "Ada tiga buku di atas meja."
+            "exampleId": "Ada tiga buah buku di atas meja."
           },
           {
-            "exampleJp": "冷蔵庫に卵が二つあります。",
-            "exampleKana": "れいぞうこにたまごがふたつあります。",
+            "exampleJp": "冷蔵庫の中に卵が二つあります。",
+            "exampleKana": "れいぞうこのなかにたまごがふたつあります。",
             "exampleEn": "There are two eggs in the refrigerator.",
             "exampleId": "Ada dua butir telur di dalam kulkas."
           },
           {
-            "exampleJp": "教室に学生が五人います。",
-            "exampleKana": "きょうしつにがくせいがごにんいます。",
+            "exampleJp": "教室に学生が五人あります。",
+            "exampleKana": "きょうしつにがくせいがごにんあります。",
             "exampleEn": "There are five students in the classroom.",
             "exampleId": "Ada lima orang murid di dalam kelas."
           }
@@ -1534,16 +1534,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Musim panas adalah yang paling panas dalam setahun."
           },
           {
-            "exampleJp": "果物の中でりんごがいちばん好きです。",
-            "exampleKana": "くだもののなかでりんごがいちばんすきです。",
-            "exampleEn": "Among fruits, I like apples the most.",
-            "exampleId": "Di antara buah-buahan, saya paling suka apel."
-          },
-          {
             "exampleJp": "クラスで田中さんがいちばん背が高いです。",
             "exampleKana": "クラスでたなかさんがいちばんせがたかいです。",
             "exampleEn": "Tanaka-san is the tallest in the class.",
             "exampleId": "Tanaka-san adalah yang paling tinggi di kelas."
+          },
+          {
+            "exampleJp": "果物の中でりんごがいちばん好きです。",
+            "exampleKana": "くだもののなかでりんごがいちばんすきです。",
+            "exampleEn": "Among fruits, I like apples the most.",
+            "exampleId": "Di antara buah-buahan, saya paling suka apel."
           }
         ]
       },
@@ -1555,22 +1555,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Membandingkan dua hal ('N1 lebih A daripada N2').",
         "examples": [
           {
-            "exampleJp": "このかばんはあの店のかばんより安いです。",
-            "exampleKana": "このかばんはあのみせのかばんよりやすいです。",
-            "exampleEn": "This bag is cheaper than the bag at that store.",
-            "exampleId": "Tas ini lebih murah daripada tas di toko itu."
+            "exampleJp": "りんごはバナナより大きいです。",
+            "exampleKana": "りんごはバナナよりおおきいです。",
+            "exampleEn": "Apples are bigger than bananas.",
+            "exampleId": "Apel lebih besar daripada pisang."
           },
           {
-            "exampleJp": "日本はタイより寒いです。",
-            "exampleKana": "にほんはタイよりさむいです。",
-            "exampleEn": "Japan is colder than Thailand.",
-            "exampleId": "Jepang lebih dingin daripada Thailand."
+            "exampleJp": "昨日は今日より寒かったです。",
+            "exampleKana": "きのうはきょうよりさむかったです。",
+            "exampleEn": "Yesterday was colder than today.",
+            "exampleId": "Kemarin lebih dingin daripada hari ini."
           },
           {
-            "exampleJp": "今日は昨日より忙しいです。",
-            "exampleKana": "きょうはきのうよりいそがしいです。",
-            "exampleEn": "Today is busier than yesterday.",
-            "exampleId": "Hari ini lebih sibuk daripada kemarin."
+            "exampleJp": "新幹線は電車より速いです。",
+            "exampleKana": "しんかんせんはでんしゃよりはやいです。",
+            "exampleEn": "The Shinkansen is faster than the train.",
+            "exampleId": "Shinkansen lebih cepat daripada kereta biasa."
           }
         ]
       },
@@ -1582,22 +1582,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan pilihan antara dua hal, dan memilih salah satunya.",
         "examples": [
           {
-            "exampleJp": "コーヒーと紅茶とどちらが飲みたいですか。コーヒーのほうがいいです。",
-            "exampleKana": "コーヒーとこうちゃとどちらがのみたいですか。コーヒーのほうがいいです。",
-            "exampleEn": "Which would you like to drink, coffee or tea? I prefer coffee.",
-            "exampleId": "Antara kopi dan teh, Anda ingin minum yang mana? Saya lebih memilih kopi."
+            "exampleJp": "コーヒーと紅茶とどちらが好きですか。コーヒーのほうが好きです。",
+            "exampleKana": "コーヒーとこうちゃとどちらがすきですか。コーヒーのほうがすきです。",
+            "exampleEn": "Which do you like better, coffee or tea? I prefer coffee.",
+            "exampleId": "Antara kopi dan teh, lebih suka yang mana? Saya lebih suka kopi."
           },
           {
-            "exampleJp": "夏と冬とどちらが好きですか。夏のほうが好きです。",
-            "exampleKana": "なつとふゆとどちらがすきですか。なつのほうがすきです。",
-            "exampleEn": "Which do you like better, summer or winter? I like summer better.",
-            "exampleId": "Antara musim panas dan musim dingin, Anda lebih suka yang mana? Saya lebih suka musim panas."
+            "exampleJp": "日本とタイとどちらが暑いですか。タイのほうが暑いです。",
+            "exampleKana": "にほんとタイとどちらがあついですか。タイのほうがあついです。",
+            "exampleEn": "Which is hotter, Japan or Thailand? Thailand is hotter.",
+            "exampleId": "Antara Jepang dan Thailand, mana yang lebih panas? Thailand lebih panas."
           },
           {
-            "exampleJp": "バスと電車とどちらが速いですか。電車のほうが速いです。",
-            "exampleKana": "バスとでんしゃとどちらがはやいですか。でんしゃのほうがはやいです。",
-            "exampleEn": "Which is faster, the bus or the train? The train is faster.",
-            "exampleId": "Antara bus dan kereta, mana yang lebih cepat? Kereta lebih cepat."
+            "exampleJp": "夏と冬とどちらが好きですか。冬のほうが好きです。",
+            "exampleKana": "なつとふゆとどちらがすきですか。ふゆのほうがすきです。",
+            "exampleEn": "Which do you like better, summer or winter? I prefer winter.",
+            "exampleId": "Antara musim panas dan musim dingin, lebih suka yang mana? Saya lebih suka musim dingin."
           }
         ]
       },
@@ -1609,20 +1609,20 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan apakah suatu aksi sudah selesai dilakukan.",
         "examples": [
           {
-            "exampleJp": "もう昼ごはんを食べましたか。",
-            "exampleKana": "もうひるごはんをたべましたか。",
-            "exampleEn": "Have you already eaten lunch?",
-            "exampleId": "Apakah kamu sudah makan siang?"
-          },
-          {
             "exampleJp": "もう宿題をしましたか。",
             "exampleKana": "もうしゅくだいをしましたか。",
             "exampleEn": "Have you already done your homework?",
             "exampleId": "Apakah kamu sudah mengerjakan PR?"
           },
           {
-            "exampleJp": "もう切符を買いましたか。",
-            "exampleKana": "もうきっぷをかいましたか。",
+            "exampleJp": "もう昼ごはんを食べましたか。",
+            "exampleKana": "もうひるごはんをたべましたか。",
+            "exampleEn": "Have you already eaten lunch?",
+            "exampleId": "Apakah kamu sudah makan siang?"
+          },
+          {
+            "exampleJp": "もうチケットを買いましたか。",
+            "exampleKana": "もうちけっとをかいましたか。",
             "exampleEn": "Have you already bought the ticket?",
             "exampleId": "Apakah kamu sudah membeli tiketnya?"
           }
@@ -1636,22 +1636,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Partikel akhir kalimat untuk memberikan informasi baru atau penekanan.",
         "examples": [
           {
-            "exampleJp": "明日は休みですよ。",
-            "exampleKana": "あしたはやすみですよ。",
-            "exampleEn": "Tomorrow is a day off, you know.",
-            "exampleId": "Besok itu libur, lho."
+            "exampleJp": "もう宿題をしましたよ。",
+            "exampleKana": "もうしゅくだいをしましたよ。",
+            "exampleEn": "I have already done my homework, you know.",
+            "exampleId": "Aku sudah mengerjakan PR, lho."
           },
           {
-            "exampleJp": "この映画はとても面白いですよ。",
-            "exampleKana": "このえいがはとてもおもしろいですよ。",
-            "exampleEn": "This movie is very interesting, I tell you.",
-            "exampleId": "Film ini sangat menarik, lho."
+            "exampleJp": "もう昼ごはんを食べましたよ。",
+            "exampleKana": "もうひるごはんをたべましたよ。",
+            "exampleEn": "I have already eaten lunch, so don't worry.",
+            "exampleId": "Aku sudah makan siang, kok."
           },
           {
-            "exampleJp": "傘を持って行ってくださいよ。",
-            "exampleKana": "かさをもっていってくださいよ。",
-            "exampleEn": "Please take an umbrella with you (because it might rain).",
-            "exampleId": "Tolong bawa payung ya."
+            "exampleJp": "もうチケットを買いましたよ。明日行きましょう。",
+            "exampleKana": "もうちけっとをかいましたよ。あしたゆきましょう。",
+            "exampleEn": "I have already bought the ticket. Let's go tomorrow!",
+            "exampleId": "Aku sudah beli tiketnya, lho. Ayo kita pergi besok!"
           }
         ]
       }
@@ -1676,16 +1676,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Tanaka-san ada di dalam kelas."
           },
           {
-            "exampleJp": "猫は机の下にいます。",
-            "exampleKana": "ねこはつくえのしたにいます。",
-            "exampleEn": "The cat is under the desk.",
-            "exampleId": "Kucing itu ada di bawah meja."
+            "exampleJp": "本は机の上にあります。",
+            "exampleKana": "ほんはつくえのうえにあります。",
+            "exampleEn": "The book is on the desk.",
+            "exampleId": "Buku ada di atas meja."
           },
           {
-            "exampleJp": "私の本はカバンの中にあります。",
-            "exampleKana": "わたしのほんはかばんのなかにあります。",
-            "exampleEn": "My book is in the bag.",
-            "exampleId": "Buku saya ada di dalam tas."
+            "exampleJp": "猫は庭にいます。",
+            "exampleKana": "ねこはにわにいます。",
+            "exampleEn": "The cat is in the garden.",
+            "exampleId": "Kucing ada di halaman."
           }
         ]
       },
@@ -1697,22 +1697,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan apa yang ada di suatu tempat ('Di N1 ada N2').",
         "examples": [
           {
-            "exampleJp": "公園に子供がいます。",
-            "exampleKana": "こうえんにこどもがいます。",
-            "exampleEn": "There are children in the park.",
-            "exampleId": "Di taman ada anak-anak."
+            "exampleJp": "教室に田中さんがいます。",
+            "exampleKana": "きょうしつにたなかさんがいます。",
+            "exampleEn": "There is Tanaka-san in the classroom.",
+            "exampleId": "Di dalam kelas ada Tanaka-san."
           },
           {
-            "exampleJp": "部屋に机があります。",
-            "exampleKana": "へやにつくえがあります。",
-            "exampleEn": "There is a desk in the room.",
-            "exampleId": "Di dalam kamar ada meja."
+            "exampleJp": "机の上に本があります。",
+            "exampleKana": "つくえのうえにほんがあります。",
+            "exampleEn": "There is a book on the desk.",
+            "exampleId": "Di atas meja ada buku."
           },
           {
-            "exampleJp": "冷蔵庫にビールがあります。",
-            "exampleKana": "れいぞうこにびーるがあります。",
-            "exampleEn": "There is beer in the refrigerator.",
-            "exampleId": "Di dalam kulkas ada bir."
+            "exampleJp": "庭に猫がいます。",
+            "exampleKana": "にわにねこがいます。",
+            "exampleEn": "There is a cat in the garden.",
+            "exampleId": "Di halaman ada kucing."
           }
         ]
       },
@@ -1724,22 +1724,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Meminta tolong atau instruksi secara sopan ('Tolong lakukan V').",
         "examples": [
           {
-            "exampleJp": "ここで待ってください。",
-            "exampleKana": "ここでまってください。",
-            "exampleEn": "Please wait here.",
-            "exampleId": "Tolong tunggu di sini."
+            "exampleJp": "教室に田中さんがいます。呼んでください。",
+            "exampleKana": "きょうしつにたなかさんがいます。よんでください。",
+            "exampleEn": "Tanaka-san is in the classroom. Please call him.",
+            "exampleId": "Tanaka-san ada di kelas. Tolong panggil dia."
           },
           {
-            "exampleJp": "名前を書いてください。",
-            "exampleKana": "なまえをかいてください。",
-            "exampleEn": "Please write your name.",
-            "exampleId": "Tolong tulis nama Anda."
+            "exampleJp": "机の上に本があります。取ってください。",
+            "exampleKana": "つくえのうえにほんがあります。とってください。",
+            "exampleEn": "There is a book on the desk. Please take it.",
+            "exampleId": "Ada buku di atas meja. Tolong ambilkan."
           },
           {
-            "exampleJp": "ドアを開けてください。",
-            "exampleKana": "どあをあけてください。",
-            "exampleEn": "Please open the door.",
-            "exampleId": "Tolong buka pintunya."
+            "exampleJp": "庭に猫がいます。見てください。",
+            "exampleKana": "にわにねこがいます。みてください。",
+            "exampleEn": "There is a cat in the garden. Please look.",
+            "exampleId": "Ada kucing di halaman. Tolong lihat."
           }
         ]
       },
@@ -1751,22 +1751,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan tindakan yang sedang berlangsung atau keadaan.",
         "examples": [
           {
-            "exampleJp": "今、日本語を勉強しています。",
-            "exampleKana": "いま、にほんごをべんきょうしています。",
-            "exampleEn": "I am studying Japanese now.",
-            "exampleId": "Sekarang saya sedang belajar bahasa Jepang."
+            "exampleJp": "田中さんは教室で本を読んでいます。",
+            "exampleKana": "たなかさんはきょうしつでほんをよんでいます。",
+            "exampleEn": "Tanaka-san is reading a book in the classroom.",
+            "exampleId": "Tanaka-san sedang membaca buku di dalam kelas."
           },
           {
-            "exampleJp": "母は料理を作っています。",
-            "exampleKana": "はははりょうりをつくっています。",
-            "exampleEn": "My mother is cooking.",
-            "exampleId": "Ibu sedang memasak."
+            "exampleJp": "猫が庭で寝ています。",
+            "exampleKana": "ねこがにわでねています。",
+            "exampleEn": "The cat is sleeping in the garden.",
+            "exampleId": "Kucing sedang tidur di halaman."
           },
           {
-            "exampleJp": "雨が降っています。",
-            "exampleKana": "あめがふっています。",
-            "exampleEn": "It is raining.",
-            "exampleId": "Sedang hujan."
+            "exampleJp": "机の上に本が置いてあります。",
+            "exampleKana": "つくえのうえにほんがおいてあります。",
+            "exampleEn": "A book is placed on the desk.",
+            "exampleId": "Ada buku yang diletakkan di atas meja."
           }
         ]
       },
@@ -1778,22 +1778,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menawarkan bantuan secara sopan ('Bagaimana kalau saya lakukan V?').",
         "examples": [
           {
-            "exampleJp": "重い荷物を持ちましょうか。",
-            "exampleKana": "おもいにもつをもちましょうか。",
-            "exampleEn": "Shall I carry your heavy luggage?",
-            "exampleId": "Bolehkah saya bantu membawakan barang bawaan Anda yang berat?"
+            "exampleJp": "窓を開けましょうか。",
+            "exampleKana": "まどをあけましょうか。",
+            "exampleEn": "Shall I open the window?",
+            "exampleId": "Bagaimana kalau saya buka jendelanya?"
           },
           {
-            "exampleJp": "窓を閉めましょうか。",
-            "exampleKana": "まどをしめましょうか。",
-            "exampleEn": "Shall I close the window?",
-            "exampleId": "Bagaimana kalau saya tutup jendelanya?"
+            "exampleJp": "荷物を持ちましょうか。",
+            "exampleKana": "にもつをもちましょうか。",
+            "exampleEn": "Shall I carry your luggage?",
+            "exampleId": "Bagaimana kalau saya bawakan barangnya?"
           },
           {
-            "exampleJp": "タクシーを呼びましょうか。",
-            "exampleKana": "たくしーをよびましょうか。",
-            "exampleEn": "Shall I call a taxi?",
-            "exampleId": "Perlukah saya panggilkan taksi?"
+            "exampleJp": "手伝いましょうか。",
+            "exampleKana": "てつだいましょうか。",
+            "exampleEn": "Shall I help you?",
+            "exampleId": "Bagaimana kalau saya bantu?"
           }
         ]
       },
@@ -1805,22 +1805,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan cara melakukan suatu tindakan ('cara melakukan V').",
         "examples": [
           {
-            "exampleJp": "この漢字の読み方を教えてください。",
-            "exampleKana": "このかんじのよみかたをおしえてください。",
-            "exampleEn": "Please teach me how to read this kanji.",
-            "exampleId": "Tolong ajarkan saya cara membaca kanji ini."
+            "exampleJp": "漢字の書き方を教えてください。",
+            "exampleKana": "かんじのかきかたをおしえてください。",
+            "exampleEn": "Please teach me how to write Kanji.",
+            "exampleId": "Tolong ajari saya cara menulis Kanji."
           },
           {
-            "exampleJp": "自転車の乗り方を練習します。",
-            "exampleKana": "じてんしゃののりかたをれんしゅうします。",
-            "exampleEn": "I will practice how to ride a bicycle.",
-            "exampleId": "Saya akan berlatih cara mengendarai sepeda."
+            "exampleJp": "この薬の飲み方を説明しましょうか。",
+            "exampleKana": "このくすりののみかたをせつめいしましょうか。",
+            "exampleEn": "Shall I explain how to take this medicine?",
+            "exampleId": "Bagaimana kalau saya jelaskan cara meminum obat ini?"
           },
           {
-            "exampleJp": "美味しいコーヒーの入れ方を知っていますか。",
-            "exampleKana": "おいしいこーひーのいれかたをしっていますか。",
-            "exampleEn": "Do you know how to make delicious coffee?",
-            "exampleId": "Apakah Anda tahu cara membuat kopi yang enak?"
+            "exampleJp": "おいしいコーヒーの作り方を教えてください。",
+            "exampleKana": "おいしいコーヒーのつくりかたをおしえてください。",
+            "exampleEn": "Please teach me how to make delicious coffee.",
+            "exampleId": "Tolong ajari saya cara membuat kopi yang enak."
           }
         ]
       },
@@ -1832,22 +1832,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata keterangan yang menyatakan 'belum / sudah'.",
         "examples": [
           {
-            "exampleJp": "宿題はもう終わりましたか。いいえ、まだです。",
-            "exampleKana": "しゅくだい M もうおわりましたか。いいえ、まだです。",
-            "exampleEn": "Have you finished your homework yet? No, not yet.",
-            "exampleId": "Apakah PR-nya sudah selesai? Belum."
+            "exampleJp": "宿題はもう終わりましたか。",
+            "exampleKana": "しゅくだいはもうおわりましたか。",
+            "exampleEn": "Have you finished your homework yet?",
+            "exampleId": "Apakah PR-nya sudah selesai?"
           },
           {
-            "exampleJp": "もう昼ごはんを食べました。",
-            "exampleKana": "もうひるごはんをたべました。",
-            "exampleEn": "I have already eaten lunch.",
-            "exampleId": "Saya sudah makan siang."
+            "exampleJp": "いいえ、まだ終わっていません。",
+            "exampleKana": "いいえ、まだおわっていません。",
+            "exampleEn": "No, I haven't finished yet.",
+            "exampleId": "Belum, saya belum menyelesaikannya."
           },
           {
-            "exampleJp": "まだ雨が降っています。",
-            "exampleKana": "まだあめがふっています。",
-            "exampleEn": "It is still raining.",
-            "exampleId": "Hujannya masih turun."
+            "exampleJp": "もうお昼ご飯を食べましたか。いいえ、まだです。",
+            "exampleKana": "もうおひるごはんをたべましたか。いいえ、まだです。",
+            "exampleEn": "Have you already eaten lunch? No, not yet.",
+            "exampleId": "Apakah sudah makan siang? Belum."
           }
         ]
       },
@@ -1859,22 +1859,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Penanda subjek untuk kata tanya ('Siapa yang...?').",
         "examples": [
           {
-            "exampleJp": "誰がこのケーキを作りましたか。",
-            "exampleKana": "だれがこのけーきをつくりましたか。",
-            "exampleEn": "Who made this cake?",
-            "exampleId": "Siapa yang membuat kue ini?"
+            "exampleJp": "誰が窓を開けましたか。",
+            "exampleKana": "だれがまどをあけましたか。",
+            "exampleEn": "Who opened the window?",
+            "exampleId": "Siapa yang membuka jendela?"
           },
           {
-            "exampleJp": "昨日、誰がここに来ましたか。",
-            "exampleKana": "きのう、だれがここにきましたか。",
-            "exampleEn": "Who came here yesterday?",
-            "exampleId": "Siapa yang datang ke sini kemarin?"
+            "exampleJp": "誰がこの漢字の書き方を知っていますか。",
+            "exampleKana": "だれがこのかんじのかきかたをしっていますか。",
+            "exampleEn": "Who knows how to write this Kanji?",
+            "exampleId": "Siapa yang tahu cara menulis Kanji ini?"
           },
           {
-            "exampleJp": "誰が一番速く走れますか。",
-            "exampleKana": "だれがいちはんはやくはしれますか。",
-            "exampleEn": "Who can run the fastest?",
-            "exampleId": "Siapa yang bisa berlari paling cepat?"
+            "exampleJp": "誰がもう宿題を終わらせましたか。",
+            "exampleKana": "だれがもうしゅくだいをおわらせましたか。",
+            "exampleEn": "Who has already finished the homework?",
+            "exampleId": "Siapa yang sudah menyelesaikan PR?"
           }
         ]
       },
@@ -1886,22 +1886,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "N yang mana / yang mana (di antara tiga pilihan atau lebih).",
         "examples": [
           {
-            "exampleJp": "どのペンがあなたのものですか。",
-            "exampleKana": "どのぺんがあなたのものですか。",
-            "exampleEn": "Which pen is yours?",
-            "exampleId": "Pena yang mana milikmu?"
+            "exampleJp": "どの傘があなたの傘ですか。",
+            "exampleKana": "どの かさが あなたの かさですか。",
+            "exampleEn": "Which umbrella is yours?",
+            "exampleId": "Payung yang mana milik Anda?"
           },
           {
-            "exampleJp": "この中で、どれが一番おいしいですか。",
-            "exampleKana": "このなかで、どれがいちばんおいしいですか。",
-            "exampleEn": "Which one of these is the most delicious?",
-            "exampleId": "Di antara ini semua, yang mana yang paling enak?"
+            "exampleJp": "この中でどれが一番おいしいですか。",
+            "exampleKana": "この なかで どれが いちばん おいしいですか。",
+            "exampleEn": "Which one among these is the most delicious?",
+            "exampleId": "Di antara ini, yang mana yang paling enak?"
           },
           {
-            "exampleJp": "どの道を行けばいいですか。",
-            "exampleKana": "どのちみちをいけばいいですか。",
-            "exampleEn": "Which road should I take?",
-            "exampleId": "Jalan yang mana yang harus saya lalui?"
+            "exampleJp": "どのペンを使いますか。どれでもいいです。",
+            "exampleKana": "どの ぺんを つかいますか。どれでも いいです。",
+            "exampleEn": "Which pen will you use? Any one is fine.",
+            "exampleId": "Pena yang mana yang akan Anda gunakan? Yang mana saja boleh."
           }
         ]
       },
@@ -1914,21 +1914,21 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "examples": [
           {
             "exampleJp": "箸でご飯を食べます。",
-            "exampleKana": "はしでごはんをたべます。",
+            "exampleKana": "はしで ごはんを たべます。",
             "exampleEn": "I eat rice with chopsticks.",
             "exampleId": "Saya makan nasi dengan sumpit."
           },
           {
-            "exampleJp": "日本語で手紙を書きました。",
-            "exampleKana": "にほんごでてがみをかきました。",
-            "exampleEn": "I wrote a letter in Japanese.",
-            "exampleId": "Saya menulis surat dengan bahasa Jepang."
+            "exampleJp": "どの箸で食べますか。この箸で食べます。",
+            "exampleKana": "どの はしで たべますか。この はしで たべます。",
+            "exampleEn": "Which chopsticks will you use to eat? I will eat with these chopsticks.",
+            "exampleId": "Anda akan makan dengan sumpit yang mana? Saya akan makan dengan sumpit ini."
           },
           {
-            "exampleJp": "ハサミで紙を切ります。",
-            "exampleKana": "はさみでかみをきります。",
-            "exampleEn": "I cut the paper with scissors.",
-            "exampleId": "Saya memotong kertas dengan gunting."
+            "exampleJp": "どれで切りますか。このナイフで切ります。",
+            "exampleKana": "どれで きりますか。この ないふで きります。",
+            "exampleEn": "Which one will you use to cut? I will cut with this knife.",
+            "exampleId": "Anda akan memotong dengan yang mana? Saya akan memotong dengan pisau ini."
           }
         ]
       }
@@ -1947,22 +1947,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan pekerjaan tetap atau kebiasaan rutin.",
         "examples": [
           {
-            "exampleJp": "私は銀行で働いています。",
-            "exampleKana": "わたしはぎんこうではたらいています。",
-            "exampleEn": "I work at a bank.",
-            "exampleId": "Saya bekerja di bank."
+            "exampleJp": "私は日本語を教えています。",
+            "exampleKana": "わたしはにほんごをおしえています。",
+            "exampleEn": "I teach Japanese.",
+            "exampleId": "Saya mengajar bahasa Jepang."
           },
           {
-            "exampleJp": "妹は毎日ピアノを練習しています。",
-            "exampleKana": "いもうとはまいにちぴあのをれんしゅうしています。",
-            "exampleEn": "My younger sister practices the piano every day.",
-            "exampleId": "Adik perempuan saya berlatih piano setiap hari."
+            "exampleJp": "父は銀行で働いています。",
+            "exampleKana": "ちちはぎんこうではたらいています。",
+            "exampleEn": "My father works at a bank.",
+            "exampleId": "Ayah saya bekerja di bank."
           },
           {
-            "exampleJp": "父は車で会社へ通っています。",
-            "exampleKana": "ちちはくるまでかいしゃへかよっています。",
-            "exampleEn": "My father commutes to work by car.",
-            "exampleId": "Ayah saya pergi ke kantor dengan mobil."
+            "exampleJp": "兄は毎日ジムで運動しています。",
+            "exampleKana": "あにはまいにちじむでうんどうしています。",
+            "exampleEn": "My older brother exercises at the gym every day.",
+            "exampleId": "Kakak laki-laki saya berolahraga di gym setiap hari."
           }
         ]
       },
@@ -1976,20 +1976,20 @@ export const BUNPOU_DATA: BunpouLesson[] = [
           {
             "exampleJp": "象は鼻が長いです。",
             "exampleKana": "ぞうははながながいです。",
-            "exampleEn": "Elephants have long noses.",
+            "exampleEn": "The elephant has a long nose.",
             "exampleId": "Gajah hidungnya panjang."
           },
           {
-            "exampleJp": "あの人は背が高いです。",
-            "exampleKana": "あのひとはせがたかいです。",
-            "exampleEn": "That person is tall.",
-            "exampleId": "Orang itu badannya tinggi."
+            "exampleJp": "あの人は目が大きいです。",
+            "exampleKana": "あのひとはめがおおきいです。",
+            "exampleEn": "That person has big eyes.",
+            "exampleId": "Orang itu matanya besar."
           },
           {
-            "exampleJp": "この部屋は窓が大きいです。",
-            "exampleKana": "このへやはまどがおおきいです。",
-            "exampleEn": "This room has large windows.",
-            "exampleId": "Kamar ini jendelanya besar."
+            "exampleJp": "私の先生は日本語が上手です。",
+            "exampleKana": "わたしのせんせいはにほんごがじょうずです。",
+            "exampleEn": "My teacher is good at Japanese.",
+            "exampleId": "Guru saya mahir bahasa Jepang."
           }
         ]
       },
@@ -2001,22 +2001,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menghubungkan kata sifat untuk menjelaskan beberapa karakteristik.",
         "examples": [
           {
-            "exampleJp": "この料理は安くて、おいしいです。",
+            "exampleJp": "この料理は安くて、美味しいです。",
             "exampleKana": "このりょうりはやすくて、おいしいです。",
             "exampleEn": "This food is cheap and delicious.",
-            "exampleId": "Masakan ini murah dan enak."
+            "exampleId": "Makanan ini murah dan enak."
           },
           {
-            "exampleJp": "昨日は天気が良くて、暑かったです。",
-            "exampleKana": "きのうはてんきがよくて、あつかったです。",
-            "exampleEn": "The weather was good and hot yesterday.",
-            "exampleId": "Cuaca kemarin bagus dan panas."
+            "exampleJp": "あの先生は親切で、日本語が上手です。",
+            "exampleKana": "あのせんせいはしんせつで、にほんごがじょうずです。",
+            "exampleEn": "That teacher is kind and good at Japanese.",
+            "exampleId": "Guru itu baik hati dan mahir bahasa Jepang."
           },
           {
-            "exampleJp": "彼は親切で、ハンサムです。",
-            "exampleKana": "かれはしんせつで、はんさむです。",
-            "exampleEn": "He is kind and handsome.",
-            "exampleId": "Dia baik hati dan tampan."
+            "exampleJp": "私の家は広くて、静かです。",
+            "exampleKana": "わたしのいえはひろくて、しずかです。",
+            "exampleEn": "My house is spacious and quiet.",
+            "exampleId": "Rumah saya luas dan tenang."
           }
         ]
       },
@@ -2034,16 +2034,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Saya memberikan hadiah kepada teman."
           },
           {
-            "exampleJp": "私は先生に花をもらいました。",
-            "exampleKana": "わたしはせんせいにはなをもらいました。",
-            "exampleEn": "I received flowers from my teacher.",
-            "exampleId": "Saya menerima bunga dari guru."
+            "exampleJp": "私は先生に美味しいお菓子をもらいました。",
+            "exampleKana": "わたしはせんせいにおいしいおかしをもらいました。",
+            "exampleEn": "I received delicious snacks from my teacher.",
+            "exampleId": "Saya menerima camilan enak dari guru."
           },
           {
-            "exampleJp": "母が私に本をくれました。",
-            "exampleKana": "ははがわたしにほんをくれました。",
-            "exampleEn": "My mother gave me a book.",
-            "exampleId": "Ibu memberikan buku kepada saya."
+            "exampleJp": "母は私に新しい服をくれました。",
+            "exampleKana": "はははわたしにあたらしいふくをくれました。",
+            "exampleEn": "My mother gave me new clothes.",
+            "exampleId": "Ibu memberikan baju baru untuk saya."
           }
         ]
       },
@@ -2062,15 +2062,15 @@ export const BUNPOU_DATA: BunpouLesson[] = [
           },
           {
             "exampleJp": "家に家族が四人います。",
-            "exampleKana": "いえにかぞくがよにんいます。",
+            "exampleKana": "うちに かぞくが よにん います。",
             "exampleEn": "There are four family members at home.",
             "exampleId": "Ada empat orang anggota keluarga di rumah."
           },
           {
-            "exampleJp": "公園に子供が五人います。",
-            "exampleKana": "こうえんにこどもがごにんいます。",
-            "exampleEn": "There are five children in the park.",
-            "exampleId": "Ada lima orang anak di taman."
+            "exampleJp": "公園に友達が二人います。",
+            "exampleKana": "こうえんに ともだちが ふたり います。",
+            "exampleEn": "There are two friends at the park.",
+            "exampleId": "Ada dua orang teman di taman."
           }
         ]
       },
@@ -2082,22 +2082,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Melakukan suatu aksi dengan jumlah orang tertentu.",
         "examples": [
           {
-            "exampleJp": "三人で映画を見に行きました。",
-            "exampleKana": "さんにんでえいがをみにいきました。",
-            "exampleEn": "Three of us went to see a movie.",
-            "exampleId": "Kami pergi menonton film bertiga."
+            "exampleJp": "三人で教室を掃除します。",
+            "exampleKana": "さんにんで きょうしつを そうじします。",
+            "exampleEn": "The three of us will clean the classroom.",
+            "exampleId": "Kami bertiga akan membersihkan kelas."
           },
           {
-            "exampleJp": "二人でランチを食べます。",
-            "exampleKana": "ふたりでランチをたべます。",
-            "exampleEn": "The two of us will eat lunch.",
-            "exampleId": "Kami berdua akan makan siang."
+            "exampleJp": "四人で一緒に晩ご飯を食べます。",
+            "exampleKana": "よにんで いっしょに ばんごはんを たべます。",
+            "exampleEn": "The four of us will eat dinner together.",
+            "exampleId": "Kami berempat akan makan malam bersama."
           },
           {
-            "exampleJp": "四人で旅行に行きたいです。",
-            "exampleKana": "よにんでりょこうにいきたいです。",
-            "exampleEn": "I want to go on a trip with four people.",
-            "exampleId": "Saya ingin pergi berwisata dengan empat orang."
+            "exampleJp": "二人で公園へ散歩に行きます。",
+            "exampleKana": "ふたりで こうえんへ さんぽに いきます。",
+            "exampleEn": "The two of us will go for a walk to the park.",
+            "exampleId": "Kami berdua akan pergi berjalan-jalan ke taman."
           }
         ]
       }
@@ -2122,16 +2122,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Hobi saya adalah membaca buku."
           },
           {
-            "exampleJp": "日本語を話すことは楽しいです。",
-            "exampleKana": "にほんごをはなすことはたのしいです。",
-            "exampleEn": "Speaking Japanese is fun.",
-            "exampleId": "Berbicara bahasa Jepang itu menyenangkan."
+            "exampleJp": "寝ることは大切です。",
+            "exampleKana": "ねることはたいせつです。",
+            "exampleEn": "Sleeping is important.",
+            "exampleId": "Tidur itu penting."
           },
           {
-            "exampleJp": "毎日運動することは大切です。",
-            "exampleKana": "まいにちうんどうすることはたいせつです。",
-            "exampleEn": "Exercising every day is important.",
-            "exampleId": "Berolahraga setiap hari itu penting."
+            "exampleJp": "日本語を勉強することは楽しいです。",
+            "exampleKana": "にほんごをべんきょうすることはたのしいです。",
+            "exampleEn": "Studying Japanese is fun.",
+            "exampleId": "Belajar bahasa Jepang itu menyenangkan."
           }
         ]
       },
@@ -2145,20 +2145,20 @@ export const BUNPOU_DATA: BunpouLesson[] = [
           {
             "exampleJp": "私は漢字を書くことができます。",
             "exampleKana": "わたしはかんじをかくことができます。",
-            "exampleEn": "I can write Kanji.",
-            "exampleId": "Saya bisa menulis Kanji."
+            "exampleEn": "I can write kanji.",
+            "exampleId": "Saya bisa menulis kanji."
           },
           {
-            "exampleJp": "ここで写真を撮ることができますか。",
-            "exampleKana": "ここでしゃしんをとることができますか。",
-            "exampleEn": "Can I take pictures here?",
-            "exampleId": "Apakah saya boleh/bisa mengambil foto di sini?"
+            "exampleJp": "泳ぐことができますか。",
+            "exampleKana": "およぐことができますか。",
+            "exampleEn": "Can you swim?",
+            "exampleId": "Apakah Anda bisa berenang?"
           },
           {
-            "exampleJp": "泳ぐことができません。",
-            "exampleKana": "およぐことができません。",
-            "exampleEn": "I cannot swim.",
-            "exampleId": "Saya tidak bisa berenang."
+            "exampleJp": "毎日、日本語を勉強することができます。",
+            "exampleKana": "まいにち、にほんごをべんきょうすることができます。",
+            "exampleEn": "I can study Japanese every day.",
+            "exampleId": "Saya bisa belajar bahasa Jepang setiap hari."
           }
         ]
       },
@@ -2170,22 +2170,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menghubungkan tindakan / menyatakan sebab-akibat sederhana.",
         "examples": [
           {
-            "exampleJp": "風邪をひいて、学校を休みました。",
-            "exampleKana": "かぜをひいて、がっこうをやすみました。",
-            "exampleEn": "I caught a cold and was absent from school.",
-            "exampleId": "Saya terkena flu, jadi saya tidak masuk sekolah."
+            "exampleJp": "風邪をひいて、学校を休みます。",
+            "exampleKana": "かぜをひいて、がっこうをやすみます。",
+            "exampleEn": "I caught a cold, so I will take a day off from school.",
+            "exampleId": "Saya masuk angin, jadi saya libur sekolah."
           },
           {
-            "exampleJp": "雨が降って、出かけませんでした。",
-            "exampleKana": "あめがふって、でかけませんでした。",
-            "exampleEn": "It rained, so I didn't go out.",
-            "exampleId": "Hujan turun, jadi saya tidak pergi keluar."
+            "exampleJp": "お腹がすいて、何も食べることができません。",
+            "exampleKana": "おなかがすいて、なにもたべることができません。",
+            "exampleEn": "I am hungry, so I cannot eat anything (yet).",
+            "exampleId": "Saya lapar, jadi saya tidak bisa makan apa-apa."
           },
           {
-            "exampleJp": "忙しくて、友達に会えません。",
-            "exampleKana": "いそがしくて、ともだちにあえません。",
-            "exampleEn": "I am busy, so I cannot meet my friend.",
-            "exampleId": "Saya sibuk, jadi saya tidak bisa menemui teman."
+            "exampleJp": "本を読んで、新しいことを知ることができました。",
+            "exampleKana": "ほんをよんで、あたらしいことをしることができました。",
+            "exampleEn": "I read a book, and (because of that) I was able to learn new things.",
+            "exampleId": "Saya membaca buku, dan (karenanya) saya bisa mengetahui hal baru."
           }
         ]
       },
@@ -2197,22 +2197,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan frekuensi dalam jangka waktu tertentu ('X kali dalam [jangka waktu]').",
         "examples": [
           {
-            "exampleJp": "一週間に二回テニスをします。",
-            "exampleKana": "いっしゅうかんににかいてにすをします。",
-            "exampleEn": "I play tennis twice a week.",
-            "exampleId": "Saya bermain tenis dua kali dalam seminggu."
+            "exampleJp": "一週間に二回、運動します。",
+            "exampleKana": "いっしゅうかんににかい、うんどうします。",
+            "exampleEn": "I exercise twice a week.",
+            "exampleId": "Saya berolahraga dua kali seminggu."
           },
           {
-            "exampleJp": "一ヶ月に一回本を買います。",
-            "exampleKana": "いっかげつにいっかいほんをかいます。",
-            "exampleEn": "I buy a book once a month.",
-            "exampleId": "Saya membeli buku satu kali dalam sebulan."
+            "exampleJp": "一ヶ月に三回、映画を見ることができます。",
+            "exampleKana": "いっかげつにさんかい、えいがをみることができます。",
+            "exampleEn": "I can watch movies three times a month.",
+            "exampleId": "Saya bisa menonton film tiga kali sebulan."
           },
           {
-            "exampleJp": "一日に三回薬を飲んでください。",
-            "exampleKana": "いちにちにさんかいくすりをのんでください。",
-            "exampleEn": "Please take the medicine three times a day.",
-            "exampleId": "Tolong minum obat tiga kali sehari."
+            "exampleJp": "疲れて、一日に一回も日本語を勉強することができませんでした。",
+            "exampleKana": "つかれて、いちにちにいっかいもにほんごをべんきょうすることができませんでした。",
+            "exampleEn": "I was tired, so I couldn't even study Japanese once today.",
+            "exampleId": "Saya lelah, jadi hari ini saya tidak bisa belajar bahasa Jepang sekalipun."
           }
         ]
       },
@@ -2224,22 +2224,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata keterangan penunjuk frekuensi kegiatan.",
         "examples": [
           {
-            "exampleJp": "私はいつも朝ご飯を食べます。",
+            "exampleJp": "私はいつも朝ごはんを食べます。",
             "exampleKana": "わたしはいつもあさごはんをたべます。",
             "exampleEn": "I always eat breakfast.",
             "exampleId": "Saya selalu makan sarapan."
           },
           {
-            "exampleJp": "ときどき図書館で勉強します。",
-            "exampleKana": "ときどきとしょかんでべんきょうします。",
-            "exampleEn": "I sometimes study at the library.",
-            "exampleId": "Saya terkadang belajar di perpustakaan."
+            "exampleJp": "ときどき図書館で本を読みます。",
+            "exampleKana": "ときどきとしょかんではんをよみます。",
+            "exampleEn": "I sometimes read books at the library.",
+            "exampleId": "Saya terkadang membaca buku di perpustakaan."
           },
           {
-            "exampleJp": "私は全然お酒を飲みません。",
-            "exampleKana": "わたしはぜんぜんおさけをのみません。",
-            "exampleEn": "I don't drink alcohol at all.",
-            "exampleId": "Saya sama sekali tidak minum alkohol."
+            "exampleJp": "私はあまり肉を食べません。全然食べません。",
+            "exampleKana": "わたしはあまりにくをたべません。ぜんぜんたべません。",
+            "exampleEn": "I don't eat meat much. I don't eat it at all.",
+            "exampleId": "Saya tidak terlalu banyak makan daging. Saya sama sekali tidak memakannya."
           }
         ]
       },
@@ -2251,22 +2251,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan cara atau rute ('bagaimana caranya?').",
         "examples": [
           {
-            "exampleJp": "どうやって駅へ行きますか。",
-            "exampleKana": "どうやってえきへいきますか。",
-            "exampleEn": "How do you get to the station?",
-            "exampleId": "Bagaimana cara pergi ke stasiun?"
+            "exampleJp": "どうやって学校へ行きますか。",
+            "exampleKana": "どうやってがっこうへいきますか。",
+            "exampleEn": "How do you go to school?",
+            "exampleId": "Bagaimana cara Anda pergi ke sekolah?"
+          },
+          {
+            "exampleJp": "どうやって日本語を勉強しますか。",
+            "exampleKana": "どうやってにほんごをべんきょうしますか。",
+            "exampleEn": "How do you study Japanese?",
+            "exampleId": "Bagaimana cara Anda belajar bahasa Jepang?"
           },
           {
             "exampleJp": "どうやってこの漢字を書きますか。",
             "exampleKana": "どうやってこのかんじをかきますか。",
-            "exampleEn": "How do you write this Kanji?",
-            "exampleId": "Bagaimana cara menulis Kanji ini?"
-          },
-          {
-            "exampleJp": "どうやって日本語を勉強しましたか。",
-            "exampleKana": "どうやってにほんごをべんきょうしましたか。",
-            "exampleEn": "How did you study Japanese?",
-            "exampleId": "Bagaimana cara Anda belajar bahasa Jepang?"
+            "exampleEn": "How do you write this kanji?",
+            "exampleId": "Bagaimana cara menulis kanji ini?"
           }
         ]
       },
@@ -2278,22 +2278,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Kata hubung di awal kalimat yang berarti 'tetapi / namun'.",
         "examples": [
           {
-            "exampleJp": "今日はいい天気です。でも、少し寒いです。",
-            "exampleKana": "きょうはいいてんきです。でも、すこしさむいです。",
-            "exampleEn": "The weather is nice today. But, it is a little cold.",
-            "exampleId": "Hari ini cuacanya bagus. Tapi, sedikit dingin."
+            "exampleJp": "私はいつも勉強します。でも、あまり上手になりません。",
+            "exampleKana": "わたしはいつもべんきょうします。でも、あまりじょうずになりません。",
+            "exampleEn": "I always study. But, I don't get very good.",
+            "exampleId": "Saya selalu belajar. Tapi, saya tidak terlalu mahir."
           },
           {
-            "exampleJp": "この料理はおいしいです。でも、辛いです。",
-            "exampleKana": "このりょうりはおいしいです。でも、からいです。",
-            "exampleEn": "This food is delicious. However, it is spicy.",
-            "exampleId": "Masakan ini enak. Tapi, pedas."
+            "exampleJp": "ときどき日本へ行きたいです。でも、お金がありません。",
+            "exampleKana": "ときどきにほんへいきたいです。でも、おかねがありません。",
+            "exampleEn": "I sometimes want to go to Japan. But, I have no money.",
+            "exampleId": "Terkadang saya ingin pergi ke Jepang. Tapi, saya tidak punya uang."
           },
           {
-            "exampleJp": "映画を見たいです。でも、時間がありません。",
-            "exampleKana": "えいがをみたいです。でも、じかんがありません。",
-            "exampleEn": "I want to watch a movie. But, I don't have time.",
-            "exampleId": "Saya ingin menonton film. Tapi, saya tidak punya waktu."
+            "exampleJp": "これはどうやって作りますか。でも、とても難しそうです。",
+            "exampleKana": "これはどうやってつくりますか。でも、とてもむずかしそうです。",
+            "exampleEn": "How do you make this? But, it looks very difficult.",
+            "exampleId": "Bagaimana cara membuat ini? Tapi, kelihatannya sangat sulit."
           }
         ]
       }
@@ -2312,22 +2312,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Meminta seseorang untuk tidak melakukan sesuatu ('Tolong jangan lakukan V').",
         "examples": [
           {
-            "exampleJp": "ここで写真を撮らないでください。",
-            "exampleKana": "ここで しゃしんを とらないで ください。",
-            "exampleEn": "Please do not take pictures here.",
-            "exampleId": "Tolong jangan mengambil foto di sini."
+            "exampleJp": "ここで たばこを 吸わないで ください。",
+            "exampleKana": "ここで たばこを すわないで ください。",
+            "exampleEn": "Please do not smoke here.",
+            "exampleId": "Tolong jangan merokok di sini."
           },
           {
-            "exampleJp": "授業中に話さないでください。",
-            "exampleKana": "じゅぎょうちゅうに はなさないで ください。",
-            "exampleEn": "Please do not talk during class.",
-            "exampleId": "Tolong jangan berbicara saat jam pelajaran."
+            "exampleJp": "この 本に 書かないで ください。",
+            "exampleKana": "この ほんに かかないで ください。",
+            "exampleEn": "Please do not write in this book.",
+            "exampleId": "Tolong jangan menulis di buku ini."
           },
           {
-            "exampleJp": "このドアを開けないでください。",
-            "exampleKana": "この ドアを あけないで ください。",
-            "exampleEn": "Please do not open this door.",
-            "exampleId": "Tolong jangan buka pintu ini."
+            "exampleJp": "教室で 大きい声で 話さないで ください。",
+            "exampleKana": "きょうしつで おおきいこえで はなさないで ください。",
+            "exampleEn": "Please do not talk in a loud voice in the classroom.",
+            "exampleId": "Tolong jangan berbicara dengan suara keras di dalam kelas."
           }
         ]
       },
@@ -2339,22 +2339,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Meminta izin untuk melakukan suatu tindakan ('Bolehkah saya melakukan V?').",
         "examples": [
           {
-            "exampleJp": "ここで座ってもいいですか。",
-            "exampleKana": "ここで すわっても いいですか。",
-            "exampleEn": "May I sit here?",
-            "exampleId": "Bolehkah saya duduk di sini?"
+            "exampleJp": "ここで 写真を 撮っても いいですか。",
+            "exampleKana": "ここで しゃしんを とっても いいですか。",
+            "exampleEn": "May I take a photo here?",
+            "exampleId": "Bolehkah saya mengambil foto di sini?"
           },
           {
-            "exampleJp": "窓を開けてもいいですか。",
+            "exampleJp": "窓を 開けても いいですか。",
             "exampleKana": "まどを あけても いいですか。",
             "exampleEn": "May I open the window?",
             "exampleId": "Bolehkah saya membuka jendela?"
           },
           {
-            "exampleJp": "明日、休んでもいいですか。",
-            "exampleKana": "あした、やすんでも いいですか。",
-            "exampleEn": "May I take a day off tomorrow?",
-            "exampleId": "Bolehkah saya libur besok?"
+            "exampleJp": "すみません、ここで たばこを 吸っても いいですか。",
+            "exampleKana": "すみません、ここで たばこを すっても いいですか。",
+            "exampleEn": "Excuse me, may I smoke here?",
+            "exampleId": "Permisi, bolehkah saya merokok di sini?"
           }
         ]
       },
@@ -2366,22 +2366,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan keadaan yang dihasilkan dari suatu tindakan sebelumnya.",
         "examples": [
           {
-            "exampleJp": "窓が開いています。",
-            "exampleKana": "まどが あいて います。",
-            "exampleEn": "The window is open.",
-            "exampleId": "Jendelanya sedang terbuka."
+            "exampleJp": "窓が 開けて あります。",
+            "exampleKana": "まどが あけて あります。",
+            "exampleEn": "The window is left open.",
+            "exampleId": "Jendelanya sedang dalam keadaan terbuka."
           },
           {
-            "exampleJp": "電気がついています。",
-            "exampleKana": "でんきが ついて います。",
-            "exampleEn": "The light is on.",
-            "exampleId": "Lampunya sedang menyala."
+            "exampleJp": "壁に 絵が かかって います。",
+            "exampleKana": "かべに えが かかって います。",
+            "exampleEn": "A picture is hanging on the wall.",
+            "exampleId": "Ada gambar yang tergantung di dinding."
           },
           {
-            "exampleJp": "ドアが閉まっています。",
-            "exampleKana": "ドアが しまって います。",
-            "exampleEn": "The door is closed.",
-            "exampleId": "Pintunya sedang tertutup."
+            "exampleJp": "机の上に 本が 置いて あります。",
+            "exampleKana": "つくえのうえに ほんが おいて あります。",
+            "exampleEn": "A book is placed on the desk.",
+            "exampleId": "Ada buku yang diletakkan di atas meja."
           }
         ]
       },
@@ -2393,22 +2393,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Pergi untuk melakukan suatu aksi lalu kembali ('pergi dulu untuk...').",
         "examples": [
           {
-            "exampleJp": "ちょっとコンビニへ行ってきます。",
+            "exampleJp": "ちょっと コンビニへ 行って 来ます。",
             "exampleKana": "ちょっと コンビニへ いって きます。",
-            "exampleEn": "I'm going to the convenience store (and will be back).",
-            "exampleId": "Saya pergi ke minimarket sebentar (lalu akan kembali)."
+            "exampleEn": "I'll go to the convenience store and come back.",
+            "exampleId": "Saya pergi ke minimarket sebentar lalu kembali."
           },
           {
-            "exampleJp": "飲み物を買ってきます。",
-            "exampleKana": "のみものを かって きます。",
-            "exampleEn": "I'll go buy a drink and come back.",
-            "exampleId": "Saya pergi beli minuman dulu ya."
+            "exampleJp": "郵便局へ 手紙を 出して 来ます。",
+            "exampleKana": "ゆうびんきょくへ てがみを だして きます。",
+            "exampleEn": "I'll go to the post office to send a letter and come back.",
+            "exampleId": "Saya pergi ke kantor pos untuk mengirim surat lalu kembali."
           },
           {
-            "exampleJp": "郵便局へ行ってきます。",
-            "exampleKana": "ゆうびんきょくへ いって きます。",
-            "exampleEn": "I'm going to the post office and will be back.",
-            "exampleId": "Saya pergi ke kantor pos sebentar."
+            "exampleJp": "冷たい お茶を 買って 来ます。",
+            "exampleKana": "つめたい おちゃを かって きます。",
+            "exampleEn": "I'll go buy some cold tea and come back.",
+            "exampleId": "Saya pergi membeli teh dingin lalu kembali."
           }
         ]
       },
@@ -2420,22 +2420,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan sesuatu terlihat atau terdengar secara spontan/alami.",
         "examples": [
           {
-            "exampleJp": "窓から富士山が見えます。",
-            "exampleKana": "まどからふじさんがみえます。",
-            "exampleEn": "I can see Mount Fuji from the window.",
-            "exampleId": "Saya bisa melihat Gunung Fuji dari jendela."
+            "exampleJp": "窓から山が見えます。",
+            "exampleKana": "まどからやまがみえます。",
+            "exampleEn": "I can see the mountain from the window.",
+            "exampleId": "Dari jendela, gunung terlihat."
           },
           {
-            "exampleJp": "外から子供の声が聞こえます。",
-            "exampleKana": "そとからこどものこえがきこえます。",
-            "exampleEn": "I can hear children's voices from outside.",
-            "exampleId": "Saya bisa mendengar suara anak-anak dari luar."
+            "exampleJp": "静かな部屋で鳥の声が聞こえます。",
+            "exampleKana": "しずかなへやでとりのこえがきこえます。",
+            "exampleEn": "I can hear the sound of birds in the quiet room.",
+            "exampleId": "Di kamar yang tenang, suara burung terdengar."
           },
           {
-            "exampleJp": "遠くに海が見えます。",
-            "exampleKana": "とおくにうみがみえます。",
-            "exampleEn": "I can see the sea in the distance.",
-            "exampleId": "Saya bisa melihat laut di kejauhan."
+            "exampleJp": "あそこから海が見えますか。",
+            "exampleKana": "あそこからうみがみえますか。",
+            "exampleEn": "Can you see the sea from over there?",
+            "exampleId": "Apakah laut terlihat dari sana?"
           }
         ]
       },
@@ -2447,22 +2447,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan perubahan keadaan ('menjadi A/N').",
         "examples": [
           {
-            "exampleJp": "寒くなりましたね。",
-            "exampleKana": "さむくなりましたね。",
-            "exampleEn": "It has become cold, hasn't it?",
-            "exampleId": "Sudah menjadi dingin ya."
+            "exampleJp": "天気が寒くなります。",
+            "exampleKana": "てんきがさむくなります。",
+            "exampleEn": "The weather is getting cold.",
+            "exampleId": "Cuacanya menjadi dingin."
           },
           {
             "exampleJp": "来年、二十歳になります。",
             "exampleKana": "らいねん、はたちになります。",
-            "exampleEn": "I will turn twenty next year.",
-            "exampleId": "Tahun depan saya akan berumur dua puluh tahun."
+            "exampleEn": "I will turn twenty years old next year.",
+            "exampleId": "Tahun depan, saya akan menjadi dua puluh tahun."
           },
           {
-            "exampleJp": "日本語が上手になりました。",
-            "exampleKana": "にほんごがじょうずになりました。",
-            "exampleEn": "My Japanese has become better.",
-            "exampleId": "Bahasa Jepang saya sudah menjadi lebih mahir."
+            "exampleJp": "窓から見える景色がきれいになります。",
+            "exampleKana": "まどからみえるけしきがきれいになります。",
+            "exampleEn": "The scenery visible from the window is becoming beautiful.",
+            "exampleId": "Pemandangan yang terlihat dari jendela menjadi indah."
           }
         ]
       },
@@ -2476,20 +2476,20 @@ export const BUNPOU_DATA: BunpouLesson[] = [
           {
             "exampleJp": "公園を散歩します。",
             "exampleKana": "こうえんをさんぽします。",
-            "exampleEn": "I will take a walk in the park.",
-            "exampleId": "Saya akan berjalan-jalan di taman."
+            "exampleEn": "I walk in the park.",
+            "exampleId": "Saya berjalan-jalan di taman."
           },
           {
-            "exampleJp": "この道をまっすぐ行きます。",
-            "exampleKana": "このみちをまっすぐいきます。",
-            "exampleEn": "Go straight along this road.",
-            "exampleId": "Jalan lurus menyusuri jalan ini."
+            "exampleJp": "橋を渡ります。",
+            "exampleKana": "はしをわたります。",
+            "exampleEn": "I cross the bridge.",
+            "exampleId": "Saya menyeberangi jembatan."
           },
           {
-            "exampleJp": "空を鳥が飛んでいます。",
-            "exampleKana": "そらをとりがとんでいます。",
-            "exampleEn": "A bird is flying through the sky.",
-            "exampleId": "Seekor burung sedang terbang melintasi langit."
+            "exampleJp": "静かになった道を歩きます。",
+            "exampleKana": "しずかになったみちをあるきます。",
+            "exampleEn": "I walk along the road that has become quiet.",
+            "exampleId": "Saya berjalan menyusuri jalan yang sudah menjadi tenang."
           }
         ]
       },
@@ -2501,22 +2501,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menggunakan partikel 'wa' untuk menunjukkan perbandingan/kontras.",
         "examples": [
           {
-            "exampleJp": "野菜は食べますが、肉は食べません。",
-            "exampleKana": "やさいはたべますが、にくはたべません。",
-            "exampleEn": "I eat vegetables, but I don't eat meat.",
-            "exampleId": "Saya makan sayur, tapi saya tidak makan daging."
+            "exampleJp": "肉は食べますが、魚は食べません。",
+            "exampleKana": "にくはたべますが、さかなはたべません。",
+            "exampleEn": "I eat meat, but I don't eat fish.",
+            "exampleId": "Saya makan daging, tetapi ikan tidak saya makan."
           },
           {
-            "exampleJp": "今日は忙しいですが、明日は暇です。",
-            "exampleKana": "きょうはいそがしいですが、あしたはひまです。",
-            "exampleEn": "I am busy today, but I am free tomorrow.",
-            "exampleId": "Hari ini saya sibuk, tapi besok saya luang."
+            "exampleJp": "今日は忙しいですが、明日は暇になります。",
+            "exampleKana": "きょうはいそがしいですが、あしたはひまになります。",
+            "exampleEn": "I am busy today, but I will be free tomorrow.",
+            "exampleId": "Hari ini saya sibuk, tetapi besok saya akan senggang."
           },
           {
-            "exampleJp": "コーヒーは飲みますが、紅茶は飲みません。",
-            "exampleKana": "こーひーはのみますが、こうちゃはのみません。",
-            "exampleEn": "I drink coffee, but I don't drink black tea.",
-            "exampleId": "Saya minum kopi, tapi saya tidak minum teh hitam."
+            "exampleJp": "公園は歩きますが、道は歩きません。",
+            "exampleKana": "こうえんはあるきますが、みちはあるきません。",
+            "exampleEn": "I walk in the park, but I don't walk on the road.",
+            "exampleId": "Saya berjalan di taman, tetapi di jalan saya tidak berjalan."
           }
         ]
       }
@@ -2535,22 +2535,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyebutkan beberapa tindakan secara tidak berurutan ('melakukan aktivitas seperti A dan B').",
         "examples": [
           {
-            "exampleJp": "日曜日は本を読んだり、映画を見たりします。",
-            "exampleKana": "にちようびはほんをよんだり、えいがをみたりします。",
-            "exampleEn": "On Sundays, I do things like reading books and watching movies.",
-            "exampleId": "Pada hari Minggu, saya melakukan hal-hal seperti membaca buku dan menonton film."
+            "exampleJp": "日曜日は本を読んだり、音楽を聞いたりします。",
+            "exampleKana": "にちようびはほんをよんだり、おんがくをきいたりします。",
+            "exampleEn": "On Sundays, I do things like reading books and listening to music.",
+            "exampleId": "Pada hari Minggu, saya melakukan hal-hal seperti membaca buku dan mendengarkan musik."
           },
           {
-            "exampleJp": "昨日は買い物をしたり、料理を作ったりしました。",
-            "exampleKana": "きのうはかいものをしたり、りょうりをつくったりしました。",
-            "exampleEn": "Yesterday, I did things like shopping and cooking.",
-            "exampleId": "Kemarin, saya melakukan hal-hal seperti berbelanja dan memasak."
+            "exampleJp": "休みの日には、買い物に行ったり、友達と会ったりします。",
+            "exampleKana": "やすみのひには、かいものにいったり、ともだちとあったりします。",
+            "exampleEn": "On my day off, I do things like going shopping and meeting friends.",
+            "exampleId": "Pada hari libur, saya melakukan hal-hal seperti pergi belanja dan bertemu teman."
           },
           {
-            "exampleJp": "休みの日には、友達と話したり、公園を散歩したりしたいです。",
-            "exampleKana": "やすみのひには、ともだちとはなしたり、こうえんをさんぽしたりしたいです。",
-            "exampleEn": "On my day off, I want to do things like talk with friends and take a walk in the park.",
-            "exampleId": "Pada hari libur, saya ingin melakukan hal-hal seperti mengobrol dengan teman dan berjalan-jalan di taman."
+            "exampleJp": "昨日は掃除をしたり、料理を作ったりして忙しかったです。",
+            "exampleKana": "きのうはそうじをしたり、りょうりをつくったりしていそがしかったです。",
+            "exampleEn": "Yesterday, I was busy doing things like cleaning and cooking.",
+            "exampleId": "Kemarin saya sibuk melakukan hal-hal seperti membersihkan rumah dan memasak."
           }
         ]
       },
@@ -2562,22 +2562,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Perbandingan kontras langsung antara dua kata benda/topik.",
         "examples": [
           {
-            "exampleJp": "日本料理は好きですが、インドネシア料理はあまり食べません。",
-            "exampleKana": "にほんりょうりはすきですが、インドネシアりょうりはあまりたべません。",
-            "exampleEn": "I like Japanese food, but I don't really eat Indonesian food.",
-            "exampleId": "Saya suka masakan Jepang, tetapi saya tidak terlalu sering makan masakan Indonesia."
+            "exampleJp": "兄は背が高いですが、弟は背が低いです。",
+            "exampleKana": "あにはせがたかいですが、おとうとはせがひくいです。",
+            "exampleEn": "My older brother is tall, but my younger brother is short.",
+            "exampleId": "Kakak laki-laki saya tinggi, tetapi adik laki-laki saya pendek."
           },
           {
-            "exampleJp": "兄は背が高いですが、私は低いです。",
-            "exampleKana": "あにはせがたかいですが、わたしはひくいです。",
-            "exampleEn": "My older brother is tall, but I am short.",
-            "exampleId": "Kakak laki-laki saya tinggi, tetapi saya pendek."
+            "exampleJp": "日本料理は好きですが、辛い料理はあまり好きではありません。",
+            "exampleKana": "にほんりょうりはすきですが、からいりょうりはあまりすきではありません。",
+            "exampleEn": "I like Japanese food, but I don't really like spicy food.",
+            "exampleId": "Saya suka masakan Jepang, tetapi saya tidak begitu suka masakan pedas."
           },
           {
-            "exampleJp": "今日は天気がいいですが、明日は雨が降るでしょう。",
-            "exampleKana": "きょうはてんきがいいですが、あしたはあめがふるでしょう。",
-            "exampleEn": "The weather is nice today, but it will probably rain tomorrow.",
-            "exampleId": "Cuaca hari ini bagus, tetapi besok mungkin akan hujan."
+            "exampleJp": "昨日は本を読んだりしましたが、今日は映画を見たりします。",
+            "exampleKana": "きのうはほんをよんだりしましたが、きょうはえいがをみたりします。",
+            "exampleEn": "Yesterday I did things like reading, but today I will do things like watching movies.",
+            "exampleId": "Kemarin saya melakukan hal seperti membaca buku, tetapi hari ini saya akan melakukan hal seperti menonton film."
           }
         ]
       },
@@ -2589,22 +2589,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan waktu atau kondisi kejadian ('saat/ketika...').",
         "examples": [
           {
-            "exampleJp": "暇なとき、よく音楽を聞きます。",
-            "exampleKana": "ひまなとき、よくおんがくをききます。",
-            "exampleEn": "When I am free, I often listen to music.",
-            "exampleId": "Saat saya senggang, saya sering mendengarkan musik."
+            "exampleJp": "暇なとき、本を読みます。",
+            "exampleKana": "ひまなとき、ほんをよみます。",
+            "exampleEn": "When I am free, I read books.",
+            "exampleId": "Saat saya senggang, saya membaca buku."
           },
           {
-            "exampleJp": "子供のとき、よく公園で遊びました。",
-            "exampleKana": "こどものとき、よくこうえんであそびました。",
-            "exampleEn": "When I was a child, I often played in the park.",
-            "exampleId": "Saat saya masih kecil, saya sering bermain di taman."
+            "exampleJp": "学生のとき、よく友達と遊びました。",
+            "exampleKana": "がくせいのとき、よくともだちとあそびました。",
+            "exampleEn": "When I was a student, I often hung out with friends.",
+            "exampleId": "Saat saya masih pelajar, saya sering bermain dengan teman-teman."
           },
           {
-            "exampleJp": "疲れたとき、温かいお茶を飲みます。",
-            "exampleKana": "つかれたとき、あたたかいおちゃをのみます。",
-            "exampleEn": "When I am tired, I drink hot tea.",
-            "exampleId": "Saat saya lelah, saya minum teh hangat."
+            "exampleJp": "疲れたとき、温かいお茶を飲んだり、音楽を聞いたりします。",
+            "exampleKana": "つかれたとき、あたたかいおちゃをのんだり、おんがくをきいたりします。",
+            "exampleEn": "When I am tired, I do things like drink warm tea and listen to music.",
+            "exampleId": "Saat saya lelah, saya melakukan hal seperti minum teh hangat dan mendengarkan musik."
           }
         ]
       },
@@ -2616,22 +2616,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menanyakan apa yang akan dilakukan dalam suatu kondisi.",
         "examples": [
           {
-            "exampleJp": "雨が降ってきました。どうしますか。",
-            "exampleKana": "あめがふってきました。どうしますか。",
-            "exampleEn": "It has started to rain. What will you do?",
-            "exampleId": "Hujan mulai turun. Apa yang akan kamu lakukan?"
+            "exampleJp": "雨が降りました。どうしますか。",
+            "exampleKana": "あめがふりました。どうしますか。",
+            "exampleEn": "It started raining. What will you do?",
+            "exampleId": "Hujan turun. Apa yang akan kamu lakukan?"
           },
           {
-            "exampleJp": "時間がありません。どうしますか。",
-            "exampleKana": "じかんがありません。どうしますか。",
-            "exampleEn": "There is no time. What are you going to do?",
-            "exampleId": "Tidak ada waktu lagi. Apa yang akan kamu lakukan?"
+            "exampleJp": "暇なとき、どうしますか。",
+            "exampleKana": "ひまなとき、どうしますか。",
+            "exampleEn": "What do you do when you are free?",
+            "exampleId": "Apa yang kamu lakukan saat senggang?"
           },
           {
-            "exampleJp": "道がわかりません。どうしますか。",
-            "exampleKana": "みちがわかりません。どうしますか。",
-            "exampleEn": "I don't know the way. What shall we do?",
-            "exampleId": "Saya tidak tahu jalannya. Apa yang harus kita lakukan?"
+            "exampleJp": "疲れたとき、どうしますか。寝たり、映画を見たりしますか。",
+            "exampleKana": "つかれたとき、どうしますか。ねたり、えいがをみたりしますか。",
+            "exampleEn": "What do you do when you are tired? Do you sleep or watch movies?",
+            "exampleId": "Apa yang kamu lakukan saat lelah? Apakah kamu tidur atau menonton film?"
           }
         ]
       }
@@ -2650,22 +2650,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Gaya bahasa informal/akrab di antara teman atau keluarga.",
         "examples": [
           {
-            "exampleJp": "昨日、どこへ行ったの？",
-            "exampleKana": "きのう、どこへいったの？",
-            "exampleEn": "Where did you go yesterday?",
-            "exampleId": "Kemarin pergi ke mana?"
+            "exampleJp": "明日、一緒に映画を見に行かない？",
+            "exampleKana": "あした、いっしょにえいがをみにいかない？",
+            "exampleEn": "Won't you go watch a movie with me tomorrow?",
+            "exampleId": "Besok, mau pergi nonton film bareng tidak?"
           },
           {
-            "exampleJp": "明日、一緒に映画を見ようよ。",
-            "exampleKana": "あした、いっしょにえいがをみようよ。",
-            "exampleEn": "Let's watch a movie together tomorrow.",
-            "exampleId": "Besok ayo nonton film bareng."
+            "exampleJp": "昨日、何を食べたの？",
+            "exampleKana": "きのう、なにをたべたの？",
+            "exampleEn": "What did you eat yesterday?",
+            "exampleId": "Kemarin makan apa?"
           },
           {
-            "exampleJp": "このケーキ、すごくおいしいね！",
-            "exampleKana": "このケーキ、すごくおいしいね！",
-            "exampleEn": "This cake is really delicious, isn't it!",
-            "exampleId": "Kue ini enak banget, ya!"
+            "exampleJp": "今日は忙しいから、行けないよ。",
+            "exampleKana": "きょうはいそがしいから、いけないよ。",
+            "exampleEn": "I'm busy today, so I can't go.",
+            "exampleId": "Hari ini sibuk, jadi tidak bisa pergi."
           }
         ]
       },
@@ -2677,22 +2677,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menjelaskan alasan, memberikan penekanan, atau meminta kejelasan.",
         "examples": [
           {
-            "exampleJp": "どうして学校を休んだんですか。",
-            "exampleKana": "どうしてがっこうをやすんだんですか。",
-            "exampleEn": "Why did you take a day off from school?",
-            "exampleId": "Kenapa (kamu) tidak masuk sekolah?"
+            "exampleJp": "明日、映画に行かないんだ。",
+            "exampleKana": "あした、えいがにいかないんだ。",
+            "exampleEn": "The thing is, I'm not going to the movie tomorrow.",
+            "exampleId": "Sebenarnya, besok saya tidak pergi menonton film."
           },
           {
-            "exampleJp": "明日、試験があるんです。",
-            "exampleKana": "あした、しけんがあるんです。",
-            "exampleEn": "I have an exam tomorrow.",
-            "exampleId": "Besok ada ujian."
+            "exampleJp": "昨日、たくさん食べたんだ。",
+            "exampleKana": "きのう、たくさんたべたんだ。",
+            "exampleEn": "You see, I ate a lot yesterday.",
+            "exampleId": "Sebenarnya, kemarin saya makan banyak."
           },
           {
-            "exampleJp": "昨日、新しいカメラを買ったんです。",
-            "exampleKana": "きのう、あたらしいカメラをかったんです。",
-            "exampleEn": "I bought a new camera yesterday.",
-            "exampleId": "Kemarin saya membeli kamera baru."
+            "exampleJp": "今日は忙しいんだ。だから行けないよ。",
+            "exampleKana": "きょうはいそがしいんだ。だからいけないよ。",
+            "exampleEn": "The thing is, I'm busy today. That's why I can't go.",
+            "exampleId": "Sebenarnya hari ini saya sibuk. Makanya tidak bisa pergi."
           }
         ]
       },
@@ -2704,22 +2704,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Memberikan saran atau nasihat ('sebaiknya / lebih baik melakukan...').",
         "examples": [
           {
-            "exampleJp": "毎日、野菜を食べたほうがいいです。",
-            "exampleKana": "まいにち、やさいをたべたほうがいいです。",
-            "exampleEn": "You should eat vegetables every day.",
-            "exampleId": "Sebaiknya kamu makan sayur setiap hari."
+            "exampleJp": "明日、映画を見に行ったほうがいいですよ。",
+            "exampleKana": "あした、えいがをみにいったほうがいいですよ。",
+            "exampleEn": "You should go watch the movie tomorrow.",
+            "exampleId": "Sebaiknya besok kamu pergi menonton film."
           },
           {
-            "exampleJp": "夜は早く寝たほうがいいですよ。",
-            "exampleKana": "よるははやくねたほうがいいですよ。",
-            "exampleEn": "You should go to bed early at night.",
-            "exampleId": "Sebaiknya kamu tidur lebih awal di malam hari."
+            "exampleJp": "野菜をたくさん食べたほうがいいですよ。",
+            "exampleKana": "やさいをたくさんたべたほうがいいですよ。",
+            "exampleEn": "You should eat lots of vegetables.",
+            "exampleId": "Sebaiknya kamu makan banyak sayur."
           },
           {
-            "exampleJp": "傘を持って行ったほうがいいです。",
-            "exampleKana": "かさをもっていったほうがいいです。",
-            "exampleEn": "You should take an umbrella with you.",
-            "exampleId": "Sebaiknya kamu membawa payung."
+            "exampleJp": "忙しいなら、今日は休んだほうがいいですよ。",
+            "exampleKana": "いそがしいなら、きょうはやすんだほうがいいですよ。",
+            "exampleEn": "If you are busy, you should rest today.",
+            "exampleId": "Kalau sibuk, sebaiknya hari ini kamu istirahat."
           }
         ]
       },
@@ -2731,22 +2731,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Tindakan yang terjadi sebelum kejadian lain ('sebelum melakukan...').",
         "examples": [
           {
-            "exampleJp": "食事の前に、手を洗います。",
-            "exampleKana": "しょくじのまえに、てをあらいます。",
-            "exampleEn": "I wash my hands before eating.",
-            "exampleId": "Saya mencuci tangan sebelum makan."
+            "exampleJp": "映画を見る前に、チケットを買います。",
+            "exampleKana": "えいがをみるまえに、チケットをかいます。",
+            "exampleEn": "I will buy a ticket before watching the movie.",
+            "exampleId": "Sebelum menonton film, saya akan membeli tiket."
           },
           {
-            "exampleJp": "寝る前に、本を読みます。",
-            "exampleKana": "ねるまえに、ほんをよみます。",
-            "exampleEn": "I read a book before going to bed.",
-            "exampleId": "Saya membaca buku sebelum tidur."
+            "exampleJp": "食べる前に、手を洗ったほうがいいですよ。",
+            "exampleKana": "たべるまえに、てをあらったほうがいいですよ。",
+            "exampleEn": "You should wash your hands before you eat.",
+            "exampleId": "Sebelum makan, sebaiknya cuci tangan."
           },
           {
-            "exampleJp": "日本へ行く前に、日本語を勉強しました。",
-            "exampleKana": "にほんへいくまえに、にほんごをべんきょうしました。",
-            "exampleEn": "I studied Japanese before going to Japan.",
-            "exampleId": "Saya belajar bahasa Jepang sebelum pergi ke Jepang."
+            "exampleJp": "忙しくなる前に、この仕事を終わらせるんだ。",
+            "exampleKana": "いそがしくなるまえに、このしごとをおわらせるんだ。",
+            "exampleEn": "I'm going to finish this work before I get busy.",
+            "exampleId": "Sebelum jadi sibuk, saya akan menyelesaikan pekerjaan ini."
           }
         ]
       },
@@ -2758,22 +2758,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Tindakan yang dilakukan setelah aksi sebelumnya selesai ('setelah melakukan...').",
         "examples": [
           {
-            "exampleJp": "手を洗ってから、ごはんを食べます。",
+            "exampleJp": "手を洗ってから、ご飯を食べます。",
             "exampleKana": "てをあらってから、ごはんをたべます。",
             "exampleEn": "After washing my hands, I will eat a meal.",
             "exampleId": "Setelah mencuci tangan, saya akan makan."
           },
           {
-            "exampleJp": "宿題をしてから、テレビを見ました。",
-            "exampleKana": "しゅくだいをしてから、テレビをみました。",
-            "exampleEn": "After doing my homework, I watched TV.",
-            "exampleId": "Setelah mengerjakan PR, saya menonton TV."
+            "exampleJp": "宿題をしてから、テレビを見たいです。",
+            "exampleKana": "しゅくだいをしてから、テレビをみたいです。",
+            "exampleEn": "After doing my homework, I want to watch TV.",
+            "exampleId": "Setelah mengerjakan PR, saya ingin menonton TV."
           },
           {
-            "exampleJp": "学校が終わってから、友達と遊びます。",
-            "exampleKana": "がっこうがおわってから、ともだちとあそびます。",
-            "exampleEn": "After school finishes, I will hang out with my friends.",
-            "exampleId": "Setelah sekolah selesai, saya akan bermain dengan teman."
+            "exampleJp": "日本語を勉強してから、日本へ行きたいです。",
+            "exampleKana": "にほんごをべんきょうしてから、にほんへいきたいです。",
+            "exampleEn": "After studying Japanese, I want to go to Japan.",
+            "exampleId": "Setelah belajar bahasa Jepang, saya ingin pergi ke Jepang."
           }
         ]
       }
@@ -2792,22 +2792,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan pengalaman di masa lalu ('pernah melakukan V').",
         "examples": [
           {
-            "exampleJp": "日本へ行ったことがあります。",
-            "exampleKana": "にほんへいったことがあります。",
-            "exampleEn": "I have been to Japan before.",
-            "exampleId": "Saya pernah pergi ke Jepang."
+            "exampleJp": "日本料理を食べたことがあります。",
+            "exampleKana": "にほんりょうりを たべた ことが あります。",
+            "exampleEn": "I have eaten Japanese food before.",
+            "exampleId": "Saya pernah makan masakan Jepang."
           },
           {
-            "exampleJp": "すしを食べたことがありますか。",
-            "exampleKana": "すしをたべたことがありますか。",
-            "exampleEn": "Have you ever eaten sushi?",
-            "exampleId": "Apakah Anda pernah makan sushi?"
+            "exampleJp": "北海道へ行ったことがあります。",
+            "exampleKana": "ほっかいどうへ いった ことが あります。",
+            "exampleEn": "I have been to Hokkaido before.",
+            "exampleId": "Saya pernah pergi ke Hokkaido."
           },
           {
-            "exampleJp": "この映画を見たことがありません。",
-            "exampleKana": "このえいがをみたことがありません。",
-            "exampleEn": "I have never seen this movie.",
-            "exampleId": "Saya belum pernah menonton film ini."
+            "exampleJp": "富士山に登ったことがあります。",
+            "exampleKana": "ふじさんに のぼった ことが あります。",
+            "exampleEn": "I have climbed Mount Fuji before.",
+            "exampleId": "Saya pernah mendaki Gunung Fuji."
           }
         ]
       },
@@ -2819,22 +2819,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Memodifikasi kata benda menggunakan klausa kata kerja bentuk biasa.",
         "examples": [
           {
-            "exampleJp": "昨日買った本は面白いです。",
-            "exampleKana": "きのうかったほんはおもしろいです。",
-            "exampleEn": "The book I bought yesterday is interesting.",
-            "exampleId": "Buku yang saya beli kemarin menarik."
+            "exampleJp": "昨日食べた料理は美味しかったです。",
+            "exampleKana": "きのう たべた りょうりは おいしかったです。",
+            "exampleEn": "The food I ate yesterday was delicious.",
+            "exampleId": "Makanan yang saya makan kemarin enak."
           },
           {
-            "exampleJp": "これは私が住んでいる町です。",
-            "exampleKana": "これはわたしがすんでいるまちです。",
-            "exampleEn": "This is the town where I live.",
-            "exampleId": "Ini adalah kota tempat saya tinggal."
+            "exampleJp": "私が行ったことがある国は日本です。",
+            "exampleKana": "わたしが いった ことが ある くには にほんです。",
+            "exampleEn": "The country I have been to is Japan.",
+            "exampleId": "Negara yang pernah saya kunjungi adalah Jepang."
           },
           {
-            "exampleJp": "さっき会った人は田中さんです。",
-            "exampleKana": "さっきあったひとはたなかさんです。",
-            "exampleEn": "The person I met just now is Mr. Tanaka.",
-            "exampleId": "Orang yang tadi saya temui adalah Pak Tanaka."
+            "exampleJp": "富士山に登ったことがある人は少ないです。",
+            "exampleKana": "ふじさんに のぼった ことが ある ひとは すくないです。",
+            "exampleEn": "There are few people who have climbed Mount Fuji.",
+            "exampleId": "Sedikit orang yang pernah mendaki Gunung Fuji."
           }
         ]
       },
@@ -2846,22 +2846,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan status tahu atau tidak tahu.",
         "examples": [
           {
-            "exampleJp": "私は彼の名前を知っています。",
-            "exampleKana": "わたしはかれのなまえをしっています。",
-            "exampleEn": "I know his name.",
-            "exampleId": "Saya tahu namanya."
+            "exampleJp": "私はその料理を知っています。",
+            "exampleKana": "わたしは その りょうりを しっています。",
+            "exampleEn": "I know that food.",
+            "exampleId": "Saya tahu masakan itu."
           },
           {
-            "exampleJp": "この歌を知っていますか。",
-            "exampleKana": "このうたをしっていますか。",
-            "exampleEn": "Do you know this song?",
-            "exampleId": "Apakah Anda tahu lagu ini?"
+            "exampleJp": "昨日食べた料理の名前を知っていますか。",
+            "exampleKana": "きのう たべた りょうりの なまえを しっていますか。",
+            "exampleEn": "Do you know the name of the food you ate yesterday?",
+            "exampleId": "Apakah Anda tahu nama makanan yang Anda makan kemarin?"
           },
           {
-            "exampleJp": "そのことは知りません。",
-            "exampleKana": "そのことはしりません。",
-            "exampleEn": "I don't know about that matter.",
-            "exampleId": "Saya tidak tahu soal hal itu."
+            "exampleJp": "富士山に登ったことがある人は知りません。",
+            "exampleKana": "ふじさんに のぼった ことが ある ひとは しりません。",
+            "exampleEn": "I don't know anyone who has climbed Mount Fuji.",
+            "exampleId": "Saya tidak kenal orang yang pernah mendaki Gunung Fuji."
           }
         ]
       },
@@ -2873,22 +2873,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyebut nama atau mengidentifikasi benda ('N2 yang bernama N1').",
         "examples": [
           {
-            "exampleJp": "これは「すき焼き」という料理です。",
-            "exampleKana": "これは「すきやき」というりょうりです。",
-            "exampleEn": "This is a dish called 'Sukiyaki'.",
-            "exampleId": "Ini adalah masakan yang disebut 'Sukiyaki'."
+            "exampleJp": "すき焼きという料理を知っています。",
+            "exampleKana": "すきやきと いう りょうりを しっています。",
+            "exampleEn": "I know a dish called Sukiyaki.",
+            "exampleId": "Saya tahu masakan yang bernama Sukiyaki."
           },
           {
-            "exampleJp": "田中という学生を知っていますか。",
-            "exampleKana": "たなかというがくせいをしっていますか。",
-            "exampleEn": "Do you know a student named Tanaka?",
-            "exampleId": "Apakah Anda tahu siswa yang bernama Tanaka?"
+            "exampleJp": "昨日食べた、すき焼きという料理は美味しかったです。",
+            "exampleKana": "きのう たべた、すきやきと いう りょうりは おいしかったです。",
+            "exampleEn": "The dish called Sukiyaki that I ate yesterday was delicious.",
+            "exampleId": "Masakan yang bernama Sukiyaki yang saya makan kemarin enak."
           },
           {
-            "exampleJp": "「さくら」という名前の花が好きです。",
-            "exampleKana": "「さくら」というなまえのはながすきです。",
-            "exampleEn": "I like the flower named 'Sakura'.",
-            "exampleId": "Saya suka bunga yang bernama 'Sakura'."
+            "exampleJp": "北海道という場所に行ったことがあります。",
+            "exampleKana": "ほっかいどうと いう ばしょに いった ことが あります。",
+            "exampleEn": "I have been to a place called Hokkaido.",
+            "exampleId": "Saya pernah pergi ke tempat yang bernama Hokkaido."
           }
         ]
       }
@@ -2907,10 +2907,10 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Pengandaian konsekuensi alamiah ('begitu / jika... maka...').",
         "examples": [
           {
-            "exampleJp": "春になると、花が咲きます。",
+            "exampleJp": "春になると、花がさきます。",
             "exampleKana": "はるになると、はながさきます。",
             "exampleEn": "When spring comes, flowers bloom.",
-            "exampleId": "Begitu musim semi tiba, bunga-bunga bermekaran."
+            "exampleId": "Jika musim semi tiba, bunga-bunga bermekaran."
           },
           {
             "exampleJp": "このボタンを押すと、ドアが開きます。",
@@ -2919,10 +2919,10 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Jika menekan tombol ini, pintunya terbuka."
           },
           {
-            "exampleJp": "右に曲がると、郵便局があります。",
-            "exampleKana": "みぎにまがると、ゆうびんきょくがあります。",
-            "exampleEn": "If you turn right, there is a post office.",
-            "exampleId": "Jika belok ke kanan, ada kantor pos."
+            "exampleJp": "右に曲がると、銀行があります。",
+            "exampleKana": "みぎにまがると、ぎんこうがあります。",
+            "exampleEn": "When you turn right, there is a bank.",
+            "exampleId": "Jika belok ke kanan, ada bank di sana."
           }
         ]
       },
@@ -2940,16 +2940,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Tidak boleh mengambil foto di sini."
           },
           {
-            "exampleJp": "授業中に寝てはいけません。",
-            "exampleKana": "じゅぎょうちゅうにねてはいけません。",
-            "exampleEn": "You must not sleep during class.",
-            "exampleId": "Tidak boleh tidur saat pelajaran berlangsung."
+            "exampleJp": "右に曲がると危ないですから、走ってはいけません。",
+            "exampleKana": "みぎにまがるとあぶないですから、はしってはいけません。",
+            "exampleEn": "It is dangerous if you turn right, so you must not run.",
+            "exampleId": "Karena berbahaya jika belok ke kanan, tidak boleh berlari."
           },
           {
-            "exampleJp": "教室で騒いではいけません。",
-            "exampleKana": "きょうしつでさわいではいけません。",
-            "exampleEn": "You must not make noise in the classroom.",
-            "exampleId": "Tidak boleh berisik di dalam kelas."
+            "exampleJp": "このボタンを押してはいけません。",
+            "exampleKana": "このボタンをおしてはいけません。",
+            "exampleEn": "You must not press this button.",
+            "exampleId": "Tidak boleh menekan tombol ini."
           }
         ]
       },
@@ -2961,22 +2961,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan keharusan atau kewajiban ('harus melakukan V').",
         "examples": [
           {
-            "exampleJp": "毎日日本語を勉強しなければなりません。",
-            "exampleKana": "まいにちにほんごをべんきょうしなければなりません。",
+            "exampleJp": "毎日、日本語を勉強しなければなりません。",
+            "exampleKana": "まいにち、にほんごをべんきょうしなければなりません。",
             "exampleEn": "I must study Japanese every day.",
             "exampleId": "Saya harus belajar bahasa Jepang setiap hari."
           },
           {
-            "exampleJp": "宿題を今日出さなければなりません。",
-            "exampleKana": "しゅくだいをきょうださなければなりません。",
-            "exampleEn": "I must submit the homework today.",
-            "exampleId": "Saya harus mengumpulkan PR hari ini."
+            "exampleJp": "春になると、新しい服を買わなければなりません。",
+            "exampleKana": "はるになると、あたらしいふくをかわなければなりません。",
+            "exampleEn": "When spring comes, I must buy new clothes.",
+            "exampleId": "Jika musim semi tiba, saya harus membeli baju baru."
           },
           {
-            "exampleJp": "薬を飲まなければなりません。",
-            "exampleKana": "くすりをのまなければなりません。",
-            "exampleEn": "I must take the medicine.",
-            "exampleId": "Saya harus minum obat."
+            "exampleJp": "銀行へ行って、お金をおろさなければなりません。",
+            "exampleKana": "ぎんこうへいって、おかねをおろさなければなりません。",
+            "exampleEn": "I must go to the bank and withdraw money.",
+            "exampleId": "Saya harus pergi ke bank dan menarik uang."
           }
         ]
       },
@@ -2991,19 +2991,19 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleJp": "明日は学校へ行かなくてもいいです。",
             "exampleKana": "あしたはがっこうへいかなくてもいいです。",
             "exampleEn": "You don't have to go to school tomorrow.",
-            "exampleId": "Besok tidak perlu pergi ke sekolah."
+            "exampleId": "Besok tidak usah pergi ke sekolah."
           },
           {
-            "exampleJp": "傘を持っていかなくてもいいです。",
-            "exampleKana": "かさをもっていかなくてもいいです。",
-            "exampleEn": "You don't have to bring an umbrella.",
-            "exampleId": "Tidak perlu membawa payung."
+            "exampleJp": "このボタンを押さなくてもいいです。",
+            "exampleKana": "このボタンをおさなくてもいいです。",
+            "exampleEn": "You don't have to press this button.",
+            "exampleId": "Tidak usah menekan tombol ini."
           },
           {
-            "exampleJp": "靴を脱がなくてもいいです。",
-            "exampleKana": "くつをぬがなくてもいいです。",
-            "exampleEn": "You don't have to take off your shoes.",
-            "exampleId": "Tidak perlu melepas sepatu."
+            "exampleJp": "春になると暖かくなりますから、コートを着なくてもいいです。",
+            "exampleKana": "はるになるとあたたかくなりますから、コートをきなくてもいいです。",
+            "exampleEn": "When spring comes, it gets warm, so you don't have to wear a coat.",
+            "exampleId": "Karena jika musim semi tiba udara menjadi hangat, jadi tidak usah memakai mantel."
           }
         ]
       },
@@ -3018,19 +3018,19 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleJp": "明日は雨が降ると思います。",
             "exampleKana": "あしたはあめがふるとおもいます。",
             "exampleEn": "I think it will rain tomorrow.",
-            "exampleId": "Saya pikir besok akan hujan."
+            "exampleId": "Saya pikir besok akan turun hujan."
           },
           {
-            "exampleJp": "この映画はとても面白いと思います。",
-            "exampleKana": "このえいがはとてもおもしろいとおもいます。",
-            "exampleEn": "I think this movie is very interesting.",
-            "exampleId": "Saya pikir film ini sangat menarik."
+            "exampleJp": "この映画は面白いと思います。",
+            "exampleKana": "このえいがはおもしろいとおもいます。",
+            "exampleEn": "I think this movie is interesting.",
+            "exampleId": "Saya pikir film ini menarik."
           },
           {
-            "exampleJp": "彼は日本へ行くと思います。",
-            "exampleKana": "かれはにほんへいくとおもいます。",
-            "exampleEn": "I think he will go to Japan.",
-            "exampleId": "Saya pikir dia akan pergi ke Jepang."
+            "exampleJp": "彼は日本へ行きたいと思っていると思います。",
+            "exampleKana": "かれはにほんへいきたいとおもっているとおもいます。",
+            "exampleEn": "I think that he wants to go to Japan.",
+            "exampleId": "Saya pikir dia ingin pergi ke Jepang."
           }
         ]
       },
@@ -3048,16 +3048,16 @@ export const BUNPOU_DATA: BunpouLesson[] = [
             "exampleId": "Guru berkata, \"Besok ada ujian.\""
           },
           {
-            "exampleJp": "田中さんは、また来週来ると言っていました。",
-            "exampleKana": "たなかさんは、またらいしゅうくるといっていました。",
-            "exampleEn": "Tanaka-san said that he would come again next week.",
-            "exampleId": "Tanaka-san berkata bahwa dia akan datang lagi minggu depan."
+            "exampleJp": "彼は「この映画は面白い」と言います。",
+            "exampleKana": "かれは「このえいがはおもしろい」といいます。",
+            "exampleEn": "He says, \"This movie is interesting.\"",
+            "exampleId": "Dia berkata, \"Film ini menarik.\""
           },
           {
-            "exampleJp": "母は「早く寝なさい」と言います。",
-            "exampleKana": "ははは「はやくねなさい」といいます。",
-            "exampleEn": "My mother says, \"Go to sleep early.\"",
-            "exampleId": "Ibu berkata, \"Cepat tidur.\""
+            "exampleJp": "私は彼に「日本へ行きたい」と言いました。",
+            "exampleKana": "わたしはかれに「にほんへいきたい」といいました。",
+            "exampleEn": "I told him, \"I want to go to Japan.\"",
+            "exampleId": "Saya berkata kepadanya, \"Saya ingin pergi ke Jepang.\""
           }
         ]
       }
@@ -3076,22 +3076,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menyatakan kabar angin / kabar burung ('katanya...').",
         "examples": [
           {
-            "exampleJp": "天気予報によると、明日は雨が降るそうです。",
-            "exampleKana": "てんきよほうによると、あしたはあめがふるそうです。",
+            "exampleJp": "天気予報によると、明日は雨だそうです。",
+            "exampleKana": "てんきよほうによると、あしたはあめだそうです。",
             "exampleEn": "According to the weather forecast, I heard it will rain tomorrow.",
-            "exampleId": "Menurut ramalan cuaca, katanya besok akan hujan."
+            "exampleId": "Menurut prakiraan cuaca, katanya besok akan hujan."
           },
           {
-            "exampleJp": "田中さんは来週、日本へ帰るそうです。",
-            "exampleKana": "たなかさんはらいしゅう、にほんへかえるそうです。",
-            "exampleEn": "I heard that Mr. Tanaka is returning to Japan next week.",
-            "exampleId": "Katanya Pak Tanaka akan pulang ke Jepang minggu depan."
+            "exampleJp": "田中さんは、新しい車を買ったそうです。",
+            "exampleKana": "たなかさんは、あたらしいくるまをかったそうです。",
+            "exampleEn": "I heard that Mr. Tanaka bought a new car.",
+            "exampleId": "Katanya Pak Tanaka telah membeli mobil baru."
           },
           {
-            "exampleJp": "このレストランはおいしいそうです。",
-            "exampleKana": "このレストランはおいしいそうです。",
-            "exampleEn": "I heard that this restaurant is delicious.",
-            "exampleId": "Katanya restoran ini enak."
+            "exampleJp": "あの店はとてもおいしいそうですから、行ってみます。",
+            "exampleKana": "あのみせはとてもおいしいそうですから、いってみます。",
+            "exampleEn": "I heard that shop is very delicious, so I will try going there.",
+            "exampleId": "Katanya toko itu sangat enak, jadi saya akan coba pergi ke sana."
           }
         ]
       },
@@ -3103,22 +3103,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Pengandaian kondisi masa lampau ('jika / kalau...').",
         "examples": [
           {
-            "exampleJp": "時間ができたら、遊びに行きます。",
-            "exampleKana": "じかんができたら、あそびにいきます。",
-            "exampleEn": "If I have time, I will go hang out.",
-            "exampleId": "Kalau ada waktu, saya akan pergi bermain."
+            "exampleJp": "明日、時間があったら、映画を見に行きます。",
+            "exampleKana": "あした、じかんがあったら、えいがをみにいきます。",
+            "exampleEn": "If I have time tomorrow, I will go to watch a movie.",
+            "exampleId": "Kalau besok ada waktu, saya akan pergi menonton film."
           },
           {
-            "exampleJp": "日本に着いたら、電話してください。",
-            "exampleKana": "にほんについたら、でんわしてください。",
-            "exampleEn": "Please call me when you arrive in Japan.",
+            "exampleJp": "日本に着いたら、電話をしてください。",
+            "exampleKana": "にほんについたら、でんわをしてください。",
+            "exampleEn": "When you arrive in Japan, please call me.",
             "exampleId": "Kalau sudah sampai di Jepang, tolong telepon saya."
           },
           {
-            "exampleJp": "安かったら、この靴を買います。",
-            "exampleKana": "やすかったら、このくつをかいます。",
-            "exampleEn": "If it is cheap, I will buy these shoes.",
-            "exampleId": "Kalau murah, saya akan membeli sepatu ini."
+            "exampleJp": "雨が降ったら、外で遊ぶのはやめましょう。",
+            "exampleKana": "あめがふったら、そとであそぶのはやめましょう。",
+            "exampleEn": "If it rains, let's stop playing outside.",
+            "exampleId": "Kalau hujan, mari kita berhenti bermain di luar."
           }
         ]
       },
@@ -3130,22 +3130,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Pengandaian pertentangan ('walaupun / biarpun...').",
         "examples": [
           {
-            "exampleJp": "雨が降っても、散歩に行きます。",
-            "exampleKana": "あめがふっても、さんぽにいきます。",
-            "exampleEn": "Even if it rains, I will go for a walk.",
-            "exampleId": "Walaupun hujan, saya akan tetap pergi jalan-jalan."
+            "exampleJp": "明日、雨が降っても、テニスをします。",
+            "exampleKana": "あした、あめがふっても、テニスをします。",
+            "exampleEn": "Even if it rains tomorrow, I will play tennis.",
+            "exampleId": "Walaupun besok hujan, saya akan tetap bermain tenis."
           },
           {
-            "exampleJp": "高くても、このバッグがほしいです。",
-            "exampleKana": "たかくても、このバッグがほしいです。",
-            "exampleEn": "Even if it is expensive, I want this bag.",
-            "exampleId": "Biarpun mahal, saya ingin tas ini."
+            "exampleJp": "高くても、このコンピューターがほしいです。",
+            "exampleKana": "たかくても、このコンピューターがほしいです。",
+            "exampleEn": "Even if it is expensive, I want this computer.",
+            "exampleId": "Biarpun mahal, saya ingin komputer ini."
           },
           {
             "exampleJp": "何回聞いても、わかりません。",
             "exampleKana": "なんかいきいても、わかりません。",
             "exampleEn": "Even if I ask many times, I don't understand.",
-            "exampleId": "Walaupun bertanya berkali-kali, saya tidak mengerti."
+            "exampleId": "Walaupun saya bertanya berkali-kali, saya tetap tidak mengerti."
           }
         ]
       },
@@ -3157,22 +3157,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Keadaan kondisi yang terus berlanjut.",
         "examples": [
           {
-            "exampleJp": "私は東京に住んでいます。",
-            "exampleKana": "わたしはとうきょうにすんでいます。",
-            "exampleEn": "I live in Tokyo.",
-            "exampleId": "Saya tinggal di Tokyo."
+            "exampleJp": "私は今、東京に住んでいます。",
+            "exampleKana": "わたしはいま、とうきょうにすんでいます。",
+            "exampleEn": "I am living in Tokyo now.",
+            "exampleId": "Sekarang saya tinggal di Tokyo."
           },
           {
-            "exampleJp": "窓が開いています。",
-            "exampleKana": "まどがあいています。",
-            "exampleEn": "The window is open.",
-            "exampleId": "Jendelanya sedang terbuka."
+            "exampleJp": "彼は結婚指輪をしています。",
+            "exampleKana": "かれはけっこんゆびわをしています。",
+            "exampleEn": "He is wearing a wedding ring.",
+            "exampleId": "Dia sedang memakai cincin pernikahan."
           },
           {
-            "exampleJp": "彼は結婚しています。",
-            "exampleKana": "かれはけっこんしています。",
-            "exampleEn": "He is married.",
-            "exampleId": "Dia sudah menikah."
+            "exampleJp": "窓が開いていますから、閉めてください。",
+            "exampleKana": "まどがあいていますから、しめてください。",
+            "exampleEn": "The window is open, so please close it.",
+            "exampleId": "Jendelanya sedang terbuka, jadi tolong tutup."
           }
         ]
       },
@@ -3184,22 +3184,22 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         "descId": "Menunjukkan sebab atau alasan terjadinya peristiwa ('karena N').",
         "examples": [
           {
-            "exampleJp": "地震で電車が止まりました。",
-            "exampleKana": "じしんででんしゃがとまりました。",
-            "exampleEn": "The train stopped because of the earthquake.",
-            "exampleId": "Kereta berhenti karena gempa bumi."
+            "exampleJp": "風邪で学校を休みます。",
+            "exampleKana": "かぜでがっこうをやすみます。",
+            "exampleEn": "I am absent from school due to a cold.",
+            "exampleId": "Saya absen sekolah karena sakit flu."
           },
           {
-            "exampleJp": "病気で学校を休みます。",
-            "exampleKana": "びょうきでがっこうをやすみます。",
-            "exampleEn": "I am absent from school due to illness.",
-            "exampleId": "Saya absen sekolah karena sakit."
+            "exampleJp": "事故で電車が遅れました。",
+            "exampleKana": "じこででんしゃがおくれました。",
+            "exampleEn": "The train was delayed because of an accident.",
+            "exampleId": "Kereta terlambat karena ada kecelakaan."
           },
           {
-            "exampleJp": "事故で道が混んでいます。",
-            "exampleKana": "じこでみちがこんでいます。",
-            "exampleEn": "The road is crowded because of an accident.",
-            "exampleId": "Jalanan macet karena ada kecelakaan."
+            "exampleJp": "地震で家が壊れました。",
+            "exampleKana": "じしんのいえがこわれました。",
+            "exampleEn": "The house was destroyed due to the earthquake.",
+            "exampleId": "Rumah rusak karena gempa bumi."
           }
         ]
       }

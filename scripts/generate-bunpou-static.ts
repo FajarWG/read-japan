@@ -263,6 +263,15 @@ async function generateChunkWithRetry(patterns: any[]): Promise<Record<string, B
 
   const systemPrompt = `You are a professional Japanese language teacher.
 Your task is to generate exactly 3 high-quality, natural example sentences for each grammar pattern in the list.
+
+Key Pedagogical Rule (Scaffolding):
+Within each chapter, the grammar patterns are ordered.
+- The first pattern's examples should be simple and basic.
+- Subsequent patterns' examples should, wherever natural and possible, build on top of and combine with the earlier patterns in the same chapter or previous chapters. For example, if Chapter 5 has:
+  1. V-tai-desu (want to do) -> "I want to eat."
+  2. V-ni-ikimasu (go to do) -> "I want to go to eat." (combining pattern 1 and 2: V-tai + V-ni ikimasu)
+Note: Some cases cannot be combined naturally, which is fine, but do it as much as naturally possible to show how grammar patterns interact in context!
+
 For each example, you must provide:
 - exampleJp: The sentence in standard Japanese (Kanji/Kana, with correct punctuation).
 - exampleKana: The sentence in Kana only (representing Furigana).
