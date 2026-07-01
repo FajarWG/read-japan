@@ -20,25 +20,21 @@ import { prisma } from "@/src/shared/lib/db";
 // Tier configs (sesuai jawaban user)
 // ─────────────────────────────────────────
 
-export type GeminiModel = "gemini-3.1-flash-lite" | "gemini-2.5-flash-lite" | "gemini-3.5-flash" | "gemini-1.5-flash";
+export type GeminiModel =
+  | "gemini-3.1-flash-lite"
+  | "gemini-2.5-flash-lite"
+  | "gemini-3.5-flash";
 
 interface TierConfig {
   model: GeminiModel;
   endpoint: string;
-  rpm: number;     // requests per minute
-  rpd: number;     // requests per day
+  rpm: number; // requests per minute
+  rpd: number; // requests per day
   /** Batas token per hari (jika ada). */
   tpd?: number;
 }
 
 const TIERS: Record<GeminiModel, TierConfig> = {
-  "gemini-1.5-flash": {
-    model: "gemini-1.5-flash",
-    endpoint:
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-    rpm: 15,
-    rpd: 1500,
-  },
   "gemini-3.5-flash": {
     model: "gemini-3.5-flash",
     endpoint:
@@ -75,7 +71,6 @@ interface ModelCounter {
 }
 
 const counters: Record<GeminiModel, ModelCounter> = {
-  "gemini-1.5-flash": createCounter(),
   "gemini-3.5-flash": createCounter(),
   "gemini-3.1-flash-lite": createCounter(),
   "gemini-2.5-flash-lite": createCounter(),
@@ -139,7 +134,10 @@ export function getQuotaStatus(): QuotaStatus[] {
 }
 
 export class RateLimitError extends Error {
-  constructor(public readonly model: GeminiModel, public readonly kind: "rpm" | "rpd") {
+  constructor(
+    public readonly model: GeminiModel,
+    public readonly kind: "rpm" | "rpd",
+  ) {
     super(`Rate limit exceeded for ${model} (${kind})`);
   }
 }
@@ -154,7 +152,11 @@ export class AllModelsExhaustedError extends Error {
  * Pilih model yang available. Default ke Lite; fallback ke 2.5 Lite.
  */
 export function pickAvailableModel(): GeminiModel {
-  for (const m of ["gemini-1.5-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"] as GeminiModel[]) {
+  for (const m of [
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite",
+    "gemini-2.5-flash-lite",
+  ] as GeminiModel[]) {
     maybeResetCounter(m);
     const t = TIERS[m];
     const c = counters[m];
@@ -214,7 +216,14 @@ export async function callGemini(
   const tier = TIERS[model];
   const contents: GeminiMessage[] = [
     { role: "user", parts: [{ text: systemPrompt }] },
-    { role: "model", parts: [{ text: "Understood. I'll help with Japanese learning at the appropriate level." }] },
+    {
+      role: "model",
+      parts: [
+        {
+          text: "Understood. I'll help with Japanese learning at the appropriate level.",
+        },
+      ],
+    },
     ...history,
     { role: "user", parts: [{ text: userMessage }] },
   ];
@@ -245,7 +254,8 @@ export async function callGemini(
     usageMetadata?: { totalTokenCount?: number };
   };
 
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "(no response)";
+  const text =
+    data.candidates?.[0]?.content?.parts?.[0]?.text ?? "(no response)";
   const tokens = data.usageMetadata?.totalTokenCount;
   return { text, model, tokens };
 }
