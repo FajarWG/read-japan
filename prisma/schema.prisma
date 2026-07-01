@@ -429,3 +429,20 @@ model BunpouProgress {
   @@unique([userId, patternId])
 }
 
+// ─────────────────────────────────────────
+// Tabel: BunpouQuestion
+// Bank soal latihan menyusun kalimat untuk pola tata bahasa Bunpou.
+// ─────────────────────────────────────────
+model BunpouQuestion {
+  id           Int      @id @default(autoincrement())
+  patternId    String
+  english      String
+  indonesian   String
+  sentenceJp   String
+  sentenceKana String
+  words        Json
+  createdAt    DateTime @default(now())
+
+  @@index([patternId])
+}
+

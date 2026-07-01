@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useTransition } from "react";
+import React, { useState, useEffect, useMemo, useTransition, useCallback } from "react";
 import Link from "next/link";
 import { 
   BookOpen, 
@@ -8,29 +8,399 @@ import {
   Search, 
   Eye, 
   EyeOff, 
-  RefreshCw, 
   Award,
   Sparkles,
   Info
 } from "lucide-react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
-import { BUNPOU_DATA, BunpouLesson, BunpouPattern } from "../data/bunpouData";
-import { getBunpouProgress, toggleBunpouProgress } from "../actions/bunpouActions";
+import { BUNPOU_DATA, BunpouLesson, BunpouPattern, BunpouExample } from "../data/bunpouData";
+import { 
+  getBunpouProgress, 
+  toggleBunpouProgress,
+  getBunpouQuestions,
+  generateBunpouQuestions
+} from "../actions/bunpouActions";
 
+interface Question {
+  id: number;
+  patternId: string;
+  english: string;
+  indonesian: string;
+  sentenceJp: string;
+  sentenceKana: string;
+  words: string[];
+}
+
+/**
+ * PracticeArea Sub-component for Sentence Scrambling exercises.
+ */
+function PracticeArea({ 
+  patternId, 
+  showFurigana, 
+  lang 
+}: { 
+  patternId: string; 
+  showFurigana: boolean; 
+  lang: "en" | "id" 
+}) {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [mode, setMode] = useState<"cards" | "typing">("cards");
+  
+  // Card mode state
+  const [selectedWords, setSelectedWords] = useState<string[]>([]);
+  const [shuffledPool, setShuffledPool] = useState<string[]>([]);
+  
+  // Typing mode state
+  const [typedAnswer, setTypedAnswer] = useState<string>("");
+  
+  // Answer status
+  const [isAnswered, setIsAnswered] = useState<boolean>(false);
+  const [isCorrect, setIsCorrect] = useState<boolean>(false);
+  const [isGenerating, startTransition] = useTransition();
+
+  // Load questions from database or generate them if empty
+  const loadQuestions = useCallback(async (forceGenerate = false) => {
+    setLoading(true);
+    try {
+      let qList: Question[] = [];
+      if (forceGenerate) {
+        qList = await generateBunpouQuestions(patternId);
+      } else {
+        qList = await getBunpouQuestions(patternId);
+      }
+      setQuestions(qList);
+      setCurrentIndex(0);
+      resetQuestionState(qList[0]);
+    } catch (e) {
+      console.error("Failed to load questions", e);
+    } finally {
+      setLoading(false);
+    }
+  }, [patternId]);
+
+  useEffect(() => {
+    loadQuestions();
+  }, [loadQuestions]);
+
+  // Reset state for a new question
+  const resetQuestionState = (q: Question | undefined) => {
+    setSelectedWords([]);
+    setTypedAnswer("");
+    setIsAnswered(false);
+    setIsCorrect(false);
+    if (q) {
+      // Shuffle the words pool
+      setShuffledPool([...q.words].sort(() => Math.random() - 0.5));
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < questions.length - 1) {
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      resetQuestionState(questions[nextIndex]);
+    } else {
+      // Completed state
+      setCurrentIndex(questions.length);
+    }
+  };
+
+  const handleResetQuiz = () => {
+    setCurrentIndex(0);
+    resetQuestionState(questions[0]);
+  };
+
+  const handleCardClick = (word: string, index: number, isSelected: boolean) => {
+    if (isAnswered) return;
+    if (isSelected) {
+      // Remove from selected, return to pool
+      setSelectedWords((prev) => prev.filter((_, i) => i !== index));
+      setShuffledPool((prev) => [...prev, word]);
+    } else {
+      // Add to selected, remove from pool
+      setSelectedWords((prev) => [...prev, word]);
+      setShuffledPool((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const checkAnswer = () => {
+    const q = questions[currentIndex];
+    if (!q) return;
+
+    // Normalize strings for comparison (remove spaces, periods, commas, question marks)
+    const clean = (str: string) => str.replace(/[\s\。\,\.\?？]/g, "");
+    const userAnswer = mode === "cards" ? selectedWords.join("") : typedAnswer;
+    
+    const userClean = clean(userAnswer);
+    const correctClean = clean(q.sentenceJp);
+
+    const correct = userClean === correctClean;
+    setIsCorrect(correct);
+    setIsAnswered(true);
+  };
+
+  const handleGenerateNew = () => {
+    startTransition(async () => {
+      await loadQuestions(true);
+    });
+  };
+
+  const text = {
+    en: {
+      practiceTitle: "Sentence Practice",
+      modeCards: "Cards",
+      modeTyping: "Typing",
+      hint: "Hint:",
+      checkBtn: "Check Answer",
+      nextBtn: "Next Question",
+      correctText: "Correct! 🎉 Well done.",
+      incorrectText: "Incorrect. Try again or check the correct sentence below:",
+      correctSentence: "Correct Sentence:",
+      quizFinished: "Practice Completed!",
+      quizScore: "Your Score:",
+      retryQuiz: "Restart Practice",
+      generateBtn: "Generate 10 New Questions (AI)",
+      generating: "Generating questions with Gemini...",
+      emptyPool: "Click cards to assemble sentence",
+      placeholderTyping: "Type the complete Japanese sentence...",
+      loading: "Loading questions...",
+    },
+    id: {
+      practiceTitle: "Latihan Menyusun Kalimat",
+      modeCards: "Kartu Kata",
+      modeTyping: "Ketik Manual",
+      hint: "Petunjuk:",
+      checkBtn: "Periksa Jawaban",
+      nextBtn: "Pertanyaan Selanjutnya",
+      correctText: "Benar! 🎉 Kerja bagus.",
+      incorrectText: "Salah. Coba lagi atau lihat kalimat yang benar di bawah:",
+      correctSentence: "Kalimat yang Benar:",
+      quizFinished: "Latihan Selesai!",
+      quizScore: "Skor Anda:",
+      retryQuiz: "Ulangi Latihan",
+      generateBtn: "Generate 10 Soal Baru (AI)",
+      generating: "Membuat soal baru dengan Gemini...",
+      emptyPool: "Klik kartu untuk menyusun kata",
+      placeholderTyping: "Ketik kalimat bahasa Jepang lengkap...",
+      loading: "Memuat soal...",
+    }
+  }[lang];
+
+  if (loading || isGenerating) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-xs text-muted font-semibold gap-2 select-none">
+        <div className="animate-spin w-5 h-5 border-2 border-accent border-t-transparent rounded-full" />
+        <span>{isGenerating ? text.generating : text.loading}</span>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 gap-4 border border-border/40 bg-background/50 rounded-xl">
+        <p className="text-xs text-muted font-semibold text-center">
+          {lang === "en" ? "No questions generated yet." : "Belum ada soal latihan untuk pola ini."}
+        </p>
+        <button
+          onClick={handleGenerateNew}
+          className="px-4 py-2 bg-accent text-white font-bold text-xs rounded-xl shadow-xs hover:bg-accent/90 transition-all cursor-pointer"
+        >
+          {text.generateBtn}
+        </button>
+      </div>
+    );
+  }
+
+  // Finished state
+  if (currentIndex >= questions.length) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 gap-4 border border-emerald-500/20 bg-emerald-500/[0.02] rounded-2xl text-center">
+        <h4 className="text-base font-black text-emerald-500">{text.quizFinished}</h4>
+        <p className="text-xs font-bold text-foreground">
+          {text.quizScore} <span className="text-lg font-black text-accent">{questions.length} / {questions.length}</span>
+        </p>
+        <div className="flex flex-wrap gap-2 justify-center mt-2">
+          <button
+            onClick={handleResetQuiz}
+            className="px-4 py-2 border border-border bg-surface text-foreground font-bold text-xs rounded-xl hover:bg-surface-muted transition-all cursor-pointer"
+          >
+            {text.retryQuiz}
+          </button>
+          <button
+            onClick={handleGenerateNew}
+            className="px-4 py-2 bg-accent text-white font-bold text-xs rounded-xl hover:bg-accent/90 transition-all cursor-pointer"
+          >
+            {text.generateBtn}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const q = questions[currentIndex];
+
+  return (
+    <div className="flex flex-col gap-4 border border-border/40 bg-background/30 rounded-xl p-4 sm:p-5">
+      {/* Exercise Header */}
+      <div className="flex items-center justify-between border-b border-border/25 pb-2">
+        <span className="text-[10px] font-extrabold text-accent uppercase tracking-wider">
+          {text.practiceTitle} ({currentIndex + 1}/{questions.length})
+        </span>
+        
+        {/* Toggle Mode */}
+        <div className="flex rounded-lg border border-border/50 overflow-hidden bg-background">
+          <button
+            onClick={() => { setMode("cards"); resetQuestionState(q); }}
+            className={`px-2.5 py-1 text-[10px] font-extrabold transition-all cursor-pointer ${mode === "cards" ? "bg-accent/15 text-accent" : "text-muted hover:text-foreground"}`}
+          >
+            {text.modeCards}
+          </button>
+          <button
+            onClick={() => { setMode("typing"); resetQuestionState(q); }}
+            className={`px-2.5 py-1 text-[10px] font-extrabold transition-all cursor-pointer ${mode === "typing" ? "bg-accent/15 text-accent" : "text-muted hover:text-foreground"}`}
+          >
+            {text.modeTyping}
+          </button>
+        </div>
+      </div>
+
+      {/* Translation hint */}
+      <div className="flex flex-col gap-1">
+        <span className="text-[9px] font-bold text-muted uppercase tracking-wider">{text.hint}</span>
+        <p className="text-xs font-bold text-foreground leading-relaxed">
+          {lang === "en" ? q.english : q.indonesian}
+        </p>
+      </div>
+
+      {/* Correct answer reading (Furigana representation) displayed after validation */}
+      {isAnswered && showFurigana && (
+        <span className="text-[10px] text-muted opacity-75 font-semibold leading-none select-none tracking-wide mt-2">
+          {q.sentenceKana}
+        </span>
+      )}
+
+      {/* Input / Sorting area */}
+      {mode === "cards" ? (
+        <div className="flex flex-col gap-3">
+          {/* Arrange Zone */}
+          <div className="min-h-[52px] p-3 rounded-xl border border-dashed border-border/80 bg-background/50 flex flex-wrap gap-1.5 items-center">
+            {selectedWords.length === 0 ? (
+              <span className="text-[10px] font-semibold text-muted/65 italic select-none">{text.emptyPool}</span>
+            ) : (
+              selectedWords.map((word, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleCardClick(word, idx, true)}
+                  disabled={isAnswered}
+                  className="px-2.5 py-1.5 rounded-lg bg-accent text-accent-foreground font-jp font-bold text-xs shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  {word}
+                </button>
+              ))
+            )}
+          </div>
+
+          {/* Scrambled word pool */}
+          {!isAnswered && (
+            <div className="flex flex-wrap gap-1.5 p-3 rounded-xl border border-border/30 bg-surface/50 justify-center">
+              {shuffledPool.map((word, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleCardClick(word, idx, false)}
+                  className="px-2.5 py-1.5 rounded-lg bg-background border border-border text-foreground font-jp font-bold text-xs shadow-3xs hover:-translate-y-0.5 hover:border-accent hover:text-accent transition-all cursor-pointer"
+                >
+                  {word}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Typing Mode */
+        <input
+          type="text"
+          value={typedAnswer}
+          onChange={(e) => setTypedAnswer(e.target.value)}
+          disabled={isAnswered}
+          placeholder={text.placeholderTyping}
+          className="w-full bg-background border border-border/50 rounded-xl py-2 px-3 text-xs font-semibold text-foreground focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all font-jp"
+        />
+      )}
+
+      {/* Answer evaluation response panel */}
+      {isAnswered && (
+        <div className={`p-4 rounded-xl border flex flex-col gap-1.5 text-xs font-bold leading-normal mt-2 ${isCorrect ? "bg-emerald-500/[0.03] border-emerald-500/25 text-emerald-600" : "bg-rose-500/[0.03] border-rose-500/25 text-rose-600"}`}>
+          <p>{isCorrect ? text.correctText : text.incorrectText}</p>
+          {!isCorrect && (
+            <div className="mt-1 border-t border-border/25 pt-2 flex flex-col gap-1 text-foreground">
+              <span className="text-[9px] font-bold text-muted uppercase tracking-wider">{text.correctSentence}</span>
+              {showFurigana && (
+                <span className="text-[10px] text-muted opacity-75 font-semibold leading-none">{q.sentenceKana}</span>
+              )}
+              <p className="text-sm font-bold font-jp text-foreground select-all leading-tight">{q.sentenceJp}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Control panel buttons */}
+      <div className="flex flex-wrap gap-2 items-center justify-between mt-2 select-none">
+        <button
+          onClick={handleGenerateNew}
+          className="px-3 py-1.5 border border-border bg-surface text-muted hover:text-foreground font-bold text-[10px] rounded-lg transition-all cursor-pointer"
+        >
+          🔄 {text.generateBtn}
+        </button>
+
+        <div className="flex gap-2">
+          {!isAnswered ? (
+            <button
+              onClick={checkAnswer}
+              disabled={mode === "cards" ? selectedWords.length === 0 : !typedAnswer.trim()}
+              className="px-4 py-2 bg-accent text-white font-bold text-xs rounded-xl shadow-xs hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+            >
+              {text.checkBtn}
+            </button>
+          ) : (
+            <button
+              onClick={handleNext}
+              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
+            >
+              {text.nextBtn}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Main Bunpou Dashboard.
+ */
 export function BunpouDashboard() {
   const { lang } = useLanguage();
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showFurigana, setShowFurigana] = useState<boolean>(true);
-  const [showRomaji, setShowRomaji] = useState<boolean>(true);
   
   // Progress State
   const [learnedPatterns, setLearnedPatterns] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
 
-  // Load progress from database on mount
+  // Active tab state per pattern ("examples" or "practice")
+  const [activeTab, setActiveTab] = useState<Record<string, "examples" | "practice">>({});
+
+  const getActiveTab = (patId: string) => activeTab[patId] || "examples";
+  const setActiveTabForPattern = (patId: string, tab: "examples" | "practice") => {
+    setActiveTab((prev) => ({ ...prev, [patId]: tab }));
+  };
+
+  // Load progress on mount
   useEffect(() => {
     async function loadProgress() {
       try {
@@ -45,9 +415,8 @@ export function BunpouDashboard() {
     loadProgress();
   }, []);
 
-  // Save progress to database when toggled (optimistic updates)
+  // Save progress (optimistic updates)
   const togglePatternLearned = (patternId: string) => {
-    // Optimistic local state update
     setLearnedPatterns((prev) =>
       prev.includes(patternId)
         ? prev.filter((id) => id !== patternId)
@@ -58,20 +427,17 @@ export function BunpouDashboard() {
       try {
         const res = await toggleBunpouProgress(patternId);
         if (!res.success) {
-          // Revert on failure
           const progress = await getBunpouProgress();
           setLearnedPatterns(progress);
         }
       } catch (e) {
         console.error("Failed to toggle progress", e);
-        // Revert on error
         const progress = await getBunpouProgress();
         setLearnedPatterns(progress);
       }
     });
   };
 
-  // Translations
   const text = {
     en: {
       title: "Bunpou — Grammar & Particles",
@@ -87,11 +453,11 @@ export function BunpouDashboard() {
       noResults: "No grammar patterns found matching your search.",
       studyOptions: "Study Options",
       furigana: "Furigana",
-      romaji: "Romaji",
       chapterBadge: "Chapter",
-      example: "Example Sentence:",
       allChapters: "All Chapters",
       chapterTitle: "Chapter",
+      examplesTab: "Examples",
+      practiceTab: "Practice",
     },
     id: {
       title: "Bunpou (文法)",
@@ -107,15 +473,15 @@ export function BunpouDashboard() {
       noResults: "Tidak ada pola tata bahasa yang cocok dengan pencarian Anda.",
       studyOptions: "Opsi Belajar",
       furigana: "Furigana",
-      romaji: "Romaji",
       chapterBadge: "Bab",
-      example: "Contoh Kalimat:",
       allChapters: "Semua Bab",
       chapterTitle: "Bab",
+      examplesTab: "Contoh Kalimat",
+      practiceTab: "Latihan",
     }
   }[lang];
 
-  // Calculate totals and statistics
+  // Calculate stats
   const totalPatternsCount = useMemo(() => {
     return BUNPOU_DATA.reduce((acc, lesson) => acc + lesson.patterns.length, 0);
   }, []);
@@ -125,7 +491,6 @@ export function BunpouDashboard() {
     return Math.round((learnedPatterns.length / totalPatternsCount) * 100);
   }, [learnedPatterns, totalPatternsCount]);
 
-  // Statistics per chapter
   const chapterStats = useMemo(() => {
     const stats: Record<number, { total: number; learned: number }> = {};
     BUNPOU_DATA.forEach((lesson) => {
@@ -136,10 +501,9 @@ export function BunpouDashboard() {
     return stats;
   }, [learnedPatterns]);
 
-  // Filtered patterns based on search query
+  // Filter lessons based on active chapter or search query
   const filteredLessons = useMemo(() => {
     if (!searchQuery.trim()) {
-      // If no search, return the active selected chapter
       return BUNPOU_DATA.filter((lesson) => lesson.chapter === selectedChapter);
     }
 
@@ -150,9 +514,11 @@ export function BunpouDashboard() {
           p.pattern.toLowerCase().includes(query) ||
           p.descEn.toLowerCase().includes(query) ||
           p.descId.toLowerCase().includes(query) ||
-          p.exampleJp.toLowerCase().includes(query) ||
-          p.exampleEn.toLowerCase().includes(query) ||
-          p.exampleId.toLowerCase().includes(query)
+          (p.examples && p.examples.some((ex) =>
+            ex.exampleJp.toLowerCase().includes(query) ||
+            ex.exampleEn.toLowerCase().includes(query) ||
+            ex.exampleId.toLowerCase().includes(query)
+          ))
       );
 
       return {
@@ -208,7 +574,7 @@ export function BunpouDashboard() {
             </div>
           </div>
 
-          {/* Counts */}
+          {/* Learned Counts */}
           <div className="flex items-center gap-4 bg-surface/80 border border-border/30 rounded-2xl p-3 sm:px-4 shadow-3xs justify-between sm:justify-start">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10 text-accent border border-accent/15">
               <Award className="w-5 h-5" />
@@ -264,26 +630,13 @@ export function BunpouDashboard() {
                 {showFurigana ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                 {text.furigana}
               </button>
-
-              <button
-                onClick={() => setShowRomaji(!showRomaji)}
-                className={[
-                  "flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 border cursor-pointer",
-                  showRomaji
-                    ? "bg-accent/10 border-accent/25 text-accent shadow-3xs"
-                    : "bg-background border-border/40 text-muted hover:text-foreground",
-                ].join(" ")}
-              >
-                {showRomaji ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                {text.romaji}
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Main Content Area */}
+        {/* Main Workspace Layout */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
-          {/* Sidebar (Chapter Navigation) - Hidden during search */}
+          {/* Sidebar - Chapter Navigation (hidden during search query) */}
           {!searchQuery.trim() && (
             <aside className="w-full flex flex-col gap-2 md:w-60 shrink-0 select-none">
               <h3 className="text-xs font-bold text-muted/80 uppercase tracking-wider px-2">
@@ -316,7 +669,6 @@ export function BunpouDashboard() {
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                        {/* Counts badge */}
                         <span className={[
                           "px-1.5 py-0.5 rounded-md text-[9px] font-bold border",
                           isFinished
@@ -326,7 +678,6 @@ export function BunpouDashboard() {
                           {stats.learned}/{stats.total}
                         </span>
 
-                        {/* Completion check */}
                         {isFinished && (
                           <span className="flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-500 text-white border border-emerald-600 shadow-3xs">
                             <Check className="w-2.5 h-2.5 stroke-[3px]" />
@@ -340,7 +691,7 @@ export function BunpouDashboard() {
             </aside>
           )}
 
-          {/* Grammar Patterns Container */}
+          {/* Grammar Patterns Details Panel */}
           <main className="flex-1 flex flex-col gap-6 w-full">
             {filteredLessons.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-12 text-muted border border-border/40 bg-surface/30 rounded-3xl shadow-2xs select-none">
@@ -350,7 +701,7 @@ export function BunpouDashboard() {
             ) : (
               filteredLessons.map((lesson) => (
                 <div key={lesson.chapter} className="flex flex-col gap-4">
-                  {/* Chapter Section Title */}
+                  {/* Chapter Header Title */}
                   <div className="flex items-center gap-2 border-b border-border/40 pb-2 select-none">
                     <span className="bg-accent/10 border border-accent/20 text-accent font-extrabold text-xs px-2.5 py-1 rounded-lg">
                       {text.chapterBadge} {lesson.chapter}
@@ -360,10 +711,11 @@ export function BunpouDashboard() {
                     </h2>
                   </div>
 
-                  {/* Patterns Cards Grid */}
+                  {/* Pattern detail cards */}
                   <div className="flex flex-col gap-4">
                     {lesson.patterns.map((pat) => {
                       const isLearned = learnedPatterns.includes(pat.id);
+                      const currentTab = getActiveTab(pat.id);
 
                       return (
                         <div
@@ -375,7 +727,7 @@ export function BunpouDashboard() {
                               : "border-border/50",
                           ].join(" ")}
                         >
-                          {/* Top Card Row */}
+                          {/* Card Header Row */}
                           <div className="flex justify-between items-start gap-4">
                             <div className="flex flex-col gap-1 min-w-0">
                               <span className="text-base sm:text-lg font-black font-jp text-accent tracking-wide select-all leading-tight">
@@ -386,14 +738,12 @@ export function BunpouDashboard() {
                               </p>
                             </div>
 
-                            {/* Actions and Badges */}
+                            {/* Badges and Actions */}
                             <div className="flex items-center gap-2 shrink-0 select-none">
-                              {/* JLPT Badge */}
                               <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-background text-muted border border-border">
                                 {pat.jlpt}
                               </span>
 
-                              {/* Learned Button Checkbox */}
                               <button
                                 onClick={() => togglePatternLearned(pat.id)}
                                 title={isLearned ? text.unmarkLearned : text.markLearned}
@@ -409,46 +759,73 @@ export function BunpouDashboard() {
                             </div>
                           </div>
 
-                          {/* Example Sentences Block */}
-                          <div className="rounded-xl bg-background border border-border/40 p-4 mt-1.5 flex flex-col gap-2">
-                            <span className="text-[10px] font-bold text-muted uppercase tracking-wider leading-none select-none">
-                              {text.example}
-                            </span>
-                            
-                            {/* Furigana */}
-                            {showFurigana && (
-                              <span className="text-[10px] text-muted opacity-75 font-semibold leading-none select-none tracking-wide">
-                                {pat.exampleKana}
-                              </span>
-                            )}
-                            
-                            {/* Japanese example sentence */}
-                            <p className="text-base font-bold font-jp text-foreground leading-snug tracking-wide select-all">
-                              {pat.exampleJp}
-                            </p>
+                          {/* Tab Navigation (Examples / Practice) */}
+                          <div className="flex border-b border-border/30 pb-1 gap-4 mt-1 select-none">
+                            <button
+                              onClick={() => setActiveTabForPattern(pat.id, "examples")}
+                              className={`text-xs font-bold transition-all cursor-pointer relative pb-1.5 ${
+                                currentTab === "examples"
+                                  ? "text-accent after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-accent"
+                                  : "text-muted hover:text-foreground"
+                              }`}
+                            >
+                              {text.examplesTab}
+                            </button>
+                            <button
+                              onClick={() => setActiveTabForPattern(pat.id, "practice")}
+                              className={`text-xs font-bold transition-all cursor-pointer relative pb-1.5 ${
+                                currentTab === "practice"
+                                  ? "text-accent after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-accent"
+                                  : "text-muted hover:text-foreground"
+                              }`}
+                            >
+                              {text.practiceTab}
+                            </button>
+                          </div>
 
-                            {/* Romaji */}
-                            {showRomaji && (
-                              <p className="text-xs text-muted/75 font-medium italic leading-none select-none border-t border-border/25 pt-1.5">
-                                {pat.exampleEn.split(" ").length > 0 ? (
-                                  // Simplified Romaji display, here we use English & ID translations below
-                                  // Just basic spacing for aesthetics
-                                  <span>&nbsp;</span>
-                                ) : null}
-                              </p>
-                            )}
+                          {/* Tab Content */}
+                          <div className="mt-2">
+                            {currentTab === "examples" ? (
+                              /* Render Examples (Exactly 3) */
+                              <div className="rounded-xl bg-background border border-border/40 p-4 flex flex-col gap-4">
+                                {pat.examples && pat.examples.length > 0 ? (
+                                  pat.examples.map((example, idx) => (
+                                    <div 
+                                      key={idx} 
+                                      className="flex flex-col gap-1.5 border-b border-border/25 pb-3.5 last:border-b-0 last:pb-0"
+                                    >
+                                      {/* Furigana Kana */}
+                                      {showFurigana && (
+                                        <span className="text-[10px] text-muted opacity-75 font-semibold leading-none select-none tracking-wide">
+                                          {example.exampleKana}
+                                        </span>
+                                      )}
+                                      
+                                      {/* Japanese example sentence */}
+                                      <p className="text-base font-bold font-jp text-foreground leading-snug tracking-wide select-all">
+                                        {example.exampleJp}
+                                      </p>
 
-                            {/* Translations */}
-                            <div className="flex flex-col gap-1 border-t border-border/25 pt-2.5 text-xs text-muted font-semibold leading-relaxed">
-                              <p className="flex items-start gap-2">
-                                <span className="shrink-0 text-[10px] select-none uppercase font-bold text-muted/50 mt-0.5">en</span>
-                                <span>🇺🇸 {pat.exampleEn}</span>
-                              </p>
-                              <p className="flex items-start gap-2">
-                                <span className="shrink-0 text-[10px] select-none uppercase font-bold text-muted/50 mt-0.5">id</span>
-                                <span>🇮🇩 {pat.exampleId}</span>
-                              </p>
-                            </div>
+                                      {/* Translation (Language Sensitive) */}
+                                      <p className="text-xs text-muted/80 font-semibold leading-relaxed mt-0.5">
+                                        {lang === "en" ? example.exampleEn : example.exampleId}
+                                      </p>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p className="text-xs text-muted/65 italic select-none">
+                                    {lang === "en" ? "Generating examples..." : "Memuat contoh kalimat..."}
+                                  </p>
+                                )}
+                              </div>
+                            ) : (
+                              /* Render Practice sentence scrambling exercises */
+                              <PracticeArea 
+                                patternId={pat.id} 
+                                showFurigana={showFurigana} 
+                                lang={lang as "en" | "id"} 
+                              />
+                            )}
                           </div>
                         </div>
                       );

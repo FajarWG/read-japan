@@ -20,7 +20,7 @@ import { prisma } from "@/src/shared/lib/db";
 // Tier configs (sesuai jawaban user)
 // ─────────────────────────────────────────
 
-export type GeminiModel = "gemini-3.1-flash-lite" | "gemini-2.5-flash-lite" | "gemini-3.5-flash";
+export type GeminiModel = "gemini-3.1-flash-lite" | "gemini-2.5-flash-lite" | "gemini-3.5-flash" | "gemini-1.5-flash";
 
 interface TierConfig {
   model: GeminiModel;
@@ -32,6 +32,13 @@ interface TierConfig {
 }
 
 const TIERS: Record<GeminiModel, TierConfig> = {
+  "gemini-1.5-flash": {
+    model: "gemini-1.5-flash",
+    endpoint:
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+    rpm: 15,
+    rpd: 1500,
+  },
   "gemini-3.5-flash": {
     model: "gemini-3.5-flash",
     endpoint:
@@ -68,6 +75,7 @@ interface ModelCounter {
 }
 
 const counters: Record<GeminiModel, ModelCounter> = {
+  "gemini-1.5-flash": createCounter(),
   "gemini-3.5-flash": createCounter(),
   "gemini-3.1-flash-lite": createCounter(),
   "gemini-2.5-flash-lite": createCounter(),
@@ -146,7 +154,7 @@ export class AllModelsExhaustedError extends Error {
  * Pilih model yang available. Default ke Lite; fallback ke 2.5 Lite.
  */
 export function pickAvailableModel(): GeminiModel {
-  for (const m of ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"] as GeminiModel[]) {
+  for (const m of ["gemini-1.5-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"] as GeminiModel[]) {
     maybeResetCounter(m);
     const t = TIERS[m];
     const c = counters[m];
@@ -218,7 +226,7 @@ export async function callGemini(
       contents,
       generationConfig: {
         temperature: 0.7,
-        maxOutputTokens: 1024,
+        maxOutputTokens: 8192,
         topP: 0.9,
       },
     }),
