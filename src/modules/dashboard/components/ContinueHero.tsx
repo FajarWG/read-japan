@@ -177,6 +177,26 @@ export function ContinueHero({
               </p>
             </div>
           </Link>
+
+          {/* IT Kotoba */}
+          <Link
+            href="/it-kotoba"
+            className="group flex flex-col gap-1.5 rounded-2xl border border-border bg-surface p-4 shadow-xs transition-all duration-150 hover:border-sky-400/50 hover:bg-sky-50/5 dark:hover:bg-sky-950/10 hover:shadow-md cursor-pointer"
+          >
+            <span className="text-2xl group-hover:scale-110 transition-transform w-fit select-none">
+              💻
+            </span>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-foreground leading-snug group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                IT Kotoba (ITの言葉)
+              </p>
+              <p className="text-[10px] sm:text-[11px] text-muted line-clamp-2 mt-0.5 leading-snug">
+                {lang === "en"
+                  ? "Memorize IT & developer terms."
+                  : "Hafalkan istilah IT & developer."}
+              </p>
+            </div>
+          </Link>
         </div>
       </div>
 
