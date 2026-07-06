@@ -13,6 +13,7 @@ import {
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
+import { HandwritingCanvas } from "@/src/shared/components/HandwritingCanvas";
 
 interface AnkiContentProps {
   username: string;
@@ -178,6 +179,40 @@ export function AnkiContent({ username }: AnkiContentProps) {
       rating: number;
     }>
   >([]);
+
+  // Handwriting active recall state
+  const [ankiWriteInput, setAnkiWriteInput] = useState("");
+  const [ankiAnswerChecked, setAnkiAnswerChecked] = useState(false);
+  const [ankiIsCorrect, setAnkiIsCorrect] = useState(false);
+  const [ankiUsedHint, setAnkiUsedHint] = useState(false);
+
+  const checkAnkiAnswer = (written: string) => {
+    const currentCard = sessionQueue[currentIndex];
+    if (!currentCard) return;
+    
+    // Remove romaji parenthetical helpers from target if any
+    const cleanTarget = currentCard.hiragana.replace(/\s*[\(（].*?[\)）]/g, "").trim();
+    const cleanWritten = written.replace(/\s*[\(（].*?[\)）]/g, "").trim();
+    
+    const correct = cleanWritten === cleanTarget;
+    setAnkiIsCorrect(correct);
+    setAnkiAnswerChecked(true);
+
+    if (correct) {
+      // Flip card to show back
+      setFlipped(true);
+      
+      // Auto-progress to next card after 1.2s delay.
+      // If user used a hint to trace characters, rate as "Hard" (rating 2) instead of "Good" (rating 3).
+      setTimeout(() => {
+        if (ankiMode === "srs") {
+          handleRateCard(ankiUsedHint ? 2 : 3);
+        } else {
+          handleQuickAnswer(true);
+        }
+      }, 1200);
+    }
+  };
 
   // Learned Kanji state (derived from vocabulary progress)
   const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
@@ -506,8 +541,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
     if (sessionQueue.length === 0) return;
     const currentCard = sessionQueue[currentIndex];
 
-    // Reset flipped
+    // Reset flipped and handwriting states
     setFlipped(false);
+    setAnkiWriteInput("");
+    setAnkiAnswerChecked(false);
+    setAnkiIsCorrect(false);
+    setAnkiUsedHint(false);
     setReviewedCount((prev) => prev + 1);
 
     // Sudah Tahu -> rating 2 (Hard, bobot paling kecil untuk sukses)
@@ -558,6 +597,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
     // Animasi balik kartu direset
     setFlipped(false);
+    setAnkiWriteInput("");
+    setAnkiAnswerChecked(false);
+    setAnkiIsCorrect(false);
+    setAnkiUsedHint(false);
     setReviewedCount((prev) => prev + 1);
 
     const cardReview = {
@@ -1084,6 +1127,59 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     </div>
                   </div>
                 </div>
+
+                {/* Handwriting active recall panel */}
+                {!flipped && (
+                  <div className="w-full max-w-md flex flex-col gap-2 page-enter">
+                    <div className="bg-surface border border-border rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+                      <div className="flex items-center justify-between text-xs font-bold text-muted border-b border-border/40 pb-2">
+                        <span>{lang === "en" ? "Write the Hiragana / Furigana reading:" : "Tulis pembacaan Hiragana / Furigana:"}</span>
+                        <span className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase font-black">Active Recall</span>
+                      </div>
+                      
+                      {ankiAnswerChecked && !ankiIsCorrect ? (
+                        <div className="flex flex-col gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-xs text-red-500 page-enter">
+                          <p className="font-extrabold uppercase text-[10px] tracking-wider">Belum Tepat!</p>
+                          <p className="font-semibold">Tulisan Anda: "{ankiWriteInput.trim()}"</p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAnkiAnswerChecked(false);
+                              setAnkiWriteInput("");
+                            }}
+                            className="w-full mt-1.5 py-1.5 bg-foreground text-background font-bold rounded-lg hover:opacity-90 transition-all cursor-pointer"
+                          >
+                            Coba Lagi
+                          </button>
+                        </div>
+                      ) : ankiIsCorrect ? (
+                        <div className="flex flex-col gap-2 p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl text-xs text-emerald-500 page-enter">
+                          <p className="font-extrabold uppercase text-[10px] tracking-wider">Tepat sekali! 🎉</p>
+                          <p className="font-semibold">{lang === "en" ? "Correct! Saving as 'Good'..." : "Benar! Menyimpan jawaban..."}</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          <HandwritingCanvas
+                            value={ankiWriteInput}
+                            onChange={setAnkiWriteInput}
+                            onSubmit={() => checkAnkiAnswer(ankiWriteInput)}
+                            placeholder={lang === "en" ? "Draw hiragana here..." : "Tulis hiragana di sini..."}
+                            hintText={currentCard.hiragana.replace(/\s*[\(（].*?[\)）]/g, "").trim()}
+                            onUseHint={() => setAnkiUsedHint(true)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => checkAnkiAnswer(ankiWriteInput)}
+                            disabled={!ankiWriteInput.trim()}
+                            className="w-full text-xs font-extrabold py-2.5 bg-accent hover:bg-accent/90 active:scale-95 text-white rounded-xl disabled:opacity-50 transition-all cursor-pointer shadow-3xs"
+                          >
+                            {lang === "en" ? "Check Answer" : "Cek Jawaban"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* GRADING BUTTONS (Hanya muncul jika kartu sudah dibalik) */}
                 <div className="w-full max-w-md flex flex-col gap-2">

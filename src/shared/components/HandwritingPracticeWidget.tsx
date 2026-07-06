@@ -111,6 +111,7 @@ export function HandwritingPracticeWidget({
             onChange={setWrittenText}
             onSubmit={handleCheck}
             placeholder={lang === "en" ? "Draw here..." : "Tulis di sini..."}
+            hintText={targetClean}
           />
           <button
             type="button"

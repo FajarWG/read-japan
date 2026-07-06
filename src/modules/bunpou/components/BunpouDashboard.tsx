@@ -15,6 +15,7 @@ import {
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { BUNPOU_DATA, BunpouLesson, BunpouPattern, BunpouExample } from "../data/bunpouData";
+import { HandwritingCanvas } from "@/src/shared/components/HandwritingCanvas";
 import { 
   getBunpouProgress, 
   toggleBunpouProgress,
@@ -320,13 +321,11 @@ function PracticeArea({
         </div>
       ) : (
         /* Typing Mode */
-        <input
-          type="text"
+        <HandwritingCanvas
           value={typedAnswer}
-          onChange={(e) => setTypedAnswer(e.target.value)}
-          disabled={isAnswered}
+          onChange={setTypedAnswer}
+          onSubmit={checkAnswer}
           placeholder={text.placeholderTyping}
-          className="w-full bg-background border border-border/50 rounded-xl py-2 px-3 text-xs font-semibold text-foreground focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all font-jp"
         />
       )}
 

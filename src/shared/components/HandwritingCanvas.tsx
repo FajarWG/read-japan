@@ -10,7 +10,8 @@ import {
   Delete, 
   Sparkles,
   CheckCircle,
-  X
+  X,
+  Lightbulb
 } from "lucide-react";
 import { recognizeHandwriting } from "../actions/handwriting";
 
@@ -40,6 +41,8 @@ interface HandwritingCanvasProps {
   language?: string; // 'ja' or 'en'
   className?: string;
   id?: string;
+  hintText?: string;
+  onUseHint?: () => void;
 }
 
 export function HandwritingCanvas({
@@ -49,8 +52,11 @@ export function HandwritingCanvas({
   placeholder = "Tulis di sini...",
   language = "ja",
   className = "",
-  id = "handwriting-canvas"
+  id = "handwriting-canvas",
+  hintText,
+  onUseHint
 }: HandwritingCanvasProps) {
+  const [showHint, setShowHint] = useState(false);
   const [isKeyboardMode, setIsKeyboardMode] = useState(false);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [segments, setSegments] = useState<DrawingSegment[]>([]);
@@ -556,19 +562,50 @@ export function HandwritingCanvas({
             )}
 
             <div className="flex h-44 sm:h-52">
-              
-              {/* Canvas drawing plane */}
-              <canvas
-                ref={canvasRef}
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
-                className="flex-1 h-full touch-none cursor-crosshair bg-surface"
-              />
+              {/* Canvas drawing plane container */}
+              <div className="relative flex-1 h-full overflow-hidden bg-surface">
+                {/* Faint hint tracing template */}
+                {showHint && hintText && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
+                    <span className="font-jp font-black text-4xl sm:text-5xl text-foreground/[0.08] dark:text-foreground/[0.05] tracking-widest text-center px-4 leading-normal">
+                      {hintText}
+                    </span>
+                  </div>
+                )}
+                <canvas
+                  ref={canvasRef}
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  className="absolute inset-0 w-full h-full touch-none cursor-crosshair bg-transparent z-10"
+                />
+              </div>
 
               {/* Drawing Toolbar controls (Side/Vertical) */}
               <div className="flex flex-col justify-between items-center border-l border-border/40 p-2 bg-surface-muted/30 shrink-0 gap-2">
                 <div className="flex flex-col gap-2">
+                  {hintText && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextShow = !showHint;
+                        setShowHint(nextShow);
+                        if (nextShow) {
+                          onUseHint?.();
+                        }
+                      }}
+                      title="Tampilkan petunjuk bayangan"
+                      className={[
+                        "flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer text-[10px] font-extrabold gap-1 min-w-12",
+                        showHint 
+                          ? "bg-amber-500/15 border-amber-500/35 text-amber-600 dark:text-amber-400" 
+                          : "hover:bg-surface border-border/20 text-muted hover:text-foreground"
+                      ].join(" ")}
+                    >
+                      <Lightbulb className={showHint ? "w-4 h-4 fill-amber-500/10" : "w-4 h-4"} />
+                      <span>{showHint ? "Petunjuk" : "Bantuan"}</span>
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={handleUndoStroke}
