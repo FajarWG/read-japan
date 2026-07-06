@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { Eye, EyeOff, Info } from "lucide-react";
+import { Eye, EyeOff, Info, PenTool } from "lucide-react";
 import { CONJUGATION_EXAMPLES } from "../data/conjugationExamples";
+import { HandwritingPracticeWidget } from "@/src/shared/components/HandwritingPracticeWidget";
 
 interface ExamplesTabProps {
   formKey: string;
@@ -13,6 +14,7 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
   const sentences = CONJUGATION_EXAMPLES[formKey] || [];
   const [showFurigana, setShowFurigana] = useState(true);
   const [showRomaji, setShowRomaji] = useState(true);
+  const [activePracticeIndex, setActivePracticeIndex] = useState<number | null>(null);
 
   if (sentences.length === 0) {
     return (
@@ -92,9 +94,24 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
               </span>
             )}
 
-            {/* Japanese Sentence */}
-            <div className="flex flex-col">
-              {renderJapaneseWithHighlight(sen.japanese, sen.highlight)}
+            {/* Japanese Sentence & Write Action */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col">
+                {renderJapaneseWithHighlight(sen.japanese, sen.highlight)}
+              </div>
+              <button
+                onClick={() => setActivePracticeIndex(activePracticeIndex === idx ? null : idx)}
+                className={[
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer shrink-0 shadow-3xs hover:scale-105 active:scale-95",
+                  activePracticeIndex === idx
+                    ? "bg-accent/15 border-accent/25 text-accent font-extrabold"
+                    : "bg-background border-border/40 text-muted hover:text-foreground"
+                ].join(" ")}
+                title={lang === "en" ? "Practice writing conjugation" : "Latih menulis konjugasi"}
+              >
+                <PenTool className="w-3.5 h-3.5" />
+                <span>{lang === "en" ? "Practice" : "Tulis"}</span>
+              </button>
             </div>
 
             {/* Romaji */}
@@ -115,6 +132,17 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
                 <span>🇮🇩 {sen.indonesian}</span>
               </p>
             </div>
+
+            {/* Handwriting practice widget drawer */}
+            {activePracticeIndex === idx && (
+              <div className="border-t border-border/25 pt-4 mt-1">
+                <HandwritingPracticeWidget
+                  expected={sen.japanese}
+                  lang={lang}
+                  onClose={() => setActivePracticeIndex(null)}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>

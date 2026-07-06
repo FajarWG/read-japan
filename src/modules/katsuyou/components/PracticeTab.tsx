@@ -5,6 +5,7 @@ import { Check, X, ArrowRight, Play, Award, HelpCircle, AlertCircle } from "luci
 import { mockVerbs, Verb } from "../data/verbs";
 import { savePracticeAttempt } from "../actions/katsuyouActions";
 import { VerbGroupBadge, JLPTBadge } from "./KatsuyouComponents";
+import { HandwritingCanvas } from "@/src/shared/components/HandwritingCanvas";
 
 interface PracticeTabProps {
   formKey: string;
@@ -390,32 +391,34 @@ export function PracticeTab({ formKey, lang, onProgressUpdate }: PracticeTabProp
                     })}
                   </div>
                 ) : (
-                  /* Text Input (Type A, C, D) */
-                  <div className="flex flex-col gap-1.5">
+                    /* Text Input (Type A, C, D) */
+                    <div className="flex flex-col gap-2">
                     <label htmlFor="answer-input" className="text-xs font-bold text-muted uppercase tracking-wider select-none">
-                      {lang === "en" ? "Your Answer (Kanji or Kana)" : "Jawaban Anda (Kanji atau Kana)"}
+                      {lang === "en" ? "Your Answer" : "Jawaban Anda"}
                     </label>
-                    <input
-                      id="answer-input"
-                      type="text"
-                      value={userAnswer}
-                      onChange={(e) => setUserAnswer(e.target.value)}
-                      disabled={isAnswered}
-                      placeholder={lang === "en" ? "Type answer..." : "Ketik jawaban..."}
-                      className={[
-                        "w-full rounded-xl border px-4 py-3 text-sm transition-all focus:outline-hidden",
-                        isAnswered
-                          ? isCorrect
+                    {isAnswered ? (
+                      <input
+                        id="answer-input"
+                        type="text"
+                        value={userAnswer}
+                        disabled={true}
+                        className={[
+                          "w-full rounded-xl border px-4 py-3 text-sm transition-all focus:outline-hidden",
+                          isCorrect
                             ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500 font-extrabold"
-                            : "bg-red-500/10 border-red-500/30 text-red-500 font-extrabold line-through"
-                          : "border-border bg-background text-foreground focus:border-accent focus:ring-1 focus:ring-accent",
-                      ].join(" ")}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !isAnswered && userAnswer.trim()) {
-                          handleSubmit();
-                        }
-                      }}
-                    />
+                            : "bg-red-500/10 border-red-500/30 text-red-500 font-extrabold line-through",
+                        ].join(" ")}
+                      />
+                    ) : (
+                      <HandwritingCanvas
+                        id="answer-input"
+                        value={userAnswer}
+                        onChange={setUserAnswer}
+                        onSubmit={handleSubmit}
+                        placeholder={lang === "en" ? "Type or draw answer..." : "Ketik atau tulis jawaban..."}
+                        language="ja"
+                      />
+                    )}
                   </div>
                 )}
               </div>

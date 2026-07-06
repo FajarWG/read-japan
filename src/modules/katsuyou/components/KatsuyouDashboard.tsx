@@ -17,12 +17,15 @@ import {
   AlertCircle,
   Sparkles,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 export function KatsuyouDashboard() {
   const { lang } = useLanguage();
   const [selectedForm, setSelectedForm] = useState<string>("dictionary");
   const [activeTab, setActiveTab] = useState<string>("learn");
+  const [showSidebar, setShowSidebar] = useState(true);
 
   // Stats State
   const [stats, setStats] = useState<{
@@ -112,8 +115,8 @@ export function KatsuyouDashboard() {
     totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   return (
-    <div className="flex min-h-screen justify-center bg-background px-4 py-8 md:py-12">
-      <div className="flex w-full max-w-6xl flex-col gap-6">
+    <div className="flex min-h-screen justify-center bg-background py-8 md:py-12">
+      <div className="flex w-full max-w-none flex-col gap-6 px-4 md:px-8">
         {/* ── Navigation & Header ────────────────────────── */}
         <header className="border-b border-border backdrop-blur-md rounded-t-2xl pb-4">
           <div className="flex items-center justify-between gap-4 py-2">
@@ -201,27 +204,83 @@ export function KatsuyouDashboard() {
         )}
 
         {/* ── Main Layout: Sidebar & Content Panel ───────── */}
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col md:flex-row relative">
           {/* Left Column: Sidebar (Conjugation forms selection) */}
-          <KatsuyouSidebar
-            selectedForm={selectedForm}
-            onSelectForm={(key) => {
-              setSelectedForm(key);
-              // Maintain current active tab or fallback
-            }}
-            completedLessons={stats.completedLessons}
-            dueReviewsByForm={stats.dueReviewsByForm}
-            lang={lang}
-          />
+          <div className={[
+            "transition-all duration-300 ease-in-out shrink-0",
+            showSidebar ? "md:w-64 md:mr-6 opacity-100" : "md:w-0 md:mr-0 opacity-0 overflow-hidden"
+          ].join(" ")}>
+            <KatsuyouSidebar
+              selectedForm={selectedForm}
+              onSelectForm={(key) => {
+                setSelectedForm(key);
+                // Maintain current active tab or fallback
+              }}
+              completedLessons={stats.completedLessons}
+              dueReviewsByForm={stats.dueReviewsByForm}
+              lang={lang}
+            />
+          </div>
+
+          {/* Vertical Full-Height Toggle Handle Bar */}
+          <button
+            type="button"
+            onClick={() => setShowSidebar(!showSidebar)}
+            className={[
+              "hidden md:flex absolute top-0 bottom-0 z-45 items-center justify-center w-3.5 hover:bg-border/20 border-r border-border/30 cursor-pointer select-none transition-all duration-300 ease-in-out group",
+              showSidebar ? "left-[256px]" : "left-0"
+            ].join(" ")}
+            title={showSidebar ? (lang === "en" ? "Hide Sidebar" : "Sembunyikan Sidebar") : (lang === "en" ? "Show Sidebar" : "Tampilkan Sidebar")}
+          >
+            {/* Centered pull-tab chevron */}
+            <div className="absolute top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white dark:bg-surface border border-border shadow-xs scale-100 group-hover:scale-110 transition-all duration-200 z-50">
+              {showSidebar ? <ChevronLeft className="w-3.5 h-3.5 text-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-foreground" />}
+            </div>
+          </button>
 
           {/* Right Column: 4-Tab Dashboard Content */}
-          <main className="flex-1 min-w-0">
+          <main className={[
+            "flex-1 min-w-0 transition-all duration-300 ease-in-out",
+            showSidebar ? "" : "md:pl-6"
+          ].join(" ")}>
             <Tabs
               selectedKey={activeTab}
               onSelectionChange={(key) => setActiveTab(key as string)}
               className="w-full mb-4"
             >
               <Tabs.ListContainer className="sticky top-0 z-30 bg-background/95 backdrop-blur-md py-2 border-b border-border/40 mb-2">
+                {/* Active Form Card Banner (appears only when sidebar is hidden) */}
+                {!showSidebar && (
+                  (() => {
+                    const activeForm = CONJUGATION_FORMS.find((f) => f.key === selectedForm);
+                    if (!activeForm) return null;
+                    return (
+                      <div className="mb-3 p-3 bg-surface border border-border/60 rounded-2xl flex items-center justify-between shadow-2xs page-enter">
+                        <div className="flex items-center gap-3">
+                          <span className="px-2 py-0.5 rounded-md text-[9px] font-bold bg-background text-muted border border-border select-none">
+                            {activeForm.jlpt}
+                          </span>
+                          <div className="flex flex-col">
+                            <span className="font-jp text-[10px] text-muted leading-none">
+                              {activeForm.jpName}
+                            </span>
+                            <span className="text-sm font-bold text-foreground mt-0.5 leading-snug">
+                              {lang === "en" ? activeForm.labelEn : activeForm.labelId}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <button
+                          type="button"
+                          onClick={() => setShowSidebar(true)}
+                          className="text-xs font-bold text-accent hover:underline cursor-pointer"
+                        >
+                          {lang === "en" ? "Change Form" : "Ubah Bentuk"}
+                        </button>
+                      </div>
+                    );
+                  })()
+                )}
                 <Tabs.List
                   aria-label="Katsuyou Learning Tabs"
                   className={[

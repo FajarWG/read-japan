@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import { BookOpen, CheckCircle, CheckCircle2, ChevronRight, Info } from "lucide-react";
+import { BookOpen, CheckCircle, CheckCircle2, ChevronRight, Info, PenTool, X } from "lucide-react";
 import { CONJUGATION_GUIDES } from "../data/conjugationGuides";
 import { MistakeCallout, JLPTBadge } from "./KatsuyouComponents";
 import { completeLesson } from "../actions/katsuyouActions";
+import { HandwritingPracticeWidget } from "@/src/shared/components/HandwritingPracticeWidget";
 
 interface LearnTabProps {
   formKey: string;
@@ -22,6 +23,8 @@ export function LearnTab({
   const guide = CONJUGATION_GUIDES[formKey];
   const [isPending, startTransition] = useTransition();
   const [completedLocal, setCompletedLocal] = useState(isCompleted);
+  const [activePractice, setActivePractice] = useState<{ group: number; index: number } | null>(null);
+  const [activeGrammarPractice, setActiveGrammarPractice] = useState<number | null>(null);
 
   // Sync state if formKey changes
   React.useEffect(() => {
@@ -89,13 +92,39 @@ export function LearnTab({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/25">
-                  {guide.rules.group1.examples.map((ex, i) => (
-                    <tr key={i} className="hover:bg-surface-muted/30">
-                      <td className="py-2.5 pr-4 font-bold font-jp text-sm text-foreground">{ex.base}</td>
-                      <td className="py-2.5 pr-4 font-bold font-jp text-sm text-accent">{ex.conj}</td>
-                      <td className="py-2.5 text-muted text-xs font-semibold">{ex.romaji}</td>
-                    </tr>
-                  ))}
+                  {guide.rules.group1.examples.flatMap((ex, i) => {
+                    const isPracticing = activePractice?.group === 1 && activePractice?.index === i;
+                    return [
+                      <tr key={`row-1-${i}`} className="hover:bg-surface-muted/30">
+                        <td className="py-2.5 pr-4 font-bold font-jp text-sm text-foreground">{ex.base}</td>
+                        <td className="py-2.5 pr-4 font-bold font-jp text-sm text-accent">
+                          <div className="flex items-center gap-2">
+                            <span>{ex.conj}</span>
+                            <button
+                              onClick={() => setActivePractice(isPracticing ? null : { group: 1, index: i })}
+                              className="p-1 text-muted hover:text-accent rounded-md hover:bg-accent/10 transition-colors cursor-pointer"
+                              title={lang === "en" ? "Practice writing" : "Latih menulis"}
+                            >
+                              <PenTool className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="py-2.5 text-muted text-xs font-semibold">{ex.romaji}</td>
+                      </tr>,
+                      isPracticing && (
+                        <tr key={`practice-1-${i}`} className="bg-surface-muted/10">
+                          <td colSpan={3} className="p-3 border-t border-b border-border/30">
+                            <HandwritingPracticeWidget
+                              expected={ex.conj}
+                              lang={lang}
+                              onClose={() => setActivePractice(null)}
+                              className="max-w-md mx-auto"
+                            />
+                          </td>
+                        </tr>
+                      )
+                    ].filter(Boolean);
+                  })}
                 </tbody>
               </table>
             </div>
@@ -121,13 +150,39 @@ export function LearnTab({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/25">
-                  {guide.rules.group2.examples.map((ex, i) => (
-                    <tr key={i} className="hover:bg-surface-muted/30">
-                      <td className="py-2.5 pr-4 font-bold font-jp text-sm text-foreground">{ex.base}</td>
-                      <td className="py-2.5 pr-4 font-bold font-jp text-sm text-accent">{ex.conj}</td>
-                      <td className="py-2.5 text-muted text-xs font-semibold">{ex.romaji}</td>
-                    </tr>
-                  ))}
+                  {guide.rules.group2.examples.flatMap((ex, i) => {
+                    const isPracticing = activePractice?.group === 2 && activePractice?.index === i;
+                    return [
+                      <tr key={`row-2-${i}`} className="hover:bg-surface-muted/30">
+                        <td className="py-2.5 pr-4 font-bold font-jp text-sm text-foreground">{ex.base}</td>
+                        <td className="py-2.5 pr-4 font-bold font-jp text-sm text-accent">
+                          <div className="flex items-center gap-2">
+                            <span>{ex.conj}</span>
+                            <button
+                              onClick={() => setActivePractice(isPracticing ? null : { group: 2, index: i })}
+                              className="p-1 text-muted hover:text-accent rounded-md hover:bg-accent/10 transition-colors cursor-pointer"
+                              title={lang === "en" ? "Practice writing" : "Latih menulis"}
+                            >
+                              <PenTool className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="py-2.5 text-muted text-xs font-semibold">{ex.romaji}</td>
+                      </tr>,
+                      isPracticing && (
+                        <tr key={`practice-2-${i}`} className="bg-surface-muted/10">
+                          <td colSpan={3} className="p-3 border-t border-b border-border/30">
+                            <HandwritingPracticeWidget
+                              expected={ex.conj}
+                              lang={lang}
+                              onClose={() => setActivePractice(null)}
+                              className="max-w-md mx-auto"
+                            />
+                          </td>
+                        </tr>
+                      )
+                    ].filter(Boolean);
+                  })}
                 </tbody>
               </table>
             </div>
@@ -153,13 +208,39 @@ export function LearnTab({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/25">
-                  {guide.rules.group3.examples.map((ex, i) => (
-                    <tr key={i} className="hover:bg-surface-muted/30">
-                      <td className="py-2.5 pr-4 font-bold font-jp text-sm text-foreground">{ex.base}</td>
-                      <td className="py-2.5 pr-4 font-bold font-jp text-sm text-accent">{ex.conj}</td>
-                      <td className="py-2.5 text-muted text-xs font-semibold">{ex.romaji}</td>
-                    </tr>
-                  ))}
+                  {guide.rules.group3.examples.flatMap((ex, i) => {
+                    const isPracticing = activePractice?.group === 3 && activePractice?.index === i;
+                    return [
+                      <tr key={`row-3-${i}`} className="hover:bg-surface-muted/30">
+                        <td className="py-2.5 pr-4 font-bold font-jp text-sm text-foreground">{ex.base}</td>
+                        <td className="py-2.5 pr-4 font-bold font-jp text-sm text-accent">
+                          <div className="flex items-center gap-2">
+                            <span>{ex.conj}</span>
+                            <button
+                              onClick={() => setActivePractice(isPracticing ? null : { group: 3, index: i })}
+                              className="p-1 text-muted hover:text-accent rounded-md hover:bg-accent/10 transition-colors cursor-pointer"
+                              title={lang === "en" ? "Practice writing" : "Latih menulis"}
+                            >
+                              <PenTool className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="py-2.5 text-muted text-xs font-semibold">{ex.romaji}</td>
+                      </tr>,
+                      isPracticing && (
+                        <tr key={`practice-3-${i}`} className="bg-surface-muted/10">
+                          <td colSpan={3} className="p-3 border-t border-b border-border/30">
+                            <HandwritingPracticeWidget
+                              expected={ex.conj}
+                              lang={lang}
+                              onClose={() => setActivePractice(null)}
+                              className="max-w-md mx-auto"
+                            />
+                          </td>
+                        </tr>
+                      )
+                    ].filter(Boolean);
+                  })}
                 </tbody>
               </table>
             </div>
@@ -207,9 +288,24 @@ export function LearnTab({
                 </p>
 
                 <div className="rounded-xl bg-background border border-border/40 p-4 mt-1 flex flex-col gap-1.5">
-                  <span className="text-xs font-semibold text-muted opacity-75 leading-none select-none">
-                    {lang === "en" ? "Example Sentence:" : "Contoh Kalimat:"}
-                  </span>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-xs font-semibold text-muted opacity-75 leading-none select-none">
+                      {lang === "en" ? "Example Sentence:" : "Contoh Kalimat:"}
+                    </span>
+                    <button
+                      onClick={() => setActiveGrammarPractice(activeGrammarPractice === idx ? null : idx)}
+                      className={[
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer hover:scale-105 active:scale-95 shadow-3xs",
+                        activeGrammarPractice === idx
+                          ? "bg-accent/15 border-accent/25 text-accent font-extrabold"
+                          : "bg-surface border border-border/40 text-muted hover:text-foreground"
+                      ].join(" ")}
+                      title={lang === "en" ? "Practice writing sentence" : "Latih menulis kalimat"}
+                    >
+                      <PenTool className="w-3.5 h-3.5" />
+                      <span>{lang === "en" ? "Practice" : "Tulis"}</span>
+                    </button>
+                  </div>
                   <p className="text-base font-bold font-jp text-foreground leading-snug">
                     {pat.exampleJp}
                   </p>
@@ -220,6 +316,16 @@ export function LearnTab({
                     <p>🇺🇸 {pat.exampleEn}</p>
                     <p>🇮🇩 {pat.exampleId}</p>
                   </div>
+
+                  {activeGrammarPractice === idx && (
+                    <div className="border-t border-border/30 pt-4 mt-2">
+                      <HandwritingPracticeWidget
+                        expected={pat.exampleJp}
+                        lang={lang}
+                        onClose={() => setActiveGrammarPractice(null)}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -254,3 +360,4 @@ export function LearnTab({
     </div>
   );
 }
+
