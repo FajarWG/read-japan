@@ -171,6 +171,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [reviewedCount, setReviewedCount] = useState<number>(0);
   const [sessionFinished, setSessionFinished] = useState<boolean>(false);
   const [ankiMode, setAnkiMode] = useState<"srs" | "quick">("srs");
+  const [reviewDirection, setReviewDirection] = useState<"normal" | "reverse">(
+    "normal",
+  );
   const [pendingReviews, setPendingReviews] = useState<
     Array<{
       cardKey: string;
@@ -185,15 +188,22 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [ankiAnswerChecked, setAnkiAnswerChecked] = useState(false);
   const [ankiIsCorrect, setAnkiIsCorrect] = useState(false);
   const [ankiUsedHint, setAnkiUsedHint] = useState(false);
+  const [isWritingActive, setIsWritingActive] = useState(false);
 
   const checkAnkiAnswer = (written: string) => {
     const currentCard = sessionQueue[currentIndex];
     if (!currentCard) return;
-    
+
+    // In reverse mode, check against Kanji (if not "-"), otherwise check against Hiragana
+    const targetText =
+      reviewDirection === "reverse" && currentCard.kanji !== "-"
+        ? currentCard.kanji
+        : currentCard.hiragana;
+
     // Remove romaji parenthetical helpers from target if any
-    const cleanTarget = currentCard.hiragana.replace(/\s*[\(（].*?[\)）]/g, "").trim();
+    const cleanTarget = targetText.replace(/\s*[\(（].*?[\)）]/g, "").trim();
     const cleanWritten = written.replace(/\s*[\(（].*?[\)）]/g, "").trim();
-    
+
     const correct = cleanWritten === cleanTarget;
     setAnkiIsCorrect(correct);
     setAnkiAnswerChecked(true);
@@ -201,16 +211,17 @@ export function AnkiContent({ username }: AnkiContentProps) {
     if (correct) {
       // Flip card to show back
       setFlipped(true);
-      
-      // Auto-progress to next card after 1.2s delay.
-      // If user used a hint to trace characters, rate as "Hard" (rating 2) instead of "Good" (rating 3).
-      setTimeout(() => {
-        if (ankiMode === "srs") {
-          handleRateCard(ankiUsedHint ? 2 : 3);
-        } else {
-          handleQuickAnswer(true);
-        }
-      }, 1200);
+
+      // Auto-progress to next card after 1.2s delay ONLY in normal mode
+      if (reviewDirection !== "reverse") {
+        setTimeout(() => {
+          if (ankiMode === "srs") {
+            handleRateCard(ankiUsedHint ? 2 : 3);
+          } else {
+            handleQuickAnswer(true);
+          }
+        }, 1200);
+      }
     }
   };
 
@@ -234,7 +245,16 @@ export function AnkiContent({ username }: AnkiContentProps) {
     if (savedReviewLimit) {
       setDailyReviewLimit(savedReviewLimit);
     }
+    const savedDirection = localStorage.getItem("anki_review_direction");
+    if (savedDirection === "normal" || savedDirection === "reverse") {
+      setReviewDirection(savedDirection as "normal" | "reverse");
+    }
   }, []);
+
+  const handleReviewDirectionChange = (direction: "normal" | "reverse") => {
+    setReviewDirection(direction);
+    localStorage.setItem("anki_review_direction", direction);
+  };
 
   const handlePostModeChange = (mode: "session" | "card") => {
     setPostMode(mode);
@@ -485,6 +505,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setSessionQueue(queue);
     setCurrentIndex(0);
     setFlipped(false);
+    setIsWritingActive(false);
     setReviewedCount(0);
     setSessionFinished(false);
     setPendingReviews([]);
@@ -534,6 +555,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       await triggerSaveBatch(pendingReviews);
     }
     setSessionQueue([]);
+    setIsWritingActive(false);
   };
 
   // Jawaban untuk Quick Memorization Mode (Sudah Tahu / Tidak Tahu)
@@ -547,6 +569,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setAnkiAnswerChecked(false);
     setAnkiIsCorrect(false);
     setAnkiUsedHint(false);
+    setIsWritingActive(false);
     setReviewedCount((prev) => prev + 1);
 
     // Sudah Tahu -> rating 2 (Hard, bobot paling kecil untuk sukses)
@@ -601,6 +624,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setAnkiAnswerChecked(false);
     setAnkiIsCorrect(false);
     setAnkiUsedHint(false);
+    setIsWritingActive(false);
     setReviewedCount((prev) => prev + 1);
 
     const cardReview = {
@@ -650,7 +674,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   }, [currentIndex, sessionQueue]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="flex w-full max-w-3xl flex-col">
         {/* Header */}
         <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
@@ -731,7 +755,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
               </div>
               <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10 mt-2">
                 {Array.from({ length: 16 }).map((_, i) => (
-                  <div key={i} className="aspect-square min-h-[48px] rounded-xl border border-border bg-surface/50 animate-pulse flex items-center justify-center">
+                  <div
+                    key={i}
+                    className="aspect-square min-h-[48px] rounded-xl border border-border bg-surface/50 animate-pulse flex items-center justify-center"
+                  >
                     <div className="h-5 w-5 bg-border/30 dark:bg-zinc-800/30 rounded-md"></div>
                   </div>
                 ))}
@@ -769,6 +796,36 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       ].join(" ")}
                     >
                       ⚡ Menghafal Sekilas (Quick)
+                    </button>
+                  </div>
+
+                  {/* Toggle Arah Review */}
+                  <div className="flex items-center justify-between gap-4 border-t border-border/50 pt-4">
+                    <div className="flex flex-col gap-0.5">
+                      <Label className="text-xs font-bold text-foreground">
+                        ✍️ Mode Sebaliknya (Tulis Kanji)
+                      </Label>
+                      <span className="text-[10px] text-muted leading-tight">
+                        Tampilkan furigana dan wajib menulis kanjinya untuk membalik kartu.
+                      </span>
+                    </div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => handleReviewDirectionChange(reviewDirection === "normal" ? "reverse" : "normal")}
+                      className={[
+                        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden",
+                        reviewDirection === "reverse" ? "bg-indigo-600" : "bg-slate-200 dark:bg-zinc-800"
+                      ].join(" ")}
+                      role="switch"
+                      aria-checked={reviewDirection === "reverse"}
+                    >
+                      <span
+                        className={[
+                          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
+                          reviewDirection === "reverse" ? "translate-x-5" : "translate-x-0"
+                        ].join(" ")}
+                      />
                     </button>
                   </div>
 
@@ -1056,8 +1113,16 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
                 {/* KARTU FLASHCARD DENGAN PERSPEKTIF CSS FLIP */}
                 <div
-                  className="relative w-full max-w-md h-64 [perspective:1000px] cursor-pointer"
-                  onClick={() => setFlipped(!flipped)}
+                  className={[
+                    "relative w-full transition-all duration-300 [perspective:1000px]",
+                    reviewDirection === "reverse" && isWritingActive && !flipped
+                      ? "max-w-2xl h-auto min-h-64"
+                      : "max-w-md h-64",
+                    reviewDirection === "normal" ? "cursor-pointer" : "",
+                  ].join(" ")}
+                  onClick={() =>
+                    reviewDirection === "normal" && setFlipped(!flipped)
+                  }
                 >
                   <div
                     className={[
@@ -1067,24 +1132,167 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   >
                     {/* Sisi Depan (Front) */}
                     <div
-                      className="absolute w-full h-full bg-surface border border-border rounded-2xl flex flex-col items-center justify-center p-6 shadow-sm"
+                      className={[
+                        reviewDirection === "reverse" &&
+                        isWritingActive &&
+                        !flipped
+                          ? "relative w-full h-auto bg-surface border border-border rounded-2xl flex flex-col shadow-sm"
+                          : "absolute w-full h-full bg-surface border border-border rounded-2xl flex flex-col items-center justify-center shadow-sm overflow-hidden",
+                        reviewDirection === "reverse" && isWritingActive
+                          ? "p-0"
+                          : "p-6",
+                      ].join(" ")}
                       style={{
                         backfaceVisibility: "hidden",
                         WebkitBackfaceVisibility: "hidden",
                       }}
                     >
-                      <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                        Depan
-                      </span>
-                      <h2 className="font-jp text-5xl font-bold leading-none text-foreground select-none">
-                        {currentCard.kanji === "-"
-                          ? currentCard.hiragana
-                          : currentCard.kanji}
-                      </h2>
-                      <p className="mt-8 text-xs text-muted/60 animate-pulse select-none">
-                        👆{" "}
-                        {t.ankiFlipCard || "Ketuk kartu untuk melihat jawaban"}
-                      </p>
+                      {!isWritingActive && (
+                        <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full z-20">
+                          Depan
+                        </span>
+                      )}
+
+                      {reviewDirection === "reverse" ? (
+                        isWritingActive ? (
+                          <div
+                            className="w-full h-full flex flex-col justify-between p-4 pt-2.5 sm:p-5 sm:pt-3.5 select-none text-left"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {/* Header */}
+                            <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                              <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+                                <h2 className="font-jp text-2xl sm:text-3xl font-extrabold text-indigo-500 leading-none">
+                                  {currentCard.hiragana}
+                                </h2>
+                                <p className="text-xs font-semibold text-muted/80 leading-none">
+                                  {currentCard.translation}
+                                </p>
+                              </div>
+                              <span className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase font-black shrink-0">
+                                Tulis Kanji
+                              </span>
+                            </div>
+
+                            {/* Canvas & Input Area */}
+                            <div className="flex-1 flex flex-col justify-center my-2.5 min-h-0">
+                              {ankiAnswerChecked && !ankiIsCorrect ? (
+                                <div className="flex flex-col gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-xs text-red-500">
+                                  <p className="font-extrabold uppercase text-[10px] tracking-wider">
+                                    Belum Tepat!
+                                  </p>
+                                  <p className="font-semibold">
+                                    Tulisan Anda: "{ankiWriteInput.trim()}"
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAnkiAnswerChecked(false);
+                                      setAnkiWriteInput("");
+                                    }}
+                                    className="w-full mt-1.5 py-1.5 bg-foreground text-background font-bold rounded-lg hover:opacity-90 transition-all cursor-pointer"
+                                  >
+                                    Coba Lagi
+                                  </button>
+                                </div>
+                              ) : ankiIsCorrect ? (
+                                <div className="flex flex-col gap-2 p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl text-xs text-emerald-500">
+                                  <p className="font-extrabold uppercase text-[10px] tracking-wider">
+                                    Tepat sekali! 🎉
+                                  </p>
+                                  <p className="font-semibold">
+                                    {lang === "en"
+                                      ? "Correct! Select your score below."
+                                      : "Benar! Silakan pilih nilai di bawah."}
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col gap-2">
+                                  <HandwritingCanvas
+                                    value={ankiWriteInput}
+                                    onChange={setAnkiWriteInput}
+                                    onSubmit={() =>
+                                      checkAnkiAnswer(ankiWriteInput)
+                                    }
+                                    placeholder={
+                                      lang === "en"
+                                        ? "Draw kanji here..."
+                                        : "Tulis kanji di sini..."
+                                    }
+                                    hintText={(currentCard.kanji !== "-"
+                                      ? currentCard.kanji
+                                      : currentCard.hiragana
+                                    )
+                                      .replace(/\s*[\(（].*?[\)）]/g, "")
+                                      .trim()}
+                                    onUseHint={() => setAnkiUsedHint(true)}
+                                  />
+                                  <div className="flex items-center gap-2 mt-1 z-20">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        checkAnkiAnswer(ankiWriteInput)
+                                      }
+                                      disabled={!ankiWriteInput.trim()}
+                                      className="flex-1 text-xs font-extrabold py-2 bg-accent hover:bg-accent/90 active:scale-95 text-white rounded-xl disabled:opacity-50 transition-all cursor-pointer shadow-3xs"
+                                    >
+                                      {lang === "en"
+                                        ? "Check Answer"
+                                        : "Cek Jawaban"}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setAnkiUsedHint(true);
+                                        setFlipped(true);
+                                      }}
+                                      className="flex-1 text-xs font-bold py-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-muted rounded-xl transition-all cursor-pointer"
+                                    >
+                                      {lang === "en"
+                                        ? "Show Answer"
+                                        : "Tampilkan Jawaban"}
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            className="flex flex-col items-center text-center justify-center w-full h-full gap-3 cursor-pointer hover:bg-surface-muted/10 transition-colors p-6 rounded-2xl"
+                            onClick={() => setIsWritingActive(true)}
+                          >
+                            <h2 className="font-jp text-5xl font-bold leading-none text-indigo-500 select-none">
+                              {currentCard.hiragana}
+                            </h2>
+                            <p className="text-sm font-medium text-muted/80 select-none max-w-xs">
+                              {currentCard.translation}
+                            </p>
+
+                            <div className="mt-8 px-4 py-2.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 rounded-xl hover:bg-indigo-500 hover:text-white transition-all duration-200 shadow-3xs flex items-center gap-2 font-semibold text-xs">
+                              <span>✍️</span>
+                              <span>
+                                {lang === "en"
+                                  ? "Click to write the Kanji..."
+                                  : "Ketuk untuk menulis Kanji..."}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        <>
+                          <h2 className="font-jp text-5xl font-bold leading-none text-foreground select-none">
+                            {currentCard.kanji === "-"
+                              ? currentCard.hiragana
+                              : currentCard.kanji}
+                          </h2>
+                          <p className="mt-8 text-xs text-muted/60 animate-pulse select-none">
+                            👆{" "}
+                            {t.ankiFlipCard ||
+                              "Ketuk kartu untuk melihat jawaban"}
+                          </p>
+                        </>
+                      )}
                     </div>
 
                     {/* Sisi Belakang (Back) */}
@@ -1100,86 +1308,65 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       </span>
 
                       <div className="flex flex-col items-center text-center gap-2 select-none">
-                        {/* Kanji jika ada */}
-                        {currentCard.kanji !== "-" && (
-                          <h3 className="font-jp text-2xl text-muted">
-                            {currentCard.kanji}
-                          </h3>
+                        {reviewDirection === "reverse" ? (
+                          <>
+                            {/* Target Kanji atau Hiragana */}
+                            <h2 className="font-jp text-5xl font-bold leading-none text-foreground select-none">
+                              {currentCard.kanji === "-"
+                                ? currentCard.hiragana
+                                : currentCard.kanji}
+                            </h2>
+
+                            {/* Pembacaan / Hiragana */}
+                            {currentCard.kanji !== "-" && (
+                              <p className="text-sm font-bold text-muted/80 font-jp mt-2">
+                                〔{currentCard.hiragana}〕
+                              </p>
+                            )}
+
+                            {/* Romaji */}
+                            {currentCard.romaji && (
+                              <p className="text-xs font-semibold text-indigo-500 font-mono">
+                                {currentCard.romaji}
+                              </p>
+                            )}
+
+                            {/* Arti */}
+                            <p className="mt-4 text-md font-medium text-foreground max-w-xs border-t border-border pt-3">
+                              {currentCard.translation}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            {/* Kanji jika ada */}
+                            {currentCard.kanji !== "-" && (
+                              <h3 className="font-jp text-2xl text-muted">
+                                {currentCard.kanji}
+                              </h3>
+                            )}
+
+                            {/* Hiragana */}
+                            <h2 className="font-jp text-4xl font-bold text-foreground">
+                              {currentCard.hiragana}
+                            </h2>
+
+                            {/* Romaji */}
+                            {currentCard.romaji && (
+                              <p className="text-xs font-semibold text-indigo-500 font-mono">
+                                {currentCard.romaji}
+                              </p>
+                            )}
+
+                            {/* Arti */}
+                            <p className="mt-4 text-md font-medium text-foreground max-w-xs border-t border-border pt-3">
+                              {currentCard.translation}
+                            </p>
+                          </>
                         )}
-
-                        {/* Hiragana */}
-                        <h2 className="font-jp text-4xl font-bold text-foreground">
-                          {currentCard.hiragana}
-                        </h2>
-
-                        {/* Romaji */}
-                        {currentCard.romaji && (
-                          <p className="text-xs font-semibold text-indigo-500 font-mono">
-                            {currentCard.romaji}
-                          </p>
-                        )}
-
-                        {/* Arti */}
-                        <p className="mt-4 text-md font-medium text-foreground max-w-xs border-t border-border pt-3">
-                          {currentCard.translation}
-                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Handwriting active recall panel */}
-                {!flipped && (
-                  <div className="w-full max-w-md flex flex-col gap-2 page-enter">
-                    <div className="bg-surface border border-border rounded-2xl p-4 shadow-sm flex flex-col gap-3">
-                      <div className="flex items-center justify-between text-xs font-bold text-muted border-b border-border/40 pb-2">
-                        <span>{lang === "en" ? "Write the Hiragana / Furigana reading:" : "Tulis pembacaan Hiragana / Furigana:"}</span>
-                        <span className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase font-black">Active Recall</span>
-                      </div>
-                      
-                      {ankiAnswerChecked && !ankiIsCorrect ? (
-                        <div className="flex flex-col gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-xs text-red-500 page-enter">
-                          <p className="font-extrabold uppercase text-[10px] tracking-wider">Belum Tepat!</p>
-                          <p className="font-semibold">Tulisan Anda: "{ankiWriteInput.trim()}"</p>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAnkiAnswerChecked(false);
-                              setAnkiWriteInput("");
-                            }}
-                            className="w-full mt-1.5 py-1.5 bg-foreground text-background font-bold rounded-lg hover:opacity-90 transition-all cursor-pointer"
-                          >
-                            Coba Lagi
-                          </button>
-                        </div>
-                      ) : ankiIsCorrect ? (
-                        <div className="flex flex-col gap-2 p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl text-xs text-emerald-500 page-enter">
-                          <p className="font-extrabold uppercase text-[10px] tracking-wider">Tepat sekali! 🎉</p>
-                          <p className="font-semibold">{lang === "en" ? "Correct! Saving as 'Good'..." : "Benar! Menyimpan jawaban..."}</p>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col gap-3">
-                          <HandwritingCanvas
-                            value={ankiWriteInput}
-                            onChange={setAnkiWriteInput}
-                            onSubmit={() => checkAnkiAnswer(ankiWriteInput)}
-                            placeholder={lang === "en" ? "Draw hiragana here..." : "Tulis hiragana di sini..."}
-                            hintText={currentCard.hiragana.replace(/\s*[\(（].*?[\)）]/g, "").trim()}
-                            onUseHint={() => setAnkiUsedHint(true)}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => checkAnkiAnswer(ankiWriteInput)}
-                            disabled={!ankiWriteInput.trim()}
-                            className="w-full text-xs font-extrabold py-2.5 bg-accent hover:bg-accent/90 active:scale-95 text-white rounded-xl disabled:opacity-50 transition-all cursor-pointer shadow-3xs"
-                          >
-                            {lang === "en" ? "Check Answer" : "Cek Jawaban"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 {/* GRADING BUTTONS (Hanya muncul jika kartu sudah dibalik) */}
                 <div className="w-full max-w-md flex flex-col gap-2">

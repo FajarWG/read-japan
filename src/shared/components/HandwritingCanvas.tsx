@@ -223,7 +223,7 @@ export function HandwritingCanvas({
   // Start auto-recognition countdown progress bar
   const startRecognitionTimer = useCallback(() => {
     clearTimers();
-    const totalTime = 1200; // 1.2s timeout
+    const totalTime = 2000; // 2s timeout
     const intervalTime = 50;
     let elapsed = 0;
 
