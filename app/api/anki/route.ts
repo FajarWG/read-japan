@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
+import { logActivity } from "@/src/shared/lib/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -125,6 +126,7 @@ export async function POST(request: NextRequest) {
       }
 
       const results = await prisma.$transaction(upserts);
+      if (results.length > 0) await logActivity(session.id, "anki_review");
       return NextResponse.json({ success: true, progress: results });
     } else {
       // SINGLE MODE
@@ -212,6 +214,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
+      await logActivity(session.id, "anki_review", cardKey);
       return NextResponse.json({ success: true, progress: updated });
     }
   } catch (error) {

@@ -11,9 +11,9 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Nihongo Flow — Belajar Bahasa Jepang Interaktif",
+  title: "Nihongo Flow — Japanese Study Suite",
   description:
-    "Aplikasi web belajar bahasa Jepang gratis: kuasai konjugasi kata kerja (Kotoba Flex), latihan membaca Hiragana & Katakana melalui cerita pendek, Anki Flashcards, dan persiapan belajar (Prep Sheet).",
+    "Track your daily study and jump into Anki, Bunpou, Katsuyou, Prep, and Kotoba — a focused Japanese learning app with an English interface and Indonesian meanings.",
   alternates: {
     canonical: "/",
   },

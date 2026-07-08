@@ -31,29 +31,29 @@ const notoSerifJP = Noto_Serif_JP({
 
 const BASE_URL = "https://read-japan.vercel.app";
 
+const APP_DESCRIPTION =
+  "A focused Japanese study app: Anki SRS flashcards, Bunpou grammar, Katsuyou verb conjugation, pre-class Prep sheets, and Kotoba — your personal vocabulary notebook. English interface, Indonesian meanings.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
     template: "%s | Nihongo Flow",
-    default: "Nihongo Flow — Belajar Bahasa Jepang Interaktif",
+    default: "Nihongo Flow — Japanese Study Suite",
   },
-  description:
-    "Aplikasi web belajar bahasa Jepang gratis: latihan membaca Hiragana & Katakana melalui cerita, kuasai konjugasi kata kerja (Kotoba Flex), SRS Flashcards, dan Prep Sheet.",
+  description: APP_DESCRIPTION,
   keywords: [
-    "belajar hiragana",
-    "belajar katakana",
-    "belajar bahasa Jepang",
-    "latihan membaca Jepang",
-    "hiragana online",
-    "katakana online",
-    "Japanese reading practice",
     "learn Japanese",
-    "nihongo flow",
-    "kotoba flex",
-    "konjugasi kata kerja",
-    "belajar kosakata Jepang",
+    "Japanese study app",
     "anki flashcards",
-    "aplikasi belajar Jepang",
+    "spaced repetition Japanese",
+    "Japanese grammar",
+    "bunpou",
+    "verb conjugation",
+    "katsuyou",
+    "Japanese vocabulary notebook",
+    "kotoba",
+    "nihongo flow",
+    "JLPT prep",
   ],
   authors: [{ name: "FajarWG", url: "https://github.com/fajarwg" }],
   creator: "FajarWG",
@@ -69,19 +69,16 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "id_ID",
-    alternateLocale: "en_US",
+    locale: "en_US",
     url: BASE_URL,
     siteName: "Nihongo Flow",
-    title: "Nihongo Flow — Belajar Bahasa Jepang Interaktif",
-    description:
-      "Aplikasi web belajar bahasa Jepang gratis: latihan membaca Hiragana & Katakana melalui cerita, kuasai konjugasi kata kerja (Kotoba Flex), SRS Flashcards, dan Prep Sheet.",
+    title: "Nihongo Flow — Japanese Study Suite",
+    description: APP_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nihongo Flow — Belajar Bahasa Jepang Interaktif",
-    description:
-      "Aplikasi web belajar bahasa Jepang gratis: latihan membaca Hiragana & Katakana melalui cerita, kuasai konjugasi kata kerja (Kotoba Flex), SRS Flashcards, dan Prep Sheet.",
+    title: "Nihongo Flow — Japanese Study Suite",
+    description: APP_DESCRIPTION,
     creator: "@fajarwg",
   },
   alternates: {
@@ -96,7 +93,7 @@ export default async function RootLayout({
 }>) {
   const user = await getSession();
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Prevent flash of wrong theme — runs before React hydration */}
         <script

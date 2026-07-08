@@ -10,6 +10,13 @@ import {
   Label,
   ListBox,
 } from "@heroui/react";
+import {
+  HelpCircle,
+  Pencil,
+  MousePointerClick,
+  PartyPopper,
+  Lightbulb,
+} from "lucide-react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
@@ -99,10 +106,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
       filterChapters.size > 1
     ) {
       return [
-        { id: "1", title: "Poin 1" },
-        { id: "2", title: "Poin 2" },
-        { id: "3", title: "Poin 3" },
-        { id: "4", title: "Poin 4 / もう一度聞こう" },
+        { id: "1", title: "Point 1" },
+        { id: "2", title: "Point 2" },
+        { id: "3", title: "Point 3" },
+        { id: "4", title: "Point 4 / もう一度聞こう" },
       ];
     }
 
@@ -114,7 +121,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
     return chap.sections.map((sect: any, sIdx: number) => ({
       id: String(sIdx + 1),
-      title: `Poin ${sIdx + 1}: ${sect.title}`,
+      title: `Point ${sIdx + 1}: ${sect.title}`,
     }));
   }, [filterChapters, dekiruGroups]);
 
@@ -131,7 +138,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     const sortedChaps = Array.from(filterChapters)
       .map(Number)
       .sort((a, b) => a - b);
-    return sortedChaps.map((chap) => `Bab ${chap}`).join(", ");
+    return sortedChaps.map((chap) => `Chapter ${chap}`).join(", ");
   }, [filterChapters, t.ankiAllChapters]);
 
   // Selected points text helper for Select.Value
@@ -695,9 +702,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 type="button"
                 onClick={() => setIsGuideOpen(true)}
                 className="flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer text-sm font-bold shrink-0"
-                title={t.ankiGuideTitle || "Panduan Penilaian SRS"}
+                title={t.ankiGuideTitle || "SRS Grading Guide"}
               >
-                ❗
+                <HelpCircle size={16} />
               </button>
               <SettingsDropdown />
             </div>
@@ -783,7 +790,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           : "text-muted hover:text-foreground",
                       ].join(" ")}
                     >
-                      📅 Spaced Repetition (SRS)
+                      Spaced Repetition (SRS)
                     </button>
                     <button
                       type="button"
@@ -795,7 +802,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           : "text-muted hover:text-foreground",
                       ].join(" ")}
                     >
-                      ⚡ Menghafal Sekilas (Quick)
+                      Quick Review
                     </button>
                   </div>
 
@@ -803,10 +810,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <div className="flex items-center justify-between gap-4 border-t border-border/50 pt-4">
                     <div className="flex flex-col gap-0.5">
                       <Label className="text-xs font-bold text-foreground">
-                        ✍️ Mode Sebaliknya (Tulis Kanji)
+                        Reverse mode (write the kanji)
                       </Label>
                       <span className="text-[10px] text-muted leading-tight">
-                        Tampilkan furigana dan wajib menulis kanjinya untuk membalik kartu.
+                        Show furigana and write the kanji to flip the card.
                       </span>
                     </div>
                     
@@ -867,7 +874,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                               </ListBox.Item>
                               {Array.from({ length: 15 }, (_, i) => {
                                 const chapNum = String(i + 1);
-                                const title = `Bab ${chapNum} — ${dekiruGroups[i]?.title || ""}`;
+                                const title = `Chapter ${chapNum} — ${dekiruGroups[i]?.title || ""}`;
                                 return (
                                   <ListBox.Item
                                     key={chapNum}
@@ -971,7 +978,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           onClick={() => startSession("due")}
                           isDisabled={cardStats.due === 0}
                         >
-                          🚀 Review ({cardStats.due})
+                          Review ({cardStats.due})
                         </Button>
                         <Button
                           variant="primary"
@@ -979,7 +986,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           onClick={() => startSession("all")}
                           isDisabled={filteredVocabulary.length === 0}
                         >
-                          ✨ Pelajari (
+                          Learn (
                           {Math.min(
                             filteredVocabulary.length,
                             cardStats.due + 20,
@@ -996,7 +1003,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           {filteredVocabulary.length}
                         </p>
                         <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
-                          Total Kosakata Bab/Poin Ini
+                          Total words in this chapter/point
                         </p>
                       </div>
 
@@ -1008,8 +1015,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           onClick={() => startSession("quick")}
                           isDisabled={filteredVocabulary.length === 0}
                         >
-                          ⚡ Mulai Menghafal Sekilas (
-                          {filteredVocabulary.length} Kartu)
+                          Start quick review (
+                          {filteredVocabulary.length} cards)
                         </Button>
                       </div>
                     </>
@@ -1022,7 +1029,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       className="font-semibold shadow-xs w-full cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-foreground border border-border"
                       onClick={() => setIsSettingsOpen(true)}
                     >
-                      ⚙️ Pengaturan Sesi Anki
+                      Anki Session Settings
                     </Button>
                   </div>
                 </Card>
@@ -1031,9 +1038,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
                   <div className="flex flex-col gap-1 border-b border-border pb-3">
                     <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                      🈶{" "}
                       {t.ankiLearnedKanjiTitle ||
-                        "Daftar Kanji yang Dipelajari"}
+                        "Learned Kanji List"}
                     </h3>
                     <p className="text-[10px] text-muted">
                       {t.ankiLearnedKanjiDesc ||
@@ -1198,7 +1204,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                               ) : ankiIsCorrect ? (
                                 <div className="flex flex-col gap-2 p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl text-xs text-emerald-500">
                                   <p className="font-extrabold uppercase text-[10px] tracking-wider">
-                                    Tepat sekali! 🎉
+                                    Spot on!
                                   </p>
                                   <p className="font-semibold">
                                     {lang === "en"
@@ -1270,12 +1276,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             </p>
 
                             <div className="mt-8 px-4 py-2.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 rounded-xl hover:bg-indigo-500 hover:text-white transition-all duration-200 shadow-3xs flex items-center gap-2 font-semibold text-xs">
-                              <span>✍️</span>
-                              <span>
-                                {lang === "en"
-                                  ? "Click to write the Kanji..."
-                                  : "Ketuk untuk menulis Kanji..."}
-                              </span>
+                              <Pencil size={14} />
+                              <span>Click to write the kanji...</span>
                             </div>
                           </div>
                         )
@@ -1286,10 +1288,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                               ? currentCard.hiragana
                               : currentCard.kanji}
                           </h2>
-                          <p className="mt-8 text-xs text-muted/60 animate-pulse select-none">
-                            👆{" "}
-                            {t.ankiFlipCard ||
-                              "Ketuk kartu untuk melihat jawaban"}
+                          <p className="mt-8 text-xs text-muted/60 animate-pulse select-none inline-flex items-center gap-1.5">
+                            <MousePointerClick size={13} />
+                            {t.ankiFlipCard || "Tap card to reveal the answer"}
                           </p>
                         </>
                       )}
@@ -1384,7 +1385,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         >
                           <span className="text-[11px] font-bold">Again</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
-                            Lupa ❌
+                            Forgot
                           </span>
                         </button>
 
@@ -1399,7 +1400,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         >
                           <span className="text-[11px] font-bold">Hard</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
-                            Susah ⚠️
+                            Difficult
                           </span>
                         </button>
 
@@ -1414,7 +1415,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         >
                           <span className="text-[11px] font-bold">Good</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
-                            Biasa ✓
+                            Normal
                           </span>
                         </button>
 
@@ -1429,7 +1430,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         >
                           <span className="text-[11px] font-bold">Easy</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
-                            Mudah 🌟
+                            Very easy
                           </span>
                         </button>
                       </div>
@@ -1444,9 +1445,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           }}
                           className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200"
                         >
-                          <span>Tidak Tahu ❌</span>
+                          <span>Don&apos;t know</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
-                            Diulang lagi
+                            Repeat again
                           </span>
                         </button>
 
@@ -1459,9 +1460,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           }}
                           className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200"
                         >
-                          <span>Sudah Tahu ✓</span>
+                          <span>Know it</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
-                            Selesai
+                            Done
                           </span>
                         </button>
                       </div>
@@ -1486,7 +1487,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
               <Modal.CloseTrigger />
               <Modal.Header className="flex items-center justify-between gap-4">
                 <Modal.Heading className="flex items-center gap-2">
-                  🈶 Detail Kanji
+                  Kanji details
                 </Modal.Heading>
                 <Button
                   size="sm"
@@ -1494,7 +1495,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   className="font-semibold text-xs border border-border bg-surface hover:bg-surface-muted cursor-pointer shrink-0 py-1 h-7 min-w-0 px-2.5 rounded-lg"
                   onPress={() => setShowReadings(!showReadings)}
                 >
-                  {showReadings ? "👁️ Sembunyikan" : "👁️ Tampilkan"}
+                  {showReadings ? "Hide" : "Show"}
                 </Button>
               </Modal.Header>
               <Modal.Body className="flex flex-col gap-4">
@@ -1644,9 +1645,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
             <Modal.Dialog className="sm:max-w-[360px]">
               <Modal.CloseTrigger />
               <Modal.Header className="flex flex-col items-center text-center pt-6">
-                <span className="text-5xl mb-2">🎉</span>
+                <PartyPopper size={44} className="mb-2 text-accent" />
                 <Modal.Heading className="font-bold text-foreground text-xl">
-                  {t.ankiFinishedTitle || "Sesi Selesai!"}
+                  {t.ankiFinishedTitle || "Session complete"}
                 </Modal.Heading>
               </Modal.Header>
               <Modal.Body className="flex flex-col items-center text-center gap-4 py-4">
@@ -1682,13 +1683,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
             <Modal.Dialog className="sm:max-w-md">
               <Modal.CloseTrigger />
               <Modal.Header>
-                <Modal.Heading>⚙️ Pengaturan Sesi Anki</Modal.Heading>
+                <Modal.Heading>Anki Session Settings</Modal.Heading>
               </Modal.Header>
               <Modal.Body className="flex flex-col gap-4 text-xs">
-                {/* Mode Penyimpanan Progres */}
+                {/* Progress saving mode */}
                 <div className="flex flex-col gap-1.5">
                   <Label className="text-xs font-semibold text-muted block mb-1">
-                    Mode Penyimpanan Progres
+                    Progress saving mode
                   </Label>
                   <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
                     <button
@@ -1701,7 +1702,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           : "text-muted hover:text-foreground",
                       ].join(" ")}
                     >
-                      💾 Simpan Selesai Sesi
+                      Save when session ends
                     </button>
                     <button
                       type="button"
@@ -1713,7 +1714,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           : "text-muted hover:text-foreground",
                       ].join(" ")}
                     >
-                      ⚡ Simpan Per Kartu
+                      Save per card
                     </button>
                   </div>
                 </div>
@@ -1721,7 +1722,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 {/* Daily New Cards Limit */}
                 <div className="flex flex-col gap-1.5 border-t border-border pt-3">
                   <Label className="text-xs font-semibold text-muted block mb-1">
-                    Daily New Cards (Limit Kartu Baru Per Hari)
+                    Daily new cards limit
                   </Label>
                   <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
                     {[10, 20, 30].map((num) => (
@@ -1788,8 +1789,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
             <Modal.Dialog className="sm:max-w-lg">
               <Modal.CloseTrigger />
               <Modal.Header>
-                <Modal.Heading>
-                  💡 {t.ankiGuideTitle || "Panduan Penilaian SRS"}
+                <Modal.Heading className="flex items-center gap-2">
+                  <Lightbulb size={18} /> {t.ankiGuideTitle || "SRS Grading Guide"}
                 </Modal.Heading>
               </Modal.Header>
               <Modal.Body className="text-xs leading-relaxed flex flex-col gap-3">

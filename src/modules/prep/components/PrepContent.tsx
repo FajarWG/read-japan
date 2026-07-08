@@ -6,7 +6,7 @@ import { Button, Card, Popover, Tabs, Select, Label, ListBox, TextArea, Input, S
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
-import { recordKotobaLookup } from "@/src/modules/stories/actions";
+import { recordKotobaLookup } from "@/src/shared/actions/kotoba-progress";
 import {
   buildKotobaAliasMap,
   createKotobaLookupEntry,
@@ -1504,7 +1504,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                             {/* Section Contoh Percakapan (Dialogue) */}
                             {sect.conversations && sect.conversations.length > 0 && (
                               <div className="flex flex-col gap-4">
-                                <h4 className="text-xs font-bold text-muted uppercase tracking-wider">💬 Contoh Percakapan</h4>
+                                <h4 className="text-xs font-bold text-muted uppercase tracking-wider">Example dialogue</h4>
                                 <div className="space-y-4">
                                   {sect.conversations.map((conv, convIdx) => {
                                     const dialogKey = `sect-${sectIdx}-conv-${convIdx}`;
@@ -1522,7 +1522,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                             )}
                                           </span>
                                           {isTranslationVisible ? (
-                                            <div className="text-xs text-muted flex items-center gap-1.5 mt-0.5 select-none">
+                                            <div className="text-sm text-foreground/70 flex items-center gap-1.5 mt-0.5 select-none">
                                               <span>{conv.translation}</span>
                                               <button
                                                 type="button"
@@ -1534,7 +1534,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                                 }}
                                                 className="text-[10px] font-semibold text-indigo-500 hover:underline ml-1 cursor-pointer"
                                               >
-                                                {lang === "en" ? "(Hide)" : "(Sembunyikan)"}
+                                                (Hide)
                                               </button>
                                             </div>
                                           ) : (
@@ -1548,7 +1548,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                               }}
                                               className="self-start text-[10px] font-semibold text-indigo-500 hover:text-indigo-600 bg-indigo-500/5 hover:bg-indigo-500/10 px-2 py-0.5 rounded-md transition-all mt-1 cursor-pointer select-none"
                                             >
-                                              {lang === "en" ? "🔍 Show Translation" : "🔍 Lihat Arti"}
+                                              Show translation
                                             </button>
                                           )}
                                         </div>
@@ -1638,7 +1638,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                         )}
                                       </span>
                                       {isTranslationVisible ? (
-                                        <div className="text-xs text-muted flex items-center gap-1.5 mt-0.5 select-none">
+                                        <div className="text-sm text-foreground/70 flex items-center gap-1.5 mt-0.5 select-none">
                                           <span>{conv.translation}</span>
                                           <button
                                             type="button"
@@ -1650,7 +1650,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                             }}
                                             className="text-[10px] font-semibold text-indigo-500 hover:underline ml-1 cursor-pointer"
                                           >
-                                            {lang === "en" ? "(Hide)" : "(Sembunyikan)"}
+                                            (Hide)
                                           </button>
                                         </div>
                                       ) : (
@@ -1664,7 +1664,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                           }}
                                           className="self-start text-[10px] font-semibold text-indigo-500 hover:text-indigo-600 bg-indigo-500/5 hover:bg-indigo-500/10 px-2 py-0.5 rounded-md transition-all mt-1 cursor-pointer select-none"
                                         >
-                                          {lang === "en" ? "🔍 Show Translation" : "🔍 Lihat Arti"}
+                                          Show translation
                                         </button>
                                       )}
                                     </div>
@@ -1750,11 +1750,11 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                               <div className="flex flex-col gap-3">
                                 {sect.grammar.map((gram, gramIdx) => {
                                   const grammarKey = `sect-${sectIdx}-gram-${gramIdx}`;
-                                  const isGrammarVisible = !!showAnswerFor[grammarKey];
+                                  const isGrammarVisible = showAnswerFor[grammarKey] ?? true;
                                   return (
                                     <div key={gramIdx} className="rounded-xl border border-border bg-surface-muted/30 p-4 flex flex-col gap-2">
                                       <div className="flex justify-between items-center">
-                                        <h5 className="font-jp text-sm font-bold text-indigo-500">
+                                        <h5 className="font-jp text-base font-bold text-indigo-500">
                                           {gram.pattern}
                                         </h5>
                                         <button
@@ -1762,32 +1762,32 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                           onClick={() => {
                                             setShowAnswerFor((prev) => ({
                                               ...prev,
-                                              [grammarKey]: !prev[grammarKey],
+                                              [grammarKey]: !isGrammarVisible,
                                             }));
                                           }}
                                           className="text-xs font-semibold text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer"
                                         >
-                                          {isGrammarVisible ? "Sembunyikan Pola ▲" : "Tampilkan Pola ▼"}
+                                          {isGrammarVisible ? "Hide ▲" : "Show ▼"}
                                         </button>
                                       </div>
 
                                       {isGrammarVisible && (
-                                        <div className="mt-2.5 flex flex-col gap-2 transition-all duration-300">
-                                          <p className="text-xs text-foreground leading-relaxed">
+                                        <div className="mt-2.5 flex flex-col gap-3 transition-all duration-300">
+                                          <p className="text-sm text-foreground leading-relaxed">
                                             {gram.explanation}
                                           </p>
 
                                           {gram.examples && gram.examples.length > 0 && (
-                                            <div className="space-y-2 pl-3 border-l-2 border-indigo-200 dark:border-indigo-800">
+                                            <div className="space-y-3 pl-3 border-l-2 border-indigo-200 dark:border-indigo-800">
                                               {gram.examples.map((ex, exIdx) => (
                                                 <div key={exIdx} className="flex flex-col gap-0.5">
-                                                  <span className="font-jp text-xs text-foreground">
+                                                  <span className="font-jp text-base text-foreground">
                                                     {renderJapaneseWithLookup(
                                                       ex.japanese,
                                                       `sect-${sectIdx}-gram-${gramIdx}-example-${exIdx}`,
                                                     )}
                                                   </span>
-                                                  <span className="text-[10px] text-muted">
+                                                  <span className="text-sm text-foreground/70">
                                                     {ex.translation}
                                                   </span>
                                                 </div>
@@ -1818,11 +1818,11 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                         <div className="flex flex-col gap-4">
                           {data.grammar.map((gram, idx) => {
                             const grammarKey = `grammar-${idx}`;
-                            const isGrammarVisible = !!showAnswerFor[grammarKey];
+                            const isGrammarVisible = showAnswerFor[grammarKey] ?? true;
                             return (
                               <Card key={idx} className="border border-border bg-surface p-5 shadow-xs flex flex-col gap-3">
                                 <div className="flex justify-between items-center">
-                                  <h4 className="text-md font-bold text-indigo-500 font-jp">
+                                  <h4 className="text-lg font-bold text-indigo-500 font-jp">
                                     {gram.pattern}
                                   </h4>
                                   <button
@@ -1830,12 +1830,12 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                     onClick={() => {
                                       setShowAnswerFor((prev) => ({
                                         ...prev,
-                                        [grammarKey]: !prev[grammarKey],
+                                        [grammarKey]: !isGrammarVisible,
                                       }));
                                     }}
                                     className="text-xs font-semibold text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer"
                                   >
-                                    {isGrammarVisible ? "Sembunyikan Tata Bahasa ▲" : "Tampilkan Tata Bahasa ▼"}
+                                    {isGrammarVisible ? "Hide ▲" : "Show ▼"}
                                   </button>
                                 </div>
 
@@ -1849,13 +1849,13 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                                       <div className="space-y-3 pl-4 border-l-2 border-indigo-200 dark:border-indigo-800">
                                         {gram.examples.map((ex, exIdx) => (
                                           <div key={exIdx} className="flex flex-col gap-0.5">
-                                            <span className="font-jp text-sm text-foreground">
+                                            <span className="font-jp text-base text-foreground">
                                               {renderJapaneseWithLookup(
                                                 ex.japanese,
                                                 `grammar-${idx}-example-${exIdx}`,
                                               )}
                                             </span>
-                                            <span className="text-xs text-muted">
+                                            <span className="text-sm text-foreground/70">
                                               {ex.translation}
                                             </span>
                                           </div>
@@ -1874,7 +1874,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                     {/* No grammar data message */}
                     {(!data.grammar || data.grammar.length === 0) && (!data.sections || !data.sections.some(s => s.grammar && s.grammar.length > 0)) && (
                       <p className="text-xs text-muted italic text-center p-8 border border-border rounded-xl">
-                        Tidak ada penjelasan tata bahasa untuk bab ini.
+                        No grammar notes for this chapter yet.
                       </p>
                     )}
                   </div>

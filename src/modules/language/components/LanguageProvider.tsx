@@ -1,11 +1,17 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 import { translations } from "@/src/modules/language/lib/i18n";
 import type { Lang, Translations } from "@/src/modules/language/lib/i18n";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Context
+//
+// The UI chrome is locked to English by design — feature names read better in
+// English/Japanese. Only *content* (Japanese → meaning) stays Indonesian, and
+// that comes from data (Prep translations, Kotoba `translationId`), not here.
+// `lang`/`toggleLang` are kept as no-ops so the existing call sites don't need
+// to change, but there is no runtime language switching anymore.
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface LanguageContextValue {
@@ -25,28 +31,9 @@ const LanguageContext = createContext<LanguageContextValue>({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  // Always start with "en" to match SSR, then sync from localStorage after hydration
-  const [lang, setLang] = useState<Lang>("en");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("lang");
-    if (stored === "en" || stored === "id") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLang(stored);
-    }
-  }, []);
-
-  const toggleLang = () => {
-    setLang((prev) => {
-      const next: Lang = prev === "en" ? "id" : "en";
-      localStorage.setItem("lang", next);
-      return next;
-    });
-  };
-
   return (
     <LanguageContext.Provider
-      value={{ lang, t: translations[lang], toggleLang }}
+      value={{ lang: "en", t: translations.en, toggleLang: () => {} }}
     >
       {children}
     </LanguageContext.Provider>

@@ -1,149 +1,82 @@
 /**
- * Server-only helpers untuk dashboard Home + /progress.
+ * Server-only helpers for the Home dashboard (`/`).
  *
- * Dipakai dari server components / server actions.
- * Tidak boleh dipakai dari client components.
+ * After the app slim-down the dashboard reflects only the surviving features:
+ * Anki, Katsuyou, Bunpou and Prep. (Kotoba lives in localStorage, so it isn't
+ * summarised here.) Used from server components only — never from the client.
  */
 
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
-import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
 
 // ─────────────────────────────────────────────────────────
-// Tipe data
+// Types
 // ─────────────────────────────────────────────────────────
-
-export interface ChapterProgressItem {
-  chapter: number;
-  title: string;
-  prepOpenedPoints: number;
-  totalPrepPoints: number;
-  storiesReadCount: number;
-  totalStoriesCount: number;
-  ankiCardsCount: number;
-}
 
 export interface DashboardSummary {
   user: { id: number; username: string };
   streakDays: number;
   todayActivityCount: number;
-  totalKanaClicks: number;
-  totalKanaWrong: number;
-  uniqueWordsLookedUp: number;
-  lastStory?: {
-    id: number;
-    title: string;
-    content: string;
-    totalReads: number;
-    lastReadAt: Date;
-  } | null;
   ankiDueCount: number;
-  bookmarksCount: number;
 }
 
 export interface ProgressStats {
   streakDays: number;
-  totalKanaClicks: number;
-  totalKanaWrong: number;
-  uniqueWordsLookedUp: number;
-  storiesRead: number;
-  ankiReviewed: number;
-  ankiDueNow: number;
-  byDay: Array<{ date: string; count: number }>; // 7 hari terakhir
-  byChapter: Array<{ chapter: number; count: number }>;
-  chaptersProgress: ChapterProgressItem[];
-  weakWords: Array<{
-    character: string;
-    wrongCount: number;
-    clickCount: number;
-    info: { romaji: string } | null;
-  }>;
-  achievements: {
-    unlocked: Array<{
-      id: number;
-      code: string;
-      titleEn: string;
-      titleId: string;
-      descEn: string;
-      descId: string;
-      icon: string;
-      unlockedAt: Date;
-    }>;
-    locked: Array<{
-      id: number;
-      code: string;
-      titleEn: string;
-      titleId: string;
-      descEn: string;
-      descId: string;
-      icon: string;
-    }>;
-  };
+  todayActivityCount: number;
+  byDay: Array<{ date: string; count: number }>; // last 7 days
+  anki: { total: number; dueNow: number };
+  katsuyou: { cards: number; dueNow: number; lessonsCompleted: number };
+  bunpou: { patternsCompleted: number };
+  prep: { chaptersOpened: number };
 }
 
 // ─────────────────────────────────────────────────────────
-// Streak — hitung hari berturut-turut dari ActivityLog
+// Date helpers (UTC day-keys)
 // ─────────────────────────────────────────────────────────
 
-/**
- * Hitung streak dari ActivityLog. Mengembalikan jumlah hari berturut-turut
- * (termasuk hari ini jika ada aktivitas hari ini).
- *
- * Definisi "hari" = hari lokal dalam timezone server (UTC, sesuaikan bila perlu).
- */
+function dayKey(d: Date): string {
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+}
+
+// ─────────────────────────────────────────────────────────
+// Streak — consecutive days with any activity
+// ─────────────────────────────────────────────────────────
+
 export async function computeStreakDays(userId: number): Promise<number> {
-  // Ambil distinct dates dari activity log, diurut desc.
   const logs = await prisma.activityLog.findMany({
     where: { userId },
     select: { createdAt: true },
     orderBy: { createdAt: "desc" },
-    take: 365, // cukup untuk streak sampai 1 tahun
+    take: 365,
   });
 
   if (logs.length === 0) return 0;
 
-  // Set of unique dates (YYYY-MM-DD UTC)
-  const dateSet = new Set<string>();
-  for (const log of logs) {
-    const d = log.createdAt;
-    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
-    dateSet.add(key);
-  }
+  const dateSet = new Set<string>(logs.map((l) => dayKey(l.createdAt)));
 
-  const dates = Array.from(dateSet).sort().reverse(); // desc
-
-  // Streak harus dimulai dari hari ini atau kemarin
   const today = new Date();
-  const todayKey = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, "0")}-${String(today.getUTCDate()).padStart(2, "0")}`;
   const yesterday = new Date(today);
   yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  const yesterdayKey = `${yesterday.getUTCFullYear()}-${String(yesterday.getUTCMonth() + 1).padStart(2, "0")}-${String(yesterday.getUTCDate()).padStart(2, "0")}`;
 
   let cursor: Date;
-  if (dateSet.has(todayKey)) {
+  if (dateSet.has(dayKey(today))) {
     cursor = new Date(today);
-  } else if (dateSet.has(yesterdayKey)) {
+  } else if (dateSet.has(dayKey(yesterday))) {
     cursor = new Date(yesterday);
   } else {
     return 0;
   }
 
   let streak = 0;
-  while (true) {
-    const key = `${cursor.getUTCFullYear()}-${String(cursor.getUTCMonth() + 1).padStart(2, "0")}-${String(cursor.getUTCDate()).padStart(2, "0")}`;
-    if (dateSet.has(key)) {
-      streak += 1;
-      cursor.setUTCDate(cursor.getUTCDate() - 1);
-    } else {
-      break;
-    }
+  while (dateSet.has(dayKey(cursor))) {
+    streak += 1;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
   }
-
   return streak;
 }
 
 // ─────────────────────────────────────────────────────────
-// Dashboard summary untuk Home (/)
+// Compact summary for the Home hero
 // ─────────────────────────────────────────────────────────
 
 export async function getDashboardSummary(): Promise<DashboardSummary | null> {
@@ -153,113 +86,89 @@ export async function getDashboardSummary(): Promise<DashboardSummary | null> {
   const todayStart = new Date();
   todayStart.setUTCHours(0, 0, 0, 0);
 
-  const [
-    streakDays,
-    kanaAgg,
-    lastStoryLog,
-    ankiDue,
-    bookmarksCount,
-    uniqueWords,
-    todayActivityCount,
-  ] = await Promise.all([
+  const [streakDays, ankiDueCount, todayActivityCount] = await Promise.all([
     computeStreakDays(session.id),
-    prisma.learningProgress.aggregate({
-      where: { userId: session.id },
-      _sum: { clickCount: true, wrongCount: true },
-    }),
-    prisma.activityLog.findFirst({
-      where: { userId: session.id, type: "story_read" },
-      orderBy: { createdAt: "desc" },
-    }),
     prisma.ankiProgress.count({
       where: { userId: session.id, dueDate: { lte: new Date() } },
-    }),
-    prisma.bookmark.count({ where: { userId: session.id } }),
-    prisma.learningProgress.count({
-      where: { userId: session.id, clickCount: { gt: 0 } },
     }),
     prisma.activityLog.count({
       where: { userId: session.id, createdAt: { gte: todayStart } },
     }),
   ]);
 
-  // Last story detail
-  let lastStory: DashboardSummary["lastStory"] = null;
-  if (lastStoryLog?.refId) {
-    const storyId = Number(lastStoryLog.refId);
-    if (!Number.isNaN(storyId)) {
-      const story = await prisma.story.findUnique({
-        where: { id: storyId },
-        select: {
-          id: true,
-          title: true,
-          content: true,
-          totalReads: true,
-        },
-      });
-      if (story) {
-        lastStory = { ...story, lastReadAt: lastStoryLog.createdAt };
-      }
-    }
-  }
-
   return {
     user: { id: session.id, username: session.username },
     streakDays,
     todayActivityCount,
-    totalKanaClicks: kanaAgg._sum.clickCount ?? 0,
-    totalKanaWrong: kanaAgg._sum.wrongCount ?? 0,
-    uniqueWordsLookedUp: uniqueWords,
-    lastStory,
-    ankiDueCount: ankiDue,
-    bookmarksCount,
+    ankiDueCount,
   };
 }
 
 // ─────────────────────────────────────────────────────────
-// Full progress stats untuk /progress
+// Full stats for the dashboard body
 // ─────────────────────────────────────────────────────────
 
 export async function getProgressStats(): Promise<ProgressStats | null> {
   const session = await getSession();
   if (!session) return null;
 
-  const [streakDays, kanaAgg, storyReadCount, ankiAgg, dueNow] =
-    await Promise.all([
-      computeStreakDays(session.id),
-      prisma.learningProgress.aggregate({
-        where: { userId: session.id },
-        _sum: { clickCount: true, wrongCount: true },
-      }),
-      prisma.activityLog.count({
-        where: { userId: session.id, type: "story_read" },
-      }),
-      prisma.ankiProgress.count({ where: { userId: session.id } }),
-      prisma.ankiProgress.count({
-        where: { userId: session.id, dueDate: { lte: new Date() } },
-      }),
-    ]);
+  const now = new Date();
+  const todayStart = new Date();
+  todayStart.setUTCHours(0, 0, 0, 0);
 
-  // By day — 7 hari terakhir, group by date
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setUTCDate(sevenDaysAgo.getUTCDate() - 6);
   sevenDaysAgo.setUTCHours(0, 0, 0, 0);
 
-  const recentLogs = await prisma.activityLog.findMany({
-    where: { userId: session.id, createdAt: { gte: sevenDaysAgo } },
-    select: { createdAt: true },
-  });
+  const [
+    streakDays,
+    todayActivityCount,
+    recentLogs,
+    ankiTotal,
+    ankiDue,
+    katsuyouCards,
+    katsuyouDue,
+    katsuyouLessons,
+    bunpouPatterns,
+    prepLogs,
+  ] = await Promise.all([
+    computeStreakDays(session.id),
+    prisma.activityLog.count({
+      where: { userId: session.id, createdAt: { gte: todayStart } },
+    }),
+    prisma.activityLog.findMany({
+      where: { userId: session.id, createdAt: { gte: sevenDaysAgo } },
+      select: { createdAt: true },
+    }),
+    prisma.ankiProgress.count({ where: { userId: session.id } }),
+    prisma.ankiProgress.count({
+      where: { userId: session.id, dueDate: { lte: now } },
+    }),
+    prisma.katsuyouReviewCard.count({ where: { userId: session.id } }),
+    prisma.katsuyouReviewCard.count({
+      where: { userId: session.id, nextReview: { lte: now } },
+    }),
+    prisma.katsuyouLessonProgress.count({
+      where: { userId: session.id, completed: true },
+    }),
+    prisma.bunpouProgress.count({
+      where: { userId: session.id, completed: true },
+    }),
+    prisma.activityLog.findMany({
+      where: { userId: session.id, type: "prep_open" },
+      select: { refId: true },
+    }),
+  ]);
 
+  // 7-day activity chart
   const dayCounts = new Map<string, number>();
   for (let i = 0; i < 7; i++) {
     const d = new Date(sevenDaysAgo);
     d.setUTCDate(d.getUTCDate() + i);
-    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
-    dayCounts.set(key, 0);
+    dayCounts.set(dayKey(d), 0);
   }
   for (const log of recentLogs) {
-    const d = log.createdAt;
-    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+    const key = dayKey(log.createdAt);
     if (dayCounts.has(key)) dayCounts.set(key, (dayCounts.get(key) ?? 0) + 1);
   }
   const byDay = Array.from(dayCounts.entries()).map(([date, count]) => ({
@@ -267,179 +176,24 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     count,
   }));
 
-  // Fetch detailed chapter progress (Prep, Stories, Anki)
-  const [prepLogs, readLogs, allStories, chapterGroups] = await Promise.all([
-    prisma.activityLog.findMany({
-      where: { userId: session.id, type: "prep_open" },
-      select: { refId: true },
-    }),
-    prisma.activityLog.findMany({
-      where: { userId: session.id, type: "story_read" },
-      select: { refId: true },
-    }),
-    prisma.story.findMany({
-      where: { NOT: { chapter: null } },
-      select: { id: true, chapter: true },
-    }),
-    prisma.ankiProgress.groupBy({
-      by: ["chapter"],
-      where: { userId: session.id },
-      _count: { _all: true },
-    }),
-  ]);
-
-  // 1. Compile Prep opened points map
-  const prepMap = new Map<number, Set<number>>();
-  prepLogs.forEach((log) => {
-    if (log.refId) {
-      const parts = log.refId.split("-");
-      if (parts.length === 2) {
-        const c = parseInt(parts[0]);
-        const p = parseInt(parts[1]);
-        if (!isNaN(c) && !isNaN(p)) {
-          if (!prepMap.has(c)) {
-            prepMap.set(c, new Set());
-          }
-          prepMap.get(c)!.add(p);
-        }
-      }
-    }
-  });
-
-  // 2. Compile read stories map
-  const readStoryIds = readLogs.map((l) => Number(l.refId)).filter((id) => !isNaN(id));
-  const readStories = await prisma.story.findMany({
-    where: { id: { in: readStoryIds }, NOT: { chapter: null } },
-    select: { id: true, chapter: true },
-  });
-  const readStoryMap = new Map<number, Set<number>>();
-  readStories.forEach((s) => {
-    if (s.chapter != null) {
-      if (!readStoryMap.has(s.chapter)) {
-        readStoryMap.set(s.chapter, new Set());
-      }
-      readStoryMap.get(s.chapter)!.add(s.id);
-    }
-  });
-
-  // 3. Compile total stories per chapter map
-  const totalStoriesMap = new Map<number, Set<number>>();
-  allStories.forEach((s) => {
-    if (s.chapter != null) {
-      if (!totalStoriesMap.has(s.chapter)) {
-        totalStoriesMap.set(s.chapter, new Set());
-      }
-      totalStoriesMap.get(s.chapter)!.add(s.id);
-    }
-  });
-
-  // 4. Compile Anki counts per chapter map
-  const ankiMap = new Map<number, number>();
-  chapterGroups.forEach((g) => {
-    const chapNum = Number(g.chapter.replace(/\D/g, "")) || 0;
-    if (chapNum > 0) {
-      ankiMap.set(chapNum, (ankiMap.get(chapNum) ?? 0) + g._count._all);
-    }
-  });
-
-  // 5. Construct full chaptersProgress
-  const chaptersProgress: ChapterProgressItem[] = [];
-  for (let c = 1; c <= 15; c++) {
-    const group = DekiruNihongoGroups[c - 1];
-    const title = group?.title ?? "";
-    const totalPrepPoints = group?.sections?.length ?? 3;
-    const prepOpenedPoints = prepMap.get(c)?.size ?? 0;
-    const storiesReadCount = readStoryMap.get(c)?.size ?? 0;
-    const totalStoriesCount = totalStoriesMap.get(c)?.size ?? 0;
-    const ankiCardsCount = ankiMap.get(c) ?? 0;
-
-    chaptersProgress.push({
-      chapter: c,
-      title,
-      prepOpenedPoints,
-      totalPrepPoints,
-      storiesReadCount,
-      totalStoriesCount,
-      ankiCardsCount,
-    });
+  // Distinct chapters where any Prep point was opened (refId = "chapter-point")
+  const chaptersOpened = new Set<number>();
+  for (const log of prepLogs) {
+    const chapter = Number(log.refId?.split("-")[0]);
+    if (!Number.isNaN(chapter)) chaptersOpened.add(chapter);
   }
-
-  const byChapter = chaptersProgress.map((cp) => ({
-    chapter: cp.chapter,
-    count: cp.ankiCardsCount,
-  }));
-
-  // Weak words — top wrongCount, exclude kotoba: prefix
-  const weakRecords = await prisma.learningProgress.findMany({
-    where: {
-      userId: session.id,
-      wrongCount: { gt: 0 },
-      // exclude kotoba: prefix (those are vocab, not kana)
-      NOT: { character: { startsWith: "kotoba:" } },
-    },
-    orderBy: [{ wrongCount: "desc" }, { clickCount: "desc" }],
-    take: 20,
-  });
-
-  // Lazy import untuk hindari circular — kanaMap adalah pure module
-  const { kanaMap } = await import("@/src/modules/kana/lib/kana-map");
-  const weakWords = weakRecords.map((r) => ({
-    character: r.character,
-    wrongCount: r.wrongCount,
-    clickCount: r.clickCount,
-    info: kanaMap[r.character]
-      ? { romaji: kanaMap[r.character].romaji }
-      : null,
-  }));
-
-  // Achievements
-  const [allAchievements, unlocked] = await Promise.all([
-    prisma.achievement.findMany({ orderBy: { id: "asc" } }),
-    prisma.userAchievement.findMany({
-      where: { userId: session.id },
-      include: { achievement: true },
-    }),
-  ]);
-
-  const unlockedIds = new Set(unlocked.map((u) => u.achievementId));
-  const achievements = {
-    unlocked: unlocked.map((u) => ({
-      id: u.achievement.id,
-      code: u.achievement.code,
-      titleEn: u.achievement.titleEn,
-      titleId: u.achievement.titleId,
-      descEn: u.achievement.descEn,
-      descId: u.achievement.descId,
-      icon: u.achievement.icon,
-      unlockedAt: u.unlockedAt,
-    })),
-    locked: allAchievements
-      .filter((a) => !unlockedIds.has(a.id))
-      .map((a) => ({
-        id: a.id,
-        code: a.code,
-        titleEn: a.titleEn,
-        titleId: a.titleId,
-        descEn: a.descEn,
-        descId: a.descId,
-        icon: a.icon,
-      })),
-  };
 
   return {
     streakDays,
-    totalKanaClicks: kanaAgg._sum.clickCount ?? 0,
-    totalKanaWrong: kanaAgg._sum.wrongCount ?? 0,
-    uniqueWordsLookedUp: await prisma.learningProgress.count({
-      where: { userId: session.id, clickCount: { gt: 0 } },
-    }),
-    storiesRead: storyReadCount,
-    ankiReviewed: ankiAgg,
-    ankiDueNow: dueNow,
+    todayActivityCount,
     byDay,
-    byChapter,
-    chaptersProgress,
-    weakWords,
-    achievements,
+    anki: { total: ankiTotal, dueNow: ankiDue },
+    katsuyou: {
+      cards: katsuyouCards,
+      dueNow: katsuyouDue,
+      lessonsCompleted: katsuyouLessons,
+    },
+    bunpou: { patternsCompleted: bunpouPatterns },
+    prep: { chaptersOpened: chaptersOpened.size },
   };
 }

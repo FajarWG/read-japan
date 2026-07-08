@@ -3,31 +3,30 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
-import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
+import { Layers, BookOpen, RefreshCw, NotebookPen, Home } from "lucide-react";
 
 export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const { t } = useLanguage();
 
   // ── Show/Hide Nav visibility state ─────────────────────────────────────────
   const [visible, setVisible] = useState(true);
 
   const NAV_ITEMS = [
-    { id: "prep", route: "/prep", label: "Prep" },
-    { id: "anki", route: "/anki", label: "Anki" },
-    { id: "kana", route: "/kana", label: t.navKana },
-    { id: "story", route: "/stories", label: t.navStories },
+    { id: "anki", route: "/anki", label: "Anki", icon: Layers },
+    { id: "bunpou", route: "/bunpou", label: "Bunpou", icon: BookOpen },
+    { id: "katsuyou", route: "/katsuyou", label: "Katsuyou", icon: RefreshCw },
+    { id: "kotoba", route: "/kotoba", label: "Kotoba", icon: NotebookPen },
   ] as const;
 
   const selectedKey = pathname.startsWith("/anki")
     ? "anki"
-    : pathname.startsWith("/kana")
-      ? "kana"
-      : pathname.startsWith("/stories") || pathname.startsWith("/read") || pathname.startsWith("/learn")
-        ? "story"
-        : pathname.startsWith("/prep")
-          ? "prep"
+    : pathname.startsWith("/bunpou")
+      ? "bunpou"
+      : pathname.startsWith("/katsuyou")
+        ? "katsuyou"
+        : pathname.startsWith("/kotoba")
+          ? "kotoba"
           : "none";
 
   // Hide on auth pages
@@ -47,7 +46,7 @@ export function BottomNav() {
             onClick={() => setVisible(false)}
             className="flex items-center justify-center text-[9px] font-bold tracking-wider uppercase text-foreground/45 hover:text-foreground/80 bg-white/20 dark:bg-white/7 backdrop-blur-md border border-white/30 dark:border-white/10 rounded-full px-2.5 py-0.5 shadow-xs transition-all duration-200 cursor-pointer"
           >
-            Sembunyikan Navigasi ▼
+            Hide navigation ▼
           </button>
           
           <div className="relative pointer-events-auto">
@@ -61,22 +60,9 @@ export function BottomNav() {
                     ? "bg-accent border-accent text-white shadow-accent/25 shadow-lg scale-105"
                     : "bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-white/40 dark:border-white/12 text-foreground/75 hover:text-foreground hover:border-white/70 hover:scale-110",
                 ].join(" ")}
-                title="Beranda"
+                title="Home"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
+                <Home size={14} strokeWidth={2.5} />
               </button>
             </div>
 
@@ -89,7 +75,7 @@ export function BottomNav() {
             >
               <Tabs.ListContainer>
                 <Tabs.List
-                  aria-label="Navigasi utama"
+                  aria-label="Main navigation"
                   className={[
                     /* Liquid glass container */
                     "rounded-2xl px-1.5 py-1.5 gap-0.5",
@@ -103,15 +89,18 @@ export function BottomNav() {
                     "shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.5)]",
                     "dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]",
                     /* Tab overrides */
-                    "*:rounded-xl *:px-5 *:h-9",
+                    "*:rounded-xl *:px-4 *:h-9",
                     "*:text-sm *:font-semibold *:tracking-wide",
                     "*:text-foreground/60 *:transition-all *:duration-200",
                     "*:data-[selected=true]:text-foreground",
                   ].join(" ")}
                 >
-                  {NAV_ITEMS.map(({ id, label }) => (
+                  {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
                     <Tabs.Tab key={id} id={id}>
-                      {label}
+                      <span className="relative z-10 flex items-center gap-1.5">
+                        <Icon size={15} />
+                        {label}
+                      </span>
                       <Tabs.Indicator
                         className={[
                           "rounded-xl",
@@ -135,7 +124,7 @@ export function BottomNav() {
             onClick={() => setVisible(true)}
             className="flex items-center justify-center text-[10px] font-bold text-foreground/75 hover:text-foreground bg-white/80 dark:bg-white/10 backdrop-blur-md border border-white/30 dark:border-white/20 rounded-full px-3 py-1.5 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
           >
-            ▲ Tampilkan Navigasi
+            ▲ Show navigation
           </button>
         </div>
       )}

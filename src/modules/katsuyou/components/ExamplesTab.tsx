@@ -121,16 +121,9 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
               </span>
             )}
 
-            {/* Translations */}
-            <div className="flex flex-col gap-1 border-t border-border/25 pt-3.5 text-xs text-muted font-semibold leading-relaxed">
-              <p className="flex items-start gap-2.5">
-                <span className="shrink-0 text-[10px] select-none uppercase font-bold text-muted/60 mt-0.5">en</span>
-                <span>🇺🇸 {sen.english}</span>
-              </p>
-              <p className="flex items-start gap-2.5">
-                <span className="shrink-0 text-[10px] select-none uppercase font-bold text-muted/60 mt-0.5">id</span>
-                <span>🇮🇩 {sen.indonesian}</span>
-              </p>
+            {/* Meaning (Indonesian) */}
+            <div className="border-t border-border/25 pt-3.5 text-sm text-foreground/70 font-medium leading-relaxed">
+              {sen.indonesian}
             </div>
 
             {/* Handwriting practice widget drawer */}
