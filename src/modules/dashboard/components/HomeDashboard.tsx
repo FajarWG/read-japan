@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
-
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { ProgressDashboard } from "@/src/modules/dashboard/components/ProgressDashboard";
 import { ContinueHero } from "@/src/modules/dashboard/components/ContinueHero";
+import { DailyTracker } from "@/src/modules/dashboard/components/DailyTracker";
 import type {
   DashboardSummary,
   ProgressStats,
@@ -55,12 +54,17 @@ export function HomeDashboard({ summary, progressStats }: HomeDashboardProps) {
         {/* ── Main ────────────────────────────────────────── */}
         <main className="px-4 py-6">
           {/* Continue Hero */}
-          <ContinueHero summary={summary} progressAnchor="progress-section" />
+          <ContinueHero summary={summary} />
+
+          {/* Daily study tracker */}
+          <section className="mb-6">
+            <DailyTracker />
+          </section>
 
           {/* Full Progress Dashboard */}
           <section id="progress-section" className="scroll-mt-4">
             <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-muted">
-              📊 {t.progressTitle}
+              Your progress
             </h2>
             <ProgressDashboard stats={progressStats} />
           </section>

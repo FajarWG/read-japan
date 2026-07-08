@@ -115,8 +115,8 @@ export function KatsuyouDashboard() {
     totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   return (
-    <div className="flex min-h-screen justify-center bg-background py-8 md:py-12">
-      <div className="flex w-full max-w-none flex-col gap-6 px-4 md:px-8">
+    <div className="flex min-h-screen justify-center bg-background px-4 py-8 md:py-12">
+      <div className="flex w-full max-w-6xl flex-col gap-6">
         {/* ── Navigation & Header ────────────────────────── */}
         <header className="border-b border-border backdrop-blur-md rounded-t-2xl pb-4">
           <div className="flex items-center justify-between gap-4 py-2">
@@ -128,7 +128,7 @@ export function KatsuyouDashboard() {
                 ← {text.backHome}
               </Link>
               <h1 className="text-xl sm:text-2xl font-black font-jp leading-tight text-foreground flex items-center gap-2 mt-1 truncate">
-                🇯🇵 {text.title}
+                <RefreshCw size={22} className="text-accent shrink-0" /> {text.title}
               </h1>
               <p className="text-xs text-muted max-w-2xl leading-relaxed">
                 {text.subtitle}

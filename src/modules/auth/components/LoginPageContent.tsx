@@ -15,7 +15,6 @@ import {
 } from "@heroui/react";
 import { loginAction, registerAction } from "@/src/modules/auth/actions";
 import { ThemeToggle } from "@/src/modules/theme/components/ThemeToggle";
-import { LanguageToggle } from "@/src/modules/language/components/LanguageToggle";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 
 type AuthResult = { success: true } | { success: false; error: string };
@@ -53,7 +52,6 @@ export function LoginPageContent() {
           <p className="text-xs text-muted">{t.brandDesc}</p>
         </div>
         <div className="flex items-center gap-2">
-          <LanguageToggle />
           <ThemeToggle />
         </div>
       </div>
@@ -103,7 +101,7 @@ export function LoginPageContent() {
                     {t.authUsername}
                   </Label>
                   <Input
-                    placeholder="contoh: fajar123"
+                    placeholder="e.g. fajar123"
                     autoComplete="username"
                     autoCapitalize="none"
                     required
@@ -168,7 +166,7 @@ export function LoginPageContent() {
                     {t.authUsername}
                   </Label>
                   <Input
-                    placeholder="contoh: FajarWG"
+                    placeholder="e.g. FajarWG"
                     autoComplete="username"
                     autoCapitalize="none"
                     required

@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect, useMemo, useTransition, useCallback } from "react";
 import Link from "next/link";
-import { 
-  BookOpen, 
-  Check, 
-  Search, 
-  Eye, 
-  EyeOff, 
+import {
+  BookOpen,
+  Check,
+  Search,
+  Eye,
+  EyeOff,
   Award,
   Sparkles,
-  Info
+  Info,
+  RefreshCw
 } from "lucide-react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
@@ -157,7 +158,7 @@ function PracticeArea({
       hint: "Hint:",
       checkBtn: "Check Answer",
       nextBtn: "Next Question",
-      correctText: "Correct! 🎉 Well done.",
+      correctText: "Correct! Well done.",
       incorrectText: "Incorrect. Try again or check the correct sentence below:",
       correctSentence: "Correct Sentence:",
       quizFinished: "Practice Completed!",
@@ -176,7 +177,7 @@ function PracticeArea({
       hint: "Petunjuk:",
       checkBtn: "Periksa Jawaban",
       nextBtn: "Pertanyaan Selanjutnya",
-      correctText: "Benar! 🎉 Kerja bagus.",
+      correctText: "Benar! Kerja bagus.",
       incorrectText: "Salah. Coba lagi atau lihat kalimat yang benar di bawah:",
       correctSentence: "Kalimat yang Benar:",
       quizFinished: "Latihan Selesai!",
@@ -272,7 +273,7 @@ function PracticeArea({
       <div className="flex flex-col gap-1">
         <span className="text-[9px] font-bold text-muted uppercase tracking-wider">{text.hint}</span>
         <p className="text-xs font-bold text-foreground leading-relaxed">
-          {lang === "en" ? q.english : q.indonesian}
+          {q.indonesian}
         </p>
       </div>
 
@@ -349,9 +350,9 @@ function PracticeArea({
       <div className="flex flex-wrap gap-2 items-center justify-between mt-2 select-none">
         <button
           onClick={handleGenerateNew}
-          className="px-3 py-1.5 border border-border bg-surface text-muted hover:text-foreground font-bold text-[10px] rounded-lg transition-all cursor-pointer"
+          className="inline-flex items-center gap-1 px-3 py-1.5 border border-border bg-surface text-muted hover:text-foreground font-bold text-[10px] rounded-lg transition-all cursor-pointer"
         >
-          🔄 {text.generateBtn}
+          <RefreshCw size={12} /> {text.generateBtn}
         </button>
 
         <div className="flex gap-2">
@@ -541,7 +542,7 @@ export function BunpouDashboard() {
                 ← {text.backHome}
               </Link>
               <h1 className="text-xl sm:text-2xl font-black font-jp leading-tight text-foreground flex items-center gap-2 mt-1 truncate">
-                📚 {text.title}
+                <BookOpen size={22} className="text-accent shrink-0" /> {text.title}
               </h1>
               <p className="text-xs text-muted max-w-2xl leading-relaxed">
                 {text.subtitle}
@@ -805,9 +806,9 @@ export function BunpouDashboard() {
                                         {example.exampleJp}
                                       </p>
 
-                                      {/* Translation (Language Sensitive) */}
-                                      <p className="text-xs text-muted/80 font-semibold leading-relaxed mt-0.5">
-                                        {lang === "en" ? example.exampleEn : example.exampleId}
+                                      {/* Meaning (Indonesian) */}
+                                      <p className="text-sm text-foreground/70 font-medium leading-relaxed mt-0.5">
+                                        {example.exampleId}
                                       </p>
                                     </div>
                                   ))

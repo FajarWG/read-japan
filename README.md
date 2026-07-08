@@ -2,23 +2,25 @@
 
 # Nihongo Flow
 
-A comprehensive Japanese study suite — practice reading short stories with active furigana, master verb conjugations using Kotoba Flex, review vocabulary via SRS flashcards, and prepare lesson cheat sheets.
+A focused Japanese study app built around a handful of things you actually do every day: SRS flashcards, grammar, verb conjugation, pre-class prep, and a personal vocabulary notebook.
 
-Built with Next.js, Prisma, and HeroUI. Supports guest mode (no account required) and registered accounts.
+**Language:** the interface is English; the *meaning* of Japanese content (sentence translations, word glosses) is in Indonesian. There is no language toggle — this split is intentional.
+
+Built with Next.js, Prisma, and HeroUI.
 
 ---
 
 ## Features
 
-- **Kotoba Flex** — Automatic verb conjugation conjugator, rules guide, and interactive flashcard quizzes (covering JLPT N5 - N3)
-- **Read Stories** — Browse and read Japanese stories with furigana support and reading tracker
-- **Prep Sheets** — Prepare for lessons with dialogs, grammar, vocabulary, and audio playbacks
-- **Anki Cards** — Spaced Repetition (SRS) vocabulary card studies
-- **Kana Chart** — Complete Hiragana and Katakana charts including Dakuten and Yoon
-- **Progress tracking** — Persists per-story reading progress (guest via localStorage, users via database)
-- **Auth** — Register / login with username + password; roles: `USER` and `ADMIN`
-- **i18n** — UI language toggle: English / Indonesian
-- **Dark mode** — System-aware theme with manual toggle
+- **Anki** — Spaced-repetition (SRS) vocabulary flashcards, with a reverse "write the kanji" mode.
+- **Bunpou (文法)** — Grammar patterns and particles reference, with sentence-building practice.
+- **Katsuyou (活用)** — Verb conjugation guides, examples, and SRS review.
+- **Prep** — Pre-class study & cheat sheets: dialogue, grammar, vocabulary, and audio playback.
+- **Kotoba (言葉)** — A personal vocabulary notebook: jot down new words you come across (manual or AI import), toggle furigana, and memorize them with an Anki-style SRS.
+- **Home dashboard** — Daily study checklist (add/remove tasks, check off per day), streak, a 7-day activity chart, and per-feature stats.
+- **Auth** — Register / login with username + password; roles: `USER` and `ADMIN`.
+- **Dark mode** — System-aware theme with manual toggle.
+- **PWA** — Installable, with an offline fallback.
 
 ---
 
@@ -54,12 +56,12 @@ Create a `.env` file at the project root:
 ```env
 DATABASE_URL_VPS="postgresql://..."
 JWT_SECRET="your-secret-key"
-GEMINI_API_KEY="..." # optional, untuk fitur AI Chat
+GEMINI_API_KEY="..." # optional, used by the Prep AI summary feature
 ```
 
-- `DATABASE_URL_VPS` — PostgreSQL connection string (VPS/Neon/managed Postgres). Nama env ini sengaja **bukan** `DATABASE_URL` agar tidak konflik dengan env standar Vercel/Next.js dan mudah diaudit.
-- `JWT_SECRET` — string random untuk sign session JWT.
-- `GEMINI_API_KEY` — opsional, hanya untuk fitur AI Chat (Phase 7).
+- `DATABASE_URL_VPS` — PostgreSQL connection string (VPS/Neon/managed Postgres). This env is deliberately **not** named `DATABASE_URL` to avoid clashing with the standard Vercel/Next.js env and to keep it easy to audit.
+- `JWT_SECRET` — random string used to sign the session JWT.
+- `GEMINI_API_KEY` — optional; only used by the Prep AI summary generator.
 
 ### 3. Set up the database
 
@@ -81,11 +83,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Project Structure
 
 ```
-app/               # Next.js App Router pages
+app/               # Next.js App Router pages + API routes (anki, prep, audio)
 prisma/            # Prisma schema and migrations
 src/
-  modules/         # Feature modules (auth, stories, learn, kana, etc.)
-  shared/          # Shared components and utilities (db, session, parser)
+  modules/         # Feature modules (anki, bunpou, katsuyou, prep, kotoba, dashboard, auth, ...)
+  shared/          # Shared components and utilities (db, session, activity, parser)
 public/            # Static assets
 ```
 
@@ -96,8 +98,13 @@ public/            # Static assets
 Key models:
 
 - **User** — `id`, `username` (unique), `password` (hashed), `role` (`USER` | `ADMIN`), `createdAt`
-- **Story** — `id`, `title`, `content`, `createdAt`
-- **LearningProgress** — composite key `(userId, storyId)`, `progress` (float), `completedAt`
+- **AnkiProgress** — per-user SRS state per card (`interval`, `ease`, `repetitions`, `dueDate`)
+- **KatsuyouReviewCard / KatsuyouLessonProgress** — conjugation SRS state and completed lessons
+- **BunpouProgress** — grammar patterns marked complete
+- **PrepData** — per-chapter/point lesson content (dialogue, grammar, vocabulary, audio)
+- **ActivityLog** — learning events powering the streak and dashboard stats
+
+> Kotoba (the vocabulary notebook) and the daily study checklist are stored client-side in `localStorage`, not the database.
 
 ---
 
