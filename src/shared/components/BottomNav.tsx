@@ -48,7 +48,7 @@ export function BottomNav() {
           >
             Hide navigation ▼
           </button>
-          
+
           <div className="relative pointer-events-auto">
             {/* Centered protruding Home Button */}
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
@@ -98,7 +98,6 @@ export function BottomNav() {
                   {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
                     <Tabs.Tab key={id} id={id}>
                       <span className="relative z-10 flex items-center gap-1.5">
-                        <Icon size={15} />
                         {label}
                       </span>
                       <Tabs.Indicator

@@ -790,7 +790,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           : "text-muted hover:text-foreground",
                       ].join(" ")}
                     >
-                      Spaced Repetition (SRS)
+                      SRS Review
                     </button>
                     <button
                       type="button"
@@ -816,13 +816,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         Show furigana and write the kanji to flip the card.
                       </span>
                     </div>
-                    
+
                     <button
                       type="button"
-                      onClick={() => handleReviewDirectionChange(reviewDirection === "normal" ? "reverse" : "normal")}
+                      onClick={() =>
+                        handleReviewDirectionChange(
+                          reviewDirection === "normal" ? "reverse" : "normal",
+                        )
+                      }
                       className={[
                         "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden",
-                        reviewDirection === "reverse" ? "bg-indigo-600" : "bg-slate-200 dark:bg-zinc-800"
+                        reviewDirection === "reverse"
+                          ? "bg-indigo-600"
+                          : "bg-slate-200 dark:bg-zinc-800",
                       ].join(" ")}
                       role="switch"
                       aria-checked={reviewDirection === "reverse"}
@@ -830,7 +836,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       <span
                         className={[
                           "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
-                          reviewDirection === "reverse" ? "translate-x-5" : "translate-x-0"
+                          reviewDirection === "reverse"
+                            ? "translate-x-5"
+                            : "translate-x-0",
                         ].join(" ")}
                       />
                     </button>
@@ -1015,8 +1023,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           onClick={() => startSession("quick")}
                           isDisabled={filteredVocabulary.length === 0}
                         >
-                          Start quick review (
-                          {filteredVocabulary.length} cards)
+                          Start quick review ({filteredVocabulary.length} cards)
                         </Button>
                       </div>
                     </>
@@ -1038,8 +1045,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
                   <div className="flex flex-col gap-1 border-b border-border pb-3">
                     <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                      {t.ankiLearnedKanjiTitle ||
-                        "Learned Kanji List"}
+                      {t.ankiLearnedKanjiTitle || "Learned Kanji List"}
                     </h3>
                     <p className="text-[10px] text-muted">
                       {t.ankiLearnedKanjiDesc ||
@@ -1790,7 +1796,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
               <Modal.CloseTrigger />
               <Modal.Header>
                 <Modal.Heading className="flex items-center gap-2">
-                  <Lightbulb size={18} /> {t.ankiGuideTitle || "SRS Grading Guide"}
+                  <Lightbulb size={18} />{" "}
+                  {t.ankiGuideTitle || "SRS Grading Guide"}
                 </Modal.Heading>
               </Modal.Header>
               <Modal.Body className="text-xs leading-relaxed flex flex-col gap-3">
