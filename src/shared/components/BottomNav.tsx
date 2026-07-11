@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
 import { Layers, BookOpen, RefreshCw, NotebookPen, Home } from "lucide-react";
@@ -11,6 +11,20 @@ export function BottomNav() {
 
   // ── Show/Hide Nav visibility state ─────────────────────────────────────────
   const [visible, setVisible] = useState(true);
+  const [hideForced, setHideForced] = useState(false);
+
+  useEffect(() => {
+    const checkClass = () => {
+      setHideForced(document.body.classList.contains("hide-bottom-nav"));
+    };
+
+    checkClass();
+
+    const observer = new MutationObserver(checkClass);
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    return () => observer.disconnect();
+  }, []);
 
   const NAV_ITEMS = [
     { id: "anki", route: "/anki", label: "Anki", icon: Layers },
@@ -29,8 +43,8 @@ export function BottomNav() {
           ? "kotoba"
           : "none";
 
-  // Hide on auth pages
-  if (pathname === "/login" || pathname === "/register") return null;
+  // Hide on auth pages or when forced by active review session
+  if (pathname === "/login" || pathname === "/register" || hideForced) return null;
 
   return (
     <>
