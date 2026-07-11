@@ -152,6 +152,28 @@ model KanjiDictionary {
   @@unique([kanji, hiragana])
 }
 
+// ─────────────────────────────────────────
+// Tabel: AnkiCard
+// Menyimpan data kartu hasil import dari file .apkg
+// ─────────────────────────────────────────
+model AnkiCard {
+  id                  String   @id // Note ID asli dari Anki
+  deckName            String   // Nama dek asal (e.g., "JLPT N5-N4")
+  kanji               String   // Kata / Kanji (Front)
+  hiragana            String   // Pembacaan / Hiragana
+  translation         String   // Arti dalam Bahasa Indonesia / Inggris
+  romaji              String?  // Romaji (opsional)
+  audio               String?  // Nama file audio kosakata (Word Audio)
+  sentence            String?  // Contoh kalimat Jepang (Sentence)
+  sentenceTranslation String?  // Arti contoh kalimat (Sentence Meaning)
+  sentenceAudio       String?  // Audio contoh kalimat (Sentence Audio)
+  image               String?  // File gambar pendukung (Picture)
+  createdAt           DateTime @default(now())
+
+  @@index([deckName])
+}
+
+
 // ═════════════════════════════════════════
 // Phase 2 — Models baru untuk fitur Phase 3+
 // ═════════════════════════════════════════
