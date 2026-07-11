@@ -16,6 +16,11 @@ import {
   MousePointerClick,
   PartyPopper,
   Lightbulb,
+  BookOpen,
+  Flame,
+  Volume2,
+  ArrowLeft,
+  Sparkles,
 } from "lucide-react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
@@ -42,6 +47,11 @@ interface VocabularyCard {
   hiragana: string;
   romaji: string;
   translation: string;
+  audio?: string | null;
+  sentence?: string | null;
+  sentenceTranslation?: string | null;
+  sentenceAudio?: string | null;
+  image?: string | null;
 }
 
 export function AnkiContent({ username }: AnkiContentProps) {
@@ -170,6 +180,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
     {},
   );
   const [loading, setLoading] = useState<boolean>(true);
+  const [deckType, setDeckType] = useState<"dekiru" | "custom" | null>(null);
+  const [customCards, setCustomCards] = useState<VocabularyCard[]>([]);
+
+  const playAudio = (filename: string) => {
+    const audio = new Audio(`/anki-media/${filename}`);
+    audio.play().catch((err) => console.error("Error playing audio:", err));
+  };
 
   // Sesi belajar saat ini
   const [sessionQueue, setSessionQueue] = useState<VocabularyCard[]>([]);
@@ -196,6 +213,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [ankiIsCorrect, setAnkiIsCorrect] = useState(false);
   const [ankiUsedHint, setAnkiUsedHint] = useState(false);
   const [isWritingActive, setIsWritingActive] = useState(false);
+
+  const currentCard = sessionQueue[currentIndex];
 
   const checkAnkiAnswer = (written: string) => {
     const currentCard = sessionQueue[currentIndex];
@@ -285,14 +304,15 @@ export function AnkiContent({ username }: AnkiContentProps) {
     }
   }, [selectedKanji]);
 
-  // Ambil progres SRS pengguna dan kurikulum Dekiru Nihongo secara dinamis saat masuk
+  // Ambil progres SRS pengguna, kurikulum Dekiru Nihongo, dan dek kustom secara dinamis saat masuk
   useEffect(() => {
     async function initAnki() {
       try {
-        // Fetch DekiruNihongoGroup and user progress in parallel to speed up initialization
-        const [mod, res] = await Promise.all([
+        // Fetch DekiruNihongoGroup, custom cards, and user progress in parallel
+        const [mod, res, customRes] = await Promise.all([
           import("@/src/helper/DekiruNihongoGroup"),
           fetch("/api/anki"),
+          fetch("/api/anki/custom-cards?deckName=JLPT N5-N4"),
         ]);
 
         setDekiruGroups(mod.DekiruNihongoGroups);
@@ -305,6 +325,27 @@ export function AnkiContent({ username }: AnkiContentProps) {
           });
           setProgressMap(pMap);
         }
+
+        if (customRes.ok) {
+          const customData = await customRes.json();
+          const mapped: VocabularyCard[] = (customData.cards || []).map(
+            (card: any) => ({
+              cardKey: `custom-${card.id}`,
+              chapter: card.deckName,
+              sectionIndex: 0,
+              kanji: card.kanji,
+              hiragana: card.hiragana,
+              romaji: card.romaji || "",
+              translation: card.translation,
+              audio: card.audio,
+              sentence: card.sentence,
+              sentenceTranslation: card.sentenceTranslation,
+              sentenceAudio: card.sentenceAudio,
+              image: card.image,
+            }),
+          );
+          setCustomCards(mapped);
+        }
       } catch (err) {
         console.error("Gagal menginisialisasi Anki:", err);
       } finally {
@@ -314,6 +355,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
     initAnki();
   }, []);
+
+  // Autoplay audio saat kartu dibalik ke belakang (deck kustom)
+  useEffect(() => {
+    if (flipped && currentCard && currentCard.audio && deckType === "custom") {
+      playAudio(currentCard.audio);
+    }
+  }, [flipped, currentCard?.cardKey]);
 
   // Ekstrak semua kosakata yang cocok dengan filter
   const filteredVocabulary = useMemo(() => {
@@ -376,13 +424,18 @@ export function AnkiContent({ username }: AnkiContentProps) {
     return list;
   }, [filterChapters, filterPoints, dekiruGroups]);
 
+  // Swap vocabulary list depending on selected deck type
+  const activeVocabularyList = useMemo(() => {
+    return deckType === "dekiru" ? filteredVocabulary : customCards;
+  }, [deckType, filteredVocabulary, customCards]);
+
   // Klasifikasikan kartu menjadi: Due (Review) atau New (Baru)
   const cardStats = useMemo(() => {
     let due = 0;
     let newCards = 0;
     const now = new Date();
 
-    filteredVocabulary.forEach((card) => {
+    activeVocabularyList.forEach((card) => {
       const prog = progressMap[card.cardKey];
       if (!prog) {
         newCards += 1;
@@ -395,7 +448,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     });
 
     return { due, newCards };
-  }, [filteredVocabulary, progressMap]);
+  }, [activeVocabularyList, progressMap]);
 
   // Ekstrak karakter Kanji unik yang dipelajari dari kosakata (anki progress)
   const learnedVocabKanji = useMemo(() => {
@@ -415,7 +468,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
     // Buat lookup untuk memetakan kanji-hiragana ke detail kosakata
     const vocabLookup = new Map<string, VocabularyCard>();
-    filteredVocabulary.forEach((card) => {
+    activeVocabularyList.forEach((card) => {
       vocabLookup.set(`${card.kanji}-${card.hiragana}`, card);
     });
 
@@ -453,7 +506,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     });
 
     return Array.from(kanjiMap.values());
-  }, [progressMap, filteredVocabulary]);
+  }, [progressMap, activeVocabularyList]);
 
   // Detail Kanji yang terpilih
   const selectedKanjiDetail = useMemo(() => {
@@ -472,12 +525,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
     if (mode === "quick") {
       // Quick mode: ambil semua kosakata terpilih
-      queue = [...filteredVocabulary];
+      queue = [...activeVocabularyList];
     } else {
       const now = new Date();
       if (mode === "due") {
         // Ambil yang jatuh tempo saja
-        let dueCards = filteredVocabulary.filter((card) => {
+        let dueCards = activeVocabularyList.filter((card) => {
           const prog = progressMap[card.cardKey];
           if (!prog) return false; // Abaikan yang baru
           return new Date(prog.dueDate) <= now;
@@ -488,7 +541,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
         queue = dueCards;
       } else {
         // Campur: Ambil yang jatuh tempo dahulu, baru yang Baru (maksimal limit kartu baru)
-        let dueCards = filteredVocabulary.filter((card) => {
+        let dueCards = activeVocabularyList.filter((card) => {
           const prog = progressMap[card.cardKey];
           return prog && new Date(prog.dueDate) <= now;
         });
@@ -496,7 +549,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
           dueCards = dueCards.slice(0, Number(dailyReviewLimit));
         }
 
-        const newCards = filteredVocabulary
+        const newCards = activeVocabularyList
           .filter((card) => {
             return !progressMap[card.cardKey];
           })
@@ -672,7 +725,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     }
   };
 
-  const currentCard = sessionQueue[currentIndex];
+  // currentCard dideklarasikan di level teratas komponen
 
   // Hitung progres bar sesi aktif
   const progressPercentage = useMemo(() => {
@@ -681,7 +734,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   }, [currentIndex, sessionQueue]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen flex-col items-center justify-start bg-background px-4 pt-6 pb-16">
       <div className="flex w-full max-w-3xl flex-col">
         {/* Header */}
         <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
@@ -698,6 +751,21 @@ export function AnkiContent({ username }: AnkiContentProps) {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              {deckType !== null && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeckType(null);
+                    setSessionQueue([]);
+                    setSessionFinished(false);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface hover:bg-surface-muted text-muted hover:text-foreground transition-colors cursor-pointer text-xs font-bold shrink-0 animate-in fade-in duration-200"
+                  title="Change deck"
+                >
+                  <ArrowLeft size={14} />
+                  <span className="hidden sm:inline">Change Deck</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setIsGuideOpen(true)}
@@ -776,316 +844,419 @@ export function AnkiContent({ username }: AnkiContentProps) {
           <main className="mt-6">
             {/* TAMPILAN SELEKSI DECK / FILTER (Jika sesi belajar belum aktif) */}
             {sessionQueue.length === 0 || sessionFinished ? (
-              <div className="flex flex-col gap-6">
-                <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
-                  {/* Switcher Mode Belajar */}
-                  <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
-                    <button
-                      type="button"
-                      onClick={() => setAnkiMode("srs")}
-                      className={[
-                        "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
-                        ankiMode === "srs"
-                          ? "bg-surface text-foreground shadow-sm"
-                          : "text-muted hover:text-foreground",
-                      ].join(" ")}
-                    >
-                      SRS Review
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAnkiMode("quick")}
-                      className={[
-                        "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
-                        ankiMode === "quick"
-                          ? "bg-surface text-foreground shadow-sm"
-                          : "text-muted hover:text-foreground",
-                      ].join(" ")}
-                    >
-                      Quick Review
-                    </button>
-                  </div>
-
-                  {/* Toggle Arah Review */}
-                  <div className="flex items-center justify-between gap-4 border-t border-border/50 pt-4">
-                    <div className="flex flex-col gap-0.5">
-                      <Label className="text-xs font-bold text-foreground">
-                        Reverse mode (write the kanji)
-                      </Label>
-                      <span className="text-[10px] text-muted leading-tight">
-                        Show furigana and write the kanji to flip the card.
-                      </span>
+              deckType === null ? (
+                <div className="flex flex-col gap-6">
+                  {/* Layar Pemilihan Dek Pertama Kali */}
+                  <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
+                    <div className="text-center border-b border-border/50 pb-4">
+                      <h2 className="text-lg font-bold text-foreground">
+                        Select Study Deck
+                      </h2>
+                      <p className="text-xs text-muted mt-1">
+                        Choose a vocabulary deck to start your flashcard review
+                        session.
+                      </p>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleReviewDirectionChange(
-                          reviewDirection === "normal" ? "reverse" : "normal",
-                        )
-                      }
-                      className={[
-                        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden",
-                        reviewDirection === "reverse"
-                          ? "bg-indigo-600"
-                          : "bg-slate-200 dark:bg-zinc-800",
-                      ].join(" ")}
-                      role="switch"
-                      aria-checked={reviewDirection === "reverse"}
-                    >
-                      <span
-                        className={[
-                          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
-                          reviewDirection === "reverse"
-                            ? "translate-x-5"
-                            : "translate-x-0",
-                        ].join(" ")}
-                      />
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Filter Bab */}
-                    <div className="flex flex-col gap-1.5">
-                      <Label className="text-xs font-semibold text-muted block mb-1.5">
-                        {t.ankiFilterChapter || "Filter Bab"}
-                      </Label>
-                      <Popover>
-                        <Popover.Trigger>
-                          <button
-                            type="button"
-                            className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground hover:bg-surface-muted/50 focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px] text-left"
-                          >
-                            <span className="truncate">
-                              {selectedChaptersText}
-                            </span>
-                            <span className="text-muted ml-2 text-xs">▼</span>
-                          </button>
-                        </Popover.Trigger>
-                        <Popover.Content
-                          placement="bottom start"
-                          className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50"
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {/* Dekiru Nihongo Card */}
+                      <div
+                        onClick={() => setDeckType("dekiru")}
+                        className="group flex flex-col items-center text-center p-6 bg-slate-50 dark:bg-zinc-900/50 border border-border/60 hover:border-indigo-500 rounded-2xl cursor-pointer hover:scale-102 hover:shadow-md transition-all duration-300 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <BookOpen size={24} />
+                        </div>
+                        <div className="flex-1 flex flex-col justify-center">
+                          <h3 className="text-sm font-bold text-foreground group-hover:text-indigo-500 transition-colors">
+                            Dekiru Nihongo N5
+                          </h3>
+                          <p className="text-[11px] text-muted mt-1.5 leading-normal">
+                            Predefined curriculum vocabulary structured by
+                            chapters and points (Chapters 1-15).
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="w-full mt-2 font-bold pointer-events-none group-hover:bg-indigo-600 group-hover:text-white"
                         >
-                          <Popover.Dialog className="outline-none">
-                            <ListBox
-                              selectionMode="multiple"
-                              selectedKeys={filterChapters}
-                              onSelectionChange={handleChapterSelectionChange}
-                            >
-                              <ListBox.Item
-                                id="all"
-                                textValue={t.ankiAllChapters || "Semua Bab"}
-                                className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                          Select Deck
+                        </Button>
+                      </div>
+
+                      {/* JLPT N5-N4 Card */}
+                      <div
+                        onClick={() => setDeckType("custom")}
+                        className="group flex flex-col items-center text-center p-6 bg-slate-50 dark:bg-zinc-900/50 border border-border/60 hover:border-indigo-500 rounded-2xl cursor-pointer hover:scale-102 hover:shadow-md transition-all duration-300 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:100ms]"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Flame size={24} />
+                        </div>
+                        <div className="flex-1 flex flex-col justify-center">
+                          <h3 className="text-sm font-bold text-foreground group-hover:text-indigo-500 transition-colors">
+                            JLPT N5-N4
+                          </h3>
+                          <p className="text-[11px] text-muted mt-1.5 leading-normal">
+                            Kaishi 1.5k Indonesian deck with native
+                            pronunciations, sentences, and illustrations.
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="w-full mt-2 font-bold pointer-events-none group-hover:bg-indigo-600 group-hover:text-white"
+                        >
+                          Select Deck
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
+                    {/* Switcher Mode Belajar */}
+                    <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
+                      <button
+                        type="button"
+                        onClick={() => setAnkiMode("srs")}
+                        className={[
+                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                          ankiMode === "srs"
+                            ? "bg-surface text-foreground shadow-sm"
+                            : "text-muted hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        SRS Review
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAnkiMode("quick")}
+                        className={[
+                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all duration-200 cursor-pointer",
+                          ankiMode === "quick"
+                            ? "bg-surface text-foreground shadow-sm"
+                            : "text-muted hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        Quick Review
+                      </button>
+                    </div>
+
+                    {/* Toggle Arah Review */}
+                    <div className="flex items-center justify-between gap-4 border-t border-border/50 pt-4">
+                      <div className="flex flex-col gap-0.5">
+                        <Label className="text-xs font-bold text-foreground">
+                          Reverse mode (write the kanji)
+                        </Label>
+                        <span className="text-[10px] text-muted leading-tight">
+                          Show furigana and write the kanji to flip the card.
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleReviewDirectionChange(
+                            reviewDirection === "normal" ? "reverse" : "normal",
+                          )
+                        }
+                        className={[
+                          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden",
+                          reviewDirection === "reverse"
+                            ? "bg-indigo-600"
+                            : "bg-slate-200 dark:bg-zinc-800",
+                        ].join(" ")}
+                        role="switch"
+                        aria-checked={reviewDirection === "reverse"}
+                      >
+                        <span
+                          className={[
+                            "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
+                            reviewDirection === "reverse"
+                              ? "translate-x-5"
+                              : "translate-x-0",
+                          ].join(" ")}
+                        />
+                      </button>
+                    </div>
+
+                    {deckType === "dekiru" && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Filter Bab */}
+                        <div className="flex flex-col gap-1.5">
+                          <Label className="text-xs font-semibold text-muted block mb-1.5">
+                            {t.ankiFilterChapter || "Filter Bab"}
+                          </Label>
+                          <Popover>
+                            <Popover.Trigger>
+                              <button
+                                type="button"
+                                className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground hover:bg-surface-muted/50 focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px] text-left"
                               >
-                                {t.ankiAllChapters || "Semua Bab"}
-                                <ListBox.ItemIndicator />
-                              </ListBox.Item>
-                              {Array.from({ length: 15 }, (_, i) => {
-                                const chapNum = String(i + 1);
-                                const title = `Chapter ${chapNum} — ${dekiruGroups[i]?.title || ""}`;
-                                return (
+                                <span className="truncate">
+                                  {selectedChaptersText}
+                                </span>
+                                <span className="text-muted ml-2 text-xs">
+                                  ▼
+                                </span>
+                              </button>
+                            </Popover.Trigger>
+                            <Popover.Content
+                              placement="bottom start"
+                              className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50"
+                            >
+                              <Popover.Dialog className="outline-none">
+                                <ListBox
+                                  selectionMode="multiple"
+                                  selectedKeys={filterChapters}
+                                  onSelectionChange={
+                                    handleChapterSelectionChange
+                                  }
+                                >
                                   <ListBox.Item
-                                    key={chapNum}
-                                    id={chapNum}
-                                    textValue={title}
+                                    id="all"
+                                    textValue={t.ankiAllChapters || "Semua Bab"}
                                     className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
                                   >
-                                    {title}
+                                    {t.ankiAllChapters || "Semua Bab"}
                                     <ListBox.ItemIndicator />
                                   </ListBox.Item>
-                                );
-                              })}
-                            </ListBox>
-                          </Popover.Dialog>
-                        </Popover.Content>
-                      </Popover>
-                    </div>
+                                  {Array.from({ length: 15 }, (_, i) => {
+                                    const chapNum = String(i + 1);
+                                    const title = `Chapter ${chapNum} — ${dekiruGroups[i]?.title || ""}`;
+                                    return (
+                                      <ListBox.Item
+                                        key={chapNum}
+                                        id={chapNum}
+                                        textValue={title}
+                                        className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                                      >
+                                        {title}
+                                        <ListBox.ItemIndicator />
+                                      </ListBox.Item>
+                                    );
+                                  })}
+                                </ListBox>
+                              </Popover.Dialog>
+                            </Popover.Content>
+                          </Popover>
+                        </div>
 
-                    {/* Filter Poin */}
-                    <div className="flex flex-col gap-1.5">
-                      <Label className="text-xs font-semibold text-muted block mb-1.5">
-                        {t.ankiFilterPoint || "Filter Poin"}
-                      </Label>
-                      <Popover>
-                        <Popover.Trigger>
-                          <button
-                            type="button"
-                            className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground hover:bg-surface-muted/50 focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px] text-left"
-                          >
-                            <span className="truncate">
-                              {selectedPointsText}
-                            </span>
-                            <span className="text-muted ml-2 text-xs">▼</span>
-                          </button>
-                        </Popover.Trigger>
-                        <Popover.Content
-                          placement="bottom start"
-                          className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50"
-                        >
-                          <Popover.Dialog className="outline-none">
-                            <ListBox
-                              selectionMode="multiple"
-                              selectedKeys={filterPoints}
-                              onSelectionChange={handlePointSelectionChange}
-                            >
-                              <ListBox.Item
-                                id="all"
-                                textValue={t.ankiAllPoints || "Semua Poin"}
-                                className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                        {/* Filter Poin */}
+                        <div className="flex flex-col gap-1.5">
+                          <Label className="text-xs font-semibold text-muted block mb-1.5">
+                            {t.ankiFilterPoint || "Filter Poin"}
+                          </Label>
+                          <Popover>
+                            <Popover.Trigger>
+                              <button
+                                type="button"
+                                className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground hover:bg-surface-muted/50 focus:border-accent focus:outline-hidden cursor-pointer min-h-[38px] text-left"
                               >
-                                {t.ankiAllPoints || "Semua Poin"}
-                                <ListBox.ItemIndicator />
-                              </ListBox.Item>
-                              {availablePointsOptions.map((opt) => (
-                                <ListBox.Item
-                                  key={opt.id}
-                                  id={opt.id}
-                                  textValue={opt.title}
-                                  className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                                <span className="truncate">
+                                  {selectedPointsText}
+                                </span>
+                                <span className="text-muted ml-2 text-xs">
+                                  ▼
+                                </span>
+                              </button>
+                            </Popover.Trigger>
+                            <Popover.Content
+                              placement="bottom start"
+                              className="border border-border bg-surface p-1 shadow-lg rounded-xl min-w-[var(--trigger-width)] max-h-64 overflow-y-auto z-50"
+                            >
+                              <Popover.Dialog className="outline-none">
+                                <ListBox
+                                  selectionMode="multiple"
+                                  selectedKeys={filterPoints}
+                                  onSelectionChange={handlePointSelectionChange}
                                 >
-                                  {opt.title}
-                                  <ListBox.ItemIndicator />
-                                </ListBox.Item>
-                              ))}
-                            </ListBox>
-                          </Popover.Dialog>
-                        </Popover.Content>
-                      </Popover>
-                    </div>
-                  </div>
-
-                  {/* Inline settings removed (moved to settings modal) */}
-
-                  {ankiMode === "srs" ? (
-                    <>
-                      {/* Statistik Kartu Terfilter */}
-                      <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
-                        <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
-                          <p className="text-xs font-bold text-amber-500 tabular-nums">
-                            {cardStats.due}
-                          </p>
-                          <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
-                            {t.ankiCardDue || "Jatuh Tempo"}
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
-                          <p className="text-xs font-bold text-indigo-500 tabular-nums">
-                            {cardStats.newCards}
-                          </p>
-                          <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
-                            {t.ankiCardNew || "Baru"}
-                          </p>
+                                  <ListBox.Item
+                                    id="all"
+                                    textValue={t.ankiAllPoints || "Semua Poin"}
+                                    className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                                  >
+                                    {t.ankiAllPoints || "Semua Poin"}
+                                    <ListBox.ItemIndicator />
+                                  </ListBox.Item>
+                                  {availablePointsOptions.map((opt) => (
+                                    <ListBox.Item
+                                      key={opt.id}
+                                      id={opt.id}
+                                      textValue={opt.title}
+                                      className="hover:bg-surface-muted/50 text-foreground cursor-pointer rounded-lg p-2 text-sm flex items-center justify-between outline-none"
+                                    >
+                                      {opt.title}
+                                      <ListBox.ItemIndicator />
+                                    </ListBox.Item>
+                                  ))}
+                                </ListBox>
+                              </Popover.Dialog>
+                            </Popover.Content>
+                          </Popover>
                         </div>
                       </div>
+                    )}
 
-                      {/* Tombol Mulai Sesi SRS */}
-                      <div className="flex flex-row gap-3 border-t border-border pt-4">
-                        <Button
-                          variant="secondary"
-                          className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer text-xs sm:text-sm"
-                          onClick={() => startSession("due")}
-                          isDisabled={cardStats.due === 0}
-                        >
-                          Review ({cardStats.due})
-                        </Button>
-                        <Button
-                          variant="primary"
-                          className="font-semibold shadow-xs flex-1 cursor-pointer text-xs sm:text-sm"
-                          onClick={() => startSession("all")}
-                          isDisabled={filteredVocabulary.length === 0}
-                        >
-                          Learn (
-                          {Math.min(
-                            filteredVocabulary.length,
-                            cardStats.due + 20,
-                          )}
-                          )
-                        </Button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Statistik Quick Memorization */}
-                      <div className="rounded-xl bg-surface-muted/50 p-4 text-center border border-border border-t pt-4">
-                        <p className="text-xs font-bold text-indigo-500 tabular-nums">
-                          {filteredVocabulary.length}
-                        </p>
-                        <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
-                          Total words in this chapter/point
-                        </p>
-                      </div>
+                    {/* Inline settings removed (moved to settings modal) */}
 
-                      {/* Tombol Mulai Sesi Quick */}
-                      <div className="flex border-t border-border pt-4">
-                        <Button
-                          variant="primary"
-                          className="font-bold shadow-xs w-full cursor-pointer py-5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none"
-                          onClick={() => startSession("quick")}
-                          isDisabled={filteredVocabulary.length === 0}
-                        >
-                          Start quick review ({filteredVocabulary.length} cards)
-                        </Button>
-                      </div>
-                    </>
-                  )}
+                    {ankiMode === "srs" ? (
+                      <>
+                        {/* Statistik Kartu Terfilter */}
+                        <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
+                          <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
+                            <p className="text-xs font-bold text-amber-500 tabular-nums">
+                              {cardStats.due}
+                            </p>
+                            <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                              {t.ankiCardDue || "Jatuh Tempo"}
+                            </p>
+                          </div>
+                          <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
+                            <p className="text-xs font-bold text-indigo-500 tabular-nums">
+                              {cardStats.newCards}
+                            </p>
+                            <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                              {t.ankiCardNew || "Baru"}
+                            </p>
+                          </div>
+                        </div>
 
-                  {/* Button Pengaturan Anki */}
-                  <div className="flex border-t border-border pt-4">
-                    <Button
-                      variant="secondary"
-                      className="font-semibold shadow-xs w-full cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-foreground border border-border"
-                      onClick={() => setIsSettingsOpen(true)}
-                    >
-                      Anki Session Settings
-                    </Button>
-                  </div>
-                </Card>
-
-                {/* List Kanji yang Sudah Dipelajari */}
-                <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
-                  <div className="flex flex-col gap-1 border-b border-border pb-3">
-                    <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                      {t.ankiLearnedKanjiTitle || "Learned Kanji List"}
-                    </h3>
-                    <p className="text-[10px] text-muted">
-                      {t.ankiLearnedKanjiDesc ||
-                        "Karakter kanji dari kosakata yang telah Anda pelajari."}
-                    </p>
-                  </div>
-
-                  {/* List Grid Kanji */}
-                  {learnedVocabKanji.length === 0 ? (
-                    <p className="text-xs text-muted text-center py-6">
-                      {t.ankiLearnedKanjiEmpty ||
-                        "Belum ada kanji yang dipelajari. Mulai pelajari kosakata untuk melihatnya di sini!"}
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
-                      {learnedVocabKanji.map((k) => (
-                        <button
-                          key={k.character}
-                          type="button"
-                          onClick={() =>
-                            setSelectedKanji(
-                              selectedKanji === k.character
-                                ? null
-                                : k.character,
+                        {/* Tombol Mulai Sesi SRS */}
+                        <div className="flex flex-row gap-3 border-t border-border pt-4">
+                          <Button
+                            variant="secondary"
+                            className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer text-xs sm:text-sm"
+                            onClick={() => startSession("due")}
+                            isDisabled={cardStats.due === 0}
+                          >
+                            Review ({cardStats.due})
+                          </Button>
+                          <Button
+                            variant="primary"
+                            className="font-semibold shadow-xs flex-1 cursor-pointer text-xs sm:text-sm"
+                            onClick={() => startSession("all")}
+                            isDisabled={activeVocabularyList.length === 0}
+                          >
+                            Learn (
+                            {Math.min(
+                              activeVocabularyList.length,
+                              cardStats.due + 20,
+                            )}
                             )
-                          }
-                          className={[
-                            "rounded-xl border-2 px-2 py-3 text-center transition-all cursor-pointer font-jp text-xl font-bold leading-none",
-                            selectedKanji === k.character
-                              ? "border-indigo-500 bg-indigo-500/10 text-indigo-500"
-                              : "border-border bg-surface text-foreground hover:border-accent/50",
-                          ].join(" ")}
-                        >
-                          {k.character}
-                        </button>
-                      ))}
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* Statistik Quick Memorization */}
+                        <div className="rounded-xl bg-surface-muted/50 p-4 text-center border border-border border-t pt-4">
+                          <p className="text-xs font-bold text-indigo-500 tabular-nums">
+                            {activeVocabularyList.length}
+                          </p>
+                          <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                            Total words in this chapter/point
+                          </p>
+                        </div>
+
+                        {/* Tombol Mulai Sesi Quick */}
+                        <div className="flex border-t border-border pt-4">
+                          <Button
+                            variant="primary"
+                            className="font-bold shadow-xs w-full cursor-pointer py-5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none"
+                            onClick={() => startSession("quick")}
+                            isDisabled={activeVocabularyList.length === 0}
+                          >
+                            Start quick review ({activeVocabularyList.length}{" "}
+                            cards)
+                          </Button>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Button Pengaturan Anki */}
+                    <div className="flex border-t border-border pt-4">
+                      <Button
+                        variant="secondary"
+                        className="font-semibold shadow-xs w-full cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-foreground border border-border"
+                        onClick={() => setIsSettingsOpen(true)}
+                      >
+                        Anki Session Settings
+                      </Button>
                     </div>
-                  )}
-                </Card>
-              </div>
+
+                    {/* Credits (Custom Deck) */}
+                    {deckType === "custom" && (
+                      <div className="mt-4 p-3 bg-slate-50 dark:bg-zinc-900/50 border border-border/60 rounded-xl flex flex-col gap-1 shadow-3xs animate-in fade-in duration-300 text-left">
+                        <p className="text-[9px] text-muted font-extrabold uppercase tracking-widest">
+                          Deck Credits
+                        </p>
+                        <p className="text-[11px] text-foreground/80 leading-normal">
+                          Kaishi 1.5k Translated to Bahasa Indonesia by{" "}
+                          <span className="text-indigo-500 font-semibold font-mono">
+                            @nihonggowatabemasen
+                          </span>
+                        </p>
+                        <a
+                          href="https://ankiweb.net/shared/info/1512066033"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-indigo-500 hover:underline flex items-center gap-1 mt-0.5 font-bold self-start"
+                        >
+                          Source: AnkiWeb
+                        </a>
+                      </div>
+                    )}
+                  </Card>
+
+                  {/* List Kanji yang Sudah Dipelajari */}
+                  <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-4">
+                    <div className="flex flex-col gap-1 border-b border-border pb-3">
+                      <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                        {t.ankiLearnedKanjiTitle || "Learned Kanji List"}
+                      </h3>
+                      <p className="text-[10px] text-muted">
+                        {t.ankiLearnedKanjiDesc ||
+                          "Kanji characters from the vocabulary you have learned."}
+                      </p>
+                    </div>
+
+                    {/* List Grid Kanji */}
+                    {learnedVocabKanji.length === 0 ? (
+                      <p className="text-xs text-muted text-center py-6">
+                        {t.ankiLearnedKanjiEmpty ||
+                          "No kanji learned yet. Start reviewing cards to see them here!"}
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
+                        {learnedVocabKanji.map((k) => (
+                          <button
+                            key={k.character}
+                            type="button"
+                            onClick={() =>
+                              setSelectedKanji(
+                                selectedKanji === k.character
+                                  ? null
+                                  : k.character,
+                              )
+                            }
+                            className={[
+                              "rounded-xl border-2 px-2 py-3 text-center transition-all cursor-pointer font-jp text-xl font-bold leading-none",
+                              selectedKanji === k.character
+                                ? "border-indigo-500 bg-indigo-500/10 text-indigo-500"
+                                : "border-border bg-surface text-foreground hover:border-accent/50",
+                            ].join(" ")}
+                          >
+                            {k.character}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                </div>
+              )
             ) : (
               /* SESI BELAJAR AKTIF (FLASHCARD INTERAKTIF) */
               <div className="flex flex-col items-center gap-6 animate-in fade-in duration-200">
@@ -1129,7 +1300,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     "relative w-full transition-all duration-300 [perspective:1000px]",
                     reviewDirection === "reverse" && isWritingActive && !flipped
                       ? "max-w-2xl h-auto min-h-64"
-                      : "max-w-md h-64",
+                      : deckType === "custom"
+                        ? "max-w-2xl h-80 sm:h-96 md:h-[400px]"
+                        : "max-w-2xl h-64",
                     reviewDirection === "normal" ? "cursor-pointer" : "",
                   ].join(" ")}
                   onClick={() =>
@@ -1161,7 +1334,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     >
                       {!isWritingActive && (
                         <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full z-20">
-                          Depan
+                          Front
                         </span>
                       )}
 
@@ -1177,12 +1350,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                 <h2 className="font-jp text-2xl sm:text-3xl font-extrabold text-indigo-500 leading-none">
                                   {currentCard.hiragana}
                                 </h2>
-                                <p className="text-xs font-semibold text-muted/80 leading-none">
+                                <p className="text-xs font-semibold text-muted/80 leading-normal whitespace-pre-line">
                                   {currentCard.translation}
                                 </p>
                               </div>
                               <span className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase font-black shrink-0">
-                                Tulis Kanji
+                                Write Kanji
                               </span>
                             </div>
 
@@ -1191,10 +1364,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                               {ankiAnswerChecked && !ankiIsCorrect ? (
                                 <div className="flex flex-col gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-xs text-red-500">
                                   <p className="font-extrabold uppercase text-[10px] tracking-wider">
-                                    Belum Tepat!
+                                    Incorrect!
                                   </p>
                                   <p className="font-semibold">
-                                    Tulisan Anda: "{ankiWriteInput.trim()}"
+                                    Your drawing: "{ankiWriteInput.trim()}"
                                   </p>
                                   <button
                                     type="button"
@@ -1204,7 +1377,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                     }}
                                     className="w-full mt-1.5 py-1.5 bg-foreground text-background font-bold rounded-lg hover:opacity-90 transition-all cursor-pointer"
                                   >
-                                    Coba Lagi
+                                    Try Again
                                   </button>
                                 </div>
                               ) : ankiIsCorrect ? (
@@ -1213,9 +1386,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                     Spot on!
                                   </p>
                                   <p className="font-semibold">
-                                    {lang === "en"
-                                      ? "Correct! Select your score below."
-                                      : "Benar! Silakan pilih nilai di bawah."}
+                                    Correct! Select your score below.
                                   </p>
                                 </div>
                               ) : (
@@ -1226,11 +1397,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                     onSubmit={() =>
                                       checkAnkiAnswer(ankiWriteInput)
                                     }
-                                    placeholder={
-                                      lang === "en"
-                                        ? "Draw kanji here..."
-                                        : "Tulis kanji di sini..."
-                                    }
+                                    placeholder="Draw kanji here..."
                                     hintText={(currentCard.kanji !== "-"
                                       ? currentCard.kanji
                                       : currentCard.hiragana
@@ -1248,9 +1415,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                       disabled={!ankiWriteInput.trim()}
                                       className="flex-1 text-xs font-extrabold py-2 bg-accent hover:bg-accent/90 active:scale-95 text-white rounded-xl disabled:opacity-50 transition-all cursor-pointer shadow-3xs"
                                     >
-                                      {lang === "en"
-                                        ? "Check Answer"
-                                        : "Cek Jawaban"}
+                                      Check Answer
                                     </button>
                                     <button
                                       type="button"
@@ -1260,9 +1425,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                       }}
                                       className="flex-1 text-xs font-bold py-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-muted rounded-xl transition-all cursor-pointer"
                                     >
-                                      {lang === "en"
-                                        ? "Show Answer"
-                                        : "Tampilkan Jawaban"}
+                                      Show Answer
                                     </button>
                                   </div>
                                 </div>
@@ -1277,7 +1440,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             <h2 className="font-jp text-5xl font-bold leading-none text-indigo-500 select-none">
                               {currentCard.hiragana}
                             </h2>
-                            <p className="text-sm font-medium text-muted/80 select-none max-w-xs">
+                            <p className="text-sm font-medium text-muted/80 select-none max-w-xs whitespace-pre-line">
                               {currentCard.translation}
                             </p>
 
@@ -1311,18 +1474,33 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       }}
                     >
                       <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/20 text-indigo-500 px-2 py-0.5 rounded-full">
-                        Belakang
+                        Back
                       </span>
 
                       <div className="flex flex-col items-center text-center gap-2 select-none">
                         {reviewDirection === "reverse" ? (
                           <>
                             {/* Target Kanji atau Hiragana */}
-                            <h2 className="font-jp text-5xl font-bold leading-none text-foreground select-none">
-                              {currentCard.kanji === "-"
-                                ? currentCard.hiragana
-                                : currentCard.kanji}
-                            </h2>
+                            <div className="flex items-center justify-center gap-2">
+                              <h2 className="font-jp text-5xl font-bold leading-none text-foreground select-none">
+                                {currentCard.kanji === "-"
+                                  ? currentCard.hiragana
+                                  : currentCard.kanji}
+                              </h2>
+                              {deckType === "custom" && currentCard.audio && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    playAudio(currentCard.audio!);
+                                  }}
+                                  className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-50 hover:bg-indigo-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-indigo-500 transition-colors cursor-pointer shrink-0"
+                                  title="Play pronunciation"
+                                >
+                                  <Volume2 size={16} />
+                                </button>
+                              )}
+                            </div>
 
                             {/* Pembacaan / Hiragana */}
                             {currentCard.kanji !== "-" && (
@@ -1339,7 +1517,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             )}
 
                             {/* Arti */}
-                            <p className="mt-4 text-md font-medium text-foreground max-w-xs border-t border-border pt-3">
+                            <p className="mt-4 text-md font-medium text-foreground max-w-xs border-t border-border pt-3 whitespace-pre-line">
                               {currentCard.translation}
                             </p>
                           </>
@@ -1353,9 +1531,24 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             )}
 
                             {/* Hiragana */}
-                            <h2 className="font-jp text-4xl font-bold text-foreground">
-                              {currentCard.hiragana}
-                            </h2>
+                            <div className="flex items-center justify-center gap-2">
+                              <h2 className="font-jp text-4xl font-bold text-foreground">
+                                {currentCard.hiragana}
+                              </h2>
+                              {deckType === "custom" && currentCard.audio && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    playAudio(currentCard.audio!);
+                                  }}
+                                  className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-50 hover:bg-indigo-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-indigo-500 transition-colors cursor-pointer shrink-0"
+                                  title="Play pronunciation"
+                                >
+                                  <Volume2 size={16} />
+                                </button>
+                              )}
+                            </div>
 
                             {/* Romaji */}
                             {currentCard.romaji && (
@@ -1365,10 +1558,58 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             )}
 
                             {/* Arti */}
-                            <p className="mt-4 text-md font-medium text-foreground max-w-xs border-t border-border pt-3">
+                            <p className="mt-4 text-md font-medium text-foreground max-w-xs border-t border-border pt-3 whitespace-pre-line">
                               {currentCard.translation}
                             </p>
                           </>
+                        )}
+
+                        {/* Audio & Image & Contoh Kalimat (Deck Kustom) */}
+                        {deckType === "custom" && (
+                          <div className="w-full flex flex-col items-center gap-2 select-none border-t border-border/50 mt-2.5 pt-2">
+                            {/* Image */}
+                            {currentCard.image && (
+                              <div className="max-h-16 max-w-[120px] overflow-hidden rounded-md border border-border/30 shadow-3xs flex items-center justify-center my-0.5">
+                                <img
+                                  src={`/anki-media/${currentCard.image}`}
+                                  alt="Card hint"
+                                  className="max-h-16 object-contain select-none pointer-events-none"
+                                />
+                              </div>
+                            )}
+
+                            {/* Contoh Kalimat */}
+                            {currentCard.sentence && (
+                              <div className="text-center max-w-xl px-4 flex flex-col items-center gap-1.5 mt-2">
+                                <div className="flex items-center justify-center gap-2.5">
+                                  <p
+                                    className="font-jp text-sm sm:text-base font-bold text-foreground leading-normal"
+                                    dangerouslySetInnerHTML={{
+                                      __html: currentCard.sentence,
+                                    }}
+                                  />
+                                  {currentCard.sentenceAudio && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        playAudio(currentCard.sentenceAudio!);
+                                      }}
+                                      className="flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-indigo-400 hover:text-indigo-600 transition-colors cursor-pointer shrink-0"
+                                      title="Play sentence audio"
+                                    >
+                                      <Volume2 size={13} />
+                                    </button>
+                                  )}
+                                </div>
+                                {currentCard.sentenceTranslation && (
+                                  <p className="text-xs sm:text-sm text-muted/80 leading-normal italic whitespace-pre-line">
+                                    {currentCard.sentenceTranslation}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -1376,7 +1617,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 </div>
 
                 {/* GRADING BUTTONS (Hanya muncul jika kartu sudah dibalik) */}
-                <div className="w-full max-w-md flex flex-col gap-2">
+                <div className="w-full max-w-2xl flex flex-col gap-2">
                   {flipped &&
                     (ankiMode === "srs" ? (
                       <div className="grid grid-cols-4 gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
@@ -1628,7 +1869,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   size="sm"
                   className="font-semibold cursor-pointer"
                 >
-                  Tutup
+                  Close
                 </Button>
               </Modal.Footer>
             </Modal.Dialog>
@@ -1659,7 +1900,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
               <Modal.Body className="flex flex-col items-center text-center gap-4 py-4">
                 <p className="text-sm text-muted">
                   {t.ankiFinishedDesc ||
-                    "Kamu telah mereview semua kartu dalam sesi ini."}
+                    "You have reviewed all the cards in this session."}
                 </p>
                 <div className="text-xs bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 px-3 py-1.5 rounded-full font-bold">
                   Reviewed: {reviewedCount} Cards
@@ -1671,7 +1912,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   variant="primary"
                   className="w-full font-semibold cursor-pointer"
                 >
-                  Tutup
+                  Close
                 </Button>
               </Modal.Footer>
             </Modal.Dialog>
@@ -1752,7 +1993,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 {/* Daily Review Limit */}
                 <div className="flex flex-col gap-1.5 border-t border-border pt-3">
                   <Label className="text-xs font-semibold text-muted block mb-1">
-                    Daily Review Limit (Batas Review Per Hari)
+                    Daily review limit
                   </Label>
                   <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
                     {["50", "100", "unlimited"].map((val) => (
@@ -1780,7 +2021,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   size="sm"
                   className="font-semibold cursor-pointer"
                 >
-                  Tutup
+                  Close
                 </Button>
               </Modal.Footer>
             </Modal.Dialog>
@@ -1803,7 +2044,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
               <Modal.Body className="text-xs leading-relaxed flex flex-col gap-3">
                 <p className="text-muted mb-1">
                   {t.ankiGuideDesc ||
-                    "Pelajari bagaimana pilihan spaced repetition memengaruhi interval kartu."}
+                    "Learn how the spaced repetition options affect card intervals."}
                 </p>
                 <div className="flex flex-col gap-2">
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/5">
@@ -1812,7 +2053,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     </span>
                     <span className="text-foreground">
                       {t.ankiGuideAgain ||
-                        "Ulangi (Again): Lupa total. Repetisi direset ke 0, interval menjadi 1 hari, nilai ease berkurang."}
+                        "Again: Forgot completely. Repetition count resets to 0, interval resets to 1 day, ease value decreases."}
                     </span>
                   </div>
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-amber-500/20 bg-amber-500/5">
@@ -1821,7 +2062,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     </span>
                     <span className="text-foreground">
                       {t.ankiGuideHard ||
-                        "Susah (Hard): Ingat dengan sulit. Interval lebih pendek (1.2x), nilai ease berkurang sedikit."}
+                        "Hard: Recalled with difficulty. Interval grows slightly slower (1.2x), ease value decreases slightly."}
                     </span>
                   </div>
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5">
@@ -1830,7 +2071,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     </span>
                     <span className="text-foreground">
                       {t.ankiGuideGood ||
-                        "Biasa (Good): Ingat dengan wajar. Interval dikalikan nilai ease, nilai ease tetap."}
+                        "Good: Recalled correctly. Interval multiplied by ease value, ease value remains unchanged."}
                     </span>
                   </div>
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
@@ -1839,7 +2080,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     </span>
                     <span className="text-foreground">
                       {t.ankiGuideEasy ||
-                        "Mudah (Easy): Ingat sangat cepat. Interval dikalikan nilai ease & bonus (1.3x), nilai ease bertambah."}
+                        "Easy: Recalled effortlessly. Interval multiplied by ease value and bonus (1.3x), ease value increases."}
                     </span>
                   </div>
                 </div>
@@ -1851,7 +2092,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   size="sm"
                   className="font-semibold cursor-pointer"
                 >
-                  Tutup
+                  Close
                 </Button>
               </Modal.Footer>
             </Modal.Dialog>
