@@ -258,6 +258,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [showReadings, setShowReadings] = useState<boolean>(false);
   const [isCreditsExpanded, setIsCreditsExpanded] = useState<boolean>(false);
   const [isKanjiListExpanded, setIsKanjiListExpanded] = useState<boolean>(false);
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
 
   // Settings
 
@@ -366,6 +367,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
       playAudio(currentCard.audio);
     }
   }, [flipped, currentCard?.cardKey]);
+
+  // Reset image loading state when card changes
+  useEffect(() => {
+    setIsImageLoading(true);
+  }, [currentIndex]);
 
   // Hide bottom navigation bar during active learning session
   useEffect(() => {
@@ -1498,8 +1504,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                               ) : (
                                 <>
                                   {currentCard.kanji !== "-" && (
-                                    <h3 className="font-jp text-lg sm:text-xl text-muted font-semibold">
-                                      {currentCard.kanji}
+                                    <h3 className="font-jp text-xl sm:text-2xl text-indigo-500 font-bold">
+                                      {currentCard.hiragana}
                                     </h3>
                                   )}
                                 </>
@@ -1522,11 +1528,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                 <div className="w-full flex flex-col items-center gap-2 mt-2 pt-2 border-t border-border/30">
                                   {/* Image */}
                                   {currentCard.image && (
-                                    <div className="max-h-16 max-w-[120px] overflow-hidden rounded-md border border-border/30 shadow-3xs flex items-center justify-center my-0.5 animate-in fade-in duration-300">
+                                    <div className="relative max-h-16 max-w-[120px] aspect-square rounded-md overflow-hidden border border-border/30 shadow-3xs flex items-center justify-center my-0.5 animate-in fade-in duration-300">
+                                      {isImageLoading && (
+                                        <div className="absolute inset-0 bg-slate-100 dark:bg-zinc-800 animate-pulse flex items-center justify-center">
+                                          <div className="h-6 w-6 rounded bg-slate-200/50 dark:bg-zinc-700/50"></div>
+                                        </div>
+                                      )}
                                       <img
                                         src={`/anki-media/${currentCard.image}`}
                                         alt="Card hint"
-                                        className="max-h-16 object-contain select-none pointer-events-none"
+                                        className={[
+                                          "max-h-16 object-contain select-none pointer-events-none transition-opacity duration-300",
+                                          isImageLoading ? "opacity-0" : "opacity-100",
+                                        ].join(" ")}
+                                        onLoad={() => setIsImageLoading(false)}
                                       />
                                     </div>
                                   )}
@@ -1864,7 +1879,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
         }}
       >
         <Modal.Backdrop>
-          <Modal.Container>
+          <Modal.Container className="flex items-center justify-center min-h-screen w-screen">
             <Modal.Dialog className="sm:max-w-[360px]">
               <Modal.CloseTrigger />
               <Modal.Header className="flex flex-col items-center text-center pt-6">
@@ -1902,7 +1917,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
         onOpenChange={(open) => setIsSettingsOpen(open)}
       >
         <Modal.Backdrop>
-          <Modal.Container>
+          <Modal.Container className="flex items-center justify-center min-h-screen w-screen">
             <Modal.Dialog className="sm:max-w-md">
               <Modal.CloseTrigger />
               <Modal.Header>
@@ -2008,7 +2023,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       {/* Modal Panduan Penilaian SRS */}
       <Modal isOpen={isGuideOpen} onOpenChange={setIsGuideOpen}>
         <Modal.Backdrop>
-          <Modal.Container>
+          <Modal.Container className="flex items-center justify-center min-h-screen w-screen">
             <Modal.Dialog className="sm:max-w-lg">
               <Modal.CloseTrigger />
               <Modal.Header>
