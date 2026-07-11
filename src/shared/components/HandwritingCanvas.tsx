@@ -298,6 +298,9 @@ export const HandwritingCanvas = forwardRef<any, HandwritingCanvasProps>((props,
     if (value !== currentSegmentsText) {
       if (!value) {
         setSegments([]);
+        setStrokes([]);
+        setCandidates([]);
+        clearTimers();
       } else {
         const newSegments: DrawingSegment[] = [];
         let tempValue = value;

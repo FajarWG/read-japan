@@ -386,9 +386,6 @@ export function KanjiTamagoContent({ username }: { username: string }) {
   const handleIncorrectProceed = async () => {
     if (!incorrectCard) return;
     setIncorrectCard(null);
-    if (canvasRef.current) {
-      canvasRef.current.clear();
-    }
     await gradeCard(1);
   };
 
@@ -1282,17 +1279,31 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                 </p>
 
                 {/* Animated Kanji VG Stroke Order Tracer */}
-                <div className="w-40 h-40 bg-surface-muted border border-border/40 rounded-2xl flex items-center justify-center relative overflow-hidden mb-5 select-none shadow-3xs">
-                  {incorrectCard && (
-                    <CanvasStrokeTracer
-                      char={incorrectCard.moji}
-                      className="w-32 h-32 text-accent pointer-events-auto cursor-pointer [&_svg]:w-full [&_svg]:h-full [&_path]:stroke-[6px] [&_path]:stroke-accent [&_path]:fill-none"
-                    />
-                  )}
-                  <span className="absolute bottom-2 right-2 text-[8px] font-bold text-muted/60 uppercase">
-                    Click Kanji to Replay
-                  </span>
-                </div>
+                {incorrectCard && (() => {
+                  const chars = Array.from(incorrectCard.moji).filter(isKanji);
+                  const count = chars.length || 1;
+                  // adjust box size: wider for 2 chars
+                  const boxClass = count >= 2
+                    ? "w-72 h-36"
+                    : "w-40 h-40";
+                  const tracerClass = count >= 2
+                    ? "w-28 h-28 text-accent pointer-events-auto cursor-pointer [&_svg]:w-full [&_svg]:h-full [&_path]:stroke-[6px] [&_path]:stroke-accent [&_path]:fill-none"
+                    : "w-32 h-32 text-accent pointer-events-auto cursor-pointer [&_svg]:w-full [&_svg]:h-full [&_path]:stroke-[6px] [&_path]:stroke-accent [&_path]:fill-none";
+                  return (
+                    <div className={`${boxClass} bg-surface-muted border border-border/40 rounded-2xl flex items-center justify-center gap-3 relative overflow-hidden mb-5 select-none shadow-3xs`}>
+                      {(chars.length > 0 ? chars : Array.from(incorrectCard.moji)).map((ch, i) => (
+                        <CanvasStrokeTracer
+                          key={i}
+                          char={ch}
+                          className={tracerClass}
+                        />
+                      ))}
+                      <span className="absolute bottom-2 right-2 text-[8px] font-bold text-muted/60 uppercase">
+                        Click to Replay
+                      </span>
+                    </div>
+                  );
+                })()}
 
                 <div className="flex flex-col gap-1 w-full text-left bg-surface-muted/50 border border-border/20 p-3 rounded-2xl mb-5">
                   <span className="text-[9px] font-extrabold text-muted uppercase">
