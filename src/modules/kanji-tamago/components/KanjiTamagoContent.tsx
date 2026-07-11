@@ -19,7 +19,10 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { Button, Card, Chip, Modal, Popover, ListBox } from "@heroui/react";
-import { HandwritingCanvas, CanvasStrokeTracer } from "@/src/shared/components/HandwritingCanvas";
+import {
+  HandwritingCanvas,
+  CanvasStrokeTracer,
+} from "@/src/shared/components/HandwritingCanvas";
 
 interface KanjiItem {
   id: number;
@@ -342,7 +345,12 @@ export function KanjiTamagoContent({ username }: { username: string }) {
   };
 
   const checkDrawAnswer = async () => {
-    if (!sessionQueue[currentIndex] || gradingScore !== null || isRecognizingDraw) return;
+    if (
+      !sessionQueue[currentIndex] ||
+      gradingScore !== null ||
+      isRecognizingDraw
+    )
+      return;
     const card = sessionQueue[currentIndex];
 
     // Force recognition if there are pending strokes
@@ -378,6 +386,9 @@ export function KanjiTamagoContent({ username }: { username: string }) {
   const handleIncorrectProceed = async () => {
     if (!incorrectCard) return;
     setIncorrectCard(null);
+    if (canvasRef.current) {
+      canvasRef.current.clear();
+    }
     await gradeCard(1);
   };
 
@@ -971,7 +982,9 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                           <div className="flex justify-end mt-1 z-20">
                             <Button
                               onPress={checkDrawAnswer}
-                              isDisabled={gradingScore !== null || isRecognizingDraw}
+                              isDisabled={
+                                gradingScore !== null || isRecognizingDraw
+                              }
                               variant="primary"
                               size="sm"
                               className="font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1038,77 +1051,9 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                   </div>
                 )}
               </div>
-
-              {/* Card Footer: Mnemonic & Confusion warnings when flipped */}
-              {isFlipped && (
-                <div className="w-full flex flex-col gap-3 my-2 border-t border-border/20 pt-3 animate-in fade-in duration-300">
-                  {/* Confusion Pairs Alert */}
-                  {confusionKanji && (
-                    <div className="rounded-xl border border-amber-500/25 bg-amber-50/10 dark:bg-amber-950/5 p-2.5 flex gap-2 items-start text-left select-none">
-                      <AlertTriangle
-                        size={14}
-                        className="text-amber-500 shrink-0 mt-0.5"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                          Confusion Warning
-                        </p>
-                        <div className="flex items-center gap-3 mt-1.5">
-                          <div className="flex flex-col items-center">
-                            <span className="font-jp text-2xl font-black text-accent">
-                              {currentCard.moji[0]}
-                            </span>
-                            <span className="text-[8px] font-bold text-muted">
-                              Current
-                            </span>
-                          </div>
-                          {confusionKanji.map((other, idx) => (
-                            <div
-                              key={idx}
-                              className="flex flex-col items-center"
-                            >
-                              <span className="font-jp text-2xl font-bold text-muted/75">
-                                {other}
-                              </span>
-                              <span className="text-[8px] font-medium text-muted/55">
-                                Similar
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Mnemonic Story Textarea */}
-                  <div className="flex flex-col gap-1.5 text-left">
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-[9px] font-bold text-muted uppercase tracking-wider">
-                        Memory Story (Mnemonic)
-                      </span>
-                      <button
-                        type="button"
-                        onClick={saveMnemonic}
-                        disabled={isMnemonicSaving}
-                        className="text-[8px] font-bold text-accent hover:text-accent-foreground flex items-center gap-1 bg-accent/8 hover:bg-accent px-2 py-0.5 rounded-full transition disabled:opacity-40 cursor-pointer"
-                      >
-                        <Save size={8} />
-                        {isMnemonicSaving ? "Saving..." : "Save Story"}
-                      </button>
-                    </div>
-                    <textarea
-                      value={userMnemonic}
-                      onChange={(e) => setUserMnemonic(e.target.value)}
-                      placeholder="E.g. 休 (rest) = 人 (person) leaning on 木 (tree)."
-                      className="w-full h-12 rounded-xl border border-border/40 bg-surface-muted/50 p-2 text-[11px] text-foreground focus:outline-hidden focus:border-accent/40 placeholder:text-muted/50"
-                    />
-                  </div>
-                </div>
-              )}
-
               {/* Card Footer: Grading buttons */}
               {isFlipped && (
-                <div className="mt-4 border-t border-border/40 pt-4 flex items-center justify-center gap-2 sm:gap-3 select-none animate-in slide-in-from-bottom duration-300">
+                <div className="border-t border-border/40 pt-4 flex items-center justify-center gap-2 sm:gap-3 select-none animate-in slide-in-from-bottom duration-300">
                   <button
                     type="button"
                     onClick={() => gradeCard(1)}
@@ -1161,6 +1106,73 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                       bonus
                     </span>
                   </button>
+                </div>
+              )}
+
+              {/* Card Footer: Mnemonic & Confusion warnings when flipped */}
+              {isFlipped && (
+                <div className="w-full flex flex-col gap-3 my-2 border-t border-border/20 pt-3 animate-in fade-in duration-300">
+                  {/* Confusion Pairs Alert */}
+                  {confusionKanji && (
+                    <div className="rounded-xl border border-amber-500/25 bg-amber-50/10 dark:bg-amber-950/5 p-2.5 flex gap-2 items-start text-left select-none">
+                      <AlertTriangle
+                        size={14}
+                        className="text-amber-500 shrink-0 mt-0.5"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                          Confusion Warning
+                        </p>
+                        <div className="flex items-center gap-3 mt-1.5">
+                          <div className="flex flex-col items-center">
+                            <span className="font-jp text-2xl font-black text-accent">
+                              {currentCard.moji[0]}
+                            </span>
+                            <span className="text-[8px] font-bold text-muted">
+                              Current
+                            </span>
+                          </div>
+                          {confusionKanji.map((other, idx) => (
+                            <div
+                              key={idx}
+                              className="flex flex-col items-center"
+                            >
+                              <span className="font-jp text-2xl font-bold text-muted/75">
+                                {other}
+                              </span>
+                              <span className="text-[8px] font-medium text-muted/55">
+                                Similar
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mnemonic Story Textarea */}
+                  <div className="flex flex-col gap-1.5 text-left">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-[9px] font-bold text-muted uppercase tracking-wider">
+                        Memory Story (Mnemonic)
+                      </span>
+                      <button
+                        type="button"
+                        onClick={saveMnemonic}
+                        disabled={isMnemonicSaving}
+                        className="text-[10px] font-bold text-accent hover:text-accent-foreground flex items-center gap-1 bg-accent/8 hover:bg-accent px-2 py-1 rounded-full transition disabled:opacity-40 cursor-pointer"
+                      >
+                        <Save size={10} />
+                        {isMnemonicSaving ? "Saving..." : "Save Story"}
+                      </button>
+                    </div>
+                    <textarea
+                      value={userMnemonic}
+                      onChange={(e) => setUserMnemonic(e.target.value)}
+                      placeholder="E.g. 休 (rest) = 人 (person) leaning on 木 (tree)."
+                      className="w-full h-12 rounded-xl border border-border/40 bg-surface-muted/50 p-2 text-[11px] text-foreground focus:outline-hidden focus:border-accent/40 placeholder:text-muted/50"
+                    />
+                  </div>
                 </div>
               )}
             </Card>
@@ -1283,12 +1295,20 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                 </div>
 
                 <div className="flex flex-col gap-1 w-full text-left bg-surface-muted/50 border border-border/20 p-3 rounded-2xl mb-5">
-                  <span className="text-[9px] font-extrabold text-muted uppercase">Meaning / Readings</span>
+                  <span className="text-[9px] font-extrabold text-muted uppercase">
+                    Meaning / Readings
+                  </span>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="font-jp text-2xl font-black text-foreground">{incorrectCard?.moji}</span>
-                    <span className="text-xs font-bold text-accent">{incorrectCard?.yomi}</span>
+                    <span className="font-jp text-2xl font-black text-foreground">
+                      {incorrectCard?.moji}
+                    </span>
+                    <span className="text-xs font-bold text-accent">
+                      {incorrectCard?.yomi}
+                    </span>
                   </div>
-                  <span className="text-xs text-foreground/80 font-medium mt-1">{incorrectCard?.topic}</span>
+                  <span className="text-xs text-foreground/80 font-medium mt-1">
+                    {incorrectCard?.topic}
+                  </span>
                 </div>
 
                 <Button
