@@ -168,7 +168,8 @@ export const translations = {
 
     // ── Kana Practice (Phase 4) ──────────────────────────────
     kanaPracticeTitle: "Kana Practice (SRS)",
-    kanaPracticeDesc: "Train kana with spaced repetition. 10 questions per session.",
+    kanaPracticeDesc:
+      "Train kana with spaced repetition. 10 questions per session.",
     kanaPracticeStart: "Start Session",
     kanaPracticeNext: "Next",
 
@@ -186,8 +187,10 @@ export const translations = {
 
     // ── Reader component ────────────────────────────────────
     finishReading: "Finish Reading",
-    readingHint: "Tap any kana (underline) or kanji (orange) to see its reading & meaning. Looked-up words are saved to your progress.",
-    readingTip: "After reading, you'll mark kana you got wrong, then review vocabulary.",
+    readingHint:
+      "Tap any kana (underline) or kanji (orange) to see its reading & meaning. Looked-up words are saved to your progress.",
+    readingTip:
+      "After reading, you'll mark kana you got wrong, then review vocabulary.",
     backToReading: "← Back to Reading",
     markedWrong: "kana marked wrong",
     noneMarked: "None marked yet — tap characters you read wrong",
@@ -248,8 +251,6 @@ export const translations = {
     pointInvalid: "Point must be a number between 1 and 3.",
     chapterPointPair: "Chapter and Point must be filled together.",
 
-
-
     // ── Credits / About ─────────────────────────────────────────
     creditsAbout: "About",
     creditsTitle: "About Nihongo Flow",
@@ -305,7 +306,6 @@ export const translations = {
     ankiCardCount: "{n} cards left for today",
     ankiCardDue: "Due",
     ankiCardNew: "New",
-    ankiFlipCard: "Tap Card to Flip",
     ankiAgain: "Again",
     ankiHard: "Hard",
     ankiGood: "Good",
@@ -324,14 +324,20 @@ export const translations = {
     ankiAllChapters: "All Chapters",
     ankiAllPoints: "All Points",
     ankiGuideTitle: "SRS Grading Guide",
-    ankiGuideDesc: "Learn how the spaced repetition options affect card intervals.",
-    ankiGuideAgain: "Again: Completely forgot. Reset repetitions, set interval to 1 day, decrease ease factor.",
-    ankiGuideHard: "Hard: Recalled with difficulty. Shorter interval (1.2x), decrease ease factor slightly.",
-    ankiGuideGood: "Good: Normal recall. Standard interval increase (multiplied by ease), ease factor remains constant.",
-    ankiGuideEasy: "Easy: Recalled instantly. Large interval increase (1.3x ease), increase ease factor.",
+    ankiGuideDesc:
+      "Learn how the spaced repetition options affect card intervals.",
+    ankiGuideAgain:
+      "Again: Completely forgot. Reset repetitions, set interval to 1 day, decrease ease factor.",
+    ankiGuideHard:
+      "Hard: Recalled with difficulty. Shorter interval (1.2x), decrease ease factor slightly.",
+    ankiGuideGood:
+      "Good: Normal recall. Standard interval increase (multiplied by ease), ease factor remains constant.",
+    ankiGuideEasy:
+      "Easy: Recalled instantly. Large interval increase (1.3x ease), increase ease factor.",
     ankiLearnedKanjiTitle: "Learned Kanji List",
     ankiLearnedKanjiDesc: "Kanji characters from vocabulary you have studied.",
-    ankiLearnedKanjiEmpty: "No kanji studied yet. Start learning vocab to see them here!",
+    ankiLearnedKanjiEmpty:
+      "No kanji studied yet. Start learning vocab to see them here!",
     ankiLearnedKanjiTabVocab: "Vocab Kanji",
     ankiLearnedKanjiTabN5: "N5 Characters",
   },
@@ -370,7 +376,8 @@ export const translations = {
     dashboardViewProgress: "Lihat progres →",
     dashboardWelcomeBack: "Selamat datang kembali, {name}",
     dashboardGreeting: "Selamat datang di Nihongo Flow",
-    dashboardNoActivity: "Belum ada aktivitas hari ini — pilih cerita untuk mulai!",
+    dashboardNoActivity:
+      "Belum ada aktivitas hari ini — pilih cerita untuk mulai!",
     dashboardQuickStart: "Mulai cepat",
     dashboardPickStory: "Pilih cerita",
     dashboardJumpAnki: "Review flashcard",
@@ -410,7 +417,8 @@ export const translations = {
     // ── Chat (Phase 7) ───────────────────────────────────────
     chatTitle: "Tutor AI Chat",
     chatSubtitle: "Gemini · oleh Google",
-    chatPlaceholder: "Ketik pesan... (Enter untuk kirim, Shift+Enter untuk newline)",
+    chatPlaceholder:
+      "Ketik pesan... (Enter untuk kirim, Shift+Enter untuk newline)",
     chatSend: "Kirim",
     chatQuotaLow: "Batas hampir habis",
     chatQuotaLowEn: "Rate limit almost reached",
@@ -522,7 +530,8 @@ export const translations = {
 
     // ── Reader component ────────────────────────────────────
     finishReading: "Selesai Membaca",
-    readingHint: "Tap huruf kana (bergaris bawah) atau kanji (oranye) untuk lihat cara baca & artinya. Yang kamu lihat akan tersimpan ke progres.",
+    readingHint:
+      "Tap huruf kana (bergaris bawah) atau kanji (oranye) untuk lihat cara baca & artinya. Yang kamu lihat akan tersimpan ke progres.",
     readingTip: "Setelah membaca, tandai kana yang salah, lalu ulasi kosakata.",
     backToReading: "← Kembali Membaca",
     markedWrong: "kana ditandai salah",
@@ -584,8 +593,6 @@ export const translations = {
     chapterInvalid: "Bab harus berupa angka antara 1 dan 15.",
     pointInvalid: "Poin harus berupa angka antara 1 dan 3.",
     chapterPointPair: "Bab dan Poin harus diisi bersamaan.",
-
-
 
     // ── Credits / About ─────────────────────────────────────────
     creditsAbout: "Tentang",
@@ -661,14 +668,21 @@ export const translations = {
     ankiAllChapters: "Semua Bab",
     ankiAllPoints: "Semua Poin",
     ankiGuideTitle: "Panduan Penilaian SRS",
-    ankiGuideDesc: "Pelajari bagaimana pilihan spaced repetition memengaruhi interval kartu.",
-    ankiGuideAgain: "Ulangi (Again): Lupa total. Repetisi direset ke 0, interval menjadi 1 hari, nilai ease berkurang.",
-    ankiGuideHard: "Susah (Hard): Ingat dengan sulit. Interval lebih pendek (1.2x), nilai ease berkurang sedikit.",
-    ankiGuideGood: "Biasa (Good): Ingat dengan wajar. Interval dikalikan nilai ease, nilai ease tetap.",
-    ankiGuideEasy: "Mudah (Easy): Ingat sangat cepat. Interval dikalikan nilai ease & bonus (1.3x), nilai ease bertambah.",
+    ankiGuideDesc:
+      "Pelajari bagaimana pilihan spaced repetition memengaruhi interval kartu.",
+    ankiGuideAgain:
+      "Ulangi (Again): Lupa total. Repetisi direset ke 0, interval menjadi 1 hari, nilai ease berkurang.",
+    ankiGuideHard:
+      "Susah (Hard): Ingat dengan sulit. Interval lebih pendek (1.2x), nilai ease berkurang sedikit.",
+    ankiGuideGood:
+      "Biasa (Good): Ingat dengan wajar. Interval dikalikan nilai ease, nilai ease tetap.",
+    ankiGuideEasy:
+      "Mudah (Easy): Ingat sangat cepat. Interval dikalikan nilai ease & bonus (1.3x), nilai ease bertambah.",
     ankiLearnedKanjiTitle: "Daftar Kanji yang Dipelajari",
-    ankiLearnedKanjiDesc: "Karakter kanji dari kosakata yang telah Anda pelajari.",
-    ankiLearnedKanjiEmpty: "Belum ada kanji yang dipelajari. Mulai pelajari kosakata untuk melihatnya di sini!",
+    ankiLearnedKanjiDesc:
+      "Karakter kanji dari kosakata yang telah Anda pelajari.",
+    ankiLearnedKanjiEmpty:
+      "Belum ada kanji yang dipelajari. Mulai pelajari kosakata untuk melihatnya di sini!",
     ankiLearnedKanjiTabVocab: "Kanji Kosakata",
     ankiLearnedKanjiTabN5: "Karakter N5",
   },
