@@ -9,6 +9,7 @@ import {
   RefreshCw,
   NotebookPen,
   FileText,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
@@ -25,6 +26,7 @@ const FEATURES: Array<{
   desc: string;
 }> = [
   { href: "/anki", icon: Layers, title: "Anki", desc: "SRS flashcards for vocabulary." },
+  { href: "/kanji-tamago", icon: Sparkles, title: "Kanji Tamago (漢字)", desc: "SRS kanji writing & recognition." },
   { href: "/bunpou", icon: BookOpen, title: "Bunpou (文法)", desc: "Grammar & particles reference." },
   { href: "/katsuyou", icon: RefreshCw, title: "Katsuyou (活用)", desc: "Verb conjugation practice & SRS." },
   { href: "/kotoba", icon: NotebookPen, title: "Kotoba (言葉)", desc: "Your vocabulary notebook." },

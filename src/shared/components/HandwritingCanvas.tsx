@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { 
-  Undo2, 
-  Trash2, 
-  RefreshCw, 
-  Keyboard, 
-  PenTool, 
-  Delete, 
+import React, { useRef, useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
+import {
+  Undo2,
+  Trash2,
+  RefreshCw,
+  Keyboard,
+  PenTool,
+  Delete,
   Sparkles,
   CheckCircle,
   X,
-  Lightbulb
+  Lightbulb,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { recognizeHandwriting } from "../actions/handwriting";
 
@@ -33,6 +35,92 @@ interface DrawingSegment {
   height: number;
 }
 
+const isKanji = (char: string): boolean => {
+  const code = char.codePointAt(0);
+  if (!code) return false;
+  return code >= 0x4e00 && code <= 0x9faf;
+};
+
+export function CanvasStrokeTracer({
+  char,
+  className = "w-28 h-28 opacity-10 dark:opacity-6 text-foreground transition-all duration-300 pointer-events-auto cursor-pointer [&_svg]:w-full [&_svg]:h-full [&_path]:stroke-[4px]",
+}: {
+  char: string;
+  className?: string;
+}) {
+  const [svgContent, setSvgContent] = useState<string>("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    async function loadSvg() {
+      try {
+        const hex = char.codePointAt(0)!.toString(16).padStart(5, "0");
+        const res = await fetch(
+          `https://cdn.jsdelivr.net/gh/KanjiVG/kanjivg@master/kanji/${hex}.svg`,
+        );
+        if (res.ok) {
+          const text = await res.text();
+          if (active) setSvgContent(text);
+        }
+      } catch (err) {
+        console.error("Error fetching KanjiVG stroke inside canvas:", err);
+      }
+    }
+    loadSvg();
+    return () => {
+      active = false;
+    };
+  }, [char]);
+
+  const triggerAnimation = () => {
+    if (!containerRef.current) return;
+    const paths = containerRef.current.querySelectorAll("path");
+    paths.forEach((path: any, index: number) => {
+      const length = path.getTotalLength();
+      path.style.strokeDasharray = `${length}`;
+      path.style.strokeDashoffset = `${length}`;
+      path.style.transition = "none";
+      setTimeout(() => {
+        path.style.transition = "stroke-dashoffset 0.8s ease-in-out";
+        path.style.strokeDashoffset = "0";
+      }, index * 600);
+    });
+  };
+
+  useEffect(() => {
+    if (svgContent && containerRef.current) {
+      setTimeout(triggerAnimation, 100);
+    }
+  }, [svgContent]);
+
+  if (!svgContent) {
+    return (
+      <span className="font-jp font-black text-4xl sm:text-5xl text-foreground/[0.08] dark:text-foreground/[0.05]">
+        {char}
+      </span>
+    );
+  }
+
+  // Sanitize SVG for tracing: very faint lines, hide labels, strip style/cdata blocks
+  const cleanedSvg = svgContent
+    .replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, "")
+    .replace(/<text[^>]*>([\s\S]*?)<\/text>/gi, "")
+    .replace(/<!\[CDATA\[[\s\S]*?\]\]>/g, "")
+    .replace(/\]\s*>/g, "") // strip stray CDATA end brackets if parsed incorrectly
+    .replace(/stroke:\s*#\w+;?/g, "stroke: currentColor;")
+    .replace(/fill:\s*#\w+;?/g, "fill: none;");
+
+  return (
+    <div
+      ref={containerRef}
+      onClick={triggerAnimation}
+      className={className}
+      dangerouslySetInnerHTML={{ __html: cleanedSvg }}
+    />
+  );
+}
+
 interface HandwritingCanvasProps {
   value: string;
   onChange: (value: string) => void;
@@ -43,19 +131,26 @@ interface HandwritingCanvasProps {
   id?: string;
   hintText?: string;
   onUseHint?: () => void;
+  onCandidatesChange?: (candidates: string[]) => void;
+  onRecognizingChange?: (isRecognizing: boolean) => void;
+  hideKeyboardMode?: boolean;
 }
 
-export function HandwritingCanvas({
-  value,
-  onChange,
-  onSubmit,
-  placeholder = "Tulis di sini...",
-  language = "ja",
-  className = "",
-  id = "handwriting-canvas",
-  hintText,
-  onUseHint
-}: HandwritingCanvasProps) {
+export const HandwritingCanvas = forwardRef<any, HandwritingCanvasProps>((props, ref) => {
+  const {
+    value,
+    onChange,
+    onSubmit,
+    placeholder = "Write here...",
+    language = "ja",
+    className = "",
+    id = "handwriting-canvas",
+    hintText,
+    onUseHint,
+    onCandidatesChange,
+    onRecognizingChange,
+    hideKeyboardMode = false,
+  } = props;
   const [showHint, setShowHint] = useState(false);
   const [isKeyboardMode, setIsKeyboardMode] = useState(false);
   const [strokes, setStrokes] = useState<Stroke[]>([]);
@@ -63,14 +158,66 @@ export function HandwritingCanvas({
   const [candidates, setCandidates] = useState<string[]>([]);
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [drawProgress, setDrawProgress] = useState(0); // Progress bar for auto-recognize
-  
+  const [showCandidates, setShowCandidates] = useState(false);
+
+  useEffect(() => {
+    onCandidatesChange?.(candidates);
+  }, [candidates, onCandidatesChange]);
+
+  const isCountdownActive = drawProgress > 0 && drawProgress < 100;
+
+  useEffect(() => {
+    onRecognizingChange?.(isRecognizing || isCountdownActive);
+  }, [isRecognizing, isCountdownActive, onRecognizingChange]);
+
+  useEffect(() => {
+    if (hideKeyboardMode) {
+      setIsKeyboardMode(false);
+    }
+  }, [hideKeyboardMode]);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef(false);
   const strokeStartTimeRef = useRef<number>(0);
+
+  useImperativeHandle(ref, () => ({
+    async forceRecognizeIfNeeded() {
+      if (strokes.length > 0 && !isRecognizing) {
+        clearTimers();
+        setIsRecognizing(true);
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const inkData = strokes.map((stroke) => [
+            stroke.points.map((p) => Math.round(p.x)),
+            stroke.points.map((p) => Math.round(p.y)),
+            stroke.points.map((p) => p.time),
+          ]);
+          try {
+            const res = await recognizeHandwriting(
+              inkData,
+              rect.width,
+              rect.height,
+              language,
+            );
+            setIsRecognizing(false);
+            if (res.success && res.candidates.length > 0) {
+              setCandidates(res.candidates);
+              return res.candidates;
+            }
+          } catch (e) {
+            setIsRecognizing(false);
+          }
+        }
+      }
+      return candidates;
+    }
+  }));
   const recognitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const getDpr = () => (typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
+  const getDpr = () =>
+    typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
 
   // Redraw canvas content
   const redrawCanvas = useCallback(() => {
@@ -154,7 +301,7 @@ export function HandwritingCanvas({
       } else {
         const newSegments: DrawingSegment[] = [];
         let tempValue = value;
-        
+
         // Preserve segments that still match the prefix of value
         for (const seg of segments) {
           if (tempValue.startsWith(seg.text)) {
@@ -164,7 +311,7 @@ export function HandwritingCanvas({
             break;
           }
         }
-        
+
         // For remaining text, generate text-only segments (empty strokes)
         if (tempValue.length > 0) {
           for (const char of tempValue.split("")) {
@@ -173,7 +320,7 @@ export function HandwritingCanvas({
               text: char,
               strokes: [],
               width: 300,
-              height: 150
+              height: 150,
             });
           }
         }
@@ -196,34 +343,42 @@ export function HandwritingCanvas({
   };
 
   // Recognize API caller
-  const triggerRecognition = useCallback(async (currentStrokes: Stroke[]) => {
-    if (currentStrokes.length === 0 || !canvasRef.current) return;
-    setIsRecognizing(true);
-    
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    
-    // Format to [ [x1, x2, ...], [y1, y2, ...], [t1, t2, ...] ]
-    const inkData = currentStrokes.map((stroke) => [
-      stroke.points.map((p) => Math.round(p.x)),
-      stroke.points.map((p) => Math.round(p.y)),
-      stroke.points.map((p) => p.time),
-    ]);
+  const triggerRecognition = useCallback(
+    async (currentStrokes: Stroke[]) => {
+      if (currentStrokes.length === 0 || !canvasRef.current) return;
+      setIsRecognizing(true);
 
-    const res = await recognizeHandwriting(inkData, rect.width, rect.height, language);
-    setIsRecognizing(false);
-    
-    if (res.success && res.candidates.length > 0) {
-      setCandidates(res.candidates);
-    } else {
-      setCandidates([]);
-    }
-  }, [language]);
+      const canvas = canvasRef.current;
+      const rect = canvas.getBoundingClientRect();
+
+      // Format to [ [x1, x2, ...], [y1, y2, ...], [t1, t2, ...] ]
+      const inkData = currentStrokes.map((stroke) => [
+        stroke.points.map((p) => Math.round(p.x)),
+        stroke.points.map((p) => Math.round(p.y)),
+        stroke.points.map((p) => p.time),
+      ]);
+
+      const res = await recognizeHandwriting(
+        inkData,
+        rect.width,
+        rect.height,
+        language,
+      );
+      setIsRecognizing(false);
+
+      if (res.success && res.candidates.length > 0) {
+        setCandidates(res.candidates);
+      } else {
+        setCandidates([]);
+      }
+    },
+    [language],
+  );
 
   // Start auto-recognition countdown progress bar
   const startRecognitionTimer = useCallback(() => {
     clearTimers();
-    const totalTime = 2000; // 2s timeout
+    const totalTime = 1000; // 2s timeout
     const intervalTime = 50;
     let elapsed = 0;
 
@@ -377,7 +532,10 @@ export function HandwritingCanvas({
     }
 
     // Compute bounding box for optimal scaling
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
     segment.strokes.forEach((stroke) => {
       stroke.points.forEach((p) => {
         if (p.x < minX) minX = p.x;
@@ -399,7 +557,10 @@ export function HandwritingCanvas({
       .map((stroke) => {
         if (stroke.points.length === 0) return "";
         return stroke.points
-          .map((p, idx) => `${idx === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
+          .map(
+            (p, idx) =>
+              `${idx === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`,
+          )
           .join(" ");
       })
       .join(" ");
@@ -428,22 +589,28 @@ export function HandwritingCanvas({
 
   return (
     <div className={`flex flex-col gap-3 w-full ${className}`} id={id}>
-      
       {/* ─── Mode Selector and Main Output ───────────────── */}
       <div className="flex items-center gap-2 border border-border bg-surface/50 rounded-2xl p-2 px-3 shadow-2xs">
-        
         {/* Toggle Mode */}
-        <button
-          type="button"
-          onClick={() => {
-            setIsKeyboardMode(!isKeyboardMode);
-            clearTimers();
-          }}
-          title={isKeyboardMode ? "Ganti ke mode Tulis" : "Ganti ke mode Keyboard"}
-          className="p-2 rounded-xl border border-border/40 hover:bg-surface-muted hover:text-accent transition-all cursor-pointer text-muted"
-        >
-          {isKeyboardMode ? <PenTool className="w-4 h-4" /> : <Keyboard className="w-4 h-4" />}
-        </button>
+        {!hideKeyboardMode && (
+          <button
+            type="button"
+            onClick={() => {
+              setIsKeyboardMode(!isKeyboardMode);
+              clearTimers();
+            }}
+            title={
+              isKeyboardMode ? "Switch to Draw Mode" : "Switch to Keyboard Mode"
+            }
+            className="p-2 rounded-xl border border-border/40 hover:bg-surface-muted hover:text-accent transition-all cursor-pointer text-muted shrink-0"
+          >
+            {isKeyboardMode ? (
+              <PenTool className="w-4 h-4" />
+            ) : (
+              <Keyboard className="w-4 h-4" />
+            )}
+          </button>
+        )}
 
         {/* Output Text Field */}
         <div className="flex-1 min-w-0 flex items-center gap-1.5 px-1">
@@ -453,10 +620,10 @@ export function HandwritingCanvas({
             </span>
           ) : (
             <span className="text-xs font-semibold text-muted/65 italic select-none">
-              {isKeyboardMode ? placeholder : "Gunakan canvas untuk menulis..."}
+              {isKeyboardMode ? placeholder : "Draw on the canvas to write..."}
             </span>
           )}
-          
+
           {/* Faux Cursor */}
           {!isKeyboardMode && (
             <span className="w-1.5 h-5 bg-accent animate-pulse rounded-full shrink-0" />
@@ -469,7 +636,7 @@ export function HandwritingCanvas({
             <button
               type="button"
               onClick={handleBackspace}
-              title="Hapus kata terakhir"
+              title="Delete last character"
               className="p-1.5 hover:text-red-500 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer text-muted"
             >
               <Delete className="w-3.5 h-3.5" />
@@ -477,7 +644,7 @@ export function HandwritingCanvas({
             <button
               type="button"
               onClick={handleResetAll}
-              title="Hapus semua"
+              title="Clear all"
               className="p-1.5 hover:text-red-500 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer text-muted"
             >
               <RefreshCw className="w-3.5 h-3.5" />
@@ -505,56 +672,12 @@ export function HandwritingCanvas({
       ) : (
         /* ─── Handwriting Input Mode ─────────────────────── */
         <div className="flex flex-col gap-3">
-          
-          {/* 📍 Stroke History Timeline (Mini visual words) */}
-          {segments.length > 0 && (
-            <div className="relative group">
-              <div 
-                ref={timelineRef}
-                className="flex items-center gap-3 overflow-x-auto py-2 px-3 bg-surface-muted/40 border border-border/30 rounded-2xl scrollbar-none shadow-3xs"
-              >
-                <span className="text-[9px] font-black uppercase text-muted tracking-wider select-none shrink-0 border-r border-border/40 pr-2">
-                  History
-                </span>
-                
-                <div className="flex items-center gap-2">
-                  {segments.map((seg, index) => (
-                    <div 
-                      key={seg.id}
-                      className="flex flex-col items-center gap-1 bg-surface border border-border p-1.5 rounded-xl shrink-0 shadow-3xs group/item relative min-w-14"
-                    >
-                      {/* Scaled strokes canvas preview */}
-                      <div className="h-10 w-12 flex items-center justify-center overflow-hidden">
-                        {renderSegmentSVG(seg)}
-                      </div>
-
-                      {/* Recognized Text under drawing */}
-                      <span className="font-jp text-xs font-black text-foreground">
-                        {seg.text}
-                      </span>
-
-                      {/* Remove segment action */}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSegment(seg.id)}
-                        className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity duration-150 hover:scale-110 shadow-md cursor-pointer"
-                      >
-                        <X className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* ✍️ Drawing Board */}
           <div className="relative border border-border bg-surface rounded-3xl shadow-xs overflow-hidden group">
-            
             {/* Countdown Auto-Recognize Progress Bar */}
             {drawProgress > 0 && (
               <div className="absolute top-0 left-0 w-full h-1 bg-border/20 z-10">
-                <div 
+                <div
                   className="h-full bg-accent transition-all duration-75"
                   style={{ width: `${drawProgress}%` }}
                 />
@@ -567,9 +690,26 @@ export function HandwritingCanvas({
                 {/* Faint hint tracing template */}
                 {showHint && hintText && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
-                    <span className="font-jp font-black text-4xl sm:text-5xl text-foreground/[0.08] dark:text-foreground/[0.05] tracking-widest text-center px-4 leading-normal">
-                      {hintText}
-                    </span>
+                    {Array.from(hintText).some(isKanji) ? (
+                      <div className="flex items-center justify-center gap-4">
+                        {Array.from(hintText).map((char, index) =>
+                          isKanji(char) ? (
+                            <CanvasStrokeTracer key={index} char={char} />
+                          ) : (
+                            <span
+                              key={index}
+                              className="font-jp font-black text-4xl sm:text-5xl text-foreground/[0.08] dark:text-foreground/[0.05]"
+                            >
+                              {char}
+                            </span>
+                          ),
+                        )}
+                      </div>
+                    ) : (
+                      <span className="font-jp font-black text-4xl sm:text-5xl text-foreground/[0.08] dark:text-foreground/[0.05] tracking-widest text-center px-4 leading-normal">
+                        {hintText}
+                      </span>
+                    )}
                   </div>
                 )}
                 <canvas
@@ -594,37 +734,41 @@ export function HandwritingCanvas({
                           onUseHint?.();
                         }
                       }}
-                      title="Tampilkan petunjuk bayangan"
+                      title="Show trace outline"
                       className={[
                         "flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer text-[10px] font-extrabold gap-1 min-w-12",
-                        showHint 
-                          ? "bg-amber-500/15 border-amber-500/35 text-amber-600 dark:text-amber-400" 
-                          : "hover:bg-surface border-border/20 text-muted hover:text-foreground"
+                        showHint
+                          ? "bg-amber-500/15 border-amber-500/35 text-amber-600 dark:text-amber-400"
+                          : "hover:bg-surface border-border/20 text-muted hover:text-foreground",
                       ].join(" ")}
                     >
-                      <Lightbulb className={showHint ? "w-4 h-4 fill-amber-500/10" : "w-4 h-4"} />
-                      <span>{showHint ? "Petunjuk" : "Bantuan"}</span>
+                      <Lightbulb
+                        className={
+                          showHint ? "w-4 h-4 fill-amber-500/10" : "w-4 h-4"
+                        }
+                      />
+                      <span>{showHint ? "Outline" : "Help"}</span>
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={handleUndoStroke}
                     disabled={strokes.length === 0}
-                    title="Undo stroke terakhir"
+                    title="Undo last stroke"
                     className="flex flex-col items-center justify-center p-2 rounded-xl hover:bg-surface border border-border/20 text-muted hover:text-accent disabled:opacity-40 disabled:hover:text-muted transition-all cursor-pointer text-[10px] font-extrabold gap-1 min-w-12"
                   >
                     <Undo2 className="w-4 h-4" />
-                    <span>Batal</span>
+                    <span>Undo</span>
                   </button>
                   <button
                     type="button"
                     onClick={handleClearCanvas}
                     disabled={strokes.length === 0}
-                    title="Bersihkan coretan aktif"
+                    title="Clear drawing"
                     className="flex flex-col items-center justify-center p-2 rounded-xl hover:bg-surface border border-border/20 text-muted hover:text-red-500 disabled:opacity-40 disabled:hover:text-muted transition-all cursor-pointer text-[10px] font-extrabold gap-1 min-w-12"
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span>Hapus</span>
+                    <span>Clear</span>
                   </button>
                 </div>
 
@@ -643,15 +787,28 @@ export function HandwritingCanvas({
           </div>
 
           {/* 🏷️ Candidates Panel */}
-          <div className="flex flex-col gap-1 px-1">
-            <span className="text-[9px] font-extrabold text-muted uppercase tracking-wider select-none leading-none mb-1">
-              Kandidat Karakter / Kata
-            </span>
-            
-            <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none min-h-11">
-              {candidates.length > 0 ? (
-                <>
-                  <div className="flex items-center gap-1.5 pr-2 border-r border-border/30 shrink-0">
+          <div className="flex flex-col gap-1.5 px-1 border-t border-border/15 pt-2">
+            <button
+              type="button"
+              onClick={() => setShowCandidates(!showCandidates)}
+              className="flex items-center justify-between w-full text-[9px] font-extrabold text-muted hover:text-foreground uppercase tracking-wider select-none leading-none cursor-pointer"
+            >
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-accent" />
+                Candidates{" "}
+                {candidates.length > 0 && `(${candidates.length} recommended)`}
+              </span>
+              {showCandidates ? (
+                <ChevronUp size={10} />
+              ) : (
+                <ChevronDown size={10} />
+              )}
+            </button>
+
+            {showCandidates && (
+              <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none min-h-11 animate-in fade-in slide-in-from-top-1 duration-200">
+                {candidates.length > 0 ? (
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {candidates.slice(0, 5).map((candidate, idx) => {
                       const isTop = idx === 0;
                       return (
@@ -663,7 +820,7 @@ export function HandwritingCanvas({
                             "px-4 py-1.5 rounded-xl text-sm font-jp font-black transition-all cursor-pointer shadow-3xs",
                             isTop
                               ? "bg-accent text-white hover:scale-105 active:scale-95"
-                              : "bg-surface border border-border/40 hover:bg-surface-muted text-foreground hover:scale-105 active:scale-95"
+                              : "bg-surface border border-border/40 hover:bg-surface-muted text-foreground hover:scale-105 active:scale-95",
                           ].join(" ")}
                         >
                           {candidate}
@@ -671,51 +828,23 @@ export function HandwritingCanvas({
                       );
                     })}
                   </div>
-                  
-                  {/* Space / Confirm Top result button */}
-                  <button
-                    type="button"
-                    onClick={() => handleConfirmCandidate(candidates[0])}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500 hover:text-white text-emerald-600 transition-all cursor-pointer shrink-0 shadow-3xs hover:scale-105"
-                  >
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    <span>Konfirmasi ({candidates[0]})</span>
-                  </button>
-
-                  {/* Clear Canvas button */}
-                  <button
-                    type="button"
-                    onClick={handleClearCanvas}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-red-500/10 border border-red-500/25 hover:bg-red-500 hover:text-white text-red-500 transition-all cursor-pointer shrink-0 shadow-3xs hover:scale-105"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Hapus Coretan</span>
-                  </button>
-                </>
-              ) : strokes.length > 0 ? (
-                <div className="flex items-center justify-between w-full pr-1">
-                  <span className="text-xs text-muted/80 italic font-semibold select-none flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-accent animate-spin" />
-                    Menganalisis coretan...
+                ) : strokes.length > 0 ? (
+                  <div className="flex items-center w-full">
+                    <span className="text-xs text-muted/80 italic font-semibold select-none flex items-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-accent animate-spin" />
+                      Analyzing strokes...
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted/60 italic font-medium select-none">
+                    Draw on the canvas above to see candidates.
                   </span>
-                  <button
-                    type="button"
-                    onClick={handleClearCanvas}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-red-500/10 border border-red-500/25 hover:bg-red-500 hover:text-white text-red-500 transition-all cursor-pointer shrink-0 shadow-3xs hover:scale-105"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Hapus Coretan</span>
-                  </button>
-                </div>
-              ) : (
-                <span className="text-xs text-muted/60 italic font-medium select-none">
-                  Tulis pada canvas di atas untuk menampilkan hasil deteksi.
-                </span>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
     </div>
   );
-}
+});

@@ -1,0 +1,503 @@
+[
+  {
+    "ka": "1",
+    "topik": "どうぞよろしく！",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "私", "yomi": "わたし (watashi)", "imi": "saya"},
+        {"moji": "人", "yomi": "ひと (hito) / じん (jin) / にん (nin)", "imi": "orang (にん dipakai saat menghitung orang, misal 三人 = さんにん)"},
+        {"moji": "才", "yomi": "さい (sai)", "imi": "usia/umur"},
+        {"moji": "学生", "yomi": "がくせい (gakusei)", "imi": "mahasiswa/pelajar"},
+        {"moji": "校", "yomi": "こう (kou)", "imi": "sekolah"},
+        {"moji": "日本", "yomi": "にほん (nihon)", "imi": "Jepang"},
+        {"moji": "語", "yomi": "ご (go)", "imi": "bahasa"}
+      ],
+      "jumlah_karakter": 9
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "牛肉", "yomi": "ぎゅうにく (gyuuniku)", "imi": "daging sapi"},
+        {"moji": "豚肉", "yomi": "ぶたにく (butaniku)", "imi": "daging babi"},
+        {"moji": "鶏肉", "yomi": "とりにく (toriniku)", "imi": "daging ayam"}
+      ],
+      "jumlah_kata": 3
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "〜産", "yomi": "〜さん (〜san)", "imi": "produksi/buatan (daerah)〜"},
+        {"moji": "〜引き", "yomi": "〜びき (〜biki)", "imi": "diskon〜"},
+        {"moji": "酒", "yomi": "さけ (sake)", "imi": "alkohol/sake"}
+      ],
+      "jumlah_kata": 3
+    }
+  },
+  {
+    "ka": "2",
+    "topik": "買い物",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "一", "yomi": "いち (ichi)", "imi": "satu"},
+        {"moji": "二", "yomi": "に (ni)", "imi": "dua"},
+        {"moji": "三", "yomi": "さん (san)", "imi": "tiga"},
+        {"moji": "四", "yomi": "よん (yon) / し (shi)", "imi": "empat"},
+        {"moji": "五", "yomi": "ご (go)", "imi": "lima"},
+        {"moji": "六", "yomi": "ろく (roku)", "imi": "enam"},
+        {"moji": "七", "yomi": "なな (nana) / しち (shichi)", "imi": "tujuh"},
+        {"moji": "八", "yomi": "はち (hachi)", "imi": "delapan"},
+        {"moji": "九", "yomi": "きゅう (kyuu) / く (ku)", "imi": "sembilan"},
+        {"moji": "十", "yomi": "じゅう (juu)", "imi": "sepuluh"},
+        {"moji": "百", "yomi": "ひゃく (hyaku)", "imi": "ratus"},
+        {"moji": "千", "yomi": "せん (sen)", "imi": "ribu"},
+        {"moji": "万", "yomi": "まん (man)", "imi": "puluh ribu"},
+        {"moji": "円", "yomi": "えん (en)", "imi": "yen"}
+      ],
+      "jumlah_karakter": 14
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "雨", "yomi": "あめ (ame)", "imi": "hujan"},
+        {"moji": "場所", "yomi": "ばしょ (basho)", "imi": "tempat"}
+      ],
+      "jumlah_kata": 2
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "平日", "yomi": "へいじつ (heijitsu)", "imi": "hari kerja"},
+        {"moji": "祝日", "yomi": "しゅくじつ (shukujitsu)", "imi": "hari libur nasional"}
+      ],
+      "jumlah_kata": 2
+    }
+  },
+  {
+    "ka": "3",
+    "topik": "いつ、どこで？",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "月", "yomi": "つき (tsuki) / げつ (getsu)", "imi": "bulan"},
+        {"moji": "火", "yomi": "ひ (hi) / か (ka)", "imi": "api"},
+        {"moji": "水", "yomi": "みず (mizu) / すい (sui)", "imi": "air"},
+        {"moji": "木", "yomi": "き (ki) / もく (moku)", "imi": "pohon"},
+        {"moji": "金", "yomi": "かね (kane) / きん (kin)", "imi": "emas/uang"},
+        {"moji": "土", "yomi": "つち (tsuchi) / ど (do)", "imi": "tanah"},
+        {"moji": "曜", "yomi": "よう (you)", "imi": "hari (dalam seminggu)"},
+        {"moji": "何", "yomi": "なに (nani) / なん (nan)", "imi": "apa"},
+        {"moji": "年", "yomi": "とし (toshi) / ねん (nen)", "imi": "tahun"},
+        {"moji": "時", "yomi": "とき (toki) / じ (ji)", "imi": "waktu/jam"},
+        {"moji": "間", "yomi": "あいだ (aida) / かん (kan)", "imi": "antara/durasi"},
+        {"moji": "分", "yomi": "わ・かる (wa-karu) / ふん (fun) / ぷん (pun)", "imi": "menit/mengerti (bunyi berubah jadi ぷん setelah angka tertentu, misal 3分=さんぷん)"}
+      ],
+      "jumlah_karakter": 12
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "電話", "yomi": "でんわ (denwa)", "imi": "telepon"},
+        {"moji": "住所", "yomi": "じゅうしょ (juusho)", "imi": "alamat"},
+        {"moji": "〜歳", "yomi": "〜さい (〜sai)", "imi": "usia 〜 tahun"}
+      ],
+      "jumlah_kata": 3
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "性別", "yomi": "せいべつ (seibetsu)", "imi": "jenis kelamin"}
+      ],
+      "jumlah_kata": 1
+    }
+  },
+  {
+    "ka": "4",
+    "topik": "新しい町で",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "東", "yomi": "ひがし (higashi) / とう (tou)", "imi": "timur"},
+        {"moji": "京", "yomi": "きょう (kyou)", "imi": "ibu kota"},
+        {"moji": "名", "yomi": "な (na) / めい (mei)", "imi": "nama"},
+        {"moji": "前", "yomi": "まえ (mae) / ぜん (zen)", "imi": "depan/sebelum"},
+        {"moji": "国", "yomi": "くに (kuni) / こく (koku)", "imi": "negara"},
+        {"moji": "男", "yomi": "おとこ (otoko) / だん (dan)", "imi": "laki-laki"},
+        {"moji": "女", "yomi": "おんな (onna) / じょ (jo)", "imi": "perempuan"},
+        {"moji": "区", "yomi": "く (ku)", "imi": "distrik/wilayah"},
+        {"moji": "市", "yomi": "し (shi) / いち (ichi)", "imi": "kota/pasar"}
+      ],
+      "jumlah_karakter": 9
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "〜放題", "yomi": "〜ほうだい (〜houdai)", "imi": "sepuasnya (contoh: makan sepuasnya)"}
+      ],
+      "jumlah_kata": 1
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "営業", "yomi": "えいぎょう (eigyou)", "imi": "bisnis/buka (toko)"},
+        {"moji": "徒歩", "yomi": "とほ (toho)", "imi": "berjalan kaki"}
+      ],
+      "jumlah_kata": 2
+    }
+  },
+  {
+    "ka": "5",
+    "topik": "楽しい週末",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "先", "yomi": "さき (saki) / せん (sen)", "imi": "sebelumnya/lalu"},
+        {"moji": "週", "yomi": "しゅう (shuu)", "imi": "minggu"},
+        {"moji": "毎", "yomi": "まい (mai)", "imi": "setiap"},
+        {"moji": "午", "yomi": "ご (go)", "imi": "siang"},
+        {"moji": "後", "yomi": "うしろ (ushiro) / ご (go)", "imi": "belakang/setelah"},
+        {"moji": "見", "yomi": "み・る (mi-ru) / けん (ken)", "imi": "melihat"},
+        {"moji": "食", "yomi": "た・べる (ta-beru) / しょく (shoku)", "imi": "makan"},
+        {"moji": "代", "yomi": "か・わる (ka-waru) / だい (dai)", "imi": "biaya/menggantikan"},
+        {"moji": "買", "yomi": "か・う (ka-u) / ばい (bai)", "imi": "membeli"},
+        {"moji": "物", "yomi": "もの (mono) / ぶつ (butsu)", "imi": "barang/benda"},
+        {"moji": "行", "yomi": "い・く (i-ku) / こう (kou)", "imi": "pergi"},
+        {"moji": "休", "yomi": "やす・む (yasu-mu) / きゅう (kyuu)", "imi": "istirahat/libur"}
+      ],
+      "jumlah_karakter": 12
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "新聞", "yomi": "しんぶん (shinbun)", "imi": "koran"},
+        {"moji": "図書館", "yomi": "としょかん (toshokan)", "imi": "perpustakaan"},
+        {"moji": "辞書", "yomi": "じしょ (jisho)", "imi": "kamus"}
+      ],
+      "jumlah_kata": 3
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "受付", "yomi": "うけつけ (uketsuke)", "imi": "resepsionis/pendaftaran"}
+      ],
+      "jumlah_kata": 1
+    }
+  },
+  {
+    "ka": "6",
+    "topik": "一緒に！",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "今", "yomi": "いま (ima) / こん (kon)", "imi": "sekarang"},
+        {"moji": "来", "yomi": "く・る (ku-ru) / らい (rai)", "imi": "datang"},
+        {"moji": "帰", "yomi": "かえ・る (kae-ru) / き (ki)", "imi": "pulang"},
+        {"moji": "会", "yomi": "あ・う (a-u) / かい (kai)", "imi": "bertemu"},
+        {"moji": "社", "yomi": "しゃ (sha)", "imi": "perusahaan/kuil"},
+        {"moji": "閉", "yomi": "し・める (shi-meru) / へい (hei)", "imi": "tutup"},
+        {"moji": "読", "yomi": "よ・む (yo-mu) / どく (doku)", "imi": "membaca"},
+        {"moji": "書", "yomi": "か・く (ka-ku) / しょ (sho)", "imi": "menulis"},
+        {"moji": "話", "yomi": "はな・す (hana-su) / わ (wa)", "imi": "berbicara"}
+      ],
+      "jumlah_karakter": 9
+    },
+    "yomeru": { "kata": [], "jumlah_kata": 0 },
+    "mite_wakaru": { "kata": [], "jumlah_kata": 0 }
+  },
+  {
+    "ka": "漢字のパーツ",
+    "topik": "Bagian Kanji (Radikal)",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "寺", "yomi": "てら (tera) / じ (ji)", "imi": "kuil buddha"},
+        {"moji": "言", "yomi": "こと (koto) / げん (gen)", "imi": "kata/berbicara"},
+        {"moji": "貝", "yomi": "かい (kai)", "imi": "kerang"},
+        {"moji": "田", "yomi": "た (ta) / でん (den)", "imi": "sawah"},
+        {"moji": "力", "yomi": "ちから (chikara) / りょく (ryoku)", "imi": "kekuatan"},
+        {"moji": "門", "yomi": "かど (kado) / もん (mon)", "imi": "gerbang"}
+      ],
+      "jumlah_karakter": 6
+    },
+    "yomeru": { "kata": [], "jumlah_kata": 0 },
+    "mite_wakaru": { "kata": [], "jumlah_kata": 0 }
+  },
+  {
+    "ka": "7",
+    "topik": "何を食べますか？",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "肉", "yomi": "にく (niku)", "imi": "daging"},
+        {"moji": "料理", "yomi": "りょうり (ryouri)", "imi": "masakan"},
+        {"moji": "野", "yomi": "の (no) / や (ya)", "imi": "ladang"},
+        {"moji": "半", "yomi": "はん (han)", "imi": "setengah"},
+        {"moji": "大", "yomi": "おお・きい (oo-kii) / だい (dai)", "imi": "besar"},
+        {"moji": "小", "yomi": "ちい・さい (chii-sai) / しょう (shou)", "imi": "kecil"}
+      ],
+      "jumlah_karakter": 7
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "魚", "yomi": "さかな (sakana)", "imi": "ikan"},
+        {"moji": "野菜", "yomi": "やさい (yasai)", "imi": "sayuran"},
+        {"moji": "ご飯", "yomi": "ごはん (gohan)", "imi": "nasi/makanan"},
+        {"moji": "酒", "yomi": "さけ (sake)", "imi": "sake/alkohol"},
+        {"moji": "〜丼", "yomi": "〜どん (〜don)", "imi": "mangkuk nasi dengan lauk di atasnya〜"},
+        {"moji": "半額", "yomi": "はんがく (hangaku)", "imi": "setengah harga"}
+      ],
+      "jumlah_kata": 6
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "定食", "yomi": "ていしょく (teishoku)", "imi": "menu paket/set makanan"}
+      ],
+      "jumlah_kata": 1
+    }
+  },
+  {
+    "ka": "8",
+    "topik": "家族のこと",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "家族", "yomi": "かぞく (kazoku)", "imi": "keluarga"},
+        {"moji": "父母", "yomi": "ふぼ (fubo) / ちちはは (chichi haha)", "imi": "orang tua (ayah & ibu)"},
+        {"moji": "兄弟", "yomi": "きょうだい (kyoudai)", "imi": "saudara (laki-laki)"},
+        {"moji": "姉妹", "yomi": "しまい (shimai)", "imi": "saudara (perempuan)"},
+        {"moji": "犬", "yomi": "いぬ (inu)", "imi": "anjing"},
+        {"moji": "高", "yomi": "たか・い (taka-i) / こう (kou)", "imi": "tinggi/mahal"},
+        {"moji": "長", "yomi": "なが・い (naga-i) / ちょう (chou)", "imi": "panjang/pemimpin"},
+        {"moji": "短", "yomi": "みじか・い (mijika-i) / たん (tan)", "imi": "pendek"}
+      ],
+      "jumlah_karakter": 12
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "趣味", "yomi": "しゅみ (shumi)", "imi": "hobi"}
+      ],
+      "jumlah_kata": 1
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "出身地", "yomi": "しゅっしんち (shusshinchi)", "imi": "tempat kelahiran/asal"},
+        {"moji": "職業", "yomi": "しょくぎょう (shokugyou)", "imi": "pekerjaan"}
+      ],
+      "jumlah_kata": 2
+    }
+  },
+  {
+    "ka": "9",
+    "topik": "好きなこと",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "好", "yomi": "す・き (su-ki) / こう (kou)", "imi": "suka"},
+        {"moji": "歌", "yomi": "うた (uta) / か (ka)", "imi": "lagu/menyanyi"},
+        {"moji": "音", "yomi": "おと (oto) / おん (on)", "imi": "bunyi/suara"},
+        {"moji": "楽", "yomi": "たの・しい (tano-shii) / がく (gaku)", "imi": "menyenangkan/musik"},
+        {"moji": "車", "yomi": "くるま (kuruma) / しゃ (sha)", "imi": "mobil/kendaraan"},
+        {"moji": "映画", "yomi": "えいが (eiga)", "imi": "film"},
+        {"moji": "旅", "yomi": "たび (tabi) / りょ (ryo)", "imi": "perjalanan"},
+        {"moji": "海外", "yomi": "かいがい (kaigai)", "imi": "luar negeri"}
+      ],
+      "jumlah_karakter": 10
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "雑誌", "yomi": "ざっし (zasshi)", "imi": "majalah"},
+        {"moji": "漢字", "yomi": "かんじ (kanji)", "imi": "kanji"}
+      ],
+      "jumlah_kata": 2
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "書店", "yomi": "しょてん (shoten)", "imi": "toko buku"}
+      ],
+      "jumlah_kata": 1
+    }
+  },
+  {
+    "ka": "10",
+    "topik": "待ち合わせ",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "駅", "yomi": "えき (eki)", "imi": "stasiun"},
+        {"moji": "上", "yomi": "うえ (ue) / じょう (jou)", "imi": "atas"},
+        {"moji": "下", "yomi": "した (shita) / か (ka)", "imi": "bawah"},
+        {"moji": "地", "yomi": "ち (chi) / じ (ji)", "imi": "bumi/tanah"},
+        {"moji": "図", "yomi": "ず (zu) / と (to)", "imi": "gambar/peta"},
+        {"moji": "館", "yomi": "かん (kan)", "imi": "gedung/bangunan"},
+        {"moji": "右", "yomi": "みぎ (migi)", "imi": "kanan"},
+        {"moji": "左", "yomi": "ひだり (hidari)", "imi": "kiri"},
+        {"moji": "道", "yomi": "みち (michi) / どう (dou)", "imi": "jalan"}
+      ],
+      "jumlah_karakter": 9
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "北口", "yomi": "きたぐち (kitaguchi)", "imi": "pintu keluar utara"},
+        {"moji": "南口", "yomi": "みなみぐち (minamiguchi)", "imi": "pintu keluar selatan"},
+        {"moji": "西口", "yomi": "にしぐち (nishiguchi)", "imi": "pintu keluar barat"},
+        {"moji": "銀行", "yomi": "ぎんこう (ginkou)", "imi": "bank"},
+        {"moji": "地下鉄", "yomi": "ちかてつ (chikatetsu)", "imi": "kereta bawah tanah"}
+      ],
+      "jumlah_kata": 5
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "駐車場", "yomi": "ちゅうしゃじょう (chuushajou)", "imi": "tempat parkir"}
+      ],
+      "jumlah_kata": 1
+    }
+  },
+  {
+    "ka": "11",
+    "topik": "何時に、何をする？",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "起", "yomi": "お・きる (o-kiru) / き (ki)", "imi": "bangun"},
+        {"moji": "歩", "yomi": "ある・く (aru-ku) / ほ (ho)", "imi": "berjalan"},
+        {"moji": "乗", "yomi": "の・る (no-ru) / じょう (jou)", "imi": "naik kendaraan"},
+        {"moji": "始", "yomi": "はじ・まる (haji-maru) / し (shi)", "imi": "mulai"},
+        {"moji": "終", "yomi": "お・わる (o-waru) / しゅう (shuu)", "imi": "selesai"},
+        {"moji": "勉強", "yomi": "べんきょう (benkyou)", "imi": "belajar"},
+        {"moji": "朝", "yomi": "あさ (asa) / ちょう (chou)", "imi": "pagi"},
+        {"moji": "昼", "yomi": "ひる (hiru) / ちゅう (chuu)", "imi": "siang"},
+        {"moji": "夜", "yomi": "よる (yoru) / や (ya)", "imi": "malam"}
+      ],
+      "jumlah_karakter": 10
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "自転車", "yomi": "じてんしゃ (jitensha)", "imi": "sepeda"},
+        {"moji": "寝る", "yomi": "ねる (neru)", "imi": "tidur"}
+      ],
+      "jumlah_kata": 2
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "集合", "yomi": "しゅうごう (shuugou)", "imi": "berkumpul"}
+      ],
+      "jumlah_kata": 1
+    }
+  },
+  {
+    "ka": "12",
+    "topik": "病気のとき",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "体", "yomi": "からだ (karada) / たい (tai)", "imi": "tubuh"},
+        {"moji": "目", "yomi": "め (me) / もく (moku)", "imi": "mata"},
+        {"moji": "耳", "yomi": "みみ (mimi) / じ (ji)", "imi": "telinga"},
+        {"moji": "口", "yomi": "くち (kuchi) / こう (kou)", "imi": "mulut"},
+        {"moji": "歯", "yomi": "は (ha) / し (shi)", "imi": "gigi"},
+        {"moji": "病院", "yomi": "びょういん (byouin)", "imi": "rumah sakit"},
+        {"moji": "薬", "yomi": "くすり (kusuri) / やく (yaku)", "imi": "obat"},
+        {"moji": "局", "yomi": "きょく (kyoku)", "imi": "biro/kantor (seperti di apotek)"}
+      ],
+      "jumlah_karakter": 9
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "体重", "yomi": "たいじゅう (taijuu)", "imi": "berat badan"},
+        {"moji": "受付", "yomi": "うけつけ (uketsuke)", "imi": "resepsionis/pendaftaran"},
+        {"moji": "熱", "yomi": "ねつ (netsu)", "imi": "demam/panas"}
+      ],
+      "jumlah_kata": 3
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "内科", "yomi": "ないか (naika)", "imi": "klinik penyakit dalam"},
+        {"moji": "外科", "yomi": "げか (geka)", "imi": "klinik bedah"}
+      ],
+      "jumlah_kata": 2
+    }
+  },
+  {
+    "ka": "13",
+    "topik": "旅行に行こう",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "世界", "yomi": "せかい (sekai)", "imi": "dunia"},
+        {"moji": "春", "yomi": "はる (haru) / しゅん (shun)", "imi": "musim semi"},
+        {"moji": "夏", "yomi": "なつ (natsu) / か (ka)", "imi": "musim panas"},
+        {"moji": "秋", "yomi": "あき (aki) / しゅう (shuu)", "imi": "musim gugur"},
+        {"moji": "冬", "yomi": "ふゆ (fuyu) / とう (tou)", "imi": "musim dingin"},
+        {"moji": "早", "yomi": "はや・い (haya-i) / そう (sou)", "imi": "cepat/awal"},
+        {"moji": "夕", "yomi": "ゆう (yuu) / せき (seki)", "imi": "sore/senja"},
+        {"moji": "予", "yomi": "よ (yo)", "imi": "sebelumnya/rencana"},
+        {"moji": "約", "yomi": "やく (yaku)", "imi": "janji/kira-kira"},
+        {"moji": "光", "yomi": "ひかり (hikari) / こう (kou)", "imi": "cahaya"}
+      ],
+      "jumlah_karakter": 11
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "観光", "yomi": "かんこう (kankou)", "imi": "pariwisata"},
+        {"moji": "出発", "yomi": "しゅっぱつ (shuppatsu)", "imi": "keberangkatan"},
+        {"moji": "到着", "yomi": "とうちゃく (touchaku)", "imi": "kedatangan"}
+      ],
+      "jumlah_kata": 3
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "〜泊〜日", "yomi": "〜はく〜か (〜haku 〜ka/nichi)", "imi": "〜 malam 〜 hari (durasi menginap)"},
+        {"moji": "〜付き", "yomi": "〜つき (〜tsuki)", "imi": "termasuk/dengan 〜"},
+        {"moji": "〜券", "yomi": "〜けん (〜ken)", "imi": "tiket/kupon 〜"}
+      ],
+      "jumlah_kata": 3
+    }
+  },
+  {
+    "ka": "14",
+    "topik": "気をつけて！",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "入", "yomi": "はい・る (hai-ru) / にゅう (nyuu)", "imi": "masuk"},
+        {"moji": "出", "yomi": "で・る (de-ru) / しゅつ (shutsu)", "imi": "keluar"},
+        {"moji": "持", "yomi": "も・つ (mo-tsu) / じ (ji)", "imi": "membawa/memiliki"},
+        {"moji": "立", "yomi": "た・つ (ta-tsu) / りつ (ritsu)", "imi": "berdiri"},
+        {"moji": "使用", "yomi": "しよう (shiyou)", "imi": "penggunaan"},
+        {"moji": "中", "yomi": "なか (naka) / ちゅう (chuu)", "imi": "dalam/tengah/sedang melakukan"},
+        {"moji": "新", "yomi": "あたら・しい (atara-shii) / しん (shin)", "imi": "baru"},
+        {"moji": "古", "yomi": "ふる・い (furu-i) / こ (ko)", "imi": "lama/kuno"},
+        {"moji": "注意", "yomi": "ちゅうい (chuui)", "imi": "perhatian/peringatan"},
+        {"moji": "止", "yomi": "と・まる (to-maru) / し (shi)", "imi": "berhenti"}
+      ],
+      "jumlah_karakter": 12
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "禁止", "yomi": "きんし (kinshi)", "imi": "larangan"},
+        {"moji": "降りる", "yomi": "おりる (oriru)", "imi": "turun (dari kendaraan)"}
+      ],
+      "jumlah_kata": 2
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "最〜", "yomi": "さい〜 (sai〜)", "imi": "paling 〜 (paling depan, paling baru, dll)"},
+        {"moji": "優先席", "yomi": "ゆうせんせき (yuusenseki)", "imi": "kursi prioritas"},
+        {"moji": "禁煙", "yomi": "きんえん (kinen)", "imi": "dilarang merokok"}
+      ],
+      "jumlah_kata": 3
+    }
+  },
+  {
+    "ka": "15",
+    "topik": "どんなニュース？",
+    "teishutsu_kanji": {
+      "kanji": [
+        {"moji": "天", "yomi": "てん (ten)", "imi": "langit/surga"},
+        {"moji": "気", "yomi": "き (ki)", "imi": "perasaan/energi/udara"},
+        {"moji": "雨", "yomi": "あめ (ame) / う (u)", "imi": "hujan"},
+        {"moji": "台", "yomi": "だい (dai) / たい (tai)", "imi": "landasan/mesin/panggung"},
+        {"moji": "風", "yomi": "かぜ (kaze) / ふう (fuu)", "imi": "angin/gaya"},
+        {"moji": "多", "yomi": "おお・い (oo-i) / た (ta)", "imi": "banyak"},
+        {"moji": "低", "yomi": "ひく・い (hiku-i) / てい (tei)", "imi": "rendah"},
+        {"moji": "度", "yomi": "ど (do)", "imi": "derajat/kali"},
+        {"moji": "交", "yomi": "まじ・わる (maji-waru) / こう (kou)", "imi": "berpotongan/asosiasi"},
+        {"moji": "通", "yomi": "とお・る (too-ru) / つう (tsuu)", "imi": "melewati/lalu lintas"},
+        {"moji": "死", "yomi": "し・ぬ (shi-nu) / し (shi)", "imi": "mati/meninggal"}
+      ],
+      "jumlah_karakter": 11
+    },
+    "yomeru": {
+      "kata": [
+        {"moji": "気温", "yomi": "きおん (kion)", "imi": "suhu udara"},
+        {"moji": "事故", "yomi": "じこ (jiko)", "imi": "kecelakaan"},
+        {"moji": "地震", "yomi": "じしん (jishin)", "imi": "gempa bumi"}
+      ],
+      "jumlah_kata": 3
+    },
+    "mite_wakaru": {
+      "kata": [
+        {"moji": "晴", "yomi": "はれ (hare)", "imi": "cerah"},
+        {"moji": "曇", "yomi": "くもり (kumori)", "imi": "berawan"},
+        {"moji": "雪", "yomi": "ゆき (yuki)", "imi": "salju"}
+      ],
+      "jumlah_kata": 3
+    }
+  }
+]

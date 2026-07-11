@@ -215,6 +215,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [ankiIsCorrect, setAnkiIsCorrect] = useState(false);
   const [ankiUsedHint, setAnkiUsedHint] = useState(false);
   const [isWritingActive, setIsWritingActive] = useState(false);
+  const [gradingScore, setGradingScore] = useState<number | null>(null);
 
   const currentCard = sessionQueue[currentIndex];
 
@@ -644,108 +645,116 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
   // Jawaban untuk Quick Memorization Mode (Sudah Tahu / Tidak Tahu)
   const handleQuickAnswer = async (knows: boolean) => {
-    if (sessionQueue.length === 0) return;
+    if (sessionQueue.length === 0 || gradingScore !== null) return;
     const currentCard = sessionQueue[currentIndex];
 
-    // Reset flipped and handwriting states
-    setFlipped(false);
-    setAnkiWriteInput("");
-    setAnkiAnswerChecked(false);
-    setAnkiIsCorrect(false);
-    setAnkiUsedHint(false);
-    setIsWritingActive(false);
-    setReviewedCount((prev) => prev + 1);
-
-    // Sudah Tahu -> rating 2 (Hard, bobot paling kecil untuk sukses)
-    // Tidak Tahu -> rating 1 (Again, lupa)
     const rating = knows ? 2 : 1;
-    const cardReview = {
-      cardKey: currentCard.cardKey,
-      chapter: currentCard.chapter,
-      sectionIndex: currentCard.sectionIndex,
-      rating,
-    };
+    setGradingScore(rating);
+    try {
+      // Reset flipped and handwriting states
+      setFlipped(false);
+      setAnkiWriteInput("");
+      setAnkiAnswerChecked(false);
+      setAnkiIsCorrect(false);
+      setAnkiUsedHint(false);
+      setIsWritingActive(false);
+      setReviewedCount((prev) => prev + 1);
 
-    if (postMode === "card") {
-      await triggerSaveBatch([cardReview], false);
-    } else {
-      setPendingReviews((prev) => [
-        ...prev.filter((r) => r.cardKey !== currentCard.cardKey),
-        cardReview,
-      ]);
-    }
+      const cardReview = {
+        cardKey: currentCard.cardKey,
+        chapter: currentCard.chapter,
+        sectionIndex: currentCard.sectionIndex,
+        rating,
+      };
 
-    if (!knows) {
-      // Tidak tahu: masukkan kartu ke akhir antrean sesi agar diulang terus
-      const reQueueCard = { ...currentCard };
-      setSessionQueue((prev) => [...prev, reQueueCard]);
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      // Sudah tahu: lanjut ke kartu berikutnya (keluarkan dari sisa sesi)
-      if (currentIndex + 1 >= sessionQueue.length) {
-        setSessionFinished(true);
-        if (postMode === "session") {
-          const nextReviews = [
-            ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
-            cardReview,
-          ];
-          await triggerSaveBatch(nextReviews);
-        }
+      if (postMode === "card") {
+        await triggerSaveBatch([cardReview], false);
       } else {
-        setCurrentIndex((prev) => prev + 1);
+        setPendingReviews((prev) => [
+          ...prev.filter((r) => r.cardKey !== currentCard.cardKey),
+          cardReview,
+        ]);
       }
+
+      if (!knows) {
+        // Tidak tahu: masukkan kartu ke akhir antrean sesi agar diulang terus
+        const reQueueCard = { ...currentCard };
+        setSessionQueue((prev) => [...prev, reQueueCard]);
+        setCurrentIndex((prev) => prev + 1);
+      } else {
+        // Sudah tahu: lanjut ke kartu berikutnya (keluarkan dari sisa sesi)
+        if (currentIndex + 1 >= sessionQueue.length) {
+          setSessionFinished(true);
+          if (postMode === "session") {
+            const nextReviews = [
+              ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
+              cardReview,
+            ];
+            await triggerSaveBatch(nextReviews);
+          }
+        } else {
+          setCurrentIndex((prev) => prev + 1);
+        }
+      }
+    } finally {
+      setGradingScore(null);
     }
   };
 
   // Nilai kartu saat ini
   const handleRateCard = async (rating: number) => {
-    if (sessionQueue.length === 0) return;
+    if (sessionQueue.length === 0 || gradingScore !== null) return;
     const currentCard = sessionQueue[currentIndex];
 
-    // Animasi balik kartu direset
-    setFlipped(false);
-    setAnkiWriteInput("");
-    setAnkiAnswerChecked(false);
-    setAnkiIsCorrect(false);
-    setAnkiUsedHint(false);
-    setIsWritingActive(false);
-    setReviewedCount((prev) => prev + 1);
+    setGradingScore(rating);
+    try {
+      // Animasi balik kartu direset
+      setFlipped(false);
+      setAnkiWriteInput("");
+      setAnkiAnswerChecked(false);
+      setAnkiIsCorrect(false);
+      setAnkiUsedHint(false);
+      setIsWritingActive(false);
+      setReviewedCount((prev) => prev + 1);
 
-    const cardReview = {
-      cardKey: currentCard.cardKey,
-      chapter: currentCard.chapter,
-      sectionIndex: currentCard.sectionIndex,
-      rating,
-    };
+      const cardReview = {
+        cardKey: currentCard.cardKey,
+        chapter: currentCard.chapter,
+        sectionIndex: currentCard.sectionIndex,
+        rating,
+      };
 
-    if (postMode === "card") {
-      await triggerSaveBatch([cardReview], false);
-    } else {
-      setPendingReviews((prev) => [
-        ...prev.filter((r) => r.cardKey !== currentCard.cardKey),
-        cardReview,
-      ]);
-    }
-
-    // LOGIKA ANKI: Jika memilih "Again" (1), kartu akan dimasukkan kembali ke antrean akhir sesi
-    if (rating === 1) {
-      const reQueueCard = { ...currentCard };
-      setSessionQueue((prev) => [...prev, reQueueCard]);
-      setCurrentIndex((prev) => prev + 1);
-    } else {
-      // Pindah ke kartu berikutnya
-      if (currentIndex + 1 >= sessionQueue.length) {
-        setSessionFinished(true);
-        if (postMode === "session") {
-          const nextReviews = [
-            ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
-            cardReview,
-          ];
-          await triggerSaveBatch(nextReviews);
-        }
+      if (postMode === "card") {
+        await triggerSaveBatch([cardReview], false);
       } else {
-        setCurrentIndex((prev) => prev + 1);
+        setPendingReviews((prev) => [
+          ...prev.filter((r) => r.cardKey !== currentCard.cardKey),
+          cardReview,
+        ]);
       }
+
+      // LOGIKA ANKI: Jika memilih "Again" (1), kartu akan dimasukkan kembali ke antrean akhir sesi
+      if (rating === 1) {
+        const reQueueCard = { ...currentCard };
+        setSessionQueue((prev) => [...prev, reQueueCard]);
+        setCurrentIndex((prev) => prev + 1);
+      } else {
+        // Pindah ke kartu berikutnya
+        if (currentIndex + 1 >= sessionQueue.length) {
+          setSessionFinished(true);
+          if (postMode === "session") {
+            const nextReviews = [
+              ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
+              cardReview,
+            ];
+            await triggerSaveBatch(nextReviews);
+          }
+        } else {
+          setCurrentIndex((prev) => prev + 1);
+        }
+      }
+    } finally {
+      setGradingScore(null);
     }
   };
 
@@ -1619,9 +1628,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             e.stopPropagation();
                             handleRateCard(1);
                           }}
-                          className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
+                          disabled={gradingScore !== null}
+                          className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
                         >
-                          <span className="text-[11px] font-bold">Again</span>
+                          <span className="text-[11px] font-bold">{gradingScore === 1 ? "Saving..." : "Again"}</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
                             Forgot
                           </span>
@@ -1634,9 +1644,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             e.stopPropagation();
                             handleRateCard(2);
                           }}
-                          className="flex flex-col items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
+                          disabled={gradingScore !== null}
+                          className="flex flex-col items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
                         >
-                          <span className="text-[11px] font-bold">Hard</span>
+                          <span className="text-[11px] font-bold">{gradingScore === 2 ? "Saving..." : "Hard"}</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
                             Difficult
                           </span>
@@ -1649,9 +1660,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             e.stopPropagation();
                             handleRateCard(3);
                           }}
-                          className="flex flex-col items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
+                          disabled={gradingScore !== null}
+                          className="flex flex-col items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
                         >
-                          <span className="text-[11px] font-bold">Good</span>
+                          <span className="text-[11px] font-bold">{gradingScore === 3 ? "Saving..." : "Good"}</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
                             Normal
                           </span>
@@ -1664,9 +1676,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             e.stopPropagation();
                             handleRateCard(4);
                           }}
-                          className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer"
+                          disabled={gradingScore !== null}
+                          className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2 px-1 shadow-sm transition-colors cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed"
                         >
-                          <span className="text-[11px] font-bold">Easy</span>
+                          <span className="text-[11px] font-bold">{gradingScore === 4 ? "Saving..." : "Easy"}</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
                             Very easy
                           </span>
@@ -1681,9 +1694,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             e.stopPropagation();
                             handleQuickAnswer(false);
                           }}
-                          className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200"
+                          disabled={gradingScore !== null}
+                          className="flex flex-col items-center justify-center bg-red-500 hover:bg-red-600 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200 disabled:opacity-45 disabled:cursor-not-allowed"
                         >
-                          <span>Don&apos;t know</span>
+                          <span>{gradingScore === 1 ? "Saving..." : "Don't know"}</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
                             Repeat again
                           </span>
@@ -1696,9 +1710,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             e.stopPropagation();
                             handleQuickAnswer(true);
                           }}
-                          className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200"
+                          disabled={gradingScore !== null}
+                          className="flex flex-col items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 px-2 shadow-sm transition-colors cursor-pointer font-bold animate-in zoom-in duration-200 disabled:opacity-45 disabled:cursor-not-allowed"
                         >
-                          <span>Know it</span>
+                          <span>{gradingScore === 2 ? "Saving..." : "Know it"}</span>
                           <span className="text-[9px] opacity-75 mt-0.5">
                             Done
                           </span>

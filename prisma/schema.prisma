@@ -72,6 +72,7 @@ model User {
   katsuyouReviewLogs       KatsuyouReviewLog[]
   katsuyouPracticeAttempts KatsuyouPracticeAttempt[]
   bunpouProgress           BunpouProgress[]
+  kanjiTamagoProgress      KanjiTamagoProgress[]
 }
 
 // ─────────────────────────────────────────
@@ -467,4 +468,49 @@ model BunpouQuestion {
 
   @@index([patternId])
 }
+
+// ─────────────────────────────────────────
+// Tabel: KanjiTamago
+// Menyimpan data kanji dari kanji_tamago.json
+// ─────────────────────────────────────────
+model KanjiTamago {
+  id          Int                   @id @default(autoincrement())
+  chapter     String                // Nomor Bab / "ka" (e.g. "1", "2", "漢字のパーツ")
+  topic       String                // Topik bab (e.g. "どうぞよろしく！")
+  category    String                // Kategori: "teishutsu_kanji" | "yomeru" | "mite_wakaru"
+  moji        String                // Karakter Kanji / kata (e.g. "私")
+  yomi        String                // Pembacaan / Furigana
+  imi         String                // Arti kata
+  progress    KanjiTamagoProgress[]
+  createdAt   DateTime              @default(now())
+
+  @@unique([chapter, category, moji])
+}
+
+// ─────────────────────────────────────────
+// Tabel: KanjiTamagoProgress
+// Melacak progres spaced repetition (SRS) & cerita memori pengguna
+// ─────────────────────────────────────────
+model KanjiTamagoProgress {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kanjiId     Int
+  kanji       KanjiTamago @relation(fields: [kanjiId], references: [id], onDelete: Cascade)
+  
+  // SRS properties
+  interval    Int         @default(0)
+  ease        Float       @default(2.5)
+  repetitions Int         @default(0)
+  dueDate     DateTime    @default(now())
+  
+  // Custom mnemonic memory story created by user
+  mnemonic    String?     @db.Text
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([userId, kanjiId])
+}
+
 
