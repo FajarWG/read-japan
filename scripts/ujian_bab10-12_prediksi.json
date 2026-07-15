@@ -1,0 +1,369 @@
+{
+  "meta": {
+    "title": "Prediksi Ujian できる日本語初級 Bab 10-12",
+    "source_basis": "Buku teks utama (本冊) bab 10-12, buku latihan (ワークブック) bab 10-12, dan pola 3 ujian sebelumnya (bab 1-3, 4-6, 7-9) milik siswa",
+    "chapters_covered": ["10 バスツアー", "11 私の生活", "12 病気・けが"],
+    "grammar_points": [
+      "まだ~ていません",
+      "~てきます",
+      "~が見えます/聞こえます",
+      "~てもいいですか",
+      "~ないでください",
+      "~ことができます",
+      "ナイ形・タ形・普通形",
+      "~ています (kebiasaan)",
+      "~たり~たりします",
+      "~とき",
+      "~んです",
+      "~たほうがいいです/~ないほうがいいです",
+      "~てから",
+      "~前に",
+      "partikel は/が/を/に/で/へ/の"
+    ],
+    "recommended_variation": "A",
+    "recommendation_reason": "Variasi A paling meniru pola 3 ujian sebelumnya: soal partikel dalam dialog panjang, tabel konjugasi kosong, dan konteks kalimat (動物園、バスツアー、病院) diambil langsung dari kosakata yang berulang di buku latihan halaman 64-81. Berdasarkan histori, guru menyusun ujian dengan menyalin ulang kalimat contoh dari buku latihan dengan angka/nama diganti - itulah pola Variasi A."
+  },
+  "variations": [
+    {
+      "id": "A",
+      "predicted_most_likely": true,
+      "total_points": 100,
+      "sections": [
+        {
+          "number": 1,
+          "type": "listening",
+          "instruction": "CDを聞いてください。それから書いてください。1.どちらがいいほうに◯をつけてください。",
+          "points_each": 1,
+          "questions": [
+            {
+              "id": "1-1",
+              "script": "A: もう荷物を送りましたか。 B: いいえ、まだ送っていません。",
+              "prompt": "田中さんは荷物を[ もう ・ まだ ]送っていません。",
+              "answer": "まだ"
+            },
+            {
+              "id": "1-2",
+              "script": "A: どこから何が見えますか。 B: 高いビルが見えます。",
+              "prompt": "そこから[ 山 ・ 高いビル ]が見えます。",
+              "answer": "高いビル"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "type": "fill_particle_in_dialogue",
+          "instruction": "（）に正しい助詞を書いてください。",
+          "points_each": 2,
+          "dialogue": [
+            { "speaker": "A", "text": "パクさん、バス停はどこですか。行き方（ を ）教えてください。", "blank_answer": "を" },
+            { "speaker": "B", "text": "そこ（ から ）何（ が ）見えますか。", "blank_answer": ["から", "が"] },
+            { "speaker": "A", "text": "大きい川（ が ）見えます。", "blank_answer": "が" },
+            { "speaker": "B", "text": "じゃ、橋（ を ）渡って、2つ目（ の ）交差点（ を ）右（ に ）曲がってください。", "blank_answer": ["を", "の", "を", "に"] },
+            { "speaker": "C", "text": "あのう、ここ（ に ）座ってもいいですか。", "blank_answer": "に" },
+            { "speaker": "A", "text": "のど（ が ）かわきました。", "blank_answer": "が" },
+            { "speaker": "B", "text": "あそこ（ で ）ジュースを飲むこと（ が ）できますよ。", "blank_answer": ["で", "が"] }
+          ]
+        },
+        {
+          "number": 3,
+          "type": "conjugation_table",
+          "instruction": "表を完成してください。（ナイ形・タ形）",
+          "points_each": 1,
+          "items": [
+            { "dictionary": "行きます", "nai_form": "行かない", "ta_form": "行った" },
+            { "dictionary": "泳ぎます", "nai_form": "泳がない", "ta_form": "泳いだ" },
+            { "dictionary": "話します", "nai_form": "話さない", "ta_form": "話した" },
+            { "dictionary": "座ります", "nai_form": "座らない", "ta_form": "座った" },
+            { "dictionary": "食べます", "nai_form": "食べない", "ta_form": "食べた" },
+            { "dictionary": "見ます", "nai_form": "見ない", "ta_form": "見た" },
+            { "dictionary": "来ます", "nai_form": "来ない", "ta_form": "来た" },
+            { "dictionary": "します", "nai_form": "しない", "ta_form": "した" }
+          ]
+        },
+        {
+          "number": 4,
+          "type": "grammar_transform",
+          "instruction": "（）の中の言葉を正しい形にして書いてください。",
+          "points_each": 2,
+          "questions": [
+            { "id": "4-1", "sentence": "コンビニでお弁当を（ 買います→買って ）きます。", "answer": "買って" },
+            { "id": "4-2", "sentence": "ここに荷物を（ 置きます→置かないで ）ください。", "answer": "置かないで" },
+            { "id": "4-3", "sentence": "写真を（ 撮ります→撮って ）もいいですか。", "answer": "撮って" },
+            { "id": "4-4", "sentence": "図書館で本を（ 読みます→読む ）ことができます。", "answer": "読む" },
+            { "id": "4-5", "sentence": "私は毎晩、うちで宿題を（ します→して ）います。", "answer": "して" },
+            { "id": "4-6", "sentence": "休みの日、掃除を（ します→し ）たり、洗濯を（ します→し ）たりします。", "answer": ["し", "し"] },
+            { "id": "4-7", "sentence": "雨の（ です→とき ）、部屋で本を読みます。", "answer": "とき" },
+            { "id": "4-8", "sentence": "どうしたんですか。おなかが（ 痛いです→痛い ）んです。", "answer": "痛い" },
+            { "id": "4-9", "sentence": "早く病院へ（ 行きます→行った ）ほうがいいですよ。", "answer": "行った" },
+            { "id": "4-10", "sentence": "手を（ 洗います→洗って ）から、ご飯を食べます。", "answer": "洗って" },
+            { "id": "4-11", "sentence": "ご飯を（ 食べます→食べる ）前に、薬を飲んでください。", "answer": "食べる" }
+          ]
+        },
+        {
+          "number": 5,
+          "type": "dialogue_completion",
+          "instruction": "絵を見て、（）に文を書いてください。",
+          "points_each": 3,
+          "questions": [
+            {
+              "id": "5-1",
+              "context": "病院で。医者：どうしましたか。",
+              "prompt": "A：（ おなかがとても痛いんです ）。",
+              "sample_answer": "おなかがとても痛いんです"
+            },
+            {
+              "id": "5-2",
+              "context": "医者：いつからですか。",
+              "prompt": "A：（ 昨日、晩ご飯を食べてから、痛くなりました ）。",
+              "sample_answer": "昨日、晩ご飯を食べてから、痛くなりました"
+            },
+            {
+              "id": "5-3",
+              "context": "動物園で。",
+              "prompt": "A：あっ、（ 鳥が飛んでいます ）。",
+              "sample_answer": "鳥が飛んでいます"
+            },
+            {
+              "id": "5-4",
+              "context": "バスツアーで。",
+              "prompt": "B：まだお弁当を（ 買っていません ）。",
+              "sample_answer": "買っていません"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "type": "true_false_reading",
+          "instruction": "文を読んで、◯ですか、✕ですか。",
+          "points_each": 3,
+          "passage": "私は先週、バスツアーで動物園へ行きました。動物園でパンダやペンギンを見ました。パンダは木に登っていました。ペンギンは泳いでいました。とても楽しかったです。それから、お弁当を買ってきて、みんなで食べました。帰る前に、お土産を買いました。",
+          "questions": [
+            { "id": "6-1", "statement": "私は先週、動物園へ行きました。", "answer": "◯" },
+            { "id": "6-2", "statement": "パンダは泳いでいました。", "answer": "✕" },
+            { "id": "6-3", "statement": "お弁当はうちで作りました。", "answer": "✕" },
+            { "id": "6-4", "statement": "帰る前に、お土産を買いました。", "answer": "◯" }
+          ]
+        },
+        {
+          "number": 7,
+          "type": "short_essay",
+          "instruction": "質問に答えて、文を書いてください。（2-3文）",
+          "points_each": 6,
+          "questions": [
+            { "id": "7-1", "prompt": "休みの日、何をしていますか。（~たり~たりします を使ってください）" },
+            { "id": "7-2", "prompt": "体の調子が悪いとき、どうしますか。（~たほうがいいです を使ってください）" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "predicted_most_likely": false,
+      "total_points": 100,
+      "sections": [
+        {
+          "number": 1,
+          "type": "listening",
+          "instruction": "CDを聞いてください。医者に何と言いますか。",
+          "points_each": 2,
+          "questions": [
+            {
+              "id": "1-1",
+              "script": "A: どうしたんですか。 B: 頭が痛いんです。おとといから痛いです。",
+              "prompt": "いつから頭が痛いですか。",
+              "answer": "おとといから"
+            },
+            {
+              "id": "1-2",
+              "script": "A: 薬を飲みましたか。 B: いいえ、まだ飲んでいません。",
+              "prompt": "薬を飲みましたか。",
+              "answer": "いいえ、まだ飲んでいません"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "type": "fill_particle_in_dialogue",
+          "instruction": "（）に正しい助詞を書いてください。",
+          "points_each": 2,
+          "dialogue": [
+            { "speaker": "A", "text": "どうしたんですか。", "blank_answer": null },
+            { "speaker": "B", "text": "のど（ が ）痛いんです。", "blank_answer": "が" },
+            { "speaker": "A", "text": "大丈夫ですか。のど（ が ）痛い（ とき ）、あまり声（ を ）出さないほうがいいですよ。", "blank_answer": ["が", "とき", "を"] },
+            { "speaker": "B", "text": "そうですね。アルバイト（ の ）前に病院へ行きます。", "blank_answer": "の" },
+            { "speaker": "A", "text": "けが（ を ）しましたか。", "blank_answer": "を" },
+            { "speaker": "B", "text": "はい。薬局（ で ）薬（ を ）もらってください。", "blank_answer": ["で", "を"] }
+          ]
+        },
+        {
+          "number": 3,
+          "type": "conjugation_table",
+          "instruction": "表を完成してください。（普通形：辞書形・ナイ形・タ形・ナカッタ形）",
+          "points_each": 1,
+          "items": [
+            { "dictionary": "買う", "nai_form": "買わない", "ta_form": "買った", "nakatta_form": "買わなかった" },
+            { "dictionary": "読む", "nai_form": "読まない", "ta_form": "読んだ", "nakatta_form": "読まなかった" },
+            { "dictionary": "ある", "nai_form": "ない", "ta_form": "あった", "nakatta_form": "なかった" },
+            { "dictionary": "食べる", "nai_form": "食べない", "ta_form": "食べた", "nakatta_form": "食べなかった" },
+            { "dictionary": "来る", "nai_form": "来ない", "ta_form": "来た", "nakatta_form": "来なかった" },
+            { "dictionary": "忙しい", "nai_form": "忙しくない", "ta_form": "忙しかった", "nakatta_form": "忙しくなかった" },
+            { "dictionary": "好き（だ）", "nai_form": "好きじゃない", "ta_form": "好きだった", "nakatta_form": "好きじゃなかった" }
+          ]
+        },
+        {
+          "number": 4,
+          "type": "grammar_transform",
+          "instruction": "（）の中の言葉を正しい形にして書いてください。",
+          "points_each": 2,
+          "questions": [
+            { "id": "4-1", "sentence": "私は毎朝、新聞を（ 読みます→読んで ）います。", "answer": "読んで" },
+            { "id": "4-2", "sentence": "1か月に3回、書道教室に（ 通います→通って ）います。", "answer": "通って" },
+            { "id": "4-3", "sentence": "中学生の（ です→とき ）、ギターを始めました。", "answer": "とき" },
+            { "id": "4-4", "sentence": "疲れた（ です→とき ）、うちでゆっくり（ 休みます→休んだ ）ほうがいいですよ。", "answer": ["とき", "休んだ"] },
+            { "id": "4-5", "sentence": "薬を飲んだとき、お酒を（ 飲みます→飲まない ）ほうがいいですよ。", "answer": "飲まない" },
+            { "id": "4-6", "sentence": "冬に北海道へ行くとき、暖かい服を（ 持って行きます→持って行った ）ほうがいいです。", "answer": "持って行った" },
+            { "id": "4-7", "sentence": "予約を（ します→して ）から、病院へ行きます。", "answer": "して" },
+            { "id": "4-8", "sentence": "旅行に行く（ です→前に ）、チケットを予約します。", "answer": "前に" },
+            { "id": "4-9", "sentence": "今朝からおなかの調子が（ よくないです→よくない ）んです。", "answer": "よくない" },
+            { "id": "4-10", "sentence": "毎日、コーヒーを（ 飲みます→飲む ）。", "answer": "飲む" }
+          ]
+        },
+        {
+          "number": 5,
+          "type": "dialogue_completion",
+          "instruction": "絵を見て、対話を完成してください。",
+          "points_each": 3,
+          "questions": [
+            { "id": "5-1", "context": "学校で。先生：あのう、早く帰ってもいいですか。", "prompt": "先生：どうしたんですか。 A：（ 頭が痛いんです ）。", "sample_answer": "頭が痛いんです" },
+            { "id": "5-2", "context": "友達に。", "prompt": "A：Bさん、昨日、どうしたんですか。飲み会に来ませんでしたね。 B：（ 風邪をひいたんです ）。", "sample_answer": "風邪をひいたんです" },
+            { "id": "5-3", "context": "次の日、病院で。", "prompt": "医者：どうしましたか。 A：おなかがとても（ 痛いんです ）。熱も（ あるんです ）。", "sample_answer": ["痛いんです", "あるんです"] }
+          ]
+        },
+        {
+          "number": 6,
+          "type": "true_false_reading",
+          "instruction": "文を読んで、◯ですか、✕ですか。",
+          "points_each": 3,
+          "passage": "昨日の朝から調子が悪くなりました。昨日の夜、家へ帰ってから、痛くなりました。今朝、学校へ来る前に、薬を飲みました。でも、まだ痛いです。先生は早く家へ帰って、ゆっくり休んだほうがいいと言いました。",
+          "questions": [
+            { "id": "6-1", "statement": "おとといの朝から調子が悪いです。", "answer": "✕" },
+            { "id": "6-2", "statement": "家へ帰ってから、痛くなりました。", "answer": "◯" },
+            { "id": "6-3", "statement": "薬をまだ飲んでいません。", "answer": "✕" },
+            { "id": "6-4", "statement": "先生はゆっくり休んだほうがいいと言いました。", "answer": "◯" }
+          ]
+        },
+        {
+          "number": 7,
+          "type": "short_essay",
+          "instruction": "質問に答えて、文を書いてください。",
+          "points_each": 6,
+          "questions": [
+            { "id": "7-1", "prompt": "いつ日本語の勉強を始めましたか。（~とき を使ってください）" },
+            { "id": "7-2", "prompt": "今の生活はどうですか。前の生活と比べて書いてください。（~が、~ を使ってください）" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "predicted_most_likely": false,
+      "total_points": 100,
+      "sections": [
+        {
+          "number": 1,
+          "type": "listening",
+          "instruction": "CDを聞いてください。友達はどんなアドバイスをしていますか。a~dから選んでください。",
+          "points_each": 2,
+          "options": { "a": "病院へ行く", "b": "たくさん寝る", "c": "たばこを吸わない", "d": "運動をする" },
+          "questions": [
+            { "id": "1-1", "script": "ワンさんは病院へ行ったほうがいいと言いました。それから、たばこを吸わないほうがいいとも言いました。", "prompt": "ワンさんのアドバイス", "answer": ["a", "c"] },
+            { "id": "1-2", "script": "パクさんは運動をしたほうがいいと言いました。", "prompt": "パクさんのアドバイス", "answer": "d" }
+          ]
+        },
+        {
+          "number": 2,
+          "type": "fill_particle_in_dialogue",
+          "instruction": "（）に正しい助詞を書いてください。",
+          "points_each": 2,
+          "dialogue": [
+            { "speaker": "A", "text": "いつ日本語（ の ）勉強（ を ）始めましたか。", "blank_answer": ["の", "を"] },
+            { "speaker": "B", "text": "大学生（ の ）とき、始めました。高校生（ の ）とき、初めて日本の漫画を読みました。", "blank_answer": ["の", "の"] },
+            { "speaker": "A", "text": "エレナさん、もう日本の生活（ に ）慣れましたか。", "blank_answer": "に" },
+            { "speaker": "B", "text": "はい、もう慣れました。休み（ の ）日、たいてい図書館（ で ）勉強しています。", "blank_answer": ["の", "で"] },
+            { "speaker": "A", "text": "高校（ を ）卒業したとき、先生（ に ）辞書をもらいました。", "blank_answer": ["を", "に"] }
+          ]
+        },
+        {
+          "number": 3,
+          "type": "conjugation_table",
+          "instruction": "表を完成してください。（タ形）",
+          "points_each": 1,
+          "items": [
+            { "dictionary": "買います", "ta_form": "買った" },
+            { "dictionary": "会います", "ta_form": "会った" },
+            { "dictionary": "持ちます", "ta_form": "もった" },
+            { "dictionary": "読みます", "ta_form": "読んだ" },
+            { "dictionary": "行きます", "ta_form": "行った" },
+            { "dictionary": "泳ぎます", "ta_form": "泳いだ" },
+            { "dictionary": "話します", "ta_form": "話した" },
+            { "dictionary": "食べます", "ta_form": "食べた" },
+            { "dictionary": "来ます", "ta_form": "来た" },
+            { "dictionary": "します", "ta_form": "した" }
+          ]
+        },
+        {
+          "number": 4,
+          "type": "grammar_transform",
+          "instruction": "（）の中の言葉を正しい形にして書いてください。",
+          "points_each": 2,
+          "questions": [
+            { "id": "4-1", "sentence": "日曜日、買い物に（ 行きます→行った ）り、友達と食事に（ 行きます→行った ）りします。", "answer": ["行った", "行った"] },
+            { "id": "4-2", "sentence": "冬休み、北海道でスキーを（ します→し ）たり、温泉に（ 入ります→入った ）りしたいです。", "answer": ["し", "入った"] },
+            { "id": "4-3", "sentence": "道が（ わかりません→わからない ）とき、地図を見ます。", "answer": "わからない" },
+            { "id": "4-4", "sentence": "消しゴムを（ 忘れます→忘れた ）とき、友達に借ります。", "answer": "忘れた" },
+            { "id": "4-5", "sentence": "去年、友達と一緒にアメリカへ行きました。アメリカへ（ 行きます→行く ）とき、大きいかばんがありませんでした。", "answer": "行く" },
+            { "id": "4-6", "sentence": "ボストンのレストランに（ 入ります→入った ）とき、店員さんの英語が全然（ わかりません→わかりませんでした ）。", "answer": ["入った", "わかりませんでした"] },
+            { "id": "4-7", "sentence": "薬を飲んだ（ です→とき ）、お酒を飲まないほうがいいですよ。", "answer": "とき" },
+            { "id": "4-8", "sentence": "できるだけ自分で料理を（ 作ります→作った ）ほうがいいですよ。", "answer": "作った" },
+            { "id": "4-9", "sentence": "上着を（ 脱ぎます→脱いで ）から、ここに横になってください。", "answer": "脱いで" },
+            { "id": "4-10", "sentence": "走る（ です→前に ）、準備運動します。", "answer": "前に" }
+          ]
+        },
+        {
+          "number": 5,
+          "type": "dialogue_completion",
+          "instruction": "絵を見て、（）に文を書いてください。",
+          "points_each": 3,
+          "questions": [
+            { "id": "5-1", "context": "アドバイスをしてください。", "prompt": "趣味はゲームです。昨日6時間ゲームをしましたから、あまり寝ませんでした。私は運動が嫌いです。→（ できるだけゲームはあまりしないほうがいいですよ。1週間に1回くらい、運動もしたほうがいいです ）", "sample_answer": "できるだけゲームはあまりしないほうがいいですよ。1週間に1回くらい、運動もしたほうがいいです" },
+            { "id": "5-2", "context": "病院で。", "prompt": "A：どうしましたか。 B：（ おなかが痛いんです ）。", "sample_answer": "おなかが痛いんです" },
+            { "id": "5-3", "context": "動物園で自転車を借りたい。", "prompt": "A：あ、私も自転車に乗りたいです。 B：あそこで自転車を（ 借りる ）ことができますよ。", "sample_answer": "借りる" }
+          ]
+        },
+        {
+          "number": 6,
+          "type": "true_false_reading",
+          "instruction": "文を読んで、◯ですか、✕ですか。",
+          "points_each": 3,
+          "passage": "初めは日本の生活は大変でしたが、今は楽しくなりました。初め、日本語の勉強は難しかったですが、今はおもしろいです。私は毎朝、散歩をしています。1週間に3回、アルバイトをします。休みの日、音楽を聞いたりゲームをしたりしています。",
+          "questions": [
+            { "id": "6-1", "statement": "今、日本の生活は楽しいです。", "answer": "◯" },
+            { "id": "6-2", "statement": "日本語の勉強は今も難しいです。", "answer": "✕" },
+            { "id": "6-3", "statement": "毎晩、散歩をしています。", "answer": "✕" },
+            { "id": "6-4", "statement": "1週間に3回、アルバイトをします。", "answer": "◯" }
+          ]
+        },
+        {
+          "number": 7,
+          "type": "short_essay",
+          "instruction": "質問に答えて、文を書いてください。",
+          "points_each": 6,
+          "questions": [
+            { "id": "7-1", "prompt": "「今までの私」の年表を作って、エピソードを話してください。（~とき を使って3文以上）" },
+            { "id": "7-2", "prompt": "友達が風邪をひきました。アドバイスをしてください。（~たほうがいいです/~ないほうがいいです を使ってください）" }
+          ]
+        }
+      ]
+    }
+  ]
+}

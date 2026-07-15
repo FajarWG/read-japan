@@ -12,6 +12,8 @@ import {
   createKotobaLookupEntry,
   type KotobaLookupEntry,
 } from "@/src/modules/prep/lib/kotoba-lookup";
+import { LatihanUjian } from "./LatihanUjian";
+
 
 interface PrepContentProps {
   username?: string | null;
@@ -290,7 +292,7 @@ export function PrepContent({ username, role }: PrepContentProps) {
   const { lang, t } = useLanguage();
 
   // State pemilihan bab & poin & mode
-  const [studyMode, setStudyMode] = useState<"biasa" | "ujian" | null>(null);
+  const [studyMode, setStudyMode] = useState<"biasa" | "ujian" | "latihan" | null>(null);
   const [chapter, setChapter] = useState<number>(1);
   const [point, setPoint] = useState<number>(1);
   const [examGroup, setExamGroup] = useState<number>(1);
@@ -365,7 +367,7 @@ export function PrepContent({ username, role }: PrepContentProps) {
   useEffect(() => {
     const storedChapter = localStorage.getItem("rj-prep-chapter");
     const storedPoint = localStorage.getItem("rj-prep-point");
-    const storedStudyMode = localStorage.getItem("rj-prep-studymode") as "biasa" | "ujian" | null;
+    const storedStudyMode = localStorage.getItem("rj-prep-studymode") as "biasa" | "ujian" | "latihan" | null;
     const storedExamGroup = localStorage.getItem("rj-prep-examgroup");
     if (storedChapter) {
       setChapter(Number(storedChapter));
@@ -398,6 +400,11 @@ export function PrepContent({ username, role }: PrepContentProps) {
   useEffect(() => {
     if (!isLoaded) return;
     if (!studyMode) return;
+    if (studyMode === "latihan") {
+      setLoading(false);
+      setData(null);
+      return;
+    }
     async function fetchPrepData() {
       setLoading(true);
       setIsEditing(false);
@@ -959,7 +966,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
   if (studyMode === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-        <div className="flex w-full max-w-3xl flex-col gap-8">
+        <div className="flex w-full max-w-4xl flex-col gap-8 animate-page-enter">
           <header className="text-center">
             <h1 className="font-jp text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl animate-pulse">
               日本語フロー
@@ -969,7 +976,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
             </p>
           </header>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {/* Card Belajar Biasa */}
             <Card
               onClick={() => setStudyMode("biasa")}
@@ -1015,6 +1022,29 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                 Mulai Ujian
               </Button>
             </Card>
+
+            {/* Card Latihan Ujian */}
+            <Card
+              onClick={() => setStudyMode("latihan")}
+              className="group border border-border bg-surface p-6 shadow-sm hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between h-64 rounded-2xl"
+            >
+              <div className="flex flex-col gap-3">
+                <span className="text-4xl">🎯</span>
+                <h2 className="font-jp text-lg font-bold text-foreground group-hover:text-indigo-500 transition-colors">
+                  Latihan Ujian
+                </h2>
+                <p className="text-xs text-muted leading-relaxed">
+                  Uji kemampuan Anda dengan latihan soal interaktif dari bab 10-12. Penilaian otomatis dan ulasan jawaban lengkap.
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                className="w-full font-semibold bg-indigo-500/10 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors cursor-pointer rounded-xl"
+                onClick={() => setStudyMode("latihan")}
+              >
+                Mulai Latihan
+              </Button>
+            </Card>
           </div>
         </div>
       </div>
@@ -1031,7 +1061,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
               <h1 className="font-jp text-base sm:text-lg font-bold leading-tight text-foreground flex items-center gap-2 truncate">
                 <span>日本語フロー</span>
                 <span className="font-sans text-[10px] sm:text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">
-                  {studyMode === "biasa" ? "Prep" : "Ujian"}
+                  {studyMode === "biasa" ? "Prep" : studyMode === "ujian" ? "Ujian" : "Latihan Ujian"}
                 </span>
               </h1>
             </div>
@@ -2206,6 +2236,15 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
                   </div>
                 ) : null}
               </>
+            )}
+
+            {studyMode === "latihan" && (
+              <LatihanUjian
+                onBackToMenu={() => {
+                  setStudyMode(null);
+                  setIsEditing(false);
+                }}
+              />
             )}
 
           </main>
