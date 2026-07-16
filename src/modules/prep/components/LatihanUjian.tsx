@@ -61,6 +61,36 @@ const examPredictions = examPredictionsRaw as {
   variations: ExamVariation[];
 };
 
+// Helper function to render furigana in ruby tags
+const renderFurigana = (text: string): React.ReactNode => {
+  if (!text) return "";
+  const regex = /\(([^)]+)\)([\u4e00-\u9fff\u3005]+)/g;
+  const parts = text.split(regex);
+  if (parts.length === 1) return text;
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        const mod = index % 3;
+        if (mod === 0) {
+          return part;
+        } else if (mod === 1) {
+          const furigana = part;
+          const kanji = parts[index + 1];
+          return (
+            <ruby key={index}>
+              {kanji}
+              <rt className="text-[10px] font-normal leading-none text-muted/80 font-sans select-none">{furigana}</rt>
+            </ruby>
+          );
+        } else {
+          return null; // Skip kanji since it was rendered inside ruby
+        }
+      })}
+    </>
+  );
+};
+
 interface LatihanUjianProps {
   onBackToMenu: () => void;
 }
@@ -368,7 +398,7 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                     <div className="mt-2 text-[11px] bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-300 p-2.5 rounded-xl flex items-start gap-1.5 leading-relaxed">
                       <span>💡</span>
                       <div>
-                        <strong>Rekomendasi Ujian:</strong> {examPredictions.meta.recommendation_reason}
+                        <strong>Rekomendasi Ujian:</strong> {renderFurigana(examPredictions.meta.recommendation_reason)}
                       </div>
                     </div>
                   )}
@@ -508,8 +538,8 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-500">
                     Bagian {section.number} — {section.type.replace(/_/g, " ")}
                   </span>
-                  <h3 className="font-jp text-base font-bold text-foreground mt-0.5">
-                    {section.instruction}
+                  <h3 className="font-jp text-base font-bold text-foreground mt-0.5 leading-relaxed">
+                    {renderFurigana(section.instruction)}
                   </h3>
                 </div>
                 <span className="text-xs bg-slate-500/10 text-muted px-2.5 py-1 rounded-lg font-semibold whitespace-nowrap">
@@ -530,13 +560,13 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                         <div className="flex flex-col gap-1.5">
                           <span className="text-[10px] font-bold text-indigo-500 uppercase">Script Pengganti Audio:</span>
                           <p className="font-jp text-sm leading-relaxed p-2.5 bg-background border border-border rounded-xl text-foreground">
-                            {q.script}
+                            {renderFurigana(q.script || "")}
                           </p>
                         </div>
 
                         <div className="flex flex-col gap-2">
                           <span className="text-xs font-semibold text-foreground">
-                            Soal: {q.prompt}
+                            Soal: {renderFurigana(q.prompt || "")}
                           </span>
 
                           {/* Jika ada opsi pilihan ganda / checkbox (Variation C) */}
@@ -587,8 +617,8 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                                       }}
                                       className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
                                     />
-                                    <span>
-                                      ({optKey}) {optVal}
+                                    <span className="leading-relaxed">
+                                      ({optKey}) {renderFurigana(optVal)}
                                     </span>
                                   </label>
                                 );
@@ -654,7 +684,7 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                             if (idx % 2 === 0) {
                               return (
                                 <span key={idx} className="font-jp text-base text-foreground leading-loose">
-                                  {part}
+                                  {renderFurigana(part)}
                                 </span>
                               );
                             } else {
@@ -730,7 +760,7 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                         return (
                           <tr key={itemIdx} className="hover:bg-surface-muted/20">
                             <td className="px-4 py-3 border-r border-border font-jp font-bold text-sm text-foreground whitespace-nowrap bg-slate-500/5">
-                              {item.dictionary}
+                              {renderFurigana(item.dictionary)}
                             </td>
                             {formKeys.map((colKey: string) => {
                               const answerKey = `sec_${secIdx}_conj_${itemIdx}_${colKey}`;
@@ -784,7 +814,7 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                           <span className="font-sans text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-md mr-2 font-bold select-none">
                             {q.id}
                           </span>
-                          {parseGrammarSentence(q.sentence || "")}
+                          {renderFurigana(parseGrammarSentence(q.sentence || ""))}
                         </p>
                         <div className="flex flex-wrap gap-4 items-center mt-1">
                           {expectedAnswers.map((expectedVal, blankIdx: number) => {
@@ -846,7 +876,7 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                             if (idx % 2 === 0) {
                               return (
                                 <span key={idx} className="font-jp text-base text-foreground leading-loose">
-                                  {part}
+                                  {renderFurigana(part)}
                                 </span>
                               );
                             } else {
@@ -898,7 +928,7 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                         Teks Bacaan (Passage):
                       </span>
                       <p className="font-jp text-base leading-loose text-foreground">
-                        {section.passage}
+                        {renderFurigana(section.passage)}
                       </p>
                     </div>
                   )}
@@ -915,7 +945,7 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                             key={q.id}
                             className="flex items-center justify-between p-3.5 border border-border bg-surface-muted/10 rounded-2xl gap-4 flex-col sm:flex-row"
                           >
-                            <span className="font-jp text-sm text-foreground">{q.statement}</span>
+                            <span className="font-jp text-sm text-foreground leading-relaxed">{renderFurigana(q.statement || "")}</span>
                             <div className="flex gap-2 shrink-0">
                               {["◯", "✕"].map((opt) => {
                                 const isSelected = val === opt;
@@ -967,8 +997,8 @@ export function LatihanUjian({ onBackToMenu }: LatihanUjianProps) {
                     return (
                       <div key={q.id} className="flex flex-col gap-3 p-4 border border-border bg-surface-muted/30 rounded-2xl">
                         <div className="flex items-center justify-between gap-4">
-                          <span className="font-jp text-sm font-bold text-foreground">
-                            {q.prompt}
+                          <span className="font-jp text-sm font-bold text-foreground leading-relaxed">
+                            {renderFurigana(q.prompt || "")}
                           </span>
                           <span className="text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full select-none shrink-0">
                             ✍️ Dinilai Manual
