@@ -7,10 +7,9 @@ import { HandwritingPracticeWidget } from "@/src/shared/components/HandwritingPr
 
 interface ExamplesTabProps {
   formKey: string;
-  lang: "en" | "id";
 }
 
-export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
+export function ExamplesTab({ formKey }: ExamplesTabProps) {
   const sentences = CONJUGATION_EXAMPLES[formKey] || [];
   const [showFurigana, setShowFurigana] = useState(true);
   const [showRomaji, setShowRomaji] = useState(true);
@@ -20,7 +19,7 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-muted">
         <Info className="w-8 h-8 mb-2" />
-        <p>{lang === "en" ? "No examples available for this form." : "Contoh kalimat tidak tersedia untuk bentuk ini."}</p>
+        <p>No examples available for this form.</p>
       </div>
     );
   }
@@ -49,7 +48,7 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
       {/* ── Display Options Bar ─────────────────────────── */}
       <div className="flex items-center justify-between gap-4 border border-border/40 bg-surface/50 rounded-2xl p-4 shadow-2xs select-none">
         <span className="text-xs font-bold text-muted uppercase tracking-wider">
-          {lang === "en" ? "Study Options" : "Opsi Belajar"}
+          Study Options
         </span>
         <div className="flex items-center gap-4">
           <button
@@ -62,7 +61,7 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
             ].join(" ")}
           >
             {showFurigana ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-            {lang === "en" ? "Furigana" : "Furigana"}
+            Furigana
           </button>
 
           <button
@@ -75,7 +74,7 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
             ].join(" ")}
           >
             {showRomaji ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-            {lang === "en" ? "Romaji" : "Romaji"}
+            Romaji
           </button>
         </div>
       </div>
@@ -107,10 +106,10 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
                     ? "bg-accent/15 border-accent/25 text-accent font-extrabold"
                     : "bg-background border-border/40 text-muted hover:text-foreground"
                 ].join(" ")}
-                title={lang === "en" ? "Practice writing conjugation" : "Latih menulis konjugasi"}
+                title="Practice writing conjugation"
               >
                 <PenTool className="w-3.5 h-3.5" />
-                <span>{lang === "en" ? "Practice" : "Tulis"}</span>
+                <span>Practice</span>
               </button>
             </div>
 
@@ -131,7 +130,6 @@ export function ExamplesTab({ formKey, lang }: ExamplesTabProps) {
               <div className="border-t border-border/25 pt-4 mt-1">
                 <HandwritingPracticeWidget
                   expected={sen.japanese}
-                  lang={lang}
                   onClose={() => setActivePracticeIndex(null)}
                 />
               </div>

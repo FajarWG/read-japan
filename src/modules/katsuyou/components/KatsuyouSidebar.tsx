@@ -38,7 +38,6 @@ interface KatsuyouSidebarProps {
   onSelectForm: (key: string) => void;
   completedLessons: string[];
   dueReviewsByForm: Record<string, number>;
-  lang: "en" | "id";
 }
 
 export function KatsuyouSidebar({
@@ -46,19 +45,18 @@ export function KatsuyouSidebar({
   onSelectForm,
   completedLessons,
   dueReviewsByForm,
-  lang,
 }: KatsuyouSidebarProps) {
   const groups = {
     basic: {
-      title: lang === "en" ? "Basic Forms" : "Bentuk Dasar",
+      title: "Basic Forms",
       items: CONJUGATION_FORMS.filter((f) => f.level === "basic"),
     },
     intermediate: {
-      title: lang === "en" ? "Intermediate Forms" : "Bentuk Menengah",
+      title: "Intermediate Forms",
       items: CONJUGATION_FORMS.filter((f) => f.level === "intermediate"),
     },
     advanced: {
-      title: lang === "en" ? "Advanced Forms" : "Bentuk Mahir",
+      title: "Advanced Forms",
       items: CONJUGATION_FORMS.filter((f) => f.level === "advanced"),
     },
   };
@@ -92,7 +90,7 @@ export function KatsuyouSidebar({
                       {form.jpName}
                     </span>
                     <span className="text-sm font-bold truncate leading-snug">
-                      {lang === "en" ? form.labelEn : form.labelId}
+                      {form.labelEn}
                     </span>
                   </div>
 

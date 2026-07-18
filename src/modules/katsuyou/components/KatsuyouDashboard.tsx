@@ -4,10 +4,10 @@ import React, { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
 import { Tabs } from "@heroui/react";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
-import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { KatsuyouSidebar, CONJUGATION_FORMS } from "./KatsuyouSidebar";
 import { LearnTab } from "./LearnTab";
 import { ExamplesTab } from "./ExamplesTab";
+import { ConjugationTableTab } from "./ConjugationTableTab";
 import { PracticeTab } from "./PracticeTab";
 import { ReviewTab } from "./ReviewTab";
 import { getKatsuyouStats } from "../actions/katsuyouActions";
@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 
 export function KatsuyouDashboard() {
-  const { lang } = useLanguage();
   const [selectedForm, setSelectedForm] = useState<string>("dictionary");
   const [activeTab, setActiveTab] = useState<string>("learn");
   const [showSidebar, setShowSidebar] = useState(true);
@@ -76,37 +75,21 @@ export function KatsuyouDashboard() {
   };
 
   const text = {
-    en: {
-      title: "Katsuyou — Verb Conjugation",
-      subtitle:
-        "Master Japanese verb structures with interactive guides, quizzes, and spaced repetition.",
-      backHome: "Back to Home",
-      tabLearn: "Learn",
-      tabExamples: "Examples",
-      tabPractice: "Practice",
-      tabReview: "Review",
-      progress: "Overall Completion",
-      loading: "Loading profile progress...",
-      statsDue: "Reviews Due",
-      statsTotal: "Cards Learned",
-      statsPractice: "Practices Logged",
-    },
-    id: {
-      title: "Katsuyou",
-      subtitle:
-        "Kuasai perubahan kata kerja Jepang dengan panduan interaktif, latihan kuis, dan SRS.",
-      backHome: "Kembali ke Beranda",
-      tabLearn: "Pelajari",
-      tabExamples: "Contoh",
-      tabPractice: "Latihan",
-      tabReview: "Review",
-      progress: "Progres Selesai",
-      loading: "Memuat progres profil...",
-      statsDue: "Review Mengantre",
-      statsTotal: "Kosakata Dipelajari",
-      statsPractice: "Latihan Selesai",
-    },
-  }[lang];
+    title: "Katsuyou — Verb Conjugation",
+    subtitle:
+      "Master Japanese verb structures with interactive guides, quizzes, and spaced repetition.",
+    backHome: "Back to Home",
+    tabLearn: "Learn",
+    tabExamples: "Examples",
+    tabTable: "Table",
+    tabPractice: "Practice",
+    tabReview: "Review",
+    progress: "Overall Completion",
+    loading: "Loading profile progress...",
+    statsDue: "Reviews Due",
+    statsTotal: "Cards Learned",
+    statsPractice: "Practices Logged",
+  };
 
   // Calculate completion percentage
   const totalLessons = CONJUGATION_FORMS.length;
@@ -218,7 +201,6 @@ export function KatsuyouDashboard() {
               }}
               completedLessons={stats.completedLessons}
               dueReviewsByForm={stats.dueReviewsByForm}
-              lang={lang}
             />
           </div>
 
@@ -230,7 +212,7 @@ export function KatsuyouDashboard() {
               "hidden md:flex absolute top-0 bottom-0 z-45 items-center justify-center w-3.5 hover:bg-border/20 border-r border-border/30 cursor-pointer select-none transition-all duration-300 ease-in-out group",
               showSidebar ? "left-[256px]" : "left-0"
             ].join(" ")}
-            title={showSidebar ? (lang === "en" ? "Hide Sidebar" : "Sembunyikan Sidebar") : (lang === "en" ? "Show Sidebar" : "Tampilkan Sidebar")}
+            title={showSidebar ? "Hide Sidebar" : "Show Sidebar"}
           >
             {/* Centered pull-tab chevron */}
             <div className="absolute top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-white dark:bg-surface border border-border shadow-xs scale-100 group-hover:scale-110 transition-all duration-200 z-50">
@@ -265,7 +247,7 @@ export function KatsuyouDashboard() {
                               {activeForm.jpName}
                             </span>
                             <span className="text-sm font-bold text-foreground mt-0.5 leading-snug">
-                              {lang === "en" ? activeForm.labelEn : activeForm.labelId}
+                              {activeForm.labelEn}
                             </span>
                           </div>
                         </div>
@@ -275,7 +257,7 @@ export function KatsuyouDashboard() {
                           onClick={() => setShowSidebar(true)}
                           className="text-xs font-bold text-accent hover:underline cursor-pointer"
                         >
-                          {lang === "en" ? "Change Form" : "Ubah Bentuk"}
+                          Change Form
                         </button>
                       </div>
                     );
@@ -295,6 +277,10 @@ export function KatsuyouDashboard() {
                   </Tabs.Tab>
                   <Tabs.Tab id="examples">
                     {text.tabExamples}
+                    <Tabs.Indicator className="bg-accent" />
+                  </Tabs.Tab>
+                  <Tabs.Tab id="table">
+                    {text.tabTable}
                     <Tabs.Indicator className="bg-accent" />
                   </Tabs.Tab>
                   <Tabs.Tab id="practice">
@@ -320,7 +306,6 @@ export function KatsuyouDashboard() {
                     formKey={selectedForm}
                     isCompleted={stats.completedLessons.includes(selectedForm)}
                     onLessonCompleted={handleLessonCompleted}
-                    lang={lang}
                   />
                 </div>
               </Tabs.Panel>
@@ -328,7 +313,14 @@ export function KatsuyouDashboard() {
               {/* 📝 Examples Tab */}
               <Tabs.Panel id="examples">
                 <div className="page-enter">
-                  <ExamplesTab formKey={selectedForm} lang={lang} />
+                  <ExamplesTab formKey={selectedForm} />
+                </div>
+              </Tabs.Panel>
+
+              {/* 📋 Table Tab */}
+              <Tabs.Panel id="table">
+                <div className="page-enter">
+                  <ConjugationTableTab formKey={selectedForm} />
                 </div>
               </Tabs.Panel>
 
@@ -337,7 +329,6 @@ export function KatsuyouDashboard() {
                 <div className="page-enter">
                   <PracticeTab
                     formKey={selectedForm}
-                    lang={lang}
                     onProgressUpdate={handleProgressUpdate}
                   />
                 </div>
@@ -348,7 +339,6 @@ export function KatsuyouDashboard() {
                 <div className="page-enter">
                   <ReviewTab
                     formKey={selectedForm}
-                    lang={lang}
                     onProgressUpdate={handleProgressUpdate}
                   />
                 </div>

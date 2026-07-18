@@ -6,15 +6,13 @@ import { HandwritingCanvas } from "./HandwritingCanvas";
 
 interface HandwritingPracticeWidgetProps {
   expected: string;
-  lang: "en" | "id";
-  label?: string; // e.g. "Target Kalimat" or "Target Kata"
+  label?: string; // e.g. "Target Sentence" or "Target Conjugation"
   onClose?: () => void;
   className?: string;
 }
 
 export function HandwritingPracticeWidget({
   expected,
-  lang,
   label,
   onClose,
   className = ""
@@ -32,8 +30,8 @@ export function HandwritingPracticeWidget({
   // Default label: check if expected looks like a sentence (has a Japanese full stop or is long)
   const defaultLabel = label || (
     targetClean.includes("。") || targetClean.length > 6
-      ? (lang === "en" ? "Target Sentence:" : "Target Kalimat:")
-      : (lang === "en" ? "Target Conjugation:" : "Target Konjugasi:")
+      ? "Target Sentence:"
+      : "Target Conjugation:"
   );
 
   const handleCheck = () => {
@@ -53,7 +51,7 @@ export function HandwritingPracticeWidget({
     <div className={`flex flex-col gap-3 p-4 bg-surface border border-border/65 rounded-2xl shadow-sm w-full ${className}`}>
       <div className="flex items-center justify-between border-b border-border/40 pb-2">
         <span className="text-[10px] font-extrabold text-muted uppercase tracking-wider select-none">
-          {lang === "en" ? "Practice Writing" : "Latihan Menulis"}
+          Practice Writing
         </span>
         {onClose && (
           <button
@@ -85,14 +83,12 @@ export function HandwritingPracticeWidget({
             )}
             <div className="flex flex-col gap-1">
               <h4 className={`text-xs font-black uppercase tracking-wider ${isCorrect ? "text-emerald-500" : "text-red-500"}`}>
-                {isCorrect 
-                  ? lang === "en" ? "Excellent Accuracy!" : "Sangat Akurat!"
-                  : lang === "en" ? "Not Quite Correct" : "Belum Tepat"}
+                {isCorrect ? "Excellent Accuracy!" : "Not Quite Correct"}
               </h4>
               <p className="text-xs text-muted leading-relaxed font-semibold">
                 {isCorrect
-                  ? lang === "en" ? "You wrote the character beautifully." : "Tulisan Anda cocok dengan hasil konjugasi."
-                  : lang === "en" ? `Target: "${targetClean}". You wrote: "${getCleanJapanese(writtenText)}"` : `Target: "${targetClean}". Anda menulis: "${getCleanJapanese(writtenText)}"`}
+                  ? "You wrote it correctly."
+                  : `Target: "${targetClean}". You wrote: "${getCleanJapanese(writtenText)}"`}
               </p>
             </div>
           </div>
@@ -101,7 +97,7 @@ export function HandwritingPracticeWidget({
             onClick={handleRetry}
             className="w-full text-xs font-bold py-2 bg-foreground text-background rounded-lg hover:opacity-90 active:scale-95 transition-all cursor-pointer"
           >
-            {lang === "en" ? "Try Again" : "Coba Lagi"}
+            Try Again
           </button>
         </div>
       ) : (
@@ -110,7 +106,7 @@ export function HandwritingPracticeWidget({
             value={writtenText}
             onChange={setWrittenText}
             onSubmit={handleCheck}
-            placeholder={lang === "en" ? "Draw here..." : "Tulis di sini..."}
+            placeholder="Draw here..."
             hintText={targetClean}
           />
           <button
@@ -119,7 +115,7 @@ export function HandwritingPracticeWidget({
             disabled={!writtenText.trim()}
             className="w-full text-xs font-extrabold py-2.5 bg-accent hover:bg-accent/90 active:scale-95 text-white rounded-xl disabled:opacity-50 transition-all cursor-pointer shadow-3xs"
           >
-            {lang === "en" ? "Check Accuracy" : "Cek Akurasi"}
+            Check Accuracy
           </button>
         </div>
       )}

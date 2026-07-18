@@ -31,21 +31,20 @@ export function JLPTBadge({ level }: JLPTBadgeProps) {
 // ─────────────────────────────────────────
 interface VerbGroupBadgeProps {
   group: 1 | 2 | 3;
-  lang?: "en" | "id";
 }
 
-export function VerbGroupBadge({ group, lang = "en" }: VerbGroupBadgeProps) {
+export function VerbGroupBadge({ group }: VerbGroupBadgeProps) {
   const info = {
     1: {
-      text: lang === "en" ? "Group 1 (Godan)" : "Golongan 1 (Godan)",
+      text: "Group 1 (Godan)",
       style: "bg-emerald-500/10 border-emerald-500/25 text-emerald-600 dark:text-emerald-400",
     },
     2: {
-      text: lang === "en" ? "Group 2 (Ichidan)" : "Golongan 2 (Ichidan)",
+      text: "Group 2 (Ichidan)",
       style: "bg-amber-500/10 border-amber-500/25 text-amber-600 dark:text-amber-400",
     },
     3: {
-      text: lang === "en" ? "Group 3 (Irregular)" : "Golongan 3 (Irregular)",
+      text: "Group 3 (Irregular)",
       style: "bg-purple-500/10 border-purple-500/25 text-purple-600 dark:text-purple-400",
     },
   }[group];
@@ -77,20 +76,14 @@ export function GrammarBadge({ level }: GrammarBadgeProps) {
 // ─────────────────────────────────────────
 interface MistakeCalloutProps {
   titleEn: string;
-  titleId: string;
   descEn: string;
-  descId: string;
-  examples: { bad: string; good: string; noteEn: string; noteId: string }[];
-  lang: "en" | "id";
+  examples: { bad: string; good: string; noteEn: string }[];
 }
 
 export function MistakeCallout({
   titleEn,
-  titleId,
   descEn,
-  descId,
   examples,
-  lang,
 }: MistakeCalloutProps) {
   return (
     <div className="rounded-2xl border border-red-500/15 bg-red-500/[0.02] p-5 flex flex-col gap-4">
@@ -98,10 +91,10 @@ export function MistakeCallout({
         <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
         <div className="flex flex-col">
           <h4 className="text-sm font-extrabold text-foreground leading-tight">
-            ⚠️ {lang === "en" ? titleEn : titleId}
+            ⚠️ {titleEn}
           </h4>
           <p className="text-xs text-muted mt-1 leading-relaxed">
-            {lang === "en" ? descEn : descId}
+            {descEn}
           </p>
         </div>
       </div>
@@ -118,7 +111,7 @@ export function MistakeCallout({
               </span>
             </div>
             <p className="text-[10px] text-muted italic leading-relaxed border-t border-border/30 pt-1.5">
-              {lang === "en" ? ex.noteEn : ex.noteId}
+              {ex.noteEn}
             </p>
           </div>
         ))}
@@ -134,22 +127,18 @@ interface VerbCardProps {
   kanji: string;
   kana: string;
   romaji: string;
-  english: string;
   indonesian: string;
   jlpt: string;
   group: 1 | 2 | 3;
-  lang: "en" | "id";
 }
 
 export function VerbCard({
   kanji,
   kana,
   romaji,
-  english,
   indonesian,
   jlpt,
   group,
-  lang,
 }: VerbCardProps) {
   return (
     <div className="rounded-2xl border border-border bg-surface p-4 shadow-xs flex items-center justify-between gap-4">
@@ -161,13 +150,13 @@ export function VerbCard({
           {kanji}
         </h3>
         <p className="text-xs text-muted leading-tight mt-1.5 truncate">
-          {lang === "en" ? english : indonesian}
+          {indonesian}
         </p>
       </div>
 
       <div className="flex items-center gap-1.5 shrink-0">
         <JLPTBadge level={jlpt as any} />
-        <VerbGroupBadge group={group} lang={lang} />
+        <VerbGroupBadge group={group} />
       </div>
     </div>
   );
