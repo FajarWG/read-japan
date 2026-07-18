@@ -1,0 +1,2342 @@
+{
+  "私": [
+    {
+      "word": "私立",
+      "yomi": "しりつ",
+      "imi": "swasta (sekolah/lembaga)"
+    },
+    {
+      "word": "私生活",
+      "yomi": "しせいかつ",
+      "imi": "kehidupan pribadi"
+    }
+  ],
+  "人": [
+    {
+      "word": "日本人",
+      "yomi": "にほんじん",
+      "imi": "orang Jepang"
+    },
+    {
+      "word": "人気",
+      "yomi": "にんき",
+      "imi": "populer/popularitas"
+    }
+  ],
+  "才": [
+    {
+      "word": "天才",
+      "yomi": "てんさい",
+      "imi": "jenius"
+    },
+    {
+      "word": "才能",
+      "yomi": "さいのう",
+      "imi": "bakat"
+    }
+  ],
+  "学生": [
+    {
+      "word": "大学",
+      "yomi": "だいがく",
+      "imi": "universitas"
+    },
+    {
+      "word": "先生",
+      "yomi": "せんせい",
+      "imi": "guru"
+    },
+    {
+      "word": "学校",
+      "yomi": "がっこう",
+      "imi": "sekolah"
+    }
+  ],
+  "校": [
+    {
+      "word": "学校",
+      "yomi": "がっこう",
+      "imi": "sekolah"
+    },
+    {
+      "word": "校長",
+      "yomi": "こうちょう",
+      "imi": "kepala sekolah"
+    }
+  ],
+  "日本": [
+    {
+      "word": "毎日",
+      "yomi": "まいにち",
+      "imi": "setiap hari"
+    },
+    {
+      "word": "本屋",
+      "yomi": "ほんや",
+      "imi": "toko buku"
+    },
+    {
+      "word": "今日",
+      "yomi": "きょう",
+      "imi": "hari ini"
+    }
+  ],
+  "語": [
+    {
+      "word": "英語",
+      "yomi": "えいご",
+      "imi": "bahasa Inggris"
+    },
+    {
+      "word": "単語",
+      "yomi": "たんご",
+      "imi": "kosakata"
+    }
+  ],
+  "牛肉": [
+    {
+      "word": "牛乳",
+      "yomi": "ぎゅうにゅう",
+      "imi": "susu sapi"
+    },
+    {
+      "word": "焼肉",
+      "yomi": "やきにく",
+      "imi": "daging panggang"
+    }
+  ],
+  "豚肉": [
+    {
+      "word": "豚汁",
+      "yomi": "とんじる",
+      "imi": "sup miso dengan daging babi"
+    }
+  ],
+  "鶏肉": [
+    {
+      "word": "鶏卵",
+      "yomi": "けいらん",
+      "imi": "telur ayam"
+    }
+  ],
+  "〜産": [
+    {
+      "word": "生産",
+      "yomi": "せいさん",
+      "imi": "produksi"
+    },
+    {
+      "word": "出産",
+      "yomi": "しゅっさん",
+      "imi": "melahirkan"
+    }
+  ],
+  "〜引き": [
+    {
+      "word": "引く",
+      "yomi": "ひく",
+      "imi": "menarik"
+    },
+    {
+      "word": "割引",
+      "yomi": "わりびき",
+      "imi": "diskon"
+    }
+  ],
+  "酒": [
+    {
+      "word": "居酒屋",
+      "yomi": "いざかや",
+      "imi": "warung minum ala Jepang"
+    },
+    {
+      "word": "酒屋",
+      "yomi": "さかや",
+      "imi": "toko minuman keras"
+    }
+  ],
+  "一": [
+    {
+      "word": "一番",
+      "yomi": "いちばん",
+      "imi": "nomor satu/paling"
+    }
+  ],
+  "二": [
+    {
+      "word": "二人",
+      "yomi": "ふたり",
+      "imi": "dua orang"
+    }
+  ],
+  "三": [
+    {
+      "word": "三日",
+      "yomi": "みっか",
+      "imi": "tanggal tiga/tiga hari"
+    }
+  ],
+  "四": [
+    {
+      "word": "四月",
+      "yomi": "しがつ",
+      "imi": "bulan April"
+    }
+  ],
+  "五": [
+    {
+      "word": "五月",
+      "yomi": "ごがつ",
+      "imi": "bulan Mei"
+    }
+  ],
+  "六": [
+    {
+      "word": "六月",
+      "yomi": "ろくがつ",
+      "imi": "bulan Juni"
+    }
+  ],
+  "七": [
+    {
+      "word": "七月",
+      "yomi": "しちがつ",
+      "imi": "bulan Juli"
+    }
+  ],
+  "八": [
+    {
+      "word": "八月",
+      "yomi": "はちがつ",
+      "imi": "bulan Agustus"
+    }
+  ],
+  "九": [
+    {
+      "word": "九月",
+      "yomi": "くがつ",
+      "imi": "bulan September"
+    }
+  ],
+  "十": [
+    {
+      "word": "十月",
+      "yomi": "じゅうがつ",
+      "imi": "bulan Oktober"
+    }
+  ],
+  "百": [
+    {
+      "word": "百円",
+      "yomi": "ひゃくえん",
+      "imi": "seratus yen"
+    },
+    {
+      "word": "八百屋",
+      "yomi": "やおや",
+      "imi": "toko sayur"
+    }
+  ],
+  "千": [
+    {
+      "word": "千円",
+      "yomi": "せんえん",
+      "imi": "seribu yen"
+    }
+  ],
+  "万": [
+    {
+      "word": "一万円",
+      "yomi": "いちまんえん",
+      "imi": "sepuluh ribu yen"
+    }
+  ],
+  "円": [
+    {
+      "word": "円高",
+      "yomi": "えんだか",
+      "imi": "yen menguat"
+    },
+    {
+      "word": "円安",
+      "yomi": "えんやす",
+      "imi": "yen melemah"
+    }
+  ],
+  "雨": [
+    {
+      "word": "雨天",
+      "yomi": "うてん",
+      "imi": "cuaca hujan"
+    },
+    {
+      "word": "大雨",
+      "yomi": "おおあめ",
+      "imi": "hujan lebat"
+    }
+  ],
+  "場所": [
+    {
+      "word": "会場",
+      "yomi": "かいじょう",
+      "imi": "tempat acara"
+    },
+    {
+      "word": "台所",
+      "yomi": "だいどころ",
+      "imi": "dapur"
+    }
+  ],
+  "平日": [
+    {
+      "word": "平和",
+      "yomi": "へいわ",
+      "imi": "damai"
+    },
+    {
+      "word": "日曜日",
+      "yomi": "にちようび",
+      "imi": "hari Minggu"
+    }
+  ],
+  "祝日": [
+    {
+      "word": "祝う",
+      "yomi": "いわう",
+      "imi": "merayakan"
+    },
+    {
+      "word": "誕生日",
+      "yomi": "たんじょうび",
+      "imi": "ulang tahun"
+    }
+  ],
+  "月": [
+    {
+      "word": "月曜日",
+      "yomi": "げつようび",
+      "imi": "hari Senin"
+    },
+    {
+      "word": "今月",
+      "yomi": "こんげつ",
+      "imi": "bulan ini"
+    }
+  ],
+  "火": [
+    {
+      "word": "火曜日",
+      "yomi": "かようび",
+      "imi": "hari Selasa"
+    },
+    {
+      "word": "花火",
+      "yomi": "はなび",
+      "imi": "kembang api"
+    }
+  ],
+  "水": [
+    {
+      "word": "水曜日",
+      "yomi": "すいようび",
+      "imi": "hari Rabu"
+    },
+    {
+      "word": "水泳",
+      "yomi": "すいえい",
+      "imi": "berenang"
+    }
+  ],
+  "木": [
+    {
+      "word": "木曜日",
+      "yomi": "もくようび",
+      "imi": "hari Kamis"
+    },
+    {
+      "word": "木材",
+      "yomi": "もくざい",
+      "imi": "kayu/bahan kayu"
+    }
+  ],
+  "金": [
+    {
+      "word": "金曜日",
+      "yomi": "きんようび",
+      "imi": "hari Jumat"
+    },
+    {
+      "word": "お金",
+      "yomi": "おかね",
+      "imi": "uang"
+    }
+  ],
+  "土": [
+    {
+      "word": "土曜日",
+      "yomi": "どようび",
+      "imi": "hari Sabtu"
+    },
+    {
+      "word": "土地",
+      "yomi": "とち",
+      "imi": "tanah/lahan"
+    }
+  ],
+  "曜": [
+    {
+      "word": "何曜日",
+      "yomi": "なんようび",
+      "imi": "hari apa"
+    }
+  ],
+  "何": [
+    {
+      "word": "何時",
+      "yomi": "なんじ",
+      "imi": "jam berapa"
+    },
+    {
+      "word": "何回",
+      "yomi": "なんかい",
+      "imi": "berapa kali"
+    }
+  ],
+  "年": [
+    {
+      "word": "今年",
+      "yomi": "ことし",
+      "imi": "tahun ini"
+    },
+    {
+      "word": "来年",
+      "yomi": "らいねん",
+      "imi": "tahun depan"
+    }
+  ],
+  "時": [
+    {
+      "word": "時計",
+      "yomi": "とけい",
+      "imi": "jam/arloji"
+    },
+    {
+      "word": "一時",
+      "yomi": "いちじ",
+      "imi": "jam satu"
+    }
+  ],
+  "間": [
+    {
+      "word": "時間",
+      "yomi": "じかん",
+      "imi": "waktu"
+    },
+    {
+      "word": "人間",
+      "yomi": "にんげん",
+      "imi": "manusia"
+    }
+  ],
+  "分": [
+    {
+      "word": "分かる",
+      "yomi": "わかる",
+      "imi": "mengerti"
+    },
+    {
+      "word": "自分",
+      "yomi": "じぶん",
+      "imi": "diri sendiri"
+    }
+  ],
+  "電話": [
+    {
+      "word": "電車",
+      "yomi": "でんしゃ",
+      "imi": "kereta listrik"
+    },
+    {
+      "word": "会話",
+      "yomi": "かいわ",
+      "imi": "percakapan"
+    }
+  ],
+  "住所": [
+    {
+      "word": "住む",
+      "yomi": "すむ",
+      "imi": "tinggal (di suatu tempat)"
+    },
+    {
+      "word": "場所",
+      "yomi": "ばしょ",
+      "imi": "tempat"
+    }
+  ],
+  "〜歳": [
+    {
+      "word": "二十歳",
+      "yomi": "はたち",
+      "imi": "usia dua puluh tahun"
+    }
+  ],
+  "性別": [
+    {
+      "word": "女性",
+      "yomi": "じょせい",
+      "imi": "perempuan"
+    },
+    {
+      "word": "特別",
+      "yomi": "とくべつ",
+      "imi": "istimewa"
+    }
+  ],
+  "東": [
+    {
+      "word": "東京",
+      "yomi": "とうきょう",
+      "imi": "Tokyo"
+    },
+    {
+      "word": "東口",
+      "yomi": "ひがしぐち",
+      "imi": "pintu keluar timur"
+    }
+  ],
+  "京": [
+    {
+      "word": "東京",
+      "yomi": "とうきょう",
+      "imi": "Tokyo"
+    },
+    {
+      "word": "京都",
+      "yomi": "きょうと",
+      "imi": "Kyoto"
+    }
+  ],
+  "名": [
+    {
+      "word": "名前",
+      "yomi": "なまえ",
+      "imi": "nama"
+    },
+    {
+      "word": "有名",
+      "yomi": "ゆうめい",
+      "imi": "terkenal"
+    }
+  ],
+  "前": [
+    {
+      "word": "名前",
+      "yomi": "なまえ",
+      "imi": "nama"
+    },
+    {
+      "word": "午前",
+      "yomi": "ごぜん",
+      "imi": "sebelum siang/pagi (AM)"
+    }
+  ],
+  "国": [
+    {
+      "word": "外国",
+      "yomi": "がいこく",
+      "imi": "luar negeri"
+    },
+    {
+      "word": "中国",
+      "yomi": "ちゅうごく",
+      "imi": "Tiongkok"
+    }
+  ],
+  "男": [
+    {
+      "word": "男性",
+      "yomi": "だんせい",
+      "imi": "laki-laki"
+    },
+    {
+      "word": "男の子",
+      "yomi": "おとこのこ",
+      "imi": "anak laki-laki"
+    }
+  ],
+  "女": [
+    {
+      "word": "女性",
+      "yomi": "じょせい",
+      "imi": "perempuan"
+    },
+    {
+      "word": "女の子",
+      "yomi": "おんなのこ",
+      "imi": "anak perempuan"
+    }
+  ],
+  "区": [
+    {
+      "word": "地区",
+      "yomi": "ちく",
+      "imi": "wilayah/kawasan"
+    },
+    {
+      "word": "区役所",
+      "yomi": "くやくしょ",
+      "imi": "kantor distrik"
+    }
+  ],
+  "市": [
+    {
+      "word": "市役所",
+      "yomi": "しやくしょ",
+      "imi": "balai kota"
+    },
+    {
+      "word": "市場",
+      "yomi": "いちば",
+      "imi": "pasar"
+    }
+  ],
+  "〜放題": [
+    {
+      "word": "放送",
+      "yomi": "ほうそう",
+      "imi": "siaran"
+    }
+  ],
+  "営業": [
+    {
+      "word": "卒業",
+      "yomi": "そつぎょう",
+      "imi": "lulus (sekolah)"
+    },
+    {
+      "word": "経営",
+      "yomi": "けいえい",
+      "imi": "manajemen/pengelolaan"
+    }
+  ],
+  "徒歩": [
+    {
+      "word": "生徒",
+      "yomi": "せいと",
+      "imi": "murid"
+    },
+    {
+      "word": "歩く",
+      "yomi": "あるく",
+      "imi": "berjalan"
+    }
+  ],
+  "先": [
+    {
+      "word": "先生",
+      "yomi": "せんせい",
+      "imi": "guru"
+    },
+    {
+      "word": "先週",
+      "yomi": "せんしゅう",
+      "imi": "minggu lalu"
+    }
+  ],
+  "週": [
+    {
+      "word": "今週",
+      "yomi": "こんしゅう",
+      "imi": "minggu ini"
+    },
+    {
+      "word": "週末",
+      "yomi": "しゅうまつ",
+      "imi": "akhir pekan"
+    }
+  ],
+  "毎": [
+    {
+      "word": "毎日",
+      "yomi": "まいにち",
+      "imi": "setiap hari"
+    },
+    {
+      "word": "毎年",
+      "yomi": "まいとし",
+      "imi": "setiap tahun"
+    }
+  ],
+  "午": [
+    {
+      "word": "午前",
+      "yomi": "ごぜん",
+      "imi": "pagi (AM)"
+    },
+    {
+      "word": "午後",
+      "yomi": "ごご",
+      "imi": "siang/sore (PM)"
+    }
+  ],
+  "後": [
+    {
+      "word": "午後",
+      "yomi": "ごご",
+      "imi": "siang/sore (PM)"
+    },
+    {
+      "word": "後ろ",
+      "yomi": "うしろ",
+      "imi": "belakang"
+    }
+  ],
+  "見": [
+    {
+      "word": "意見",
+      "yomi": "いけん",
+      "imi": "pendapat"
+    },
+    {
+      "word": "見学",
+      "yomi": "けんがく",
+      "imi": "kunjungan studi"
+    }
+  ],
+  "食": [
+    {
+      "word": "食事",
+      "yomi": "しょくじ",
+      "imi": "makan (kata benda)"
+    },
+    {
+      "word": "朝食",
+      "yomi": "ちょうしょく",
+      "imi": "sarapan"
+    }
+  ],
+  "代": [
+    {
+      "word": "時代",
+      "yomi": "じだい",
+      "imi": "zaman"
+    },
+    {
+      "word": "電気代",
+      "yomi": "でんきだい",
+      "imi": "biaya listrik"
+    }
+  ],
+  "買": [
+    {
+      "word": "買い物",
+      "yomi": "かいもの",
+      "imi": "belanja"
+    },
+    {
+      "word": "売買",
+      "yomi": "ばいばい",
+      "imi": "jual-beli"
+    }
+  ],
+  "物": [
+    {
+      "word": "買い物",
+      "yomi": "かいもの",
+      "imi": "belanja"
+    },
+    {
+      "word": "動物",
+      "yomi": "どうぶつ",
+      "imi": "hewan"
+    }
+  ],
+  "行": [
+    {
+      "word": "旅行",
+      "yomi": "りょこう",
+      "imi": "perjalanan/wisata"
+    },
+    {
+      "word": "銀行",
+      "yomi": "ぎんこう",
+      "imi": "bank"
+    }
+  ],
+  "休": [
+    {
+      "word": "休む",
+      "yomi": "やすむ",
+      "imi": "beristirahat"
+    },
+    {
+      "word": "休日",
+      "yomi": "きゅうじつ",
+      "imi": "hari libur"
+    }
+  ],
+  "新聞": [
+    {
+      "word": "新しい",
+      "yomi": "あたらしい",
+      "imi": "baru"
+    },
+    {
+      "word": "聞く",
+      "yomi": "きく",
+      "imi": "mendengar/bertanya"
+    }
+  ],
+  "図書館": [
+    {
+      "word": "地図",
+      "yomi": "ちず",
+      "imi": "peta"
+    },
+    {
+      "word": "映画館",
+      "yomi": "えいがかん",
+      "imi": "bioskop"
+    }
+  ],
+  "辞書": [
+    {
+      "word": "辞める",
+      "yomi": "やめる",
+      "imi": "berhenti (kerja/sekolah)"
+    },
+    {
+      "word": "読書",
+      "yomi": "どくしょ",
+      "imi": "membaca buku"
+    }
+  ],
+  "受付": [
+    {
+      "word": "受ける",
+      "yomi": "うける",
+      "imi": "menerima"
+    },
+    {
+      "word": "付ける",
+      "yomi": "つける",
+      "imi": "memasang/menempelkan"
+    }
+  ],
+  "今": [
+    {
+      "word": "今日",
+      "yomi": "きょう",
+      "imi": "hari ini"
+    },
+    {
+      "word": "今年",
+      "yomi": "ことし",
+      "imi": "tahun ini"
+    }
+  ],
+  "来": [
+    {
+      "word": "来年",
+      "yomi": "らいねん",
+      "imi": "tahun depan"
+    },
+    {
+      "word": "未来",
+      "yomi": "みらい",
+      "imi": "masa depan"
+    }
+  ],
+  "帰": [
+    {
+      "word": "帰国",
+      "yomi": "きこく",
+      "imi": "pulang ke negara asal"
+    },
+    {
+      "word": "帰り",
+      "yomi": "かえり",
+      "imi": "perjalanan pulang"
+    }
+  ],
+  "会": [
+    {
+      "word": "会社",
+      "yomi": "かいしゃ",
+      "imi": "perusahaan"
+    },
+    {
+      "word": "社会",
+      "yomi": "しゃかい",
+      "imi": "masyarakat"
+    }
+  ],
+  "社": [
+    {
+      "word": "会社",
+      "yomi": "かいしゃ",
+      "imi": "perusahaan"
+    },
+    {
+      "word": "神社",
+      "yomi": "じんじゃ",
+      "imi": "kuil Shinto"
+    }
+  ],
+  "閉": [
+    {
+      "word": "閉店",
+      "yomi": "へいてん",
+      "imi": "toko tutup"
+    }
+  ],
+  "読": [
+    {
+      "word": "読書",
+      "yomi": "どくしょ",
+      "imi": "membaca buku"
+    }
+  ],
+  "書": [
+    {
+      "word": "辞書",
+      "yomi": "じしょ",
+      "imi": "kamus"
+    },
+    {
+      "word": "図書館",
+      "yomi": "としょかん",
+      "imi": "perpustakaan"
+    }
+  ],
+  "話": [
+    {
+      "word": "電話",
+      "yomi": "でんわ",
+      "imi": "telepon"
+    },
+    {
+      "word": "会話",
+      "yomi": "かいわ",
+      "imi": "percakapan"
+    }
+  ],
+  "寺": [
+    {
+      "word": "お寺",
+      "yomi": "おてら",
+      "imi": "kuil Buddha"
+    },
+    {
+      "word": "寺院",
+      "yomi": "じいん",
+      "imi": "kuil (formal)"
+    }
+  ],
+  "言": [
+    {
+      "word": "言う",
+      "yomi": "いう",
+      "imi": "mengatakan"
+    },
+    {
+      "word": "言葉",
+      "yomi": "ことば",
+      "imi": "kata/bahasa"
+    }
+  ],
+  "貝": [
+    {
+      "word": "貝殻",
+      "yomi": "かいがら",
+      "imi": "cangkang kerang"
+    }
+  ],
+  "田": [
+    {
+      "word": "田んぼ",
+      "yomi": "たんぼ",
+      "imi": "sawah"
+    },
+    {
+      "word": "水田",
+      "yomi": "すいでん",
+      "imi": "sawah berair"
+    }
+  ],
+  "力": [
+    {
+      "word": "力持ち",
+      "yomi": "ちからもち",
+      "imi": "orang yang kuat"
+    },
+    {
+      "word": "協力",
+      "yomi": "きょうりょく",
+      "imi": "kerja sama"
+    }
+  ],
+  "門": [
+    {
+      "word": "正門",
+      "yomi": "せいもん",
+      "imi": "gerbang utama"
+    },
+    {
+      "word": "専門",
+      "yomi": "せんもん",
+      "imi": "spesialisasi/jurusan"
+    }
+  ],
+  "肉": [
+    {
+      "word": "焼肉",
+      "yomi": "やきにく",
+      "imi": "daging panggang"
+    },
+    {
+      "word": "肉料理",
+      "yomi": "にくりょうり",
+      "imi": "masakan daging"
+    }
+  ],
+  "料理": [
+    {
+      "word": "料金",
+      "yomi": "りょうきん",
+      "imi": "biaya/tarif"
+    },
+    {
+      "word": "無理",
+      "yomi": "むり",
+      "imi": "tidak mungkin/memaksakan"
+    }
+  ],
+  "野": [
+    {
+      "word": "野菜",
+      "yomi": "やさい",
+      "imi": "sayuran"
+    },
+    {
+      "word": "野球",
+      "yomi": "やきゅう",
+      "imi": "bisbol"
+    }
+  ],
+  "半": [
+    {
+      "word": "半分",
+      "yomi": "はんぶん",
+      "imi": "setengah"
+    },
+    {
+      "word": "半年",
+      "yomi": "はんとし",
+      "imi": "setengah tahun"
+    }
+  ],
+  "大": [
+    {
+      "word": "大学",
+      "yomi": "だいがく",
+      "imi": "universitas"
+    },
+    {
+      "word": "大変",
+      "yomi": "たいへん",
+      "imi": "berat/susah"
+    }
+  ],
+  "小": [
+    {
+      "word": "小学校",
+      "yomi": "しょうがっこう",
+      "imi": "sekolah dasar"
+    },
+    {
+      "word": "小説",
+      "yomi": "しょうせつ",
+      "imi": "novel"
+    }
+  ],
+  "魚": [
+    {
+      "word": "魚屋",
+      "yomi": "さかなや",
+      "imi": "toko ikan"
+    },
+    {
+      "word": "金魚",
+      "yomi": "きんぎょ",
+      "imi": "ikan mas"
+    }
+  ],
+  "野菜": [
+    {
+      "word": "野球",
+      "yomi": "やきゅう",
+      "imi": "bisbol"
+    },
+    {
+      "word": "白菜",
+      "yomi": "はくさい",
+      "imi": "sawi putih"
+    }
+  ],
+  "ご飯": [
+    {
+      "word": "朝ご飯",
+      "yomi": "あさごはん",
+      "imi": "sarapan"
+    },
+    {
+      "word": "夕飯",
+      "yomi": "ゆうはん",
+      "imi": "makan malam"
+    }
+  ],
+  "〜丼": [
+    {
+      "word": "牛丼",
+      "yomi": "ぎゅうどん",
+      "imi": "nasi dengan daging sapi"
+    }
+  ],
+  "半額": [
+    {
+      "word": "半分",
+      "yomi": "はんぶん",
+      "imi": "setengah"
+    },
+    {
+      "word": "金額",
+      "yomi": "きんがく",
+      "imi": "jumlah uang"
+    }
+  ],
+  "定食": [
+    {
+      "word": "予定",
+      "yomi": "よてい",
+      "imi": "rencana"
+    },
+    {
+      "word": "食事",
+      "yomi": "しょくじ",
+      "imi": "makan"
+    }
+  ],
+  "家族": [
+    {
+      "word": "家",
+      "yomi": "いえ",
+      "imi": "rumah"
+    },
+    {
+      "word": "民族",
+      "yomi": "みんぞく",
+      "imi": "suku bangsa"
+    }
+  ],
+  "父母": [
+    {
+      "word": "お父さん",
+      "yomi": "おとうさん",
+      "imi": "ayah"
+    },
+    {
+      "word": "お母さん",
+      "yomi": "おかあさん",
+      "imi": "ibu"
+    }
+  ],
+  "兄弟": [
+    {
+      "word": "お兄さん",
+      "yomi": "おにいさん",
+      "imi": "kakak laki-laki"
+    },
+    {
+      "word": "弟",
+      "yomi": "おとうと",
+      "imi": "adik laki-laki"
+    }
+  ],
+  "姉妹": [
+    {
+      "word": "お姉さん",
+      "yomi": "おねえさん",
+      "imi": "kakak perempuan"
+    },
+    {
+      "word": "妹",
+      "yomi": "いもうと",
+      "imi": "adik perempuan"
+    }
+  ],
+  "犬": [
+    {
+      "word": "子犬",
+      "yomi": "こいぬ",
+      "imi": "anak anjing"
+    },
+    {
+      "word": "番犬",
+      "yomi": "ばんけん",
+      "imi": "anjing penjaga"
+    }
+  ],
+  "高": [
+    {
+      "word": "高校",
+      "yomi": "こうこう",
+      "imi": "SMA"
+    },
+    {
+      "word": "最高",
+      "yomi": "さいこう",
+      "imi": "tertinggi/terbaik"
+    }
+  ],
+  "長": [
+    {
+      "word": "校長",
+      "yomi": "こうちょう",
+      "imi": "kepala sekolah"
+    },
+    {
+      "word": "社長",
+      "yomi": "しゃちょう",
+      "imi": "direktur perusahaan"
+    }
+  ],
+  "短": [
+    {
+      "word": "短期",
+      "yomi": "たんき",
+      "imi": "jangka pendek"
+    }
+  ],
+  "趣味": [
+    {
+      "word": "興味",
+      "yomi": "きょうみ",
+      "imi": "minat"
+    },
+    {
+      "word": "意味",
+      "yomi": "いみ",
+      "imi": "arti"
+    }
+  ],
+  "出身地": [
+    {
+      "word": "出る",
+      "yomi": "でる",
+      "imi": "keluar"
+    },
+    {
+      "word": "地図",
+      "yomi": "ちず",
+      "imi": "peta"
+    }
+  ],
+  "職業": [
+    {
+      "word": "就職",
+      "yomi": "しゅうしょく",
+      "imi": "mendapat pekerjaan"
+    },
+    {
+      "word": "授業",
+      "yomi": "じゅぎょう",
+      "imi": "pelajaran/kelas"
+    }
+  ],
+  "好": [
+    {
+      "word": "好物",
+      "yomi": "こうぶつ",
+      "imi": "makanan favorit"
+    },
+    {
+      "word": "大好き",
+      "yomi": "だいすき",
+      "imi": "sangat suka"
+    }
+  ],
+  "歌": [
+    {
+      "word": "歌手",
+      "yomi": "かしゅ",
+      "imi": "penyanyi"
+    }
+  ],
+  "音": [
+    {
+      "word": "音楽",
+      "yomi": "おんがく",
+      "imi": "musik"
+    },
+    {
+      "word": "発音",
+      "yomi": "はつおん",
+      "imi": "pengucapan"
+    }
+  ],
+  "楽": [
+    {
+      "word": "音楽",
+      "yomi": "おんがく",
+      "imi": "musik"
+    },
+    {
+      "word": "気楽",
+      "yomi": "きらく",
+      "imi": "santai/tanpa beban"
+    }
+  ],
+  "車": [
+    {
+      "word": "電車",
+      "yomi": "でんしゃ",
+      "imi": "kereta listrik"
+    },
+    {
+      "word": "自転車",
+      "yomi": "じてんしゃ",
+      "imi": "sepeda"
+    }
+  ],
+  "映画": [
+    {
+      "word": "上映",
+      "yomi": "じょうえい",
+      "imi": "pemutaran (film)"
+    },
+    {
+      "word": "画家",
+      "yomi": "がか",
+      "imi": "pelukis"
+    }
+  ],
+  "旅": [
+    {
+      "word": "旅行",
+      "yomi": "りょこう",
+      "imi": "perjalanan/wisata"
+    },
+    {
+      "word": "旅館",
+      "yomi": "りょかん",
+      "imi": "penginapan tradisional Jepang"
+    }
+  ],
+  "海外": [
+    {
+      "word": "海",
+      "yomi": "うみ",
+      "imi": "laut"
+    },
+    {
+      "word": "外国",
+      "yomi": "がいこく",
+      "imi": "luar negeri"
+    }
+  ],
+  "雑誌": [
+    {
+      "word": "雑貨",
+      "yomi": "ざっか",
+      "imi": "barang-barang keperluan sehari-hari"
+    },
+    {
+      "word": "雑音",
+      "yomi": "ざつおん",
+      "imi": "suara bising"
+    }
+  ],
+  "漢字": [
+    {
+      "word": "数字",
+      "yomi": "すうじ",
+      "imi": "angka"
+    },
+    {
+      "word": "文字",
+      "yomi": "もじ",
+      "imi": "huruf/karakter"
+    }
+  ],
+  "書店": [
+    {
+      "word": "図書館",
+      "yomi": "としょかん",
+      "imi": "perpustakaan"
+    },
+    {
+      "word": "店員",
+      "yomi": "てんいん",
+      "imi": "pegawai toko"
+    }
+  ],
+  "駅": [
+    {
+      "word": "駅員",
+      "yomi": "えきいん",
+      "imi": "petugas stasiun"
+    },
+    {
+      "word": "駅前",
+      "yomi": "えきまえ",
+      "imi": "depan stasiun"
+    }
+  ],
+  "上": [
+    {
+      "word": "上手",
+      "yomi": "じょうず",
+      "imi": "pandai/mahir"
+    },
+    {
+      "word": "屋上",
+      "yomi": "おくじょう",
+      "imi": "atap gedung"
+    }
+  ],
+  "下": [
+    {
+      "word": "下手",
+      "yomi": "へた",
+      "imi": "tidak pandai"
+    },
+    {
+      "word": "地下",
+      "yomi": "ちか",
+      "imi": "bawah tanah"
+    }
+  ],
+  "地": [
+    {
+      "word": "地図",
+      "yomi": "ちず",
+      "imi": "peta"
+    },
+    {
+      "word": "地下鉄",
+      "yomi": "ちかてつ",
+      "imi": "kereta bawah tanah"
+    }
+  ],
+  "図": [
+    {
+      "word": "地図",
+      "yomi": "ちず",
+      "imi": "peta"
+    },
+    {
+      "word": "図書館",
+      "yomi": "としょかん",
+      "imi": "perpustakaan"
+    }
+  ],
+  "館": [
+    {
+      "word": "図書館",
+      "yomi": "としょかん",
+      "imi": "perpustakaan"
+    },
+    {
+      "word": "映画館",
+      "yomi": "えいがかん",
+      "imi": "bioskop"
+    }
+  ],
+  "右": [
+    {
+      "word": "右手",
+      "yomi": "みぎて",
+      "imi": "tangan kanan"
+    },
+    {
+      "word": "右側",
+      "yomi": "みぎがわ",
+      "imi": "sisi kanan"
+    }
+  ],
+  "左": [
+    {
+      "word": "左手",
+      "yomi": "ひだりて",
+      "imi": "tangan kiri"
+    },
+    {
+      "word": "左側",
+      "yomi": "ひだりがわ",
+      "imi": "sisi kiri"
+    }
+  ],
+  "道": [
+    {
+      "word": "道路",
+      "yomi": "どうろ",
+      "imi": "jalan raya"
+    },
+    {
+      "word": "北海道",
+      "yomi": "ほっかいどう",
+      "imi": "Hokkaido"
+    }
+  ],
+  "北口": [
+    {
+      "word": "北海道",
+      "yomi": "ほっかいどう",
+      "imi": "Hokkaido"
+    },
+    {
+      "word": "入り口",
+      "yomi": "いりぐち",
+      "imi": "pintu masuk"
+    }
+  ],
+  "南口": [
+    {
+      "word": "南米",
+      "yomi": "なんべい",
+      "imi": "Amerika Selatan"
+    },
+    {
+      "word": "出口",
+      "yomi": "でぐち",
+      "imi": "pintu keluar"
+    }
+  ],
+  "西口": [
+    {
+      "word": "関西",
+      "yomi": "かんさい",
+      "imi": "wilayah Kansai"
+    },
+    {
+      "word": "窓口",
+      "yomi": "まどぐち",
+      "imi": "loket"
+    }
+  ],
+  "銀行": [
+    {
+      "word": "銀",
+      "yomi": "ぎん",
+      "imi": "perak"
+    },
+    {
+      "word": "旅行",
+      "yomi": "りょこう",
+      "imi": "perjalanan/wisata"
+    }
+  ],
+  "地下鉄": [
+    {
+      "word": "地図",
+      "yomi": "ちず",
+      "imi": "peta"
+    },
+    {
+      "word": "鉄道",
+      "yomi": "てつどう",
+      "imi": "perkeretaapian"
+    }
+  ],
+  "駐車場": [
+    {
+      "word": "電車",
+      "yomi": "でんしゃ",
+      "imi": "kereta listrik"
+    },
+    {
+      "word": "場所",
+      "yomi": "ばしょ",
+      "imi": "tempat"
+    }
+  ],
+  "起": [
+    {
+      "word": "起立",
+      "yomi": "きりつ",
+      "imi": "berdiri (aba-aba)"
+    }
+  ],
+  "歩": [
+    {
+      "word": "散歩",
+      "yomi": "さんぽ",
+      "imi": "jalan-jalan"
+    }
+  ],
+  "乗": [
+    {
+      "word": "乗車",
+      "yomi": "じょうしゃ",
+      "imi": "naik kendaraan (formal)"
+    }
+  ],
+  "始": [
+    {
+      "word": "開始",
+      "yomi": "かいし",
+      "imi": "permulaan"
+    }
+  ],
+  "終": [
+    {
+      "word": "最終",
+      "yomi": "さいしゅう",
+      "imi": "terakhir"
+    }
+  ],
+  "勉強": [
+    {
+      "word": "強い",
+      "yomi": "つよい",
+      "imi": "kuat"
+    }
+  ],
+  "朝": [
+    {
+      "word": "朝ご飯",
+      "yomi": "あさごはん",
+      "imi": "sarapan"
+    },
+    {
+      "word": "毎朝",
+      "yomi": "まいあさ",
+      "imi": "setiap pagi"
+    }
+  ],
+  "昼": [
+    {
+      "word": "昼ご飯",
+      "yomi": "ひるごはん",
+      "imi": "makan siang"
+    },
+    {
+      "word": "昼休み",
+      "yomi": "ひるやすみ",
+      "imi": "istirahat siang"
+    }
+  ],
+  "夜": [
+    {
+      "word": "夜中",
+      "yomi": "よなか",
+      "imi": "tengah malam"
+    },
+    {
+      "word": "今夜",
+      "yomi": "こんや",
+      "imi": "malam ini"
+    }
+  ],
+  "自転車": [
+    {
+      "word": "自分",
+      "yomi": "じぶん",
+      "imi": "diri sendiri"
+    },
+    {
+      "word": "運転",
+      "yomi": "うんてん",
+      "imi": "mengemudi"
+    }
+  ],
+  "寝る": [
+    {
+      "word": "寝坊",
+      "yomi": "ねぼう",
+      "imi": "bangun kesiangan"
+    },
+    {
+      "word": "昼寝",
+      "yomi": "ひるね",
+      "imi": "tidur siang"
+    }
+  ],
+  "集合": [
+    {
+      "word": "集める",
+      "yomi": "あつめる",
+      "imi": "mengumpulkan"
+    },
+    {
+      "word": "都合",
+      "yomi": "つごう",
+      "imi": "keadaan/kecocokan waktu"
+    }
+  ],
+  "体": [
+    {
+      "word": "体育",
+      "yomi": "たいいく",
+      "imi": "olahraga (pelajaran)"
+    },
+    {
+      "word": "体調",
+      "yomi": "たいちょう",
+      "imi": "kondisi tubuh"
+    }
+  ],
+  "目": [
+    {
+      "word": "目的",
+      "yomi": "もくてき",
+      "imi": "tujuan"
+    },
+    {
+      "word": "目玉",
+      "yomi": "めだま",
+      "imi": "biji mata"
+    }
+  ],
+  "耳": [
+    {
+      "word": "耳鼻科",
+      "yomi": "じびか",
+      "imi": "klinik THT"
+    }
+  ],
+  "口": [
+    {
+      "word": "入り口",
+      "yomi": "いりぐち",
+      "imi": "pintu masuk"
+    },
+    {
+      "word": "人口",
+      "yomi": "じんこう",
+      "imi": "populasi"
+    }
+  ],
+  "歯": [
+    {
+      "word": "歯医者",
+      "yomi": "はいしゃ",
+      "imi": "dokter gigi"
+    },
+    {
+      "word": "歯磨き",
+      "yomi": "はみがき",
+      "imi": "sikat gigi"
+    }
+  ],
+  "病院": [
+    {
+      "word": "病気",
+      "yomi": "びょうき",
+      "imi": "sakit/penyakit"
+    },
+    {
+      "word": "入院",
+      "yomi": "にゅういん",
+      "imi": "rawat inap"
+    }
+  ],
+  "薬": [
+    {
+      "word": "薬局",
+      "yomi": "やっきょく",
+      "imi": "apotek"
+    },
+    {
+      "word": "薬屋",
+      "yomi": "くすりや",
+      "imi": "toko obat"
+    }
+  ],
+  "局": [
+    {
+      "word": "薬局",
+      "yomi": "やっきょく",
+      "imi": "apotek"
+    },
+    {
+      "word": "郵便局",
+      "yomi": "ゆうびんきょく",
+      "imi": "kantor pos"
+    }
+  ],
+  "体重": [
+    {
+      "word": "重い",
+      "yomi": "おもい",
+      "imi": "berat"
+    },
+    {
+      "word": "大体",
+      "yomi": "だいたい",
+      "imi": "kira-kira/pada umumnya"
+    }
+  ],
+  "熱": [
+    {
+      "word": "情熱",
+      "yomi": "じょうねつ",
+      "imi": "semangat/passion"
+    }
+  ],
+  "内科": [
+    {
+      "word": "内側",
+      "yomi": "うちがわ",
+      "imi": "sisi dalam"
+    },
+    {
+      "word": "科目",
+      "yomi": "かもく",
+      "imi": "mata pelajaran"
+    }
+  ],
+  "外科": [
+    {
+      "word": "外国",
+      "yomi": "がいこく",
+      "imi": "luar negeri"
+    },
+    {
+      "word": "外側",
+      "yomi": "そとがわ",
+      "imi": "sisi luar"
+    }
+  ],
+  "世界": [
+    {
+      "word": "世紀",
+      "yomi": "せいき",
+      "imi": "abad"
+    },
+    {
+      "word": "業界",
+      "yomi": "ぎょうかい",
+      "imi": "industri/kalangan bisnis"
+    }
+  ],
+  "春": [
+    {
+      "word": "春休み",
+      "yomi": "はるやすみ",
+      "imi": "libur musim semi"
+    },
+    {
+      "word": "青春",
+      "yomi": "せいしゅん",
+      "imi": "masa muda"
+    }
+  ],
+  "夏": [
+    {
+      "word": "夏休み",
+      "yomi": "なつやすみ",
+      "imi": "libur musim panas"
+    },
+    {
+      "word": "真夏",
+      "yomi": "まなつ",
+      "imi": "puncak musim panas"
+    }
+  ],
+  "秋": [
+    {
+      "word": "秋分の日",
+      "yomi": "しゅうぶんのひ",
+      "imi": "hari ekuinoks musim gugur"
+    },
+    {
+      "word": "晩秋",
+      "yomi": "ばんしゅう",
+      "imi": "akhir musim gugur"
+    }
+  ],
+  "冬": [
+    {
+      "word": "冬休み",
+      "yomi": "ふゆやすみ",
+      "imi": "libur musim dingin"
+    },
+    {
+      "word": "真冬",
+      "yomi": "まふゆ",
+      "imi": "puncak musim dingin"
+    }
+  ],
+  "早": [
+    {
+      "word": "早朝",
+      "yomi": "そうちょう",
+      "imi": "pagi-pagi sekali"
+    }
+  ],
+  "夕": [
+    {
+      "word": "夕方",
+      "yomi": "ゆうがた",
+      "imi": "sore hari"
+    },
+    {
+      "word": "夕食",
+      "yomi": "ゆうしょく",
+      "imi": "makan malam"
+    }
+  ],
+  "予": [
+    {
+      "word": "予定",
+      "yomi": "よてい",
+      "imi": "rencana"
+    },
+    {
+      "word": "予約",
+      "yomi": "よやく",
+      "imi": "reservasi"
+    }
+  ],
+  "約": [
+    {
+      "word": "予約",
+      "yomi": "よやく",
+      "imi": "reservasi"
+    },
+    {
+      "word": "約束",
+      "yomi": "やくそく",
+      "imi": "janji"
+    }
+  ],
+  "光": [
+    {
+      "word": "観光",
+      "yomi": "かんこう",
+      "imi": "pariwisata"
+    }
+  ],
+  "観光": [
+    {
+      "word": "観客",
+      "yomi": "かんきゃく",
+      "imi": "penonton"
+    },
+    {
+      "word": "日光",
+      "yomi": "にっこう",
+      "imi": "sinar matahari"
+    }
+  ],
+  "出発": [
+    {
+      "word": "出口",
+      "yomi": "でぐち",
+      "imi": "pintu keluar"
+    },
+    {
+      "word": "発表",
+      "yomi": "はっぴょう",
+      "imi": "presentasi/pengumuman"
+    }
+  ],
+  "到着": [
+    {
+      "word": "着く",
+      "yomi": "つく",
+      "imi": "tiba/sampai"
+    },
+    {
+      "word": "着る",
+      "yomi": "きる",
+      "imi": "memakai (baju)"
+    }
+  ],
+  "〜泊〜日": [
+    {
+      "word": "宿泊",
+      "yomi": "しゅくはく",
+      "imi": "menginap"
+    },
+    {
+      "word": "一泊",
+      "yomi": "いっぱく",
+      "imi": "satu malam menginap"
+    }
+  ],
+  "〜付き": [
+    {
+      "word": "付ける",
+      "yomi": "つける",
+      "imi": "memasang/menempelkan"
+    },
+    {
+      "word": "気付く",
+      "yomi": "きづく",
+      "imi": "menyadari"
+    }
+  ],
+  "〜券": [
+    {
+      "word": "入場券",
+      "yomi": "にゅうじょうけん",
+      "imi": "tiket masuk"
+    },
+    {
+      "word": "定期券",
+      "yomi": "ていきけん",
+      "imi": "tiket berlangganan"
+    }
+  ],
+  "入": [
+    {
+      "word": "入学",
+      "yomi": "にゅうがく",
+      "imi": "masuk sekolah"
+    },
+    {
+      "word": "輸入",
+      "yomi": "ゆにゅう",
+      "imi": "impor"
+    }
+  ],
+  "出": [
+    {
+      "word": "出発",
+      "yomi": "しゅっぱつ",
+      "imi": "keberangkatan"
+    },
+    {
+      "word": "出口",
+      "yomi": "でぐち",
+      "imi": "pintu keluar"
+    }
+  ],
+  "持": [
+    {
+      "word": "気持ち",
+      "yomi": "きもち",
+      "imi": "perasaan"
+    }
+  ],
+  "立": [
+    {
+      "word": "私立",
+      "yomi": "しりつ",
+      "imi": "swasta"
+    },
+    {
+      "word": "独立",
+      "yomi": "どくりつ",
+      "imi": "kemerdekaan"
+    }
+  ],
+  "使用": [
+    {
+      "word": "使う",
+      "yomi": "つかう",
+      "imi": "menggunakan"
+    },
+    {
+      "word": "用事",
+      "yomi": "ようじ",
+      "imi": "urusan/keperluan"
+    }
+  ],
+  "中": [
+    {
+      "word": "中国",
+      "yomi": "ちゅうごく",
+      "imi": "Tiongkok"
+    },
+    {
+      "word": "中学校",
+      "yomi": "ちゅうがっこう",
+      "imi": "SMP"
+    }
+  ],
+  "新": [
+    {
+      "word": "新聞",
+      "yomi": "しんぶん",
+      "imi": "koran"
+    },
+    {
+      "word": "新幹線",
+      "yomi": "しんかんせん",
+      "imi": "kereta cepat shinkansen"
+    }
+  ],
+  "古": [
+    {
+      "word": "中古",
+      "yomi": "ちゅうこ",
+      "imi": "bekas/second-hand"
+    }
+  ],
+  "注意": [
+    {
+      "word": "注文",
+      "yomi": "ちゅうもん",
+      "imi": "memesan"
+    },
+    {
+      "word": "意味",
+      "yomi": "いみ",
+      "imi": "arti"
+    }
+  ],
+  "止": [
+    {
+      "word": "中止",
+      "yomi": "ちゅうし",
+      "imi": "dibatalkan"
+    },
+    {
+      "word": "停止",
+      "yomi": "ていし",
+      "imi": "berhenti"
+    }
+  ],
+  "禁止": [
+    {
+      "word": "禁煙",
+      "yomi": "きんえん",
+      "imi": "dilarang merokok"
+    },
+    {
+      "word": "中止",
+      "yomi": "ちゅうし",
+      "imi": "dibatalkan"
+    }
+  ],
+  "降りる": [
+    {
+      "word": "降る",
+      "yomi": "ふる",
+      "imi": "turun (hujan/salju)"
+    },
+    {
+      "word": "乗り降り",
+      "yomi": "のりおり",
+      "imi": "naik turun (kendaraan)"
+    }
+  ],
+  "最〜": [
+    {
+      "word": "最高",
+      "yomi": "さいこう",
+      "imi": "tertinggi/terbaik"
+    },
+    {
+      "word": "最初",
+      "yomi": "さいしょ",
+      "imi": "pertama kali"
+    }
+  ],
+  "優先席": [
+    {
+      "word": "優しい",
+      "yomi": "やさしい",
+      "imi": "baik hati"
+    },
+    {
+      "word": "座席",
+      "yomi": "ざせき",
+      "imi": "tempat duduk"
+    }
+  ],
+  "禁煙": [
+    {
+      "word": "禁止",
+      "yomi": "きんし",
+      "imi": "larangan"
+    },
+    {
+      "word": "煙草",
+      "yomi": "たばこ",
+      "imi": "rokok"
+    }
+  ],
+  "天": [
+    {
+      "word": "天気",
+      "yomi": "てんき",
+      "imi": "cuaca"
+    },
+    {
+      "word": "天国",
+      "yomi": "てんごく",
+      "imi": "surga"
+    }
+  ],
+  "気": [
+    {
+      "word": "天気",
+      "yomi": "てんき",
+      "imi": "cuaca"
+    },
+    {
+      "word": "元気",
+      "yomi": "げんき",
+      "imi": "sehat/bersemangat"
+    }
+  ],
+  "台": [
+    {
+      "word": "台風",
+      "yomi": "たいふう",
+      "imi": "topan"
+    },
+    {
+      "word": "台所",
+      "yomi": "だいどころ",
+      "imi": "dapur"
+    }
+  ],
+  "風": [
+    {
+      "word": "台風",
+      "yomi": "たいふう",
+      "imi": "topan"
+    },
+    {
+      "word": "風邪",
+      "yomi": "かぜ",
+      "imi": "masuk angin/flu"
+    }
+  ],
+  "多": [
+    {
+      "word": "多分",
+      "yomi": "たぶん",
+      "imi": "mungkin"
+    }
+  ],
+  "低": [
+    {
+      "word": "最低",
+      "yomi": "さいてい",
+      "imi": "paling rendah/terburuk"
+    }
+  ],
+  "度": [
+    {
+      "word": "今度",
+      "yomi": "こんど",
+      "imi": "kali ini/lain kali"
+    },
+    {
+      "word": "温度",
+      "yomi": "おんど",
+      "imi": "suhu"
+    }
+  ],
+  "交": [
+    {
+      "word": "交通",
+      "yomi": "こうつう",
+      "imi": "lalu lintas"
+    },
+    {
+      "word": "交換",
+      "yomi": "こうかん",
+      "imi": "pertukaran"
+    }
+  ],
+  "通": [
+    {
+      "word": "交通",
+      "yomi": "こうつう",
+      "imi": "lalu lintas"
+    },
+    {
+      "word": "普通",
+      "yomi": "ふつう",
+      "imi": "biasa/normal"
+    }
+  ],
+  "死": [
+    {
+      "word": "死亡",
+      "yomi": "しぼう",
+      "imi": "kematian (formal)"
+    }
+  ],
+  "気温": [
+    {
+      "word": "天気",
+      "yomi": "てんき",
+      "imi": "cuaca"
+    },
+    {
+      "word": "温泉",
+      "yomi": "おんせん",
+      "imi": "onsen/pemandian air panas"
+    }
+  ],
+  "事故": [
+    {
+      "word": "仕事",
+      "yomi": "しごと",
+      "imi": "pekerjaan"
+    },
+    {
+      "word": "事件",
+      "yomi": "じけん",
+      "imi": "insiden/kasus"
+    }
+  ],
+  "地震": [
+    {
+      "word": "地図",
+      "yomi": "ちず",
+      "imi": "peta"
+    },
+    {
+      "word": "震える",
+      "yomi": "ふるえる",
+      "imi": "gemetar"
+    }
+  ],
+  "晴": [
+    {
+      "word": "晴れる",
+      "yomi": "はれる",
+      "imi": "menjadi cerah"
+    },
+    {
+      "word": "快晴",
+      "yomi": "かいせい",
+      "imi": "cuaca sangat cerah"
+    }
+  ],
+  "曇": [
+    {
+      "word": "曇る",
+      "yomi": "くもる",
+      "imi": "menjadi mendung"
+    },
+    {
+      "word": "曇り空",
+      "yomi": "くもりぞら",
+      "imi": "langit berawan"
+    }
+  ],
+  "雪": [
+    {
+      "word": "雪だるま",
+      "yomi": "ゆきだるま",
+      "imi": "manusia salju"
+    },
+    {
+      "word": "大雪",
+      "yomi": "おおゆき",
+      "imi": "salju lebat"
+    }
+  ]
+}

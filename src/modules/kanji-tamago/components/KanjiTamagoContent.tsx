@@ -24,6 +24,12 @@ import {
   CanvasStrokeTracer,
 } from "@/src/shared/components/HandwritingCanvas";
 
+interface Example {
+  word: string;
+  yomi: string;
+  imi: string;
+}
+
 interface KanjiItem {
   id: number;
   chapter: string;
@@ -32,6 +38,7 @@ interface KanjiItem {
   moji: string;
   yomi: string;
   imi: string;
+  examples?: Example[] | null;
 }
 
 interface ProgressItem {
@@ -96,9 +103,9 @@ const CONFUSION_PAIRS: Record<string, string[]> = {
   会: ["今", "合"],
   合: ["会", "台"],
   雨: ["両", "満"],
-  両: ["雨", "両"],
+  両: ["雨", "満"],
   気: ["汽", "売"],
-  石: ["Hal", "右", "百"],
+  石: ["右", "百"],
   名: ["各", "多"],
   多: ["名", "タ"],
   小: ["少", "水"],
@@ -108,6 +115,101 @@ const CONFUSION_PAIRS: Record<string, string[]> = {
   買: ["売", "貝"],
   売: ["買", "貝"],
   貝: ["買", "売"],
+};
+
+// Offline reading + meaning lookup for confusion-pair characters, so each
+// character in the "Confusion Warning" can be tapped for an explanation.
+const CHAR_INFO: Record<string, { yomi: string; imi: string }> = {
+  未: { yomi: "み / いま(だ)", imi: "belum" },
+  末: { yomi: "まつ / すえ", imi: "akhir, ujung" },
+  士: { yomi: "し", imi: "ksatria, ahli" },
+  土: { yomi: "ど / つち", imi: "tanah" },
+  木: { yomi: "き / もく", imi: "pohon, kayu" },
+  本: { yomi: "ほん / もと", imi: "buku; asal" },
+  体: { yomi: "からだ / たい", imi: "tubuh" },
+  人: { yomi: "ひと / じん / にん", imi: "orang" },
+  入: { yomi: "はい(る) / い(る)", imi: "masuk" },
+  八: { yomi: "はち / や", imi: "delapan" },
+  右: { yomi: "みぎ / う", imi: "kanan" },
+  左: { yomi: "ひだり / さ", imi: "kiri" },
+  在: { yomi: "あ(る) / ざい", imi: "berada" },
+  日: { yomi: "ひ / にち", imi: "hari, matahari" },
+  目: { yomi: "め / もく", imi: "mata" },
+  自: { yomi: "じ / し", imi: "diri sendiri" },
+  白: { yomi: "しろ / はく", imi: "putih" },
+  百: { yomi: "ひゃく", imi: "seratus" },
+  曰: { yomi: "いわ(く) / えつ", imi: "berkata (klasik)" },
+  且: { yomi: "か(つ)", imi: "lagipula" },
+  千: { yomi: "せん / ち", imi: "seribu" },
+  干: { yomi: "ほ(す) / かん", imi: "mengeringkan" },
+  万: { yomi: "まん / ばん", imi: "sepuluh ribu" },
+  方: { yomi: "かた / ほう", imi: "arah; cara; orang (sopan)" },
+  大: { yomi: "おお(きい) / だい", imi: "besar" },
+  太: { yomi: "ふと(い) / たい", imi: "gemuk, tebal" },
+  犬: { yomi: "いぬ / けん", imi: "anjing" },
+  中: { yomi: "なか / ちゅう", imi: "tengah, dalam" },
+  口: { yomi: "くち / こう", imi: "mulut" },
+  回: { yomi: "まわ(る) / かい", imi: "berputar; kali" },
+  四: { yomi: "よん / し", imi: "empat" },
+  西: { yomi: "にし / せい", imi: "barat" },
+  匹: { yomi: "ひき / ひつ", imi: "ekor (penghitung hewan)" },
+  川: { yomi: "かわ / せん", imi: "sungai" },
+  州: { yomi: "す / しゅう", imi: "provinsi, negara bagian" },
+  三: { yomi: "みっ(つ) / さん", imi: "tiga" },
+  山: { yomi: "やま / さん", imi: "gunung" },
+  力: { yomi: "ちから / りょく", imi: "tenaga, kekuatan" },
+  刀: { yomi: "かたな / とう", imi: "pedang" },
+  刃: { yomi: "は / じん", imi: "mata pisau" },
+  子: { yomi: "こ / し", imi: "anak" },
+  了: { yomi: "りょう", imi: "selesai" },
+  予: { yomi: "よ", imi: "sebelumnya" },
+  天: { yomi: "てん / あめ", imi: "langit" },
+  夫: { yomi: "おっと / ふ", imi: "suami" },
+  失: { yomi: "うしな(う) / しつ", imi: "kehilangan" },
+  矢: { yomi: "や / し", imi: "anak panah" },
+  先: { yomi: "さき / せん", imi: "depan, lebih dulu" },
+  元: { yomi: "もと / げん", imi: "asal, semula" },
+  無: { yomi: "な(い) / む", imi: "tidak ada" },
+  月: { yomi: "つき / げつ", imi: "bulan" },
+  用: { yomi: "もち(いる) / よう", imi: "memakai; keperluan" },
+  肉: { yomi: "にく", imi: "daging" },
+  牛: { yomi: "うし / ぎゅう", imi: "sapi" },
+  午: { yomi: "ご", imi: "tengah hari" },
+  年: { yomi: "とし / ねん", imi: "tahun" },
+  手: { yomi: "て / しゅ", imi: "tangan" },
+  毛: { yomi: "け / もう", imi: "bulu, rambut" },
+  分: { yomi: "わ(ける) / ふん / ぶん", imi: "membagi; menit; bagian" },
+  公: { yomi: "おおやけ / こう", imi: "umum, publik" },
+  介: { yomi: "かい", imi: "perantara" },
+  今: { yomi: "いま / こん", imi: "sekarang" },
+  令: { yomi: "れい", imi: "perintah" },
+  冷: { yomi: "つめ(たい) / れい", imi: "dingin" },
+  会: { yomi: "あ(う) / かい", imi: "bertemu; pertemuan" },
+  合: { yomi: "あ(う) / ごう", imi: "cocok, gabung" },
+  台: { yomi: "だい", imi: "meja, alas; penghitung mesin" },
+  雨: { yomi: "あめ / う", imi: "hujan" },
+  両: { yomi: "りょう", imi: "kedua; keping" },
+  満: { yomi: "み(ちる) / まん", imi: "penuh" },
+  気: { yomi: "き / け", imi: "udara, semangat" },
+  汽: { yomi: "き", imi: "uap" },
+  石: { yomi: "いし / せき", imi: "batu" },
+  名: { yomi: "な / めい", imi: "nama" },
+  各: { yomi: "おのおの / かく", imi: "masing-masing" },
+  多: { yomi: "おお(い) / た", imi: "banyak" },
+  小: { yomi: "ちい(さい) / しょう", imi: "kecil" },
+  少: { yomi: "すく(ない) / しょう", imi: "sedikit" },
+  歩: { yomi: "ある(く) / ほ", imi: "berjalan" },
+  半: { yomi: "なか(ば) / はん", imi: "setengah" },
+  平: { yomi: "たい(ら) / へい", imi: "datar, damai" },
+  羊: { yomi: "ひつじ / よう", imi: "domba" },
+  美: { yomi: "うつく(しい) / び", imi: "indah" },
+  買: { yomi: "か(う) / ばい", imi: "membeli" },
+  売: { yomi: "う(る) / ばい", imi: "menjual" },
+  貝: { yomi: "かい", imi: "kerang" },
+  森: { yomi: "もり / しん", imi: "hutan" },
+  林: { yomi: "はやし / りん", imi: "hutan kecil" },
+  チ: { yomi: "chi", imi: "katakana “chi”" },
+  タ: { yomi: "ta", imi: "katakana “ta”" },
 };
 
 const isKanji = (char: string): boolean => {
@@ -149,6 +251,36 @@ export function KanjiTamagoContent({ username }: { username: string }) {
   const [gradingScore, setGradingScore] = useState<number | null>(null);
   const [incorrectCard, setIncorrectCard] = useState<KanjiItem | null>(null);
   const [isRecognizingDraw, setIsRecognizingDraw] = useState<boolean>(false);
+
+  // Confusion-pair explanation modal
+  const [confusionDetail, setConfusionDetail] = useState<{
+    char: string;
+    yomi: string;
+    imi: string;
+  } | null>(null);
+
+  const openConfusionDetail = (char: string) => {
+    const info = CHAR_INFO[char];
+    setConfusionDetail({
+      char,
+      yomi: info?.yomi || "—",
+      imi: info?.imi || "Reading/meaning not available.",
+    });
+  };
+
+  // Example-word writing practice (bonus, after main kanji is written correctly)
+  const exampleCanvasRef = useRef<any>(null);
+  const [selectedExamples, setSelectedExamples] = useState<Set<number>>(
+    new Set(),
+  );
+  const [exampleQueue, setExampleQueue] = useState<Example[]>([]);
+  const [exampleIdx, setExampleIdx] = useState<number>(0);
+  const [exampleInput, setExampleInput] = useState<string>("");
+  const [exampleCandidates, setExampleCandidates] = useState<string[]>([]);
+  const [exampleChecked, setExampleChecked] = useState<boolean>(false);
+  const [exampleCorrect, setExampleCorrect] = useState<boolean>(false);
+  const [isRecognizingExample, setIsRecognizingExample] =
+    useState<boolean>(false);
 
   const [alertModal, setAlertModal] = useState<{
     isOpen: boolean;
@@ -327,10 +459,80 @@ export function KanjiTamagoContent({ username }: { username: string }) {
     setIsDrawCorrect(false);
     setHasCheckedDraw(false);
     setCurrentCandidates([]);
+    resetExamplePractice();
 
     // Load custom mnemonic story
     const prog = getProgress(card.id);
     setUserMnemonic(prog?.mnemonic || "");
+  };
+
+  const resetExamplePractice = () => {
+    setSelectedExamples(new Set());
+    setExampleQueue([]);
+    setExampleIdx(0);
+    setExampleInput("");
+    setExampleCandidates([]);
+    setExampleChecked(false);
+    setExampleCorrect(false);
+  };
+
+  const toggleExampleSelection = (idx: number) => {
+    setSelectedExamples((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) {
+        next.delete(idx);
+      } else {
+        next.add(idx);
+      }
+      return next;
+    });
+  };
+
+  const startExamplePractice = (words: Example[]) => {
+    if (words.length === 0) return;
+    setExampleQueue(words);
+    setExampleIdx(0);
+    setExampleInput("");
+    setExampleCandidates([]);
+    setExampleChecked(false);
+    setExampleCorrect(false);
+  };
+
+  const checkExampleAnswer = async () => {
+    if (!exampleQueue[exampleIdx] || isRecognizingExample) return;
+    const target = exampleQueue[exampleIdx];
+
+    let activeCandidates = exampleCandidates;
+    if (exampleCanvasRef.current) {
+      activeCandidates = await exampleCanvasRef.current.forceRecognizeIfNeeded();
+    }
+
+    const cleanStr = (s: string) => s.replace(/\s*[\(（].*?[\)）]/g, "").trim();
+    let currentInput = exampleInput;
+    if (!currentInput && activeCandidates.length > 0) {
+      currentInput = activeCandidates[0];
+      setExampleInput(currentInput);
+    }
+
+    setExampleCorrect(cleanStr(target.word) === cleanStr(currentInput));
+    setExampleChecked(true);
+  };
+
+  const handleNextExample = () => {
+    const nextIdx = exampleIdx + 1;
+    if (nextIdx < exampleQueue.length) {
+      setExampleIdx(nextIdx);
+      setExampleInput("");
+      setExampleCandidates([]);
+      setExampleChecked(false);
+      setExampleCorrect(false);
+    } else {
+      // Finished all example words; collapse back to the selection panel.
+      setExampleQueue([]);
+      setExampleIdx(0);
+      setExampleChecked(false);
+      setExampleCorrect(false);
+    }
   };
 
   const handleNextCard = () => {
@@ -475,6 +677,75 @@ export function KanjiTamagoContent({ username }: { username: string }) {
       CONFUSION_PAIRS[currentCard.moji[0]] ||
       null
     : null;
+
+  // Keyboard shortcuts during an active practice session
+  useEffect(() => {
+    if (viewMode !== "session" || !currentCard || sessionFinished) return;
+
+    const anyModalOpen =
+      incorrectCard !== null || alertModal.isOpen || confusionDetail !== null;
+
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      )
+        return;
+      if (anyModalOpen) return;
+
+      const key = e.key;
+
+      // Grading shortcuts (1-4) once the answer is revealed
+      if (isFlipped && exampleQueue.length === 0) {
+        if (key >= "1" && key <= "4") {
+          e.preventDefault();
+          if (gradingScore === null) gradeCard(Number(key));
+          return;
+        }
+      }
+
+      if (key === " " || key === "Enter") {
+        if (currentCard.category === "teishutsu_kanji") {
+          if (exampleQueue.length > 0) {
+            e.preventDefault();
+            if (exampleChecked) handleNextExample();
+            else checkExampleAnswer();
+          } else if (!isDrawCorrect) {
+            e.preventDefault();
+            checkDrawAnswer();
+          }
+        } else if (!isFlipped) {
+          e.preventDefault();
+          setIsFlipped(true);
+        }
+        return;
+      }
+
+      if (key === "Escape") {
+        e.preventDefault();
+        setViewMode("dashboard");
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    viewMode,
+    sessionFinished,
+    currentCard,
+    isFlipped,
+    isDrawCorrect,
+    gradingScore,
+    exampleQueue.length,
+    exampleChecked,
+    incorrectCard,
+    alertModal.isOpen,
+    confusionDetail,
+  ]);
 
   if (loading) {
     return (
@@ -879,9 +1150,14 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                 <ArrowLeft size={13} />
                 Cancel Session
               </button>
-              <span className="text-[10px] font-bold text-muted uppercase tracking-wider">
-                Practice Mode ({currentIndex + 1}/{sessionQueue.length})
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline text-[9px] font-medium text-muted/60">
+                  Space·Enter · 1–4 grade · Esc exit
+                </span>
+                <span className="text-[10px] font-bold text-muted uppercase tracking-wider">
+                  Practice Mode ({currentIndex + 1}/{sessionQueue.length})
+                </span>
+              </div>
             </div>
 
             {/* Progress bar */}
@@ -949,17 +1225,180 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                     {/* Handwriting Canvas */}
                     <div className="w-full max-w-lg sm:max-w-xl">
                       {isDrawCorrect ? (
-                        <div className="h-44 w-full rounded-2xl border-2 border-emerald-500/20 bg-emerald-50/10 dark:bg-emerald-950/5 flex flex-col items-center justify-center gap-2 select-none animate-in fade-in duration-300">
-                          <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                            <Check size={20} />
+                        <div className="w-full flex flex-col gap-3">
+                          <div className="h-44 w-full rounded-2xl border-2 border-emerald-500/20 bg-emerald-50/10 dark:bg-emerald-950/5 flex flex-col items-center justify-center gap-2 select-none animate-in fade-in duration-300">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                              <Check size={20} />
+                            </div>
+                            <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                              Excellent! Draw matches the Kanji "
+                              {currentCard.moji}"
+                            </p>
+                            <h1 className="font-jp text-5xl font-black text-foreground mt-1 select-all">
+                              {currentCard.moji}
+                            </h1>
                           </div>
-                          <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                            Excellent! Draw matches the Kanji "
-                            {currentCard.moji}"
-                          </p>
-                          <h1 className="font-jp text-5xl font-black text-foreground mt-1 select-all">
-                            {currentCard.moji}
-                          </h1>
+
+                          {/* Bonus: practice writing the example words */}
+                          {currentCard.examples &&
+                            currentCard.examples.length > 0 &&
+                            exampleQueue.length === 0 && (
+                              <div className="w-full rounded-2xl border border-border/30 bg-surface-muted/40 p-3 flex flex-col gap-2 animate-in fade-in duration-300">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] font-bold text-muted uppercase tracking-wider">
+                                    Practice writing example words?
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const all = new Set(
+                                        currentCard.examples!.map((_, i) => i),
+                                      );
+                                      setSelectedExamples(
+                                        selectedExamples.size ===
+                                          currentCard.examples!.length
+                                          ? new Set()
+                                          : all,
+                                      );
+                                    }}
+                                    className="text-[10px] font-bold text-accent cursor-pointer"
+                                  >
+                                    {selectedExamples.size ===
+                                    currentCard.examples.length
+                                      ? "Clear"
+                                      : "Select all"}
+                                  </button>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {currentCard.examples.map((ex, i) => {
+                                    const active = selectedExamples.has(i);
+                                    return (
+                                      <button
+                                        key={i}
+                                        type="button"
+                                        onClick={() =>
+                                          toggleExampleSelection(i)
+                                        }
+                                        title={`${ex.yomi} — ${ex.imi}`}
+                                        className={[
+                                          "px-2.5 py-1 rounded-full border text-xs font-jp font-bold transition cursor-pointer",
+                                          active
+                                            ? "bg-accent text-accent-foreground border-accent"
+                                            : "bg-surface border-border/40 text-foreground hover:bg-surface-muted",
+                                        ].join(" ")}
+                                      >
+                                        {ex.word}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="primary"
+                                  isDisabled={selectedExamples.size === 0}
+                                  onPress={() =>
+                                    startExamplePractice(
+                                      currentCard.examples!.filter((_, i) =>
+                                        selectedExamples.has(i),
+                                      ),
+                                    )
+                                  }
+                                  className="font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed self-end"
+                                >
+                                  Write selected ({selectedExamples.size})
+                                </Button>
+                              </div>
+                            )}
+
+                          {/* Active example-writing sub-practice */}
+                          {exampleQueue.length > 0 && (
+                            <div className="w-full rounded-2xl border border-accent/25 bg-surface-muted/40 p-3 flex flex-col gap-2 animate-in fade-in duration-300">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-accent uppercase tracking-wider">
+                                  Write example ({exampleIdx + 1}/
+                                  {exampleQueue.length})
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setExampleQueue([])}
+                                  className="text-[10px] font-semibold text-muted hover:text-foreground cursor-pointer"
+                                >
+                                  Done
+                                </button>
+                              </div>
+                              <div className="text-center">
+                                <p className="text-sm font-bold text-foreground">
+                                  {exampleQueue[exampleIdx].imi}
+                                </p>
+                                <p className="text-xs font-jp text-muted">
+                                  {exampleQueue[exampleIdx].yomi}
+                                </p>
+                              </div>
+                              {exampleChecked ? (
+                                <div
+                                  className={[
+                                    "rounded-xl border p-3 flex flex-col items-center gap-1",
+                                    exampleCorrect
+                                      ? "border-emerald-500/25 bg-emerald-50/10 dark:bg-emerald-950/5"
+                                      : "border-rose-500/25 bg-rose-50/10 dark:bg-rose-950/5",
+                                  ].join(" ")}
+                                >
+                                  <span
+                                    className={[
+                                      "text-xs font-bold",
+                                      exampleCorrect
+                                        ? "text-emerald-600 dark:text-emerald-400"
+                                        : "text-rose-600 dark:text-rose-400",
+                                    ].join(" ")}
+                                  >
+                                    {exampleCorrect
+                                      ? "Correct!"
+                                      : "Not quite — here it is:"}
+                                  </span>
+                                  <span className="font-jp text-3xl font-black text-foreground select-all">
+                                    {exampleQueue[exampleIdx].word}
+                                  </span>
+                                  <Button
+                                    size="sm"
+                                    variant="primary"
+                                    onPress={handleNextExample}
+                                    className="font-bold cursor-pointer mt-1"
+                                  >
+                                    {exampleIdx + 1 < exampleQueue.length
+                                      ? "Next word"
+                                      : "Finish"}
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col gap-2">
+                                  <HandwritingCanvas
+                                    ref={exampleCanvasRef}
+                                    value={exampleInput}
+                                    onChange={setExampleInput}
+                                    onSubmit={checkExampleAnswer}
+                                    placeholder="Draw the word..."
+                                    hintText={exampleQueue[exampleIdx].word}
+                                    hideKeyboardMode={true}
+                                    onCandidatesChange={setExampleCandidates}
+                                    onRecognizingChange={setIsRecognizingExample}
+                                  />
+                                  <div className="flex justify-end">
+                                    <Button
+                                      onPress={checkExampleAnswer}
+                                      isDisabled={isRecognizingExample}
+                                      variant="primary"
+                                      size="sm"
+                                      className="font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      {isRecognizingExample
+                                        ? "Analyzing..."
+                                        : "Check"}
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="flex flex-col gap-2">
@@ -1031,6 +1470,30 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                           <p className="mt-1 text-sm sm:text-base font-semibold text-foreground max-w-sm border-t border-border/50 pt-2 whitespace-pre-line leading-relaxed">
                             {currentCard.imi}
                           </p>
+                          {currentCard.examples &&
+                            currentCard.examples.length > 0 && (
+                              <div className="w-full max-w-sm mt-3 flex flex-col gap-1.5 text-left">
+                                <span className="text-[9px] font-bold text-muted uppercase tracking-wider">
+                                  Example usage
+                                </span>
+                                {currentCard.examples.map((ex, i) => (
+                                  <div
+                                    key={i}
+                                    className="flex items-baseline gap-2 rounded-lg bg-surface-muted/50 border border-border/20 px-2.5 py-1.5"
+                                  >
+                                    <span className="font-jp text-base font-bold text-foreground shrink-0 select-all">
+                                      {ex.word}
+                                    </span>
+                                    <span className="font-jp text-[11px] text-indigo-500/90 shrink-0">
+                                      {ex.yomi}
+                                    </span>
+                                    <span className="text-[11px] text-muted truncate">
+                                      — {ex.imi}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                         </div>
                       )}
                     </div>
@@ -1118,21 +1581,32 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                          Confusion Warning
+                          Confusion Warning{" "}
+                          <span className="font-medium text-amber-500/70 normal-case tracking-normal">
+                            — tap a kanji to compare
+                          </span>
                         </p>
                         <div className="flex items-center gap-3 mt-1.5">
-                          <div className="flex flex-col items-center">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openConfusionDetail(currentCard.moji[0])
+                            }
+                            className="flex flex-col items-center rounded-lg px-1.5 py-0.5 hover:bg-accent/10 transition cursor-pointer"
+                          >
                             <span className="font-jp text-2xl font-black text-accent">
                               {currentCard.moji[0]}
                             </span>
                             <span className="text-[8px] font-bold text-muted">
                               Current
                             </span>
-                          </div>
+                          </button>
                           {confusionKanji.map((other, idx) => (
-                            <div
+                            <button
                               key={idx}
-                              className="flex flex-col items-center"
+                              type="button"
+                              onClick={() => openConfusionDetail(other)}
+                              className="flex flex-col items-center rounded-lg px-1.5 py-0.5 hover:bg-muted/10 transition cursor-pointer"
                             >
                               <span className="font-jp text-2xl font-bold text-muted/75">
                                 {other}
@@ -1140,7 +1614,7 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                               <span className="text-[8px] font-medium text-muted/55">
                                 Similar
                               </span>
-                            </div>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -1328,6 +1802,54 @@ export function KanjiTamagoContent({ username }: { username: string }) {
                   className="w-full font-bold cursor-pointer"
                 >
                   Got It (Next)
+                </Button>
+              </Modal.Dialog>
+            </Modal.Container>
+          </Modal.Backdrop>
+        </Modal>
+
+        {/* Confusion-pair Kanji detail modal */}
+        <Modal
+          isOpen={confusionDetail !== null}
+          onOpenChange={(open) => {
+            if (!open) setConfusionDetail(null);
+          }}
+        >
+          <Modal.Backdrop>
+            <Modal.Container className="flex items-center justify-center min-h-screen w-screen animate-in fade-in duration-200">
+              <Modal.Dialog className="sm:max-w-[320px] p-6 flex flex-col items-center text-center">
+                <Modal.CloseTrigger />
+                {confusionDetail && (
+                  <>
+                    <span className="font-jp text-6xl font-black text-foreground mb-3 select-all">
+                      {confusionDetail.char}
+                    </span>
+                    <div className="w-full rounded-2xl bg-surface-muted/50 border border-border/20 p-3 flex flex-col gap-2">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[9px] font-bold text-muted uppercase tracking-wider">
+                          Reading
+                        </span>
+                        <span className="font-jp text-sm font-bold text-indigo-500">
+                          {confusionDetail.yomi}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-0.5 border-t border-border/20 pt-2">
+                        <span className="text-[9px] font-bold text-muted uppercase tracking-wider">
+                          Meaning
+                        </span>
+                        <span className="text-sm font-semibold text-foreground">
+                          {confusionDetail.imi}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
+                <Button
+                  slot="close"
+                  variant="primary"
+                  className="w-full font-bold cursor-pointer mt-5"
+                >
+                  Close
                 </Button>
               </Modal.Dialog>
             </Modal.Container>

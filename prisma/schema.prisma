@@ -481,6 +481,7 @@ model KanjiTamago {
   moji        String                // Karakter Kanji / kata (e.g. "私")
   yomi        String                // Pembacaan / Furigana
   imi         String                // Arti kata
+  examples    Json?                 // Contoh pemakaian: [{ word, yomi, imi }]
   progress    KanjiTamagoProgress[]
   createdAt   DateTime              @default(now())
 

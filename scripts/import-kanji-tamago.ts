@@ -2,10 +2,30 @@ import fs from "fs";
 import path from "path";
 import { prisma } from "../src/shared/lib/db";
 
+type Example = { word: string; yomi: string; imi: string };
+
 async function main() {
   const jsonPath = path.join(process.cwd(), "src/helper/kanji_tamago.json");
   const rawData = fs.readFileSync(jsonPath, "utf-8");
   const chapters = JSON.parse(rawData);
+
+  // Optional example-usage map: { [moji]: Example[] }, generated separately.
+  const examplesPath = path.join(
+    process.cwd(),
+    "src/helper/kanji_tamago_examples.json",
+  );
+  let examplesMap: Record<string, Example[]> = {};
+  if (fs.existsSync(examplesPath)) {
+    try {
+      examplesMap = JSON.parse(fs.readFileSync(examplesPath, "utf-8"));
+    } catch (err) {
+      console.warn("Could not parse kanji_tamago_examples.json, skipping:", err);
+    }
+  }
+  const getExamples = (moji: string): Example[] | undefined => {
+    const ex = examplesMap[moji];
+    return ex && ex.length > 0 ? ex : undefined;
+  };
 
   console.log("Starting Kanji Tamago import...");
 
@@ -29,6 +49,7 @@ async function main() {
             topic,
             yomi: item.yomi,
             imi: item.imi,
+            examples: getExamples(item.moji) ?? undefined,
           },
           create: {
             chapter: ka,
@@ -37,6 +58,7 @@ async function main() {
             topic,
             yomi: item.yomi,
             imi: item.imi,
+            examples: getExamples(item.moji) ?? undefined,
           },
         });
         count++;
@@ -58,6 +80,7 @@ async function main() {
             topic,
             yomi: item.yomi,
             imi: item.imi,
+            examples: getExamples(item.moji) ?? undefined,
           },
           create: {
             chapter: ka,
@@ -66,6 +89,7 @@ async function main() {
             topic,
             yomi: item.yomi,
             imi: item.imi,
+            examples: getExamples(item.moji) ?? undefined,
           },
         });
         count++;
@@ -87,6 +111,7 @@ async function main() {
             topic,
             yomi: item.yomi,
             imi: item.imi,
+            examples: getExamples(item.moji) ?? undefined,
           },
           create: {
             chapter: ka,
@@ -95,6 +120,7 @@ async function main() {
             topic,
             yomi: item.yomi,
             imi: item.imi,
+            examples: getExamples(item.moji) ?? undefined,
           },
         });
         count++;
