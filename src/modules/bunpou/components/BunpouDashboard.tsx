@@ -9,13 +9,13 @@ import {
   Eye,
   EyeOff,
   Award,
-  Sparkles,
   Info,
+  PenLine,
   RefreshCw
 } from "lucide-react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
-import { BUNPOU_DATA, BunpouLesson, BunpouPattern, BunpouExample } from "../data/bunpouData";
+import { BUNPOU_DATA } from "../data/bunpouData";
 import { HandwritingCanvas } from "@/src/shared/components/HandwritingCanvas";
 import { 
   getBunpouProgress, 
@@ -381,16 +381,16 @@ function PracticeArea({
 /**
  * Main Bunpou Dashboard.
  */
-export function BunpouDashboard() {
+export function BunpouDashboard({ initialChapter = 1 }: { initialChapter?: number }) {
   const { lang } = useLanguage();
-  const [selectedChapter, setSelectedChapter] = useState<number>(1);
+  const [selectedChapter, setSelectedChapter] = useState<number>(initialChapter);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showFurigana, setShowFurigana] = useState<boolean>(true);
   
   // Progress State
   const [learnedPatterns, setLearnedPatterns] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   // Active tab state per pattern ("examples" or "practice")
   const [activeTab, setActiveTab] = useState<Record<string, "examples" | "practice">>({});
@@ -441,7 +441,7 @@ export function BunpouDashboard() {
   const text = {
     en: {
       title: "Bunpou — Grammar & Particles",
-      subtitle: "Study basic textbook structures, particles, adjectives, and expressions (Chapters 1–15).",
+      subtitle: "Grammar reference library. Read the explanation here, then practice it actively in Kakou.",
       backHome: "Back to Home",
       searchPlaceholder: "Search grammar patterns or keywords...",
       overallProgress: "Textbook Progress",
@@ -461,7 +461,7 @@ export function BunpouDashboard() {
     },
     id: {
       title: "Bunpou (文法)",
-      subtitle: "Tata Bahasa & Partikel",
+      subtitle: "Library referensi tata bahasa. Baca penjelasannya di sini, lalu praktikkan secara aktif di Kakou.",
       backHome: "Kembali ke Beranda",
       searchPlaceholder: "Cari pola tata bahasa atau kata kunci...",
       overallProgress: "Progres Buku Pelajaran",
@@ -719,6 +719,7 @@ export function BunpouDashboard() {
 
                       return (
                         <div
+                          id={`pattern-${pat.id}`}
                           key={pat.id}
                           className={[
                             "relative overflow-hidden rounded-2xl border bg-surface p-5 shadow-2xs hover:shadow-xs transition-all duration-300 flex flex-col gap-3 group",
@@ -740,6 +741,13 @@ export function BunpouDashboard() {
 
                             {/* Badges and Actions */}
                             <div className="flex items-center gap-2 shrink-0 select-none">
+                              <Link
+                                href={`/kakou?source=bunpou&sourceId=${encodeURIComponent(pat.id)}`}
+                                title="Practice this pattern in Kakou"
+                                className="inline-flex items-center gap-1 rounded-lg border border-accent/25 bg-accent/5 px-2 py-1 text-[10px] font-bold text-accent hover:bg-accent/10"
+                              >
+                                <PenLine size={12} /> <span className="hidden lg:inline">Practice in Kakou</span>
+                              </Link>
                               <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-background text-muted border border-border">
                                 {pat.jlpt}
                               </span>

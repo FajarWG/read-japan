@@ -12,6 +12,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BunpouPage() {
-  return <BunpouDashboard />;
+export default async function BunpouPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ chapter?: string }>;
+}) {
+  const params = await searchParams;
+  const parsedChapter = Number(params.chapter);
+  const initialChapter =
+    Number.isInteger(parsedChapter) && parsedChapter >= 1 && parsedChapter <= 15
+      ? parsedChapter
+      : 1;
+
+  return <BunpouDashboard initialChapter={initialChapter} />;
 }

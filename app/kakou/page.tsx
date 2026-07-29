@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { getKakouOverview } from "@/src/modules/kakou/actions/kakouActions";
 import { KakouDashboard } from "@/src/modules/kakou/components/KakouDashboard";
+import type { KakouSourceType } from "@/src/modules/kakou/data/types";
 
 export const dynamic = "force-dynamic";
 
@@ -14,9 +15,29 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function KakouPage() {
-  const overview = await getKakouOverview();
+export default async function KakouPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ source?: string; sourceId?: string }>;
+}) {
+  const [overview, params] = await Promise.all([getKakouOverview(), searchParams]);
   if (!overview) return null;
 
-  return <KakouDashboard initialOverview={overview} />;
+  const sourceType: KakouSourceType | undefined =
+    params.source === "bunpou"
+      ? "BUNPOU"
+      : params.source === "katsuyou"
+        ? "KATSUYOU"
+        : undefined;
+  const initialSource =
+    sourceType && params.sourceId
+      ? { type: sourceType, id: params.sourceId }
+      : undefined;
+
+  return (
+    <KakouDashboard
+      initialOverview={overview}
+      initialSource={initialSource}
+    />
+  );
 }

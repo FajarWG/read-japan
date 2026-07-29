@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import {
+  BookOpen,
   BookOpenCheck,
   Check,
+  ChevronDown,
   ChevronRight,
   Clipboard,
-  Clock3,
+  ExternalLink,
   History,
+  Info,
   NotebookPen,
   PenLine,
   RotateCcw,
@@ -33,7 +37,14 @@ import {
   type KakouOverview,
   type KakouPrompt,
   type KakouSessionView,
+  type KakouSourceType,
 } from "@/src/modules/kakou/data/types";
+import { startStudyTimer } from "@/src/modules/study-timer/actions/studyTimerActions";
+import {
+  formatStudyTime,
+  StudyTimerBar,
+} from "@/src/modules/study-timer/components/StudyTimerBar";
+import type { StudyTimerView } from "@/src/modules/study-timer/types";
 
 const KIND_LABELS: Record<KakouPrompt["kind"], string> = {
   JOURNAL: "Guided journal",
@@ -67,7 +78,7 @@ function buildTextReviewPrompt(session: KakouSessionView): string {
 }
 
 function buildPhotoReviewPrompt(session: KakouSessionView): string {
-  return `Saya akan mengunggah foto latihan tulisan tangan bahasa Jepang. Level saya JLPT ${session.level}.\n\nTolong lakukan hal berikut:\n1. Transkripsikan tulisan pada foto tanpa menambah isi.\n2. Tandai karakter yang tidak dapat dibaca dengan [?], jangan menebak.\n3. Periksa bentuk kana/kanji, ejaan, partikel, kosakata, dan tata bahasa.\n4. Tampilkan kalimat asli dan versi yang benar.\n5. Jelaskan koreksi dalam bahasa Indonesia secara singkat.\n6. Pertahankan kalimat yang sudah benar.\n7. Jangan menilai kualitas artistik tulisan.\n8. Akhiri dengan maksimal tiga hal yang perlu saya latih kembali.\n\nKonteks latihan:\n${session.prompts
+  return `Saya akan mengunggah foto latihan tulisan tangan bahasa Jepang. Level saya JLPT ${session.level}.\n\nTolong lakukan hal berikut:\n1. Transkripsikan tulisan pada foto tanpa menambah isi.\n2. Tandai karakter yang tidak dapat dibaca dengan [?], jangan menebak.\n3. Periksa bentuk kana/kanji, ejaan, partikel, kosakata, dan tata bahasa.\n4. Untuk setiap kalimat hasil transkripsi, tampilkan tulisan asli, versi yang benar, dan satu versi improved yang lebih natural. Versi improved harus berasal dari maksud kalimat asli, mempertahankan maknanya, dan tidak boleh menambahkan fakta baru.\n5. Jelaskan koreksi dalam bahasa Indonesia secara singkat.\n6. Pertahankan kalimat yang sudah benar; jika sudah natural, katakan bahwa tidak perlu diubah.\n7. Pertahankan kosakata dan tata bahasa di sekitar level ${session.level}.\n8. Jangan menilai kualitas artistik tulisan.\n9. Akhiri dengan maksimal tiga hal yang perlu saya latih kembali.\n\nGunakan format jawaban berikut untuk Bagian 1:\n\nBAGIAN 1 — TRANSKRIPSI DAN PERBAIKAN\n\nKalimat 1\n- Tulisan asli: [transkripsi persis dari foto]\n- Versi benar: [koreksi minimum agar kalimat benar]\n- Versi improved: [kalimat yang lebih natural dan baik, tetap dengan maksud yang sama]\n- Arti Indonesia: [arti versi improved]\n- Penjelasan: [alasan perubahan secara singkat]\n\nUlangi format tersebut untuk setiap kalimat. Jika maksud tulisan tidak dapat dipastikan, jangan membuat versi improved berdasarkan tebakan; jelaskan bagian yang perlu dikonfirmasi.\n\nSetelah Bagian 1, tampilkan:\n\nBAGIAN 2 — POLA KESALAHAN\n- Ringkas pola kesalahan yang berulang.\n\nBAGIAN 3 — SARAN LATIHAN\n- Berikan maksimal tiga hal yang perlu saya latih kembali.\n\nKonteks latihan:\n${session.prompts
     .map(
       (item, index) =>
         `${index + 1}. ${item.instruction}${item.pattern ? ` (Target: ${item.pattern})` : ""}`,
@@ -84,6 +95,8 @@ function formatDate(value: string): string {
 }
 
 function PromptCard({ prompt, index }: { prompt: KakouPrompt; index: number }) {
+  const [showReminder, setShowReminder] = useState(false);
+
   return (
     <article className="rounded-3xl border border-border bg-surface p-5 shadow-sm sm:p-7">
       <div className="mb-5 flex items-start justify-between gap-3">
@@ -109,34 +122,84 @@ function PromptCard({ prompt, index }: { prompt: KakouPrompt; index: number }) {
         <p className="mt-1.5 leading-relaxed text-foreground">{prompt.instruction}</p>
       </div>
 
-      {prompt.pattern && (
-        <div className="mt-4 rounded-xl bg-surface-muted px-4 py-3">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Target pattern</p>
-          <p className="font-jp mt-1 text-sm font-semibold text-foreground">{prompt.pattern}</p>
-        </div>
-      )}
+      {prompt.reminder && (
+        <section className="mt-5 overflow-hidden rounded-2xl border border-border bg-background">
+          <button
+            type="button"
+            onClick={() => setShowReminder((value) => !value)}
+            aria-expanded={showReminder}
+            className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left hover:bg-surface-muted/50"
+          >
+            <span className="flex items-center gap-2 text-sm font-bold text-foreground">
+              <Info size={16} className="text-accent" />
+              Need a reminder?
+            </span>
+            <ChevronDown
+              size={16}
+              className={`text-muted transition-transform ${showReminder ? "rotate-180" : ""}`}
+            />
+          </button>
 
-      {prompt.example && (
-        <div className="mt-4 border-l-2 border-accent/50 pl-4">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Example</p>
-          <p className="font-jp mt-1 text-sm leading-relaxed text-foreground">{prompt.example}</p>
-        </div>
-      )}
+          {showReminder && (
+            <div className="border-t border-border px-4 py-4">
+              <div className="flex items-start gap-3">
+                <BookOpen size={18} className="mt-0.5 shrink-0 text-accent" />
+                <div>
+                  <h3 className="font-jp font-bold text-foreground">{prompt.reminder.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{prompt.reminder.meaning}</p>
+                </div>
+              </div>
 
-      {prompt.hints && prompt.hints.length > 0 && (
-        <div className="mt-4">
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted">Hints</p>
-          <div className="flex flex-wrap gap-2">
-            {prompt.hints.map((hint) => (
-              <span
-                key={hint}
-                className="font-jp rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs text-foreground"
-              >
-                {hint}
-              </span>
-            ))}
-          </div>
-        </div>
+              {prompt.reminder.structures.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Structure</p>
+                  <div className="mt-2 flex flex-col gap-1.5">
+                    {prompt.reminder.structures.map((structure) => (
+                      <code key={structure} className="rounded-lg bg-surface-muted px-3 py-2 text-xs text-foreground">
+                        {structure}
+                      </code>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {prompt.reminder.examples.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Examples</p>
+                  <div className="mt-2 flex flex-col gap-2">
+                    {prompt.reminder.examples.map((example, exampleIndex) => (
+                      <div key={`${example.japanese}-${exampleIndex}`} className="rounded-xl border border-border p-3">
+                        <p className="font-jp text-sm font-semibold text-foreground">{example.japanese}</p>
+                        {example.reading && <p className="font-jp mt-1 text-[11px] text-muted">{example.reading}</p>}
+                        {example.meaning && <p className="mt-1 text-xs text-muted">{example.meaning}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {prompt.reminder.commonMistakes && prompt.reminder.commonMistakes.length > 0 && (
+                <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                    Watch out
+                  </p>
+                  <ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-relaxed text-muted">
+                    {prompt.reminder.commonMistakes.map((mistake) => <li key={mistake}>{mistake}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {prompt.reminder.source && (
+                <Link
+                  href={prompt.reminder.source.href}
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline"
+                >
+                  {prompt.reminder.source.label} <ExternalLink size={12} />
+                </Link>
+              )}
+            </div>
+          )}
+        </section>
       )}
     </article>
   );
@@ -151,22 +214,30 @@ function Stats({ overview }: { overview: KakouOverview }) {
         <p className="text-[10px] text-muted sm:text-xs">sessions done</p>
       </div>
       <div className="rounded-2xl border border-border bg-surface p-3 sm:p-4">
-        <Clock3 size={16} className="mb-2 text-accent" />
-        <p className="text-xl font-bold tabular-nums text-foreground">{overview.stats.totalMinutes}</p>
-        <p className="text-[10px] text-muted sm:text-xs">minutes written</p>
+        <PenLine size={16} className="mb-2 text-accent" />
+        <p className="text-lg font-bold tabular-nums text-foreground">{formatStudyTime(overview.stats.todaySeconds, false)}</p>
+        <p className="text-[10px] text-muted sm:text-xs">studied today</p>
       </div>
       <div className="rounded-2xl border border-border bg-surface p-3 sm:p-4">
         <Sparkles size={16} className="mb-2 text-accent" />
-        <p className="text-xl font-bold tabular-nums text-foreground">{overview.stats.thisWeek}</p>
+        <p className="text-lg font-bold tabular-nums text-foreground">{formatStudyTime(overview.stats.weekSeconds, false)}</p>
         <p className="text-[10px] text-muted sm:text-xs">this week</p>
       </div>
     </div>
   );
 }
 
-export function KakouDashboard({ initialOverview }: { initialOverview: KakouOverview }) {
+export function KakouDashboard({
+  initialOverview,
+  initialSource,
+}: {
+  initialOverview: KakouOverview;
+  initialSource?: { type: KakouSourceType; id: string };
+}) {
   const [overview, setOverview] = useState(initialOverview);
   const [active, setActive] = useState(initialOverview.activeSession);
+  const [timer, setTimer] = useState<StudyTimerView | null>(initialOverview.timer.activeTimer);
+  const [timerEnabled, setTimerEnabled] = useState(true);
   const [mode, setMode] = useState<KakouMode>("DAILY_MIX");
   const [level, setLevel] = useState<KakouLevel>("N5");
   const [duration, setDuration] = useState<KakouDuration>(10);
@@ -177,13 +248,25 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
   const startSession = () => {
     setMessage(null);
     startTransition(async () => {
-      const result = await createKakouSession({ mode, level, durationMinutes: duration });
+      const result = await createKakouSession({
+        mode,
+        level,
+        durationMinutes: duration,
+        sourceType: initialSource?.type,
+        sourceId: initialSource?.id,
+      });
       if (!result.success) {
         setMessage(result.error);
         return;
       }
       setActive(result.session);
-      if (result.resumed) setMessage("Your unfinished session has been restored.");
+      if (timerEnabled && (!timer || timer.kakouSessionId !== result.session.id)) {
+        const timerResult = await startStudyTimer(result.session.id);
+        if (timerResult.success) setTimer(timerResult.timer);
+        else setMessage(timerResult.error);
+      } else if (result.resumed) {
+        setMessage("Your unfinished session has been restored.");
+      }
     });
   };
 
@@ -211,6 +294,7 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
       }
       setOverview(result.overview);
       setActive(null);
+      setTimer(result.overview.timer.activeTimer);
       setCopied(null);
       setMessage("Session saved. Nice work — your streak has been updated.");
     });
@@ -227,6 +311,7 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
       }
       setOverview(result.overview);
       setActive(null);
+      setTimer(result.overview.timer.activeTimer);
       setCopied(null);
     });
   };
@@ -266,6 +351,13 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
             </button>
           </header>
 
+          <StudyTimerBar
+            kakouSessionId={active.id}
+            timer={timer?.kakouSessionId === active.id ? timer : null}
+            onChange={setTimer}
+            onError={setMessage}
+          />
+
           <section className="rounded-2xl border border-border bg-surface px-4 py-3">
             <div className="mb-2 flex items-center justify-between text-xs">
               <span className="font-semibold text-foreground">{KAKOU_MODE_LABELS[active.mode].title}</span>
@@ -292,10 +384,9 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
                 disabled={isPending}
                 className="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-accent px-5 py-3 font-bold text-white shadow-sm transition-all hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isPending ? "Saving to database…" : active.progress + 1 === total ? "I finished this step" : "Step done — continue"}
+                {isPending ? "Saving…" : active.progress + 1 === total ? "I finished this step" : "Step done — continue"}
                 {!isPending && <ChevronRight size={18} />}
               </button>
-              <p className="text-center text-xs text-muted">Your current step is saved to PostgreSQL after you continue.</p>
             </>
           )}
 
@@ -394,7 +485,21 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
             <h2 className="font-bold text-foreground">Start a writing session</h2>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          {initialSource && (
+            <div className="mb-5 flex items-start justify-between gap-3 rounded-2xl border border-accent/25 bg-accent/5 p-4">
+              <div>
+                <p className="text-xs font-bold text-accent">Focused library practice</p>
+                <p className="mt-1 text-sm text-muted">
+                  This session will use the selected {initialSource.type === "BUNPOU" ? "Bunpou pattern" : "Katsuyou guide"}.
+                </p>
+              </div>
+              <Link href="/kakou" className="shrink-0 text-xs font-bold text-muted hover:text-foreground">
+                Clear
+              </Link>
+            </div>
+          )}
+
+          <div className={`${initialSource ? "hidden" : "grid"} gap-3 sm:grid-cols-2`}>
             {KAKOU_MODES.map((item) => {
               const selected = mode === item;
               return (
@@ -416,7 +521,7 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
           </div>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <fieldset>
+            <fieldset className={initialSource ? "hidden" : ""}>
               <legend className="mb-2 text-xs font-bold uppercase tracking-wide text-muted">JLPT level</legend>
               <div className="grid grid-cols-3 gap-2">
                 {(["N5", "N4", "N3"] as KakouLevel[]).map((item) => (
@@ -452,16 +557,31 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
             </fieldset>
           </div>
 
+          <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl border border-border bg-background p-4">
+            <div>
+              <p className="text-sm font-bold text-foreground">Track actual study time</p>
+              <p className="mt-0.5 text-xs text-muted">The timer stays visible and can be paused anytime.</p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={timerEnabled}
+              onClick={() => setTimerEnabled((value) => !value)}
+              className={`relative h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors ${timerEnabled ? "bg-accent" : "bg-border"}`}
+            >
+              <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${timerEnabled ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={startSession}
             disabled={isPending}
             className="mt-6 inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-accent px-5 py-3 font-bold text-white shadow-sm transition-all hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isPending ? "Preparing and saving…" : "Open today’s notebook page"}
+            {isPending ? "Preparing…" : initialSource ? "Practice this material" : "Open today’s notebook page"}
             {!isPending && <ChevronRight size={18} />}
           </button>
-          <p className="mt-3 text-center text-[11px] text-muted">The selected questions and session progress are stored in your database.</p>
         </section>
 
         <section className="rounded-3xl border border-border bg-surface p-5 sm:p-7">
@@ -473,7 +593,7 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
             <div className="rounded-2xl bg-surface-muted p-5 text-center">
               <RotateCcw size={20} className="mx-auto mb-2 text-muted" />
               <p className="text-sm font-semibold text-foreground">No completed sessions yet</p>
-              <p className="mt-1 text-xs text-muted">Your database-backed writing history will appear here.</p>
+              <p className="mt-1 text-xs text-muted">Completed writing sessions will appear here.</p>
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -481,7 +601,9 @@ export function KakouDashboard({ initialOverview }: { initialOverview: KakouOver
                 <div key={item.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-foreground">{KAKOU_MODE_LABELS[item.mode].title}</p>
-                    <p className="mt-0.5 text-[11px] text-muted">{formatDate(item.completedAt ?? item.startedAt)} · {item.level} · {item.durationMinutes} min</p>
+                    <p className="mt-0.5 text-[11px] text-muted">
+                      {formatDate(item.completedAt ?? item.startedAt)} · {item.level} · {item.actualSeconds > 0 ? formatStudyTime(item.actualSeconds, false) : "timer off"}
+                    </p>
                   </div>
                   <span className="shrink-0 rounded-full bg-surface-muted px-2.5 py-1 text-[10px] font-bold text-muted">
                     {item.difficulty ?? "DONE"}

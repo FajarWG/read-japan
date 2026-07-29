@@ -10,11 +10,13 @@ import {
   BookOpen,
   FileText,
   PencilLine,
+  Clock3,
   Moon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import type { ProgressStats } from "@/src/modules/dashboard/lib/dashboard";
+import { formatStudyTime } from "@/src/modules/study-timer/components/StudyTimerBar";
 
 // ─────────────────────────────────────────────────────────
 // 7-day activity chart (inline SVG, no external lib)
@@ -85,6 +87,56 @@ function ActivityChart({
 }
 
 // ─────────────────────────────────────────────────────────
+// Actual study time — sourced from the persistent timer
+// ─────────────────────────────────────────────────────────
+
+function StudyTimeChart({ stats }: { stats: ProgressStats["kakou"] }) {
+  const max = Math.max(1, ...stats.byDay.map((day) => day.seconds));
+
+  return (
+    <section className="rounded-2xl border border-border bg-surface px-5 py-4 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <Clock3 size={15} className="text-accent" /> Actual study time
+          </p>
+          <p className="mt-1 text-xs text-muted">Only active timer time is counted.</p>
+        </div>
+        <div className="flex gap-5 text-right">
+          <div>
+            <p className="text-lg font-bold tabular-nums text-foreground">{formatStudyTime(stats.todaySeconds, false)}</p>
+            <p className="text-[10px] uppercase tracking-wide text-muted">today</p>
+          </div>
+          <div>
+            <p className="text-lg font-bold tabular-nums text-foreground">{formatStudyTime(stats.weekSeconds, false)}</p>
+            <p className="text-[10px] uppercase tracking-wide text-muted">7 days</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid h-24 grid-cols-7 items-end gap-2">
+        {stats.byDay.map((day, index) => {
+          const height = Math.max(3, Math.round((day.seconds / max) * 68));
+          const today = index === stats.byDay.length - 1;
+          return (
+            <div key={day.date} className="flex h-full flex-col items-center justify-end gap-1">
+              <span className="text-[9px] font-semibold tabular-nums text-muted">
+                {day.seconds > 0 ? formatStudyTime(day.seconds, false) : "0m"}
+              </span>
+              <span
+                className={`w-full max-w-8 rounded-t-md ${today ? "bg-accent" : day.seconds > 0 ? "bg-accent/40" : "bg-border"}`}
+                style={{ height }}
+              />
+              <span className="text-[9px] text-muted">{day.date.slice(8)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
 // Streak card
 // ─────────────────────────────────────────────────────────
 
@@ -132,15 +184,16 @@ function MetricCard({
 }: {
   icon: LucideIcon;
   title: string;
-  primary: number;
+  primary: number | string;
   primaryLabel: string;
-  secondary?: number;
+  secondary?: number | string;
   secondaryLabel?: string;
   highlightSecondary?: boolean;
   href: string;
   cta?: string;
 }) {
-  const showCta = cta && highlightSecondary && (secondary ?? 0) > 0;
+  const secondaryNumber = typeof secondary === "number" ? secondary : 0;
+  const showCta = cta && highlightSecondary && secondaryNumber > 0;
   return (
     <section className="flex flex-col rounded-2xl border border-border bg-surface px-5 py-4 shadow-sm">
       <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -156,7 +209,7 @@ function MetricCard({
             <p
               className={[
                 "text-2xl font-bold tabular-nums",
-                highlightSecondary && (secondary ?? 0) > 0
+                highlightSecondary && secondaryNumber > 0
                   ? "text-accent"
                   : "text-foreground",
               ].join(" ")}
@@ -194,6 +247,8 @@ export function ProgressDashboard({ stats }: { stats: ProgressStats }) {
         <StreakCard days={stats.streakDays} />
         <ActivityChart data={stats.byDay} />
       </div>
+
+      <StudyTimeChart stats={stats.kakou} />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <MetricCard
@@ -235,10 +290,10 @@ export function ProgressDashboard({ stats }: { stats: ProgressStats }) {
         <MetricCard
           icon={PencilLine}
           title="Kakou"
-          primary={stats.kakou.sessionsCompleted}
-          primaryLabel="writing sessions"
-          secondary={stats.kakou.minutesWritten}
-          secondaryLabel="minutes written"
+          primary={formatStudyTime(stats.kakou.todaySeconds, false)}
+          primaryLabel="studied today"
+          secondary={formatStudyTime(stats.kakou.weekSeconds, false)}
+          secondaryLabel="this week"
           href="/kakou"
         />
       </div>

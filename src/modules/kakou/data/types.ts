@@ -1,3 +1,5 @@
+import type { StudyTimerOverview } from "@/src/modules/study-timer/types";
+
 export const KAKOU_MODES = [
   "DAILY_MIX",
   "GUIDED_JOURNAL",
@@ -21,6 +23,30 @@ export type KakouPromptKind =
   | "SENTENCE_BUILDER"
   | "CONJUGATION";
 
+export type KakouSourceType = "BUNPOU" | "KATSUYOU";
+
+export interface KakouSource {
+  type: KakouSourceType;
+  id: string;
+  href: string;
+  label: string;
+}
+
+export interface KakouReminderExample {
+  japanese: string;
+  reading?: string;
+  meaning?: string;
+}
+
+export interface KakouReminder {
+  title: string;
+  meaning: string;
+  structures: string[];
+  examples: KakouReminderExample[];
+  commonMistakes?: string[];
+  source?: KakouSource;
+}
+
 export interface KakouPrompt {
   id: string;
   kind: KakouPromptKind;
@@ -31,6 +57,8 @@ export interface KakouPrompt {
   pattern?: string;
   example?: string;
   hints?: string[];
+  source?: KakouSource;
+  reminder?: KakouReminder;
 }
 
 export interface KakouSessionView {
@@ -44,15 +72,18 @@ export interface KakouSessionView {
   difficulty: KakouDifficulty | null;
   startedAt: string;
   completedAt: string | null;
+  actualSeconds: number;
 }
 
 export interface KakouOverview {
   activeSession: KakouSessionView | null;
   history: KakouSessionView[];
+  timer: StudyTimerOverview;
   stats: {
     completedSessions: number;
-    totalMinutes: number;
-    thisWeek: number;
+    todaySeconds: number;
+    weekSeconds: number;
+    totalSeconds: number;
   };
 }
 

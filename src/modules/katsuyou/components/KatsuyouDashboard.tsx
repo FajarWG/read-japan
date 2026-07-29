@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, startTransition } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Tabs } from "@heroui/react";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
@@ -13,16 +13,13 @@ import { ReviewTab } from "./ReviewTab";
 import { getKatsuyouStats } from "../actions/katsuyouActions";
 import {
   RefreshCw,
-  BookOpen,
-  AlertCircle,
-  Sparkles,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  PenLine,
 } from "lucide-react";
 
-export function KatsuyouDashboard() {
-  const [selectedForm, setSelectedForm] = useState<string>("dictionary");
+export function KatsuyouDashboard({ initialForm = "dictionary" }: { initialForm?: string }) {
+  const [selectedForm, setSelectedForm] = useState<string>(initialForm);
   const [activeTab, setActiveTab] = useState<string>("learn");
   const [showSidebar, setShowSidebar] = useState(true);
 
@@ -77,7 +74,7 @@ export function KatsuyouDashboard() {
   const text = {
     title: "Katsuyou — Verb Conjugation",
     subtitle:
-      "Master Japanese verb structures with interactive guides, quizzes, and spaced repetition.",
+      "Verb conjugation reference library. Review rules and examples here, then write the drill in Kakou.",
     backHome: "Back to Home",
     tabLearn: "Learn",
     tabExamples: "Examples",
@@ -118,6 +115,12 @@ export function KatsuyouDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0 self-start mt-2">
+              <Link
+                href={`/kakou?source=katsuyou&sourceId=${encodeURIComponent(selectedForm)}`}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-accent/25 bg-accent/5 px-3 py-2 text-xs font-bold text-accent hover:bg-accent/10"
+              >
+                <PenLine size={14} /> <span className="hidden sm:inline">Practice in Kakou</span>
+              </Link>
               <SettingsDropdown />
             </div>
           </div>

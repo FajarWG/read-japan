@@ -28,9 +28,9 @@ export function BottomNav() {
 
   const NAV_ITEMS = [
     { id: "anki", route: "/anki", label: "Anki", icon: Layers },
+    { id: "kakou", route: "/kakou", label: "Kakou", icon: PencilLine },
     { id: "bunpou", route: "/bunpou", label: "Bunpou", icon: BookOpen },
     { id: "katsuyou", route: "/katsuyou", label: "Katsuyou", icon: RefreshCw },
-    { id: "kakou", route: "/kakou", label: "Kakou", icon: PencilLine },
     { id: "kotoba", route: "/kotoba", label: "Kotoba", icon: NotebookPen },
   ] as const;
 

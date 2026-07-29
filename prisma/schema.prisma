@@ -74,6 +74,7 @@ model User {
   bunpouProgress           BunpouProgress[]
   kanjiTamagoProgress      KanjiTamagoProgress[]
   kakouSessions            KakouSession[]
+  studyTimers              StudyTimerSession[]
 }
 
 // ─────────────────────────────────────────
@@ -536,7 +537,33 @@ model KakouSession {
   startedAt       DateTime  @default(now())
   completedAt     DateTime?
   updatedAt       DateTime  @updatedAt
+  studyTimers      StudyTimerSession[]
 
   @@index([userId, status, updatedAt])
   @@index([userId, completedAt])
+}
+
+// ─────────────────────────────────────────
+// Tabel: StudyTimerSession
+// Mencatat waktu belajar aktual. accumulatedSeconds hanya berisi waktu aktif;
+// jeda tidak dihitung. activeKey nullable menjaga satu timer aktif per user.
+// ─────────────────────────────────────────
+model StudyTimerSession {
+  id                 Int           @id @default(autoincrement())
+  userId             Int
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kakouSessionId     Int?          @unique
+  kakouSession       KakouSession? @relation(fields: [kakouSessionId], references: [id], onDelete: SetNull)
+  source             String        @default("KAKOU")
+  status             String        @default("RUNNING") // "RUNNING" | "PAUSED" | "COMPLETED"
+  activeKey          String?       @unique
+  accumulatedSeconds Int           @default(0)
+  lastStartedAt      DateTime?
+  startedAt          DateTime      @default(now())
+  endedAt            DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([userId, startedAt])
+  @@index([userId, status])
 }

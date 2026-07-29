@@ -5,6 +5,10 @@ import { revalidatePath } from "next/cache";
 import type { Prisma } from "@/app/generated/prisma/client";
 import { KAKOU_PROMPTS } from "@/src/modules/kakou/data/prompts";
 import {
+  buildFocusedKakouPrompt,
+  hydrateKakouPrompt,
+} from "@/src/modules/kakou/data/reminders";
+import {
   KAKOU_DIFFICULTIES,
   KAKOU_DURATIONS,
   KAKOU_LEVELS,
@@ -17,7 +21,13 @@ import {
   type KakouPrompt,
   type KakouPromptKind,
   type KakouSessionView,
+  type KakouSourceType,
 } from "@/src/modules/kakou/data/types";
+import {
+  elapsedSeconds,
+  finishTimerForKakou,
+  getStudyTimerOverviewForUser,
+} from "@/src/modules/study-timer/lib/timer";
 import { logActivity } from "@/src/shared/lib/activity";
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
@@ -33,6 +43,11 @@ type SessionRecord = {
   difficulty: string | null;
   startedAt: Date;
   completedAt: Date | null;
+  studyTimers?: Array<{
+    accumulatedSeconds: number;
+    status: string;
+    lastStartedAt: Date | null;
+  }>;
 };
 
 function isMode(value: string): value is KakouMode {
@@ -41,6 +56,10 @@ function isMode(value: string): value is KakouMode {
 
 function isLevel(value: string): value is KakouLevel {
   return (KAKOU_LEVELS as readonly string[]).includes(value);
+}
+
+function isSourceType(value: string | undefined): value is KakouSourceType {
+  return value === "BUNPOU" || value === "KATSUYOU";
 }
 
 function isDuration(value: number): value is KakouDuration {
@@ -79,7 +98,7 @@ function toSessionView(record: SessionRecord): KakouSessionView {
     mode: isMode(record.mode) ? record.mode : "DAILY_MIX",
     level: isLevel(record.level) ? record.level : "N5",
     durationMinutes: record.durationMinutes,
-    prompts: readPrompts(record.promptSnapshot),
+    prompts: readPrompts(record.promptSnapshot).map(hydrateKakouPrompt),
     progress: record.progress,
     status:
       record.status === "COMPLETED" || record.status === "ABANDONED"
@@ -91,48 +110,50 @@ function toSessionView(record: SessionRecord): KakouSessionView {
         : null,
     startedAt: record.startedAt.toISOString(),
     completedAt: record.completedAt?.toISOString() ?? null,
+    actualSeconds: record.studyTimers?.reduce(
+      (total, timer) => total + elapsedSeconds({
+        id: 0,
+        kakouSessionId: record.id,
+        source: "KAKOU",
+        accumulatedSeconds: timer.accumulatedSeconds,
+        status: timer.status,
+        lastStartedAt: timer.lastStartedAt,
+        startedAt: record.startedAt,
+        endedAt: record.completedAt,
+      }),
+      0,
+    ) ?? 0,
   };
 }
 
 async function loadOverview(userId: number): Promise<KakouOverview> {
-  const weekStart = new Date();
-  weekStart.setUTCDate(weekStart.getUTCDate() - 6);
-  weekStart.setUTCHours(0, 0, 0, 0);
-
-  const [activeSession, history, completedSessions, totalMinutes, thisWeek] =
-    await Promise.all([
-      prisma.kakouSession.findFirst({
-        where: { userId, status: "ACTIVE" },
-        orderBy: { updatedAt: "desc" },
-      }),
-      prisma.kakouSession.findMany({
-        where: { userId, status: "COMPLETED" },
-        orderBy: { completedAt: "desc" },
-        take: 8,
-      }),
-      prisma.kakouSession.count({
-        where: { userId, status: "COMPLETED" },
-      }),
-      prisma.kakouSession.aggregate({
-        where: { userId, status: "COMPLETED" },
-        _sum: { durationMinutes: true },
-      }),
-      prisma.kakouSession.count({
-        where: {
-          userId,
-          status: "COMPLETED",
-          completedAt: { gte: weekStart },
-        },
-      }),
-    ]);
+  const [activeSession, history, completedSessions, timer] = await Promise.all([
+    prisma.kakouSession.findFirst({
+      where: { userId, status: "ACTIVE" },
+      include: { studyTimers: true },
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.kakouSession.findMany({
+      where: { userId, status: "COMPLETED" },
+      include: { studyTimers: true },
+      orderBy: { completedAt: "desc" },
+      take: 8,
+    }),
+    prisma.kakouSession.count({
+      where: { userId, status: "COMPLETED" },
+    }),
+    getStudyTimerOverviewForUser(userId),
+  ]);
 
   return {
     activeSession: activeSession ? toSessionView(activeSession) : null,
     history: history.map(toSessionView),
+    timer,
     stats: {
       completedSessions,
-      totalMinutes: totalMinutes._sum.durationMinutes ?? 0,
-      thisWeek,
+      todaySeconds: timer.stats.todaySeconds,
+      weekSeconds: timer.stats.weekSeconds,
+      totalSeconds: timer.stats.totalSeconds,
     },
   };
 }
@@ -192,6 +213,8 @@ export async function createKakouSession(input: {
   mode: string;
   level: string;
   durationMinutes: number;
+  sourceType?: string;
+  sourceId?: string;
 }) {
   const auth = await getSession();
   if (!auth) return { success: false as const, error: "Unauthorized" };
@@ -199,9 +222,16 @@ export async function createKakouSession(input: {
   if (!isMode(input.mode) || !isLevel(input.level) || !isDuration(input.durationMinutes)) {
     return { success: false as const, error: "Invalid session settings" };
   }
+  if (
+    (input.sourceType || input.sourceId) &&
+    (!isSourceType(input.sourceType) || !input.sourceId)
+  ) {
+    return { success: false as const, error: "Invalid library material" };
+  }
 
   const current = await prisma.kakouSession.findFirst({
     where: { userId: auth.id, status: "ACTIVE" },
+    include: { studyTimers: true },
     orderBy: { updatedAt: "desc" },
   });
   if (current) {
@@ -217,12 +247,25 @@ export async function createKakouSession(input: {
   const recentIds = new Set(
     recentSessions.flatMap((item) => readPromptIds(item.promptIds)),
   );
-  const prompts = pickPrompts(
-    input.level,
-    input.mode,
-    input.durationMinutes,
-    recentIds,
-  );
+
+  const focusedPrompt =
+    isSourceType(input.sourceType) && input.sourceId
+      ? buildFocusedKakouPrompt(input.sourceType, input.sourceId)
+      : null;
+  if ((input.sourceType || input.sourceId) && !focusedPrompt) {
+    return { success: false as const, error: "Library material was not found" };
+  }
+
+  const effectiveMode: KakouMode = focusedPrompt
+    ? focusedPrompt.kind === "GRAMMAR"
+      ? "GRAMMAR_CHALLENGE"
+      : "CONJUGATION_DRILL"
+    : input.mode;
+  const effectiveLevel = focusedPrompt?.level ?? input.level;
+  const prompts = (focusedPrompt
+    ? [focusedPrompt]
+    : pickPrompts(effectiveLevel, effectiveMode, input.durationMinutes, recentIds)
+  ).map(hydrateKakouPrompt);
 
   if (prompts.length === 0) {
     return { success: false as const, error: "No prompts available for these settings" };
@@ -231,8 +274,8 @@ export async function createKakouSession(input: {
   const created = await prisma.kakouSession.create({
     data: {
       userId: auth.id,
-      mode: input.mode,
-      level: input.level,
+      mode: effectiveMode,
+      level: effectiveLevel,
       durationMinutes: input.durationMinutes,
       promptIds: prompts.map((item) => item.id),
       promptSnapshot: prompts as unknown as Prisma.InputJsonValue,
@@ -297,6 +340,7 @@ export async function completeKakouSession(
     return { success: false as const, error: "Session was already completed" };
   }
 
+  await finishTimerForKakou(auth.id, target.id);
   await logActivity(auth.id, "kakou_session", String(target.id));
   revalidatePath("/kakou");
   revalidatePath("/");
@@ -318,6 +362,7 @@ export async function abandonKakouSession(sessionId: number) {
     return { success: false as const, error: "Session not found" };
   }
 
+  await finishTimerForKakou(auth.id, sessionId);
   revalidatePath("/kakou");
   return { success: true as const, overview: await loadOverview(auth.id) };
 }
