@@ -32,7 +32,7 @@ const notoSerifJP = Noto_Serif_JP({
 const BASE_URL = "https://read-japan.vercel.app";
 
 const APP_DESCRIPTION =
-  "A focused Japanese study app: Anki SRS flashcards, Bunpou grammar, Katsuyou verb conjugation, pre-class Prep sheets, and Kotoba — your personal vocabulary notebook. English interface, Indonesian meanings.";
+  "A focused Japanese study app: Anki SRS flashcards, Bunpou grammar, Katsuyou verb conjugation, Kakou guided handwriting, pre-class Prep sheets, and Kotoba — your personal vocabulary notebook. English interface, Indonesian meanings.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

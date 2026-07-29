@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
-import { Layers, BookOpen, RefreshCw, NotebookPen, Home } from "lucide-react";
+import { Layers, BookOpen, RefreshCw, NotebookPen, PencilLine, Home } from "lucide-react";
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -30,6 +30,7 @@ export function BottomNav() {
     { id: "anki", route: "/anki", label: "Anki", icon: Layers },
     { id: "bunpou", route: "/bunpou", label: "Bunpou", icon: BookOpen },
     { id: "katsuyou", route: "/katsuyou", label: "Katsuyou", icon: RefreshCw },
+    { id: "kakou", route: "/kakou", label: "Kakou", icon: PencilLine },
     { id: "kotoba", route: "/kotoba", label: "Kotoba", icon: NotebookPen },
   ] as const;
 
@@ -39,9 +40,11 @@ export function BottomNav() {
       ? "bunpou"
       : pathname.startsWith("/katsuyou")
         ? "katsuyou"
-        : pathname.startsWith("/kotoba")
-          ? "kotoba"
-          : "none";
+        : pathname.startsWith("/kakou")
+          ? "kakou"
+          : pathname.startsWith("/kotoba")
+            ? "kotoba"
+            : "none";
 
   // Hide on auth pages or when forced by active review session
   if (pathname === "/login" || pathname === "/register" || hideForced) return null;
@@ -103,13 +106,13 @@ export function BottomNav() {
                     "shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.5)]",
                     "dark:shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)]",
                     /* Tab overrides */
-                    "*:rounded-xl *:px-4 *:h-9",
+                    "*:rounded-xl *:px-2 *:h-9",
                     "*:text-sm *:font-semibold *:tracking-wide",
                     "*:text-foreground/60 *:transition-all *:duration-200",
                     "*:data-[selected=true]:text-foreground",
                   ].join(" ")}
                 >
-                  {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
+                  {NAV_ITEMS.map(({ id, label }) => (
                     <Tabs.Tab key={id} id={id}>
                       <span className="relative z-10 flex items-center gap-1.5">
                         {label}

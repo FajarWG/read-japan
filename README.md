@@ -17,6 +17,7 @@ Built with Next.js, Prisma, and HeroUI.
 - **Katsuyou (活用)** — Verb conjugation guides, examples, and SRS review.
 - **Prep** — Pre-class study & cheat sheets: dialogue, grammar, vocabulary, and audio playback.
 - **Kotoba (言葉)** — A personal vocabulary notebook: jot down new words you come across (manual or AI import), toggle furigana, and memorize them with an Anki-style SRS.
+- **Kakou (書こう)** — Database-backed guided handwriting sessions for a paper notebook, using a curated static prompt bank and optional copy-only prompts for external AI review.
 - **Home dashboard** — Daily study checklist (add/remove tasks, check off per day), streak, a 7-day activity chart, and per-feature stats.
 - **Auth** — Register / login with username + password; roles: `USER` and `ADMIN`.
 - **Dark mode** — System-aware theme with manual toggle.

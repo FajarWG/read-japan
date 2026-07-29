@@ -8,8 +8,10 @@ import {
   BookOpen,
   RefreshCw,
   NotebookPen,
+  PencilLine,
   FileText,
   Sparkles,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -29,8 +31,10 @@ const FEATURES: Array<{
   { href: "/kanji-tamago", icon: Sparkles, title: "Kanji Tamago (漢字)", desc: "SRS kanji writing & recognition." },
   { href: "/bunpou", icon: BookOpen, title: "Bunpou (文法)", desc: "Grammar & particles reference." },
   { href: "/katsuyou", icon: RefreshCw, title: "Katsuyou (活用)", desc: "Verb conjugation practice & SRS." },
+  { href: "/kakou", icon: PencilLine, title: "Kakou (書こう)", desc: "Guided handwriting in your paper notebook." },
   { href: "/kotoba", icon: NotebookPen, title: "Kotoba (言葉)", desc: "Your vocabulary notebook." },
   { href: "/prep", icon: FileText, title: "Prep", desc: "Pre-class study & cheat sheets." },
+  { href: "/conversation", icon: MessageCircle, title: "AI Conversation", desc: "Voice chat with Gemini Live — practice speaking!" },
 ];
 
 /**

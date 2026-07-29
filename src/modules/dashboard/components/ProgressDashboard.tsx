@@ -9,6 +9,7 @@ import {
   RefreshCw,
   BookOpen,
   FileText,
+  PencilLine,
   Moon,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -230,6 +231,15 @@ export function ProgressDashboard({ stats }: { stats: ProgressStats }) {
           primary={stats.prep.chaptersOpened}
           primaryLabel="chapters opened"
           href="/prep"
+        />
+        <MetricCard
+          icon={PencilLine}
+          title="Kakou"
+          primary={stats.kakou.sessionsCompleted}
+          primaryLabel="writing sessions"
+          secondary={stats.kakou.minutesWritten}
+          secondaryLabel="minutes written"
+          href="/kakou"
         />
       </div>
     </div>

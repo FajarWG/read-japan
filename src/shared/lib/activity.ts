@@ -10,6 +10,7 @@ export type ActivityType =
   | "bunpou_study"
   | "kotoba_review"
   | "prep_open"
+  | "kakou_session"
   | "login";
 
 /**

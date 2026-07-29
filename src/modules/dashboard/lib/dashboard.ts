@@ -28,6 +28,7 @@ export interface ProgressStats {
   katsuyou: { cards: number; dueNow: number; lessonsCompleted: number };
   bunpou: { patternsCompleted: number };
   prep: { chaptersOpened: number };
+  kakou: { sessionsCompleted: number; minutesWritten: number };
 }
 
 // ─────────────────────────────────────────────────────────
@@ -131,6 +132,7 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     katsuyouLessons,
     bunpouPatterns,
     prepLogs,
+    kakouStats,
   ] = await Promise.all([
     computeStreakDays(session.id),
     prisma.activityLog.count({
@@ -157,6 +159,11 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     prisma.activityLog.findMany({
       where: { userId: session.id, type: "prep_open" },
       select: { refId: true },
+    }),
+    prisma.kakouSession.aggregate({
+      where: { userId: session.id, status: "COMPLETED" },
+      _count: { id: true },
+      _sum: { durationMinutes: true },
     }),
   ]);
 
@@ -195,5 +202,9 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     },
     bunpou: { patternsCompleted: bunpouPatterns },
     prep: { chaptersOpened: chaptersOpened.size },
+    kakou: {
+      sessionsCompleted: kakouStats._count.id,
+      minutesWritten: kakouStats._sum.durationMinutes ?? 0,
+    },
   };
 }

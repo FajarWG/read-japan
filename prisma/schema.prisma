@@ -73,6 +73,7 @@ model User {
   katsuyouPracticeAttempts KatsuyouPracticeAttempt[]
   bunpouProgress           BunpouProgress[]
   kanjiTamagoProgress      KanjiTamagoProgress[]
+  kakouSessions            KakouSession[]
 }
 
 // ─────────────────────────────────────────
@@ -515,3 +516,27 @@ model KanjiTamagoProgress {
 }
 
 
+// ─────────────────────────────────────────
+// Tabel: KakouSession
+// Sesi latihan menulis tangan. Soal berasal dari bank statis, sedangkan
+// snapshot soal dan progres pengguna disimpan agar sesi dapat dilanjutkan.
+// ─────────────────────────────────────────
+model KakouSession {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mode            String
+  level           String
+  durationMinutes Int
+  promptIds       Json
+  promptSnapshot  Json
+  progress        Int       @default(0)
+  status          String    @default("ACTIVE") // "ACTIVE" | "COMPLETED" | "ABANDONED"
+  difficulty      String?   // "EASY" | "OKAY" | "DIFFICULT"
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId, status, updatedAt])
+  @@index([userId, completedAt])
+}

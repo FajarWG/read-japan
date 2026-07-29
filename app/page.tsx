@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { HomeDashboard } from "@/src/modules/dashboard/components/HomeDashboard";
-import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
 import {
   getDashboardSummary,
@@ -13,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Nihongo Flow — Japanese Study Suite",
   description:
-    "Track your daily study and jump into Anki, Bunpou, Katsuyou, Prep, and Kotoba — a focused Japanese learning app with an English interface and Indonesian meanings.",
+    "Track your daily study and jump into Anki, Bunpou, Katsuyou, Kakou, Prep, and Kotoba — a focused Japanese learning app with an English interface and Indonesian meanings.",
   alternates: {
     canonical: "/",
   },
