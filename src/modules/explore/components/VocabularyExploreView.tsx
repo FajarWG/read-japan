@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Volume2, Loader2, Sparkles, BookOpen, Layers, Bookmark } from "lucide-react";
+import { Volume2, Loader2, Sparkles, BookOpen, Layers } from "lucide-react";
 import { ProgressBadge, ProgressStatus } from "./ProgressBadge";
+import { cleanJMdictArray, cleanJMdictString } from "@/src/shared/lib/sanitize";
 
 interface KanjiGridItem {
   id: number;
@@ -106,7 +107,7 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
 
   if (error || !data) {
     return (
-      <div className="p-6 text-center text-rose-400 bg-rose-950/30 rounded-2xl border border-rose-900/50 my-4">
+      <div className="p-6 text-center text-rose-500 bg-rose-50 dark:bg-rose-950/30 rounded-2xl border border-rose-200 dark:border-rose-900/50 my-4 text-sm font-semibold">
         Failed to load vocabulary details.
       </div>
     );
@@ -114,34 +115,22 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
 
   const { vocabulary, ankiData, kanjiGrid, relatedWords, userStatus } = data;
 
-  // Format meanings
-  const formatMeaningList = (meanings: any[]) => {
-    if (!Array.isArray(meanings) || meanings.length === 0) return ["No English meaning available."];
-    return meanings.map((m) => {
-      if (typeof m === "string") return m;
-      if (m.glosses && Array.isArray(m.glosses)) {
-        const posText = m.pos && m.pos.length > 0 ? `(${m.pos.join(", ")}) ` : "";
-        return `${posText}${m.glosses.join("; ")}`;
-      }
-      return JSON.stringify(m);
-    });
-  };
-
-  const meaningLines = formatMeaningList(vocabulary.meanings);
+  // Format and clean meanings
+  const meaningLines = cleanJMdictArray(vocabulary.meanings);
 
   return (
-    <div className="flex flex-col gap-6 py-2">
+    <div className="flex flex-col gap-6 py-2 text-slate-900 dark:text-slate-100">
       {/* Header Banner */}
-      <div className="flex flex-col gap-4 p-6 bg-gradient-to-br from-slate-900 via-slate-900/80 to-blue-950/40 rounded-3xl border border-slate-800 shadow-xl relative overflow-hidden">
+      <div className="flex flex-col gap-4 p-6 bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50 dark:from-slate-900 dark:via-slate-900/80 dark:to-blue-950/40 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden">
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-slate-400 tracking-wide font-japanese">
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-400 tracking-wide font-japanese">
                 {vocabulary.reading}
               </span>
               {userStatus && <ProgressBadge status={userStatus} size="sm" />}
             </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight font-japanese">
+            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight font-japanese">
               {vocabulary.kanji}
             </h1>
           </div>
@@ -153,7 +142,7 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
                 className={`p-3 rounded-2xl border transition-all duration-200 ${
                   playingAudio
                     ? "bg-blue-500 text-white border-blue-400 scale-105 shadow-lg shadow-blue-500/30"
-                    : "bg-slate-800/80 hover:bg-blue-600/30 text-blue-400 border-slate-700 hover:border-blue-500/50"
+                    : "bg-slate-200 dark:bg-slate-800/80 hover:bg-blue-100 dark:hover:bg-blue-600/30 text-blue-600 dark:text-blue-400 border-slate-300 dark:border-slate-700"
                 }`}
                 title="Play pronunciation"
               >
@@ -164,12 +153,16 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
         </div>
 
         {/* Primary Meanings */}
-        <div className="flex flex-col gap-1.5 pt-3 border-t border-slate-800/80">
-          {meaningLines.map((line, i) => (
-            <p key={i} className="text-base sm:text-lg font-medium text-slate-200">
-              {line}
-            </p>
-          ))}
+        <div className="flex flex-col gap-1.5 pt-3 border-t border-slate-200 dark:border-slate-800/80">
+          {meaningLines.length > 0 ? (
+            meaningLines.map((line, i) => (
+              <p key={i} className="text-base sm:text-lg font-medium text-slate-800 dark:text-slate-200">
+                {line}
+              </p>
+            ))
+          ) : (
+            <p className="text-sm text-slate-500 italic">No English meaning available.</p>
+          )}
         </div>
       </div>
 
@@ -177,11 +170,11 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
       {kanjiGrid.length > 0 && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2 text-slate-300 font-semibold text-base">
-              <Layers className="w-4 h-4 text-blue-400" />
+            <div className="flex items-center gap-2 text-slate-800 dark:text-slate-300 font-semibold text-base">
+              <Layers className="w-4 h-4 text-blue-500 dark:text-blue-400" />
               <span>Kanji Breakdown ({kanjiGrid.length})</span>
             </div>
-            <span className="text-xs text-slate-400">Click a kanji to explore</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Click a kanji to explore</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -189,16 +182,16 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
               <button
                 key={k.id}
                 onClick={() => onSelectKanji(k.literal)}
-                className="flex items-center gap-3 p-3 bg-slate-900/60 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/50 rounded-2xl transition-all duration-200 group text-left shadow-sm hover:shadow-blue-500/10"
+                className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 hover:border-blue-500/50 rounded-2xl transition-all duration-200 group text-left shadow-sm"
               >
-                <div className="w-11 h-11 flex items-center justify-center bg-slate-950 rounded-xl border border-slate-800 text-2xl font-black text-white group-hover:text-blue-400 transition-colors font-japanese">
+                <div className="w-11 h-11 flex items-center justify-center bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-2xl font-black text-slate-900 dark:text-white group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors font-japanese">
                   {k.literal}
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-xs font-semibold text-slate-200 truncate">
-                    {k.meanings.slice(0, 2).join(", ")}
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
+                    {cleanJMdictString(k.meanings.slice(0, 2).join(", "))}
                   </span>
-                  <span className="text-[11px] text-slate-400 truncate">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                     {k.onyomi.concat(k.kunyomi).slice(0, 2).join(" • ")}
                   </span>
                 </div>
@@ -211,24 +204,24 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
       {/* Example Sentence Section */}
       {ankiData?.sentence && (
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-slate-300 font-semibold text-base px-1">
-            <Sparkles className="w-4 h-4 text-amber-400" />
+          <div className="flex items-center gap-2 text-slate-800 dark:text-slate-300 font-semibold text-base px-1">
+            <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400" />
             <span>Example Sentence</span>
           </div>
 
-          <div className="flex flex-col gap-2 p-5 bg-slate-900/60 rounded-2xl border border-slate-800 shadow-sm relative">
-            <p className="text-lg font-bold text-slate-100 font-japanese leading-relaxed">
-              {ankiData.sentence}
+          <div className="flex flex-col gap-2 p-5 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative">
+            <p className="text-lg font-bold text-slate-900 dark:text-slate-100 font-japanese leading-relaxed">
+              {cleanJMdictString(ankiData.sentence)}
             </p>
             {ankiData.sentenceTranslation && (
-              <p className="text-sm font-medium text-slate-400">
-                {ankiData.sentenceTranslation}
+              <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                {cleanJMdictString(ankiData.sentenceTranslation)}
               </p>
             )}
             {ankiData.sentenceAudio && (
               <button
                 onClick={() => playAudio(ankiData.sentenceAudio!)}
-                className="self-start mt-2 inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-blue-600/20 text-blue-400 border border-slate-700 hover:border-blue-500/40 rounded-xl transition-all"
+                className="self-start mt-2 inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-slate-200 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-600/20 text-blue-600 dark:text-blue-400 border border-slate-300 dark:border-slate-700 rounded-xl transition-all"
               >
                 <Volume2 className="w-4 h-4" />
                 Listen Sentence
@@ -241,36 +234,34 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
       {/* Related Words Section */}
       {relatedWords.length > 0 && (
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-slate-300 font-semibold text-base px-1">
-            <BookOpen className="w-4 h-4 text-purple-400" />
+          <div className="flex items-center gap-2 text-slate-800 dark:text-slate-300 font-semibold text-base px-1">
+            <BookOpen className="w-4 h-4 text-purple-500 dark:text-purple-400" />
             <span>Related Words ({relatedWords.length})</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {relatedWords.map((rw) => {
-              const glosses = Array.isArray(rw.meanings)
-                ? rw.meanings.map((m: any) => (typeof m === "string" ? m : m.glosses?.join(", "))).filter(Boolean).join("; ")
-                : "";
+              const glosses = cleanJMdictArray(rw.meanings).join("; ");
 
               return (
                 <button
                   key={rw.id}
                   onClick={() => onSelectWord(rw.kanji || rw.reading)}
-                  className="flex flex-col gap-1 p-4 bg-slate-900/50 hover:bg-slate-800/80 border border-slate-800/80 hover:border-purple-500/50 rounded-2xl text-left transition-all duration-200 group shadow-sm hover:shadow-purple-500/10"
+                  className="flex flex-col gap-1 p-4 bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800/80 hover:border-purple-500/50 rounded-2xl text-left transition-all duration-200 group shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col">
-                      <span className="text-xl font-bold text-slate-100 group-hover:text-purple-400 transition-colors font-japanese">
+                      <span className="text-xl font-bold text-slate-900 dark:text-slate-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors font-japanese">
                         {rw.kanji}
                       </span>
-                      <span className="text-xs font-medium text-slate-400">
+                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                         {rw.reading}
                       </span>
                     </div>
                     {rw.status && <ProgressBadge status={rw.status} size="sm" />}
                   </div>
                   {glosses && (
-                    <p className="text-xs text-slate-400 line-clamp-1 group-hover:text-slate-300">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 group-hover:text-slate-800 dark:group-hover:text-slate-300">
                       {glosses}
                     </p>
                   )}

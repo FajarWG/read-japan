@@ -21,14 +21,14 @@ export const ExploreBreadcrumb: React.FC<ExploreBreadcrumbProps> = ({
         const isLast = idx === history.length - 1;
         return (
           <React.Fragment key={idx}>
-            {idx > 0 && <ChevronRight className="w-3 h-3 text-slate-600 shrink-0" />}
+            {idx > 0 && <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600 shrink-0" />}
             <button
               onClick={() => onSelectIndex(idx)}
               disabled={isLast}
-              className={`px-2 py-0.5 rounded-lg font-japanese font-semibold transition-all shrink-0 ${
+              className={`px-2 py-0.5 rounded-lg font-japanese font-semibold transition-all shrink-0 cursor-pointer ${
                 isLast
-                  ? "bg-blue-500/20 text-blue-300 border border-blue-500/30 cursor-default"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  ? "bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/30 cursor-default"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800/60"
               }`}
             >
               {item.query}

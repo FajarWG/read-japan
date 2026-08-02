@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { AlertTriangle, ArrowRight, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight } from "lucide-react";
 
 interface ConfusionBannerProps {
   kanji: string;
@@ -37,17 +37,17 @@ export const ConfusionBanner: React.FC<ConfusionBannerProps> = ({
   if (!similarPair) return null;
 
   return (
-    <div className="flex items-center justify-between p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-300 shadow-sm animate-in fade-in duration-300">
+    <div className="flex items-center justify-between p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-800 dark:text-amber-300 shadow-sm animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+        <div className="p-2 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400">
           <AlertTriangle className="w-5 h-5" />
         </div>
         <div className="flex flex-col">
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
             Often Confused
           </span>
-          <span className="text-sm font-medium text-slate-200">
-            Confused with <strong className="text-amber-300 font-japanese text-base">{similarPair.similarKanji}</strong>
+          <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+            Confused with <strong className="text-amber-600 dark:text-amber-300 font-japanese text-base">{similarPair.similarKanji}</strong>
           </span>
         </div>
       </div>
