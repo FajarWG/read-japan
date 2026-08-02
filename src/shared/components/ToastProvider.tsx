@@ -46,18 +46,18 @@ export const ToastProvider: React.FC = () => {
       {toasts.map((t) => (
         <div
           key={t.id}
-          className="pointer-events-auto flex items-center justify-between p-4 bg-slate-900/90 border border-slate-800 text-white rounded-2xl shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom-5 duration-300 gap-3"
+          className="pointer-events-auto flex items-center justify-between p-4 bg-white/95 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom-5 duration-300 gap-3"
         >
           <div className="flex items-center gap-3">
-            {t.type === "success" && <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />}
-            {t.type === "error" && <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />}
-            {t.type === "info" && <Info className="w-5 h-5 text-blue-400 shrink-0" />}
+            {t.type === "success" && <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
+            {t.type === "error" && <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />}
+            {t.type === "info" && <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />}
             <span className="text-xs font-semibold">{t.message}</span>
           </div>
 
           <button
             onClick={() => setToasts((prev) => prev.filter((item) => item.id !== t.id))}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>

@@ -10,6 +10,7 @@ import { GoalProgressCard } from "@/src/modules/goals/components/GoalProgressCar
 import { TodayMissionsCard } from "@/src/modules/goals/components/TodayMissionsCard";
 import { LearningCalendarHeatmap } from "@/src/modules/goals/components/LearningCalendarHeatmap";
 import { DashboardSkeleton } from "@/src/shared/components/LoadingSkeleton";
+import { openGlobalSearch } from "@/src/shared/components/GlobalSearchModal";
 
 import { ContinueLearningState, ActivityItem } from "../services/journeyService";
 import { GoalDetails, MissionItem } from "@/src/modules/goals/services/goalService";
@@ -108,15 +109,18 @@ export const LearningHub: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-4 bg-slate-900/60 rounded-2xl border border-slate-800">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <button
+            onClick={openGlobalSearch}
+            className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/50 transition-all cursor-pointer text-left shadow-sm"
+          >
+            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
               <Command className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-extrabold text-white">Cmd + K</span>
-              <span className="text-xs text-slate-400 font-medium">Global Search Shortcut</span>
+              <span className="text-xs font-extrabold text-slate-900 dark:text-white">Cmd + K</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Click to Search</span>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 

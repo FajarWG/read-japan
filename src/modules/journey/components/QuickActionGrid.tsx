@@ -11,49 +11,49 @@ export const QuickActionGrid: React.FC = () => {
       desc: "Anki SRS Spaced Repetition",
       href: "/anki",
       icon: Layers,
-      color: "from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-400",
+      color: "border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400",
     },
     {
       title: "Explore Knowledge",
       desc: "Kanji & Vocab Tree",
       href: "/anki",
       icon: Compass,
-      color: "from-purple-500/20 to-purple-600/10 border-purple-500/30 text-purple-400",
+      color: "border-purple-200 dark:border-purple-500/30 text-purple-600 dark:text-purple-400",
     },
     {
       title: "Adaptive Weakness",
       desc: "Weak Kanji & Confusions",
       href: "/adaptive",
       icon: Activity,
-      color: "from-rose-500/20 to-rose-600/10 border-rose-500/30 text-rose-400",
+      color: "border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-400",
     },
     {
       title: "Writing Canvas",
       desc: "Kakou Guided Handwriting",
       href: "/kakou",
       icon: Pencil,
-      color: "from-amber-500/20 to-amber-600/10 border-amber-500/30 text-amber-400",
+      color: "border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-400",
     },
     {
       title: "Verb Conjugation",
       desc: "Katsuyou Lessons",
       href: "/katsuyou",
       icon: BookOpen,
-      color: "from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400",
+      color: "border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
     },
     {
       title: "AI Conversation",
       desc: "3D VRM Avatar Practice",
       href: "/conversation",
       icon: MessageSquare,
-      color: "from-indigo-500/20 to-indigo-600/10 border-indigo-500/30 text-indigo-400",
+      color: "border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400",
     },
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2 text-slate-300 font-bold text-base px-1">
-        <Sparkles className="w-4 h-4 text-blue-400" />
+    <div className="flex flex-col gap-4 text-slate-900 dark:text-slate-100">
+      <div className="flex items-center gap-2 text-slate-800 dark:text-slate-300 font-bold text-base px-1">
+        <Sparkles className="w-4 h-4 text-blue-500 dark:text-blue-400" />
         <span>Quick Actions</span>
       </div>
 
@@ -64,16 +64,16 @@ export const QuickActionGrid: React.FC = () => {
             <Link
               key={idx}
               href={act.href}
-              className={`flex items-start gap-4 p-4 rounded-2xl bg-gradient-to-br border transition-all duration-200 hover:scale-[1.02] shadow-sm ${act.color}`}
+              className={`flex items-start gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800/80 border transition-all duration-200 hover:scale-[1.02] shadow-sm ${act.color}`}
             >
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 shrink-0">
+              <div className="p-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 shrink-0">
                 <Icon className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
-                <span className="text-base font-extrabold text-slate-100">
+                <span className="text-base font-extrabold text-slate-900 dark:text-slate-100">
                   {act.title}
                 </span>
-                <span className="text-xs text-slate-400 font-medium">
+                <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">
                   {act.desc}
                 </span>
               </div>
