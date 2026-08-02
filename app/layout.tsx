@@ -10,6 +10,9 @@ import { PageTransition } from "@/src/shared/components/PageTransition";
 import { getSession } from "@/src/shared/lib/session";
 import { Analytics } from "@vercel/analytics/next";
 import { ServiceWorkerRegistration } from "@/src/shared/components/ServiceWorkerRegistration";
+import { GlobalSearchModal } from "@/src/shared/components/GlobalSearchModal";
+import { ToastProvider } from "@/src/shared/components/ToastProvider";
+import { ShortcutDialog } from "@/src/shared/components/ShortcutDialog";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -135,6 +138,9 @@ export default async function RootLayout({
           <LanguageProvider>
             <AuthProvider user={user}>
               <PageTransition>{children}</PageTransition>
+              <GlobalSearchModal />
+              <ShortcutDialog />
+              <ToastProvider />
               <BottomNav />
             </AuthProvider>
           </LanguageProvider>

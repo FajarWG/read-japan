@@ -132,7 +132,14 @@ const MODES: ConvMode[] = [
     label: "Natural",
     model: "models/gemini-2.5-flash-native-audio-preview-12-2025",
     nativeAudio: true,
-    hint: { id: "Suara paling natural, tapi bisa melambat saat ngobrol lama", en: "Most natural voice, may slow down over long chats" },
+    hint: { id: "Suara paling natural (varian Des 2025), bisa melambat saat ngobrol lama", en: "Most natural voice (Dec 2025 build), may slow down over long chats" },
+  },
+  {
+    id: "dialog",
+    label: "Dialog",
+    model: "models/gemini-2.5-flash-preview-native-audio-dialog",
+    nativeAudio: true,
+    hint: { id: "Native Audio Dialog resmi (yang tercantum di AI Studio)", en: "Official Native Audio Dialog (the one listed in AI Studio)" },
   },
   {
     id: "fluent",
@@ -172,6 +179,13 @@ export default function ConversationPage() {
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const transcriptIdRef = useRef(0);
   const statusRef = useRef<Status>("idle");
+  const transcriptScrollRef = useRef<HTMLDivElement | null>(null);
+
+  // Keep the newest message in view during a conversation.
+  useEffect(() => {
+    const el = transcriptScrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [transcripts, status]);
 
   const addDebug = useCallback((msg: string) => {
     setDebugLog((prev) => [...prev.slice(-20), `[${new Date().toISOString().slice(11, 23)}] ${msg}`]);
@@ -597,7 +611,7 @@ ${topic.focus}`,
                 🗣️ AI Conversation
               </h1>
               <p className="text-xs text-muted">
-                Gemini 2.5 Flash Native Audio · N5
+                Gemini Live · {mode.label} · N5
                 {status !== "idle" ? ` · ${lang === "id" ? topic.label.id : topic.label.en}` : ""}
               </p>
             </div>
@@ -624,7 +638,9 @@ ${topic.focus}`,
         )}
 
         {/* 3D Avatar */}
-        <div className="relative h-[280px] w-full overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-b from-surface/60 to-surface-muted/30">
+        <div className={`relative w-full overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-b from-surface/60 to-surface-muted/30 transition-[height] duration-300 ${
+          status === "connected" ? "h-[200px]" : "h-[280px]"
+        }`}>
           <VRMAvatar analyser={analyserRef} url={character.model} lookAtCursor={lookAtCursor} />
 
           {/* Character name badge */}
@@ -666,7 +682,12 @@ ${topic.focus}`,
         </div>
 
         {/* Transcripts */}
-        <div className="flex-1 min-h-[200px] max-h-[340px] overflow-y-auto rounded-2xl border border-border/40 bg-surface/30 p-4 space-y-3 scrollbar-none">
+        <div
+          ref={transcriptScrollRef}
+          className={`flex-1 overflow-y-auto rounded-2xl border border-border/40 bg-surface/30 p-4 space-y-3 scrollbar-none transition-[max-height] duration-300 ${
+            status === "connected" ? "min-h-[280px] max-h-[420px]" : "min-h-[200px] max-h-[340px]"
+          }`}
+        >
           {transcripts.length === 0 && status !== "connected" && (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-center py-16">
               <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
@@ -711,7 +732,7 @@ ${topic.focus}`,
                     <p className="text-[10px] font-black text-muted uppercase tracking-wider mb-2">
                       {lang === "id" ? "Mode Suara AI" : "AI Voice Mode"}
                     </p>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {MODES.map((m) => (
                         <button
                           key={m.id}

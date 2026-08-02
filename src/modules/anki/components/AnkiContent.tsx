@@ -23,7 +23,9 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Compass,
 } from "lucide-react";
+import { ExploreDrawer, ExploreTarget } from "@/src/modules/explore/components/ExploreDrawer";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
@@ -181,6 +183,14 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [progressMap, setProgressMap] = useState<Record<string, SRSProgress>>(
     {},
   );
+  const [soundSetting, setSoundSetting] = useState<"on" | "off">("on");
+  const [isExploreOpen, setIsExploreOpen] = useState(false);
+  const [exploreTarget, setExploreTarget] = useState<ExploreTarget | null>(null);
+
+  const handleOpenExplore = (word: string) => {
+    setExploreTarget({ type: "vocab", query: word });
+    setIsExploreOpen(true);
+  };
   const [loading, setLoading] = useState<boolean>(true);
   const [deckType, setDeckType] = useState<"dekiru" | "custom" | null>(null);
   const [customCards, setCustomCards] = useState<VocabularyCard[]>([]);
@@ -1584,6 +1594,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                       )}
                                     </div>
                                   )}
+
+                                  {/* Explore Layer Button */}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const targetWord = currentCard.kanji !== "-" ? currentCard.kanji : currentCard.hiragana;
+                                      handleOpenExplore(targetWord);
+                                    }}
+                                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/30 rounded-xl transition-all duration-200 shadow-sm cursor-pointer"
+                                  >
+                                    <Compass size={14} />
+                                    Explore →
+                                  </button>
                                 </div>
                               )}
                             </div>
@@ -2105,6 +2129,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
           </Modal.Container>
         </Modal.Backdrop>
       </Modal>
+
+      {/* Explore Layer Drawer */}
+      <ExploreDrawer
+        isOpen={isExploreOpen}
+        onClose={() => setIsExploreOpen(false)}
+        initialTarget={exploreTarget}
+      />
     </div>
   );
 }

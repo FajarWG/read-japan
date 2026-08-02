@@ -7,7 +7,12 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "pwa:icons": "bun scripts/generate-pwa-icons.mjs"
+    "pwa:icons": "bun scripts/generate-pwa-icons.mjs",
+    "download:datasets": "bun scripts/download-datasets.ts",
+    "import:kanjidic": "bun scripts/import-kanjidic.ts",
+    "import:jmdict": "bun scripts/import-jmdict.ts",
+    "sync:kanjivg": "bun scripts/sync-kanjivg.ts",
+    "build:relations": "bun scripts/build-kanji-relations.ts"
   },
   "dependencies": {
     "@google/genai": "^2.12.0",
@@ -24,6 +29,7 @@
     "@vercel/analytics": "^1.6.1",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.3.1",
+    "fast-xml-parser": "^5.10.1",
     "jose": "^6.1.3",
     "lucide-react": "^1.21.0",
     "next": "16.1.6",

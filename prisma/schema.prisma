@@ -75,6 +75,10 @@ model User {
   kanjiTamagoProgress      KanjiTamagoProgress[]
   kakouSessions            KakouSession[]
   studyTimers              StudyTimerSession[]
+  confusions               UserKanjiConfusion[]
+  goals                    Goal[]
+  missions                 DailyMission[]
+  calendars                LearningCalendar[]
 }
 
 // ─────────────────────────────────────────
@@ -567,3 +571,146 @@ model StudyTimerSession {
   @@index([userId, startedAt])
   @@index([userId, status])
 }
+
+// ─────────────────────────────────────────
+// Tabel Master Kanji (KANJIDIC2 Dataset)
+// ─────────────────────────────────────────
+model Kanji {
+  id          Int      @id @default(autoincrement())
+  literal     String   @unique
+  unicode     String   // e.g. "05b66"
+  strokeCount Int
+  grade       Int?
+  jlpt        Int?
+  frequency   Int?
+  meanings    Json
+  onyomi      Json
+  kunyomi     Json
+  radicals    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vocabularies KanjiVocabulary[]
+
+  @@index([literal])
+  @@index([unicode])
+  @@index([jlpt])
+}
+
+// ─────────────────────────────────────────
+// Tabel Master Vocabulary (JMdict Dataset)
+// ─────────────────────────────────────────
+model Vocabulary {
+  id        Int      @id @default(autoincrement())
+  entrySeq  Int      @unique
+  kanji     String
+  reading   String
+  meanings  Json
+  jlpt      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kanjiElements KanjiVocabulary[]
+
+  @@index([kanji])
+  @@index([reading])
+  @@index([jlpt])
+}
+
+// ─────────────────────────────────────────
+// Tabel Relasi Kanji <-> Vocabulary
+// ─────────────────────────────────────────
+model KanjiVocabulary {
+  kanjiId      Int
+  vocabularyId Int
+  kanji        Kanji      @relation(fields: [kanjiId], references: [id], onDelete: Cascade)
+  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+
+  @@id([kanjiId, vocabularyId])
+  @@index([kanjiId])
+  @@index([vocabularyId])
+}
+
+// ─────────────────────────────────────────
+// Tabel Master Similar Kanji (Dataset Kanji Mirip/Tertukar)
+// ─────────────────────────────────────────
+model SimilarKanji {
+  id           Int      @id @default(autoincrement())
+  kanji        String
+  similarKanji String
+  reason       String
+  difficulty   String   @default("Medium") // "Easy" | "Medium" | "Hard"
+  createdAt    DateTime @default(now())
+
+  @@unique([kanji, similarKanji])
+  @@index([kanji])
+  @@index([similarKanji])
+}
+
+// ─────────────────────────────────────────
+// Tabel User Kanji Confusion (Tracking Kelemahan User)
+// ─────────────────────────────────────────
+model UserKanjiConfusion {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expectedKanji String
+  selectedKanji String
+  count         Int      @default(1)
+  lastSeen      DateTime @default(now()) @updatedAt
+  createdAt     DateTime @default(now())
+
+  @@unique([userId, expectedKanji, selectedKanji])
+  @@index([userId, count])
+}
+
+// ─────────────────────────────────────────
+// Tabel Master Goal System & Study Planner
+// ─────────────────────────────────────────
+model Goal {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String    // "JLPT_N5" | "JLPT_N4" | "JLPT_N3" | "JLPT_N2" | "CONVERSATION" | "CUSTOM"
+  targetLevel String    // "N5" | "N4" | "N3" | "N2" | "General"
+  targetDate  DateTime
+  examDate    DateTime?
+  status      String    @default("ACTIVE") // "ACTIVE" | "COMPLETED" | "PAUSED"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, status])
+}
+
+model DailyMission {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         String   // YYYY-MM-DD
+  title        String
+  module       String
+  targetCount  Int      @default(1)
+  currentCount Int      @default(0)
+  completed    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, date, title])
+  @@index([userId, date])
+}
+
+model LearningCalendar {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date              String   // YYYY-MM-DD
+  studyMinutes      Int      @default(0)
+  reviewCount       Int      @default(0)
+  completedMissions Int      @default(0)
+  createdAt         DateTime @default(now())
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+
+

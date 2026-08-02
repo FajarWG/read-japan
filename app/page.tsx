@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
-
-import { HomeDashboard } from "@/src/modules/dashboard/components/HomeDashboard";
 import { getSession } from "@/src/shared/lib/session";
-import {
-  getDashboardSummary,
-  getProgressStats,
-} from "@/src/modules/dashboard/lib/dashboard";
+import { LearningHub } from "@/src/modules/journey/components/LearningHub";
+import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Nihongo Flow — Japanese Study Suite",
+  title: "Nihongo Flow — Learning Hub Dashboard",
   description:
-    "Track your daily study and jump into Anki, Bunpou, Katsuyou, Kakou, Prep, and Kotoba — a focused Japanese learning app with an English interface and Indonesian meanings.",
+    "Unified Japanese Learning Journey: Anki SRS Flashcards, Knowledge Navigation, Adaptive Error Analysis, and Multi-Skill Practice.",
   alternates: {
     canonical: "/",
   },
@@ -20,19 +16,34 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const session = await getSession();
-  if (!session) return null;
-
-  const [summary, progressStats] = await Promise.all([
-    getDashboardSummary(),
-    getProgressStats(),
-  ]);
-
-  if (!summary || !progressStats) return null;
 
   return (
-    <HomeDashboard
-      summary={summary}
-      progressStats={progressStats}
-    />
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 sm:p-10 font-sans">
+      <div className="max-w-6xl mx-auto flex flex-col gap-6">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-5">
+          <div className="flex flex-col">
+            <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">
+              Nihongo Flow Platform
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              Learning Hub
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {session && (
+              <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300">
+                👤 {session.username}
+              </span>
+            )}
+            <SettingsDropdown />
+          </div>
+        </div>
+
+        {/* Learning Hub Widgets */}
+        <LearningHub />
+      </div>
+    </div>
   );
 }
