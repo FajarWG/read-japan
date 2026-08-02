@@ -2,9 +2,20 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Target, Calendar, CheckCircle2, ArrowRight, Loader2 } from "lucide-react";
+import { Target, Calendar, CheckCircle2, ArrowRight, Loader2, X } from "lucide-react";
+import { showToast } from "@/src/shared/components/ToastProvider";
 
-export const GoalSetupWizard: React.FC = () => {
+interface GoalSetupWizardProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onSuccess?: () => void;
+}
+
+export const GoalSetupWizard: React.FC<GoalSetupWizardProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+}) => {
   const router = useRouter();
   const [selectedType, setSelectedType] = useState("JLPT_N4");
   const [selectedLevel, setSelectedLevel] = useState("N4");
@@ -44,7 +55,9 @@ export const GoalSetupWizard: React.FC = () => {
       });
 
       if (res.ok) {
-        router.push("/");
+        showToast("Goal & Exam Schedule configured successfully!", "success");
+        if (onSuccess) onSuccess();
+        if (onClose) onClose();
         router.refresh();
       }
     } catch (err) {
@@ -54,38 +67,48 @@ export const GoalSetupWizard: React.FC = () => {
     }
   };
 
-  return (
-    <div className="flex flex-col gap-8 max-w-3xl mx-auto p-6 sm:p-10 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100">
+  const contentNode = (
+    <div className="flex flex-col gap-6 max-w-3xl w-full mx-auto p-6 sm:p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl text-slate-900 dark:text-slate-100 relative">
+      {/* Close button if Modal */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
+
       {/* Header */}
-      <div className="flex flex-col gap-2 border-b border-slate-200 dark:border-slate-800 pb-6">
+      <div className="flex flex-col gap-2 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div className="flex items-center gap-3">
           <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
             <Target className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">Goal Setup Wizard & Exam Planner</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Set your official exam date to generate an adaptive study schedule.</p>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Goal Setup & Exam Planner</h1>
+            <p className="text-xs text-slate-600 dark:text-slate-400">Set your official exam date to generate an adaptive study schedule.</p>
           </div>
         </div>
       </div>
 
       {/* Step 1: Select Target Goal */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Step 1: Choose Your Target Level</span>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {goalTypes.map((gt) => (
             <button
               key={gt.id}
               onClick={() => handleSelectGoal(gt)}
-              className={`flex flex-col gap-2 p-5 rounded-2xl border text-left transition-all cursor-pointer ${
+              className={`flex flex-col gap-1.5 p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                 selectedType === gt.id
                   ? "bg-blue-500/15 border-blue-500 text-slate-900 dark:text-white shadow-lg shadow-blue-500/10"
-                  : "bg-white dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-800/80 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
+                  : "bg-slate-50 dark:bg-slate-950/60 hover:bg-slate-100 dark:hover:bg-slate-800/80 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-base font-extrabold">{gt.title}</span>
-                {selectedType === gt.id && <CheckCircle2 className="w-5 h-5 text-blue-500 dark:text-blue-400" />}
+                <span className="text-sm font-extrabold">{gt.title}</span>
+                {selectedType === gt.id && <CheckCircle2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />}
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">{gt.desc}</p>
             </button>
@@ -94,9 +117,9 @@ export const GoalSetupWizard: React.FC = () => {
       </div>
 
       {/* Step 2: Exam Date Selection */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Step 2: Official Exam Date</span>
-        <div className="flex flex-col sm:flex-row items-center gap-4 p-5 bg-white dark:bg-slate-950/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-slate-50 dark:bg-slate-950/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <Calendar className="w-6 h-6 text-amber-500 dark:text-amber-400 shrink-0" />
           <div className="flex-1 flex flex-col">
             <span className="text-xs font-bold text-slate-800 dark:text-slate-300">JLPT Official / Target Exam Date</span>
@@ -106,7 +129,7 @@ export const GoalSetupWizard: React.FC = () => {
             type="date"
             value={examDate}
             onChange={(e) => setExamDate(e.target.value)}
-            className="px-4 py-2 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white font-mono focus:outline-none focus:border-blue-500"
+            className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white font-mono focus:outline-none focus:border-blue-500"
           />
         </div>
       </div>
@@ -131,4 +154,17 @@ export const GoalSetupWizard: React.FC = () => {
       </button>
     </div>
   );
+
+  if (isOpen !== undefined) {
+    if (!isOpen) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in overflow-y-auto">
+        <div className="my-8 w-full max-w-3xl">
+          {contentNode}
+        </div>
+      </div>
+    );
+  }
+
+  return contentNode;
 };

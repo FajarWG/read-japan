@@ -41,21 +41,21 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       tl.fromTo(
         overlayRef.current,
         { opacity: 0, scale: 1.02 },
-        { opacity: 1, scale: 1, duration: 0.18, ease: "power2.inOut" }
+        { opacity: 1, scale: 1, duration: 0.4, ease: "power2.inOut" }
       )
       // 2. Text scales up with pulse
       .fromTo(
         textRef.current,
-        { opacity: 0, y: 15, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.7)" },
-        "-=0.08"
+        { opacity: 0, y: 20, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.7)" },
+        "-=0.2"
       )
-      // 3. Hold briefly and fade out curtain
+      // 3. Hold for 1.8s (Total ~2.7s visible duration) and fade out curtain
       .to(overlayRef.current, {
         opacity: 0,
-        duration: 0.25,
+        duration: 0.5,
         ease: "power2.out",
-        delay: 0.12,
+        delay: 1.8,
       });
     }
 
@@ -63,7 +63,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       gsap.fromTo(
         containerRef.current,
         { opacity: 0.2, y: 12 },
-        { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", delay: 0.15 }
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", delay: 0.3 }
       );
     }
   }, [pathname]);
@@ -72,7 +72,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* Fullscreen GSAP Transition Overlay Curtain */}
+      {/* Fullscreen GSAP Transition Overlay Curtain (2.5 - 3 Seconds Duration) */}
       <div
         ref={overlayRef}
         aria-hidden={!isTransitioning}
