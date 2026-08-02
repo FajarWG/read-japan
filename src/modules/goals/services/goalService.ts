@@ -200,15 +200,19 @@ export async function getTodayMissions(userId?: number): Promise<MissionItem[]> 
 }
 
 export async function getLearningCalendarData(userId?: number) {
+  const activeGoal = await getUserActiveGoal(userId);
+  const examDateStr = activeGoal?.examDate ? new Date(activeGoal.examDate).toISOString().split("T")[0] : null;
+
   if (!userId) {
     const days = [];
     const now = new Date();
     for (let i = 29; i >= 0; i--) {
       const d = new Date(now.getTime() - i * 86400000);
+      const dateStr = d.toISOString().split("T")[0];
       days.push({
-        date: d.toISOString().split("T")[0],
+        date: dateStr,
         count: (i % 3 === 0) ? 0 : ((i * 7) % 20) + 5,
-        isExamDay: i === 5,
+        isExamDay: examDateStr ? dateStr === examDateStr : i === 5,
       });
     }
     return days;
@@ -216,12 +220,25 @@ export async function getLearningCalendarData(userId?: number) {
 
   const calendarLogs = await prisma.learningCalendar.findMany({
     where: { userId },
-    take: 90,
   });
 
-  return calendarLogs.map((c) => ({
-    date: c.date,
-    count: c.reviewCount + c.studyMinutes,
-    isExamDay: false,
-  }));
+  const logMap = new Map<string, number>();
+  for (const c of calendarLogs) {
+    logMap.set(c.date, c.reviewCount + c.studyMinutes);
+  }
+
+  const days = [];
+  const now = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * 86400000);
+    const dateStr = d.toISOString().split("T")[0];
+    const count = logMap.get(dateStr) || 0;
+    days.push({
+      date: dateStr,
+      count,
+      isExamDay: examDateStr ? dateStr === examDateStr : false,
+    });
+  }
+
+  return days;
 }

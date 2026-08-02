@@ -1,32 +1,34 @@
+import { translateSentenceToIndonesian } from "./translation";
+
 const ENTITY_MAP: Record<string, string> = {
-  "&n;": "noun",
-  "&adj-i;": "i-adjective",
-  "&adj-na;": "na-adjective",
-  "&adj-no;": "no-adjective",
-  "&adj-pn;": "adjectival pronoun",
-  "&v1;": "Ichidan verb",
-  "&v5k;": "Godan verb",
-  "&v5s;": "Godan verb",
-  "&v5t;": "Godan verb",
-  "&v5n;": "Godan verb",
-  "&v5m;": "Godan verb",
-  "&v5r;": "Godan verb",
-  "&v5g;": "Godan verb",
-  "&v5b;": "Godan verb",
-  "&v5u;": "Godan verb",
-  "&vs;": "Suru verb",
-  "&vk;": "Kuru verb",
-  "&vt;": "transitive verb",
-  "&vi;": "intransitive verb",
-  "&exp;": "expression",
-  "&pref;": "prefix",
-  "&suf;": "suffix",
-  "&adv;": "adverb",
-  "&conj;": "conjunction",
-  "&pn;": "pronoun",
-  "&num;": "numeric",
-  "&ctr;": "counter",
-  "&int;": "interjection",
+  "&n;": "kata benda (noun)",
+  "&adj-i;": "kata sifat-i",
+  "&adj-na;": "kata sifat-na",
+  "&adj-no;": "kata sifat-no",
+  "&adj-pn;": "pronomina sifat",
+  "&v1;": "kata kerja Ichidan",
+  "&v5k;": "kata kerja Godan",
+  "&v5s;": "kata kerja Godan",
+  "&v5t;": "kata kerja Godan",
+  "&v5n;": "kata kerja Godan",
+  "&v5m;": "kata kerja Godan",
+  "&v5r;": "kata kerja Godan",
+  "&v5g;": "kata kerja Godan",
+  "&v5b;": "kata kerja Godan",
+  "&v5u;": "kata kerja Godan",
+  "&vs;": "kata kerja Suru",
+  "&vk;": "kata kerja Kuru",
+  "&vt;": "kata kerja transitif",
+  "&vi;": "kata kerja intransitif",
+  "&exp;": "ungkapan / ekspresi",
+  "&pref;": "awalan (prefix)",
+  "&suf;": "akhiran (suffix)",
+  "&adv;": "kata keterangan (adverb)",
+  "&conj;": "kata sambung",
+  "&pn;": "kata ganti",
+  "&num;": "angka / numerik",
+  "&ctr;": "kata penggolong (counter)",
+  "&int;": "kata seru",
 };
 
 export function cleanJMdictString(input: string): string {
@@ -47,6 +49,9 @@ export function cleanJMdictString(input: string): string {
 
   // Clean extra spaces
   cleaned = cleaned.replace(/\s+/g, " ").trim();
+
+  // Translate English gloss words to Indonesian
+  cleaned = translateSentenceToIndonesian(cleaned);
 
   return cleaned;
 }

@@ -89,23 +89,23 @@ export const LearningHub: React.FC = () => {
           <TodayMissionsCard initialMissions={data.missions} />
         </div>
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3 p-4 bg-slate-900/60 rounded-2xl border border-slate-800">
-            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
               <Layers className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-black text-white">{data.stats.srsDueCount}</span>
-              <span className="text-xs text-slate-400 font-medium">SRS Due Today</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white">{data.stats.srsDueCount}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">SRS Due Today</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-4 bg-slate-900/60 rounded-2xl border border-slate-800">
-            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+          <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
               <Flame className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-black text-white">{data.stats.weakKanjiCount}</span>
-              <span className="text-xs text-slate-400 font-medium">Weak Kanji Confusions</span>
+              <span className="text-xl font-black text-slate-900 dark:text-white">{data.stats.weakKanjiCount}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Weak Kanji Confusions</span>
             </div>
           </div>
 

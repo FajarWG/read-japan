@@ -123,7 +123,7 @@ export const KanjiExploreView: React.FC<KanjiExploreViewProps> = ({
             )}
           </div>
 
-          <p className="text-lg font-medium text-slate-800 dark:text-slate-200 capitalize">
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 capitalize">
             {cleanedMeanings.length > 0 ? cleanedMeanings.join(", ") : "No meaning listed"}
           </p>
 

@@ -31,7 +31,6 @@ export function BottomNav() {
     { id: "kakou", route: "/kakou", label: "Kakou", icon: PencilLine },
     { id: "bunpou", route: "/bunpou", label: "Bunpou", icon: BookOpen },
     { id: "katsuyou", route: "/katsuyou", label: "Katsuyou", icon: RefreshCw },
-    { id: "kotoba", route: "/kotoba", label: "Kotoba", icon: NotebookPen },
   ] as const;
 
   const selectedKey = pathname.startsWith("/anki")
@@ -42,9 +41,7 @@ export function BottomNav() {
         ? "katsuyou"
         : pathname.startsWith("/kakou")
           ? "kakou"
-          : pathname.startsWith("/kotoba")
-            ? "kotoba"
-            : "none";
+          : "none";
 
   // Hide on auth pages or when forced by active review session
   if (pathname === "/login" || pathname === "/register" || hideForced) return null;
