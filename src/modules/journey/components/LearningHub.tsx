@@ -1,15 +1,36 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Loader2, Layers, Command, Clock } from "lucide-react";
+import { Layers, Hourglass, Clock } from "lucide-react";
 import { ContinueLearningCard } from "./ContinueLearningCard";
 import { QuickActionGrid } from "./QuickActionGrid";
 import { TodayMissionsCard } from "@/src/modules/goals/components/TodayMissionsCard";
 import { DashboardSkeleton } from "@/src/shared/components/LoadingSkeleton";
-import { openGlobalSearch } from "@/src/shared/components/GlobalSearchModal";
 
 import { ContinueLearningState, ActivityItem } from "../services/journeyService";
 import { GoalDetails, MissionItem } from "@/src/modules/goals/services/goalService";
+
+interface StudyTimeSummary {
+  totalSeconds: number;
+  avgSecondsPerActiveDay: number;
+  activeDays: number;
+  todaySeconds: number;
+}
+
+const EMPTY_STUDY_TIME: StudyTimeSummary = {
+  totalSeconds: 0,
+  avgSecondsPerActiveDay: 0,
+  activeDays: 0,
+  todaySeconds: 0,
+};
+
+/** 0 → "0h", 5400 → "1.5h", 900 → "15m" */
+function formatHours(totalSeconds: number): string {
+  const seconds = Math.max(0, Math.round(totalSeconds));
+  if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
+  const hours = seconds / 3600;
+  return `${hours >= 10 ? Math.round(hours) : hours.toFixed(1)}h`;
+}
 
 interface DashboardData {
   continueState: ContinueLearningState;
@@ -18,6 +39,7 @@ interface DashboardData {
   stats: {
     srsDueCount: number;
     weakKanjiCount: number;
+    studyTime?: StudyTimeSummary;
   };
   goal: GoalDetails | null;
   missions: MissionItem[];
@@ -77,6 +99,8 @@ export const LearningHub: React.FC = () => {
   const defaultDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
   const defaultWeeks = Math.ceil(defaultDays / 7);
 
+  const studyTime = data.stats.studyTime ?? EMPTY_STUDY_TIME;
+
   const activeGoal = data.goal || {
     id: 0,
     type: "JLPT_N4",
@@ -112,18 +136,30 @@ export const LearningHub: React.FC = () => {
             </div>
           </div>
 
-          <button
-            onClick={openGlobalSearch}
-            className="flex items-center gap-3 p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/50 transition-all cursor-pointer text-left shadow-sm flex-1"
-          >
+          {/* Ringkasan waktu belajar dari study timer */}
+          <div className="flex items-center gap-3 p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex-1">
             <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-              <Command className="w-5 h-5" />
+              <Hourglass className="w-5 h-5" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-extrabold text-slate-900 dark:text-white">Cmd + K</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Click to Search</span>
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+              <div className="flex flex-col">
+                <span className="text-xl font-black leading-tight text-slate-900 dark:text-white">
+                  {formatHours(studyTime.totalSeconds)}
+                </span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Total Studied
+                </span>
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-black leading-tight text-amber-600 dark:text-amber-400">
+                  {formatHours(studyTime.avgSecondsPerActiveDay)}
+                </span>
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  Avg / day
+                </span>
+              </div>
             </div>
-          </button>
+          </div>
 
           {/* Exam Time Remaining Card */}
           <div className="flex items-center justify-between p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm text-slate-900 dark:text-slate-100 flex-1">

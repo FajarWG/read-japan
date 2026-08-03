@@ -6,6 +6,7 @@ import {
   getCrossModuleRecommendations,
 } from "@/src/modules/journey/services/journeyService";
 import { prisma } from "@/src/shared/lib/db";
+import { getStudyTimerOverviewForUser } from "@/src/modules/study-timer/lib/timer";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,12 @@ export async function GET(request: NextRequest) {
 
     let srsDueCount = 0;
     let weakKanjiCount = 0;
+    let studyTime = {
+      totalSeconds: 0,
+      avgSecondsPerActiveDay: 0,
+      activeDays: 0,
+      todaySeconds: 0,
+    };
 
     if (userId) {
       const now = new Date();
@@ -37,6 +44,14 @@ export async function GET(request: NextRequest) {
         where: { userId },
       });
       weakKanjiCount = confusions;
+
+      const overview = await getStudyTimerOverviewForUser(userId);
+      studyTime = {
+        totalSeconds: overview.stats.totalSeconds,
+        avgSecondsPerActiveDay: overview.stats.avgSecondsPerActiveDay,
+        activeDays: overview.stats.activeDays,
+        todaySeconds: overview.stats.todaySeconds,
+      };
     }
 
     return NextResponse.json({
@@ -46,6 +61,7 @@ export async function GET(request: NextRequest) {
       stats: {
         srsDueCount,
         weakKanjiCount,
+        studyTime,
       },
     });
   } catch (error) {

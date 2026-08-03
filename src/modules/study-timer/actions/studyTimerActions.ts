@@ -16,6 +16,89 @@ export async function getStudyTimerOverview() {
   return getStudyTimerOverviewForUser(auth.id);
 }
 
+/**
+ * Timer belajar manual — tidak terikat sesi Kakou.
+ * Dipakai oleh FloatingStudyTimer yang tampil di semua halaman.
+ */
+export async function startManualStudyTimer() {
+  const auth = await getSession();
+  if (!auth) return { success: false as const, error: "Unauthorized" };
+
+  const active = await prisma.studyTimerSession.findFirst({
+    where: { userId: auth.id, activeKey: { not: null } },
+  });
+
+  // Sudah ada timer aktif — jangan buat sesi baru, cukup lanjutkan.
+  if (active) {
+    if (active.status === "PAUSED") {
+      const resumed = await prisma.studyTimerSession.update({
+        where: { id: active.id },
+        data: { status: "RUNNING", lastStartedAt: new Date() },
+      });
+      return { success: true as const, timer: toStudyTimerView(resumed) };
+    }
+    return { success: true as const, timer: toStudyTimerView(active) };
+  }
+
+  const now = new Date();
+  try {
+    const created = await prisma.studyTimerSession.create({
+      data: {
+        userId: auth.id,
+        source: "MANUAL",
+        status: "RUNNING",
+        activeKey: `user:${auth.id}`,
+        lastStartedAt: now,
+        startedAt: now,
+      },
+    });
+    return { success: true as const, timer: toStudyTimerView(created, now) };
+  } catch (error) {
+    console.error("[studyTimer] failed to start manual timer:", error);
+    return { success: false as const, error: "Could not start the study timer" };
+  }
+}
+
+/**
+ * Menutup sesi timer dan mengunci totalnya ke akumulasi harian.
+ * Hanya untuk sesi MANUAL — sesi KAKOU diselesaikan dari halaman Kakou.
+ */
+export async function stopStudyTimer(timerId: number) {
+  const auth = await getSession();
+  if (!auth) return { success: false as const, error: "Unauthorized" };
+  if (!Number.isInteger(timerId)) {
+    return { success: false as const, error: "Invalid timer" };
+  }
+
+  const timer = await prisma.studyTimerSession.findFirst({
+    where: { id: timerId, userId: auth.id, activeKey: { not: null } },
+  });
+  if (!timer) return { success: false as const, error: "Active timer not found" };
+  if (timer.source !== "MANUAL") {
+    return {
+      success: false as const,
+      error: "Finish this timer from the Kakou session",
+    };
+  }
+
+  const now = new Date();
+  await prisma.studyTimerSession.update({
+    where: { id: timer.id },
+    data: {
+      accumulatedSeconds: elapsedSeconds(timer, now),
+      lastStartedAt: null,
+      activeKey: null,
+      status: "COMPLETED",
+      endedAt: now,
+    },
+  });
+
+  return {
+    success: true as const,
+    overview: await getStudyTimerOverviewForUser(auth.id),
+  };
+}
+
 export async function startStudyTimer(kakouSessionId: number) {
   const auth = await getSession();
   if (!auth) return { success: false as const, error: "Unauthorized" };

@@ -73,7 +73,7 @@ export async function getStudyTimerOverviewForUser(
   const todayStart = startOfJstDay();
   const weekStart = startOfJstDay(6);
 
-  const [activeTimer, recentTimers, totalAggregate] = await Promise.all([
+  const [activeTimer, recentTimers, totalAggregate, allSessionDays] = await Promise.all([
     prisma.studyTimerSession.findFirst({
       where: { userId, activeKey: { not: null } },
       orderBy: { updatedAt: "desc" },
@@ -85,6 +85,10 @@ export async function getStudyTimerOverviewForUser(
     prisma.studyTimerSession.aggregate({
       where: { userId },
       _sum: { accumulatedSeconds: true },
+    }),
+    prisma.studyTimerSession.findMany({
+      where: { userId },
+      select: { startedAt: true },
     }),
   ]);
 
@@ -111,13 +115,24 @@ export async function getStudyTimerOverviewForUser(
     0,
   );
 
+  const totalSeconds =
+    (totalAggregate._sum.accumulatedSeconds ?? 0) + Math.max(0, activeExtra);
+
+  // Rata-rata dihitung per hari yang benar-benar ada sesi belajar,
+  // bukan per hari kalender — supaya jeda panjang tidak menipiskan angka.
+  const activeDays = new Set(
+    allSessionDays.map((session) => jstDayKey(session.startedAt)),
+  ).size;
+
   return {
     activeTimer: activeTimer ? toStudyTimerView(activeTimer, now) : null,
     stats: {
       todaySeconds,
       weekSeconds,
-      totalSeconds:
-        (totalAggregate._sum.accumulatedSeconds ?? 0) + Math.max(0, activeExtra),
+      totalSeconds,
+      activeDays,
+      avgSecondsPerActiveDay:
+        activeDays === 0 ? 0 : Math.round(totalSeconds / activeDays),
       byDay: Array.from(daySeconds.entries()).map(([date, seconds]) => ({
         date,
         seconds,

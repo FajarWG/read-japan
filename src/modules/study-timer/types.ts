@@ -21,6 +21,10 @@ export interface StudyTimeStats {
   todaySeconds: number;
   weekSeconds: number;
   totalSeconds: number;
+  /** Jumlah hari (JST) yang punya minimal satu sesi belajar. */
+  activeDays: number;
+  /** totalSeconds dibagi activeDays — rata-rata per hari belajar. */
+  avgSecondsPerActiveDay: number;
   byDay: StudyTimeDay[];
 }
 

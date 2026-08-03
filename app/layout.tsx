@@ -13,6 +13,7 @@ import { ServiceWorkerRegistration } from "@/src/shared/components/ServiceWorker
 import { GlobalSearchModal } from "@/src/shared/components/GlobalSearchModal";
 import { ToastProvider } from "@/src/shared/components/ToastProvider";
 import { ShortcutDialog } from "@/src/shared/components/ShortcutDialog";
+import { FloatingStudyTimer } from "@/src/modules/study-timer/components/FloatingStudyTimer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -141,6 +142,7 @@ export default async function RootLayout({
               <GlobalSearchModal />
               <ShortcutDialog />
               <ToastProvider />
+              <FloatingStudyTimer />
               <BottomNav />
             </AuthProvider>
           </LanguageProvider>
