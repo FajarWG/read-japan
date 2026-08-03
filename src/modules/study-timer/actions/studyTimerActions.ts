@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import {
   elapsedSeconds,
   getStudyTimerOverviewForUser,
+  startOfJstDay,
   toStudyTimerView,
 } from "@/src/modules/study-timer/lib/timer";
 import { prisma } from "@/src/shared/lib/db";
@@ -245,4 +246,35 @@ export async function resumeStudyTimer(timerId: number) {
   });
   revalidatePath("/kakou");
   return { success: true as const, timer: toStudyTimerView(updated, now) };
+}
+
+/**
+ * Mereset akumulasi waktu belajar hari ini dan menghentikan sesi aktif (jika ada).
+ */
+export async function resetTodayStudyTimer() {
+  const auth = await getSession();
+  if (!auth) return { success: false as const, error: "Unauthorized" };
+
+  const todayStart = startOfJstDay();
+
+  try {
+    await prisma.studyTimerSession.deleteMany({
+      where: {
+        userId: auth.id,
+        OR: [
+          { startedAt: { gte: todayStart } },
+          { activeKey: { not: null } },
+        ],
+      },
+    });
+
+    revalidatePath("/kakou");
+    return {
+      success: true as const,
+      overview: await getStudyTimerOverviewForUser(auth.id),
+    };
+  } catch (error) {
+    console.error("[studyTimer] failed to reset today timer:", error);
+    return { success: false as const, error: "Gagal mereset timer hari ini" };
+  }
 }

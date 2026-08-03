@@ -67,7 +67,7 @@ function jstDayKey(date: Date): string {
   return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}-${String(shifted.getUTCDate()).padStart(2, "0")}`;
 }
 
-function startOfJstDay(daysAgo = 0): Date {
+export function startOfJstDay(daysAgo = 0): Date {
   const shifted = new Date(Date.now() + JST_OFFSET_MS);
   const startUtc = Date.UTC(
     shifted.getUTCFullYear(),
