@@ -33,7 +33,7 @@ export async function startManualStudyTimer() {
     if (active.status === "PAUSED") {
       const resumed = await prisma.studyTimerSession.update({
         where: { id: active.id },
-        data: { status: "RUNNING", lastStartedAt: new Date() },
+        data: { status: "RUNNING", lastStartedAt: new Date(), lastHeartbeatAt: null },
       });
       return { success: true as const, timer: toStudyTimerView(resumed) };
     }
@@ -57,6 +57,32 @@ export async function startManualStudyTimer() {
     console.error("[studyTimer] failed to start manual timer:", error);
     return { success: false as const, error: "Could not start the study timer" };
   }
+}
+
+/**
+ * Ping ringan dari klien selagi timer RUNNING (tiap ~30 detik). Server pakai
+ * ini untuk tahu klien masih "hidup" — tanpa ini, sesi yang ditinggal (tab
+ * ditutup, device tidur) akan berhenti dihitung otomatis setelah grace period,
+ * bukan terus menumpuk jam kosong. Lihat HEARTBEAT_GRACE_MS di lib/timer.ts.
+ */
+export async function heartbeatStudyTimer(timerId: number) {
+  const auth = await getSession();
+  if (!auth) return { success: false as const, error: "Unauthorized" };
+  if (!Number.isInteger(timerId)) {
+    return { success: false as const, error: "Invalid timer" };
+  }
+
+  const updated = await prisma.studyTimerSession.updateMany({
+    where: {
+      id: timerId,
+      userId: auth.id,
+      activeKey: { not: null },
+      status: "RUNNING",
+    },
+    data: { lastHeartbeatAt: new Date() },
+  });
+
+  return { success: updated.count > 0 };
 }
 
 /**
@@ -127,7 +153,7 @@ export async function startStudyTimer(kakouSessionId: number) {
     if (active.status === "PAUSED") {
       const resumed = await prisma.studyTimerSession.update({
         where: { id: active.id },
-        data: { status: "RUNNING", lastStartedAt: new Date() },
+        data: { status: "RUNNING", lastStartedAt: new Date(), lastHeartbeatAt: null },
       });
       return { success: true as const, timer: toStudyTimerView(resumed) };
     }
@@ -215,7 +241,7 @@ export async function resumeStudyTimer(timerId: number) {
   const now = new Date();
   const updated = await prisma.studyTimerSession.update({
     where: { id: timer.id },
-    data: { status: "RUNNING", lastStartedAt: now },
+    data: { status: "RUNNING", lastStartedAt: now, lastHeartbeatAt: null },
   });
   revalidatePath("/kakou");
   return { success: true as const, timer: toStudyTimerView(updated, now) };

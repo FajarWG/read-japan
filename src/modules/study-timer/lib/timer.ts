@@ -5,6 +5,8 @@ import type {
   StudyTimerView,
 } from "@/src/modules/study-timer/types";
 
+import { HEARTBEAT_GRACE_MS } from "@/src/modules/study-timer/constants";
+
 const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 
 type TimerRecord = {
@@ -14,6 +16,7 @@ type TimerRecord = {
   status: string;
   accumulatedSeconds: number;
   lastStartedAt: Date | null;
+  lastHeartbeatAt?: Date | null;
   startedAt: Date;
   endedAt: Date | null;
 };
@@ -27,9 +30,16 @@ export function elapsedSeconds(record: TimerRecord, now = new Date()): number {
   if (record.status !== "RUNNING" || !record.lastStartedAt) {
     return Math.max(0, record.accumulatedSeconds);
   }
+  // Jangan hitung lewat heartbeat terakhir + grace — sesi yang ditinggal
+  // (tab ditutup / device tidur) tidak boleh terus menumpuk jam kosong.
+  const reference = record.lastHeartbeatAt ?? record.lastStartedAt;
+  const cappedNowMs = Math.min(
+    now.getTime(),
+    reference.getTime() + HEARTBEAT_GRACE_MS,
+  );
   const runningSeconds = Math.max(
     0,
-    Math.floor((now.getTime() - record.lastStartedAt.getTime()) / 1000),
+    Math.floor((cappedNowMs - record.lastStartedAt.getTime()) / 1000),
   );
   return Math.max(0, record.accumulatedSeconds + runningSeconds);
 }
@@ -46,6 +56,7 @@ export function toStudyTimerView(
     accumulatedSeconds: record.accumulatedSeconds,
     elapsedSeconds: elapsedSeconds(record, now),
     lastStartedAt: record.lastStartedAt?.toISOString() ?? null,
+    lastHeartbeatAt: record.lastHeartbeatAt?.toISOString() ?? null,
     startedAt: record.startedAt.toISOString(),
     endedAt: record.endedAt?.toISOString() ?? null,
   };

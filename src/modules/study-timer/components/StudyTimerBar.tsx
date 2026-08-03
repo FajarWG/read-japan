@@ -4,10 +4,15 @@ import { useEffect, useState, useTransition } from "react";
 import { Clock3, Pause, Play } from "lucide-react";
 
 import {
+  heartbeatStudyTimer,
   pauseStudyTimer,
   resumeStudyTimer,
   startStudyTimer,
 } from "@/src/modules/study-timer/actions/studyTimerActions";
+import {
+  HEARTBEAT_GRACE_MS,
+  HEARTBEAT_INTERVAL_MS,
+} from "@/src/modules/study-timer/constants";
 import type { StudyTimerView } from "@/src/modules/study-timer/types";
 
 export function formatStudyTime(totalSeconds: number, showSeconds = true): string {
@@ -24,15 +29,25 @@ export function formatStudyTime(totalSeconds: number, showSeconds = true): strin
     .join(":");
 }
 
-function liveElapsed(timer: StudyTimerView | null, now: number): number {
+/**
+ * Sama seperti liveElapsed di FloatingStudyTimer: dibatasi oleh heartbeat
+ * lokal supaya tidak ikut menumpuk jam kosong kalau tab ditinggal.
+ */
+function liveElapsed(
+  timer: StudyTimerView | null,
+  now: number,
+  lastPingAt: number | null,
+): number {
   if (!timer) return 0;
   if (timer.status !== "RUNNING" || !timer.lastStartedAt) {
     return timer.accumulatedSeconds;
   }
-  return (
-    timer.accumulatedSeconds +
-    Math.max(0, Math.floor((now - new Date(timer.lastStartedAt).getTime()) / 1000))
-  );
+  const started = new Date(timer.lastStartedAt).getTime();
+  const referenceMs =
+    lastPingAt ??
+    (timer.lastHeartbeatAt ? new Date(timer.lastHeartbeatAt).getTime() : started);
+  const cappedNow = Math.min(now, referenceMs + HEARTBEAT_GRACE_MS);
+  return timer.accumulatedSeconds + Math.max(0, Math.floor((cappedNow - started) / 1000));
 }
 
 export function StudyTimerBar({
@@ -47,16 +62,36 @@ export function StudyTimerBar({
   onError: (message: string) => void;
 }) {
   const [now, setNow] = useState(() => Date.now());
+  const [lastPingAt, setLastPingAt] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const running = timer?.status === "RUNNING";
+
   useEffect(() => {
-    if (timer?.status !== "RUNNING") return;
+    if (!running) return;
     const interval = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(interval);
-  }, [timer?.status]);
+  }, [running]);
 
-  const running = timer?.status === "RUNNING";
-  const elapsed = liveElapsed(timer, now);
+  // Heartbeat lokal — sama seperti di FloatingStudyTimer. Boleh berjalan
+  // berbarengan dengan heartbeat pill floating; server cukup update timestamp
+  // yang sama jadi tidak ada efek samping dari dua ping ke timer yang sama.
+  useEffect(() => {
+    if (!running || !timer) {
+      setLastPingAt(null);
+      return;
+    }
+    const timerId = timer.id;
+    const ping = () => {
+      setLastPingAt(Date.now());
+      void heartbeatStudyTimer(timerId);
+    };
+    ping();
+    const id = window.setInterval(ping, HEARTBEAT_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [running, timer?.id]);
+
+  const elapsed = liveElapsed(timer, now, lastPingAt);
 
   const toggle = () => {
     startTransition(async () => {

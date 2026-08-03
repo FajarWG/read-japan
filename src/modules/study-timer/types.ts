@@ -8,6 +8,7 @@ export interface StudyTimerView {
   accumulatedSeconds: number;
   elapsedSeconds: number;
   lastStartedAt: string | null;
+  lastHeartbeatAt: string | null;
   startedAt: string;
   endedAt: string | null;
 }

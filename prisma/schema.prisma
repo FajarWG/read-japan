@@ -564,6 +564,7 @@ model StudyTimerSession {
   activeKey          String?       @unique
   accumulatedSeconds Int           @default(0)
   lastStartedAt      DateTime?
+  lastHeartbeatAt    DateTime?
   startedAt          DateTime      @default(now())
   endedAt            DateTime?
   createdAt          DateTime      @default(now())

@@ -6,12 +6,17 @@ import { ChevronDown, Clock3, Pause, Play, Square } from "lucide-react";
 
 import {
   getStudyTimerOverview,
+  heartbeatStudyTimer,
   pauseStudyTimer,
   resumeStudyTimer,
   startManualStudyTimer,
   stopStudyTimer,
 } from "@/src/modules/study-timer/actions/studyTimerActions";
 import { formatStudyTime } from "@/src/modules/study-timer/components/StudyTimerBar";
+import {
+  HEARTBEAT_GRACE_MS,
+  HEARTBEAT_INTERVAL_MS,
+} from "@/src/modules/study-timer/constants";
 import type {
   StudyTimerOverview,
   StudyTimerView,
@@ -21,14 +26,28 @@ import { showToast } from "@/src/shared/components/ToastProvider";
 
 const HIDDEN_ROUTES = ["/login", "/register"];
 
-/** Detik berjalan sisi-klien supaya angka bergerak tanpa polling ke server. */
-function liveElapsed(timer: StudyTimerView | null, now: number): number {
+/**
+ * Detik berjalan sisi-klien supaya angka bergerak tanpa polling ke server.
+ * `lastPingAt` (waktu heartbeat lokal terakhir berhasil dikirim) dipakai
+ * sebagai batas atas — kalau tab ditutup / device tidur, interval heartbeat
+ * ikut berhenti dan angka ini otomatis berhenti bertambah juga, sama seperti
+ * yang dihitung server.
+ */
+function liveElapsed(
+  timer: StudyTimerView | null,
+  now: number,
+  lastPingAt: number | null,
+): number {
   if (!timer) return 0;
   if (timer.status !== "RUNNING" || !timer.lastStartedAt) {
     return timer.accumulatedSeconds;
   }
   const started = new Date(timer.lastStartedAt).getTime();
-  return timer.accumulatedSeconds + Math.max(0, Math.floor((now - started) / 1000));
+  const referenceMs =
+    lastPingAt ??
+    (timer.lastHeartbeatAt ? new Date(timer.lastHeartbeatAt).getTime() : started);
+  const cappedNow = Math.min(now, referenceMs + HEARTBEAT_GRACE_MS);
+  return timer.accumulatedSeconds + Math.max(0, Math.floor((cappedNow - started) / 1000));
 }
 
 export function FloatingStudyTimer() {
@@ -40,6 +59,7 @@ export function FloatingStudyTimer() {
   const [now, setNow] = useState(() => Date.now());
   const [hideForced, setHideForced] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [lastPingAt, setLastPingAt] = useState<number | null>(null);
   const loadedRef = useRef(false);
 
   const timer = overview?.activeTimer ?? null;
@@ -47,7 +67,7 @@ export function FloatingStudyTimer() {
 
   // Total hari ini = yang sudah tersimpan + detik sesi aktif yang belum di-commit.
   const storedToday = overview?.stats.todaySeconds ?? 0;
-  const liveSeconds = liveElapsed(timer, now);
+  const liveSeconds = liveElapsed(timer, now, lastPingAt);
   const todayTotal = timer
     ? storedToday - timer.accumulatedSeconds + liveSeconds
     : storedToday;
@@ -85,6 +105,24 @@ export function FloatingStudyTimer() {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, [running]);
+
+  // Heartbeat ke server selagi berjalan — kalau tab ditutup / device tidur,
+  // ping ini berhenti dan server otomatis stop menghitung setelah grace period
+  // (bukan terus jalan sampai halaman dibuka lagi nanti).
+  useEffect(() => {
+    if (!running || !timer) {
+      setLastPingAt(null);
+      return;
+    }
+    const timerId = timer.id;
+    const ping = () => {
+      setLastPingAt(Date.now());
+      void heartbeatStudyTimer(timerId);
+    };
+    ping();
+    const id = window.setInterval(ping, HEARTBEAT_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [running, timer?.id]);
 
   // Ikut aturan BottomNav: sembunyi saat sesi review memaksa nav tersembunyi.
   useEffect(() => {
@@ -166,7 +204,7 @@ export function FloatingStudyTimer() {
 
           <div className="mb-3 flex items-baseline justify-between rounded-xl bg-surface-muted px-3 py-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
-              {isKakouTimer ? "Kakou" : "Session"}
+              Session
             </span>
             <span className="font-mono text-sm font-bold tabular-nums text-foreground">
               {formatStudyTime(liveSeconds)}
@@ -202,7 +240,7 @@ export function FloatingStudyTimer() {
 
           {isKakouTimer && (
             <p className="mt-2 text-[10px] leading-snug text-muted">
-              Finish this session from the Kakou page.
+              This session can only be finished from where it started.
             </p>
           )}
         </div>
