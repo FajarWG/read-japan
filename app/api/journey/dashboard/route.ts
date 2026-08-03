@@ -26,7 +26,11 @@ export async function GET(request: NextRequest) {
     if (userId) {
       const now = new Date();
       srsDueCount = await prisma.ankiProgress.count({
-        where: { userId, dueDate: { lte: now } },
+        where: {
+          userId,
+          dueDate: { lte: now },
+          NOT: { cardKey: { startsWith: "Bab " } },
+        },
       });
 
       const confusions = await prisma.userKanjiConfusion.count({

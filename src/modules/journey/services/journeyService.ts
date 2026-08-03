@@ -20,7 +20,7 @@ export async function getLastUserActivity(userId?: number): Promise<ContinueLear
     return {
       module: "Anki Review",
       title: "JLPT N5-N4 Flashcard Review",
-      href: "/anki",
+      href: "/anki?deck=custom",
       lastActive: "Just now",
     };
   }
@@ -34,13 +34,13 @@ export async function getLastUserActivity(userId?: number): Promise<ContinueLear
     return {
       module: "Anki Review",
       title: "JLPT N5-N4 Flashcard Review",
-      href: "/anki",
+      href: "/anki?deck=custom",
       lastActive: "Ready to start",
     };
   }
 
   const moduleMap: Record<string, { module: string; title: string; href: string }> = {
-    anki_review: { module: "Anki Review", title: "SRS Flashcards Review", href: "/anki" },
+    anki_review: { module: "Anki Review", title: "JLPT N5-N4 Flashcard Review", href: "/anki?deck=custom" },
     bunpou_lesson: { module: "Bunpou Grammar", title: "Japanese Grammar Lessons", href: "/bunpou" },
     katsuyou_practice: { module: "Katsuyou Conjugation", title: "Verb & Adjective Conjugation", href: "/katsuyou" },
     kakou_handwriting: { module: "Kakou Handwriting", title: "Kanji Canvas Handwriting", href: "/kakou" },
@@ -51,7 +51,7 @@ export async function getLastUserActivity(userId?: number): Promise<ContinueLear
   const matched = moduleMap[lastLog.type] || {
     module: "Anki Review",
     title: "JLPT N5-N4 Flashcard Review",
-    href: "/anki",
+    href: "/anki?deck=custom",
   };
 
   return {

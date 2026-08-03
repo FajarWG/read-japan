@@ -20,26 +20,30 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground p-6 sm:p-10 font-sans">
       <div className="max-w-6xl mx-auto flex flex-col gap-6">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-5">
-          <div className="flex flex-col">
-            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
-              Nihongo Flow Platform
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              Learning Hub
-            </h1>
+        {/* Header (copied from Anki header, with Help ? button removed) */}
+        <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
+          <div className="flex items-center justify-between gap-4 px-4 py-4">
+            <div className="min-w-0">
+              <h1 className="font-jp text-base sm:text-lg font-bold leading-tight text-foreground flex items-center gap-2 truncate">
+                <span>日本語フロー</span>
+                <span className="font-sans text-[10px] sm:text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">
+                  Home
+                </span>
+              </h1>
+              <p className="text-[10px] sm:text-xs text-muted line-clamp-1 truncate">
+                Your Japanese Learning Hub & Study Journey
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {session && (
+                <span className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-border bg-surface text-foreground">
+                  👤 {session.username}
+                </span>
+              )}
+              <SettingsDropdown />
+            </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            {session && (
-              <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300">
-                👤 {session.username}
-              </span>
-            )}
-            <SettingsDropdown />
-          </div>
-        </div>
+        </header>
 
         {/* Learning Hub Widgets */}
         <LearningHub />

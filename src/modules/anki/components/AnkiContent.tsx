@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Button,
   Card,
@@ -191,8 +192,22 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setExploreTarget({ type: "vocab", query: word });
     setIsExploreOpen(true);
   };
+  const searchParams = useSearchParams();
+  const deckParam = searchParams.get("deck");
+
   const [loading, setLoading] = useState<boolean>(true);
-  const [deckType, setDeckType] = useState<"dekiru" | "custom" | null>(null);
+  const [deckType, setDeckType] = useState<"dekiru" | "custom" | null>(() => {
+    if (deckParam === "custom" || deckParam === "n5-n4" || deckParam === "jlpt") {
+      return "custom";
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (deckParam === "custom" || deckParam === "n5-n4" || deckParam === "jlpt") {
+      setDeckType("custom");
+    }
+  }, [deckParam]);
   const [customCards, setCustomCards] = useState<VocabularyCard[]>([]);
 
   const playAudio = (filename: string) => {

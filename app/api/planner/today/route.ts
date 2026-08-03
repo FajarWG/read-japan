@@ -3,6 +3,7 @@ import { getSession } from "@/src/shared/lib/session";
 import { getUserActiveGoal, getTodayMissions } from "@/src/modules/goals/services/goalService";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   try {

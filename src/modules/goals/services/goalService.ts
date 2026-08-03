@@ -60,7 +60,30 @@ export async function getUserActiveGoal(userId?: number): Promise<GoalDetails | 
     orderBy: { createdAt: "desc" },
   });
 
-  if (!goal) return null;
+  if (!goal) {
+    const now = new Date();
+    const diffTime = defaultExamDate.getTime() - now.getTime();
+    const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    const weeksRemaining = Math.ceil(daysRemaining / 7);
+
+    return {
+      id: 0,
+      type: "JLPT_N4",
+      targetLevel: "N4",
+      targetDate: defaultExamDate.toISOString(),
+      examDate: defaultExamDate.toISOString(),
+      daysRemaining,
+      weeksRemaining,
+      progressPercent: 0,
+      status: "On Track",
+      plannerMode: daysRemaining > 60 ? "Normal" : daysRemaining > 7 ? "Intensive" : "Review Focus",
+      remainingMaterial: {
+        vocabCount: 1500,
+        grammarCount: 120,
+        kanjiCount: 300,
+      },
+    };
+  }
 
   const now = new Date();
   const exam = goal.examDate ? new Date(goal.examDate) : new Date(goal.targetDate);
@@ -107,96 +130,123 @@ export async function getUserActiveGoal(userId?: number): Promise<GoalDetails | 
 
 export async function getTodayMissions(userId?: number): Promise<MissionItem[]> {
   const todayStr = new Date().toISOString().split("T")[0];
-  const activeGoal = await getUserActiveGoal(userId);
-  const plannerMode = activeGoal?.plannerMode || "Normal";
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  let hasSomatomeToday = false;
+  let hasAnkiReviewToday = false;
+  let hasNewSrsPracticeToday = false;
+
+  if (userId) {
+    const [somatomeCount, somatomeActivity, ankiReviewCount, ankiActivity, newSrsCount] = await Promise.all([
+      prisma.somatomeAttempt.count({
+        where: { userId, createdAt: { gte: startOfDay } },
+      }),
+      prisma.activityLog.count({
+        where: {
+          userId,
+          type: { in: ["somatome_answer", "somatome_practice"] },
+          createdAt: { gte: startOfDay },
+        },
+      }),
+      prisma.ankiProgress.count({
+        where: { userId, updatedAt: { gte: startOfDay }, repetitions: { gte: 1 } },
+      }),
+      prisma.activityLog.count({
+        where: {
+          userId,
+          type: { in: ["anki_review", "anki_study"] },
+          createdAt: { gte: startOfDay },
+        },
+      }),
+      prisma.ankiProgress.count({
+        where: { userId, createdAt: { gte: startOfDay } },
+      }),
+    ]);
+
+    hasSomatomeToday = (somatomeCount + somatomeActivity) > 0;
+    hasAnkiReviewToday = (ankiReviewCount + ankiActivity) > 0;
+    hasNewSrsPracticeToday = newSrsCount > 0;
+  }
+
+  const defaultMissions = [
+    { title: "Somatome Study", module: "Somatome", autoCompleted: hasSomatomeToday },
+    { title: "Review Anki SRS Flashcards", module: "Anki Review", autoCompleted: hasAnkiReviewToday },
+    { title: "Practice New SRS Cards", module: "Anki Practice", autoCompleted: hasNewSrsPracticeToday },
+  ];
 
   if (!userId) {
-    if (plannerMode === "Review Focus") {
-      return [
-        { id: 1, title: "Review 60 SRS Flashcards (Review Focus)", module: "Anki Review", targetCount: 60, currentCount: 30, completed: false },
-        { id: 2, title: "Fix 5 Weak Kanji Confusions", module: "Adaptive Engine", targetCount: 5, currentCount: 2, completed: false },
-        { id: 3, title: "Practice 1 Kanji Writing Canvas", module: "Kakou Handwriting", targetCount: 1, currentCount: 1, completed: true },
-      ];
-    }
-
-    if (plannerMode === "Intensive") {
-      return [
-        { id: 1, title: "Review 45 SRS Flashcards (Intensive)", module: "Anki Review", targetCount: 45, currentCount: 20, completed: false },
-        { id: 2, title: "Learn 8 New Vocabulary", module: "Explore Layer", targetCount: 8, currentCount: 8, completed: true },
-        { id: 3, title: "Practice 2 Grammar Lessons", module: "Bunpou Grammar", targetCount: 2, currentCount: 1, completed: false },
-        { id: 4, title: "Complete 1 Kanji Canvas Writing", module: "Kakou Handwriting", targetCount: 1, currentCount: 1, completed: true },
-      ];
-    }
-
-    return [
-      { id: 1, title: "Review 30 SRS Flashcards", module: "Anki Review", targetCount: 30, currentCount: 15, completed: false },
-      { id: 2, title: "Learn 5 New Vocabulary", module: "Explore Layer", targetCount: 5, currentCount: 5, completed: true },
-      { id: 3, title: "Practice 1 Grammar Lesson", module: "Bunpou Grammar", targetCount: 1, currentCount: 1, completed: true },
-      { id: 4, title: "Complete 1 Kanji Writing Canvas", module: "Kakou Handwriting", targetCount: 1, currentCount: 0, completed: false },
-    ];
+    return defaultMissions.map((m, idx) => ({
+      id: idx + 1,
+      title: m.title,
+      module: m.module,
+      targetCount: 1,
+      currentCount: m.autoCompleted ? 1 : 0,
+      completed: m.autoCompleted,
+    }));
   }
 
   const existing = await prisma.dailyMission.findMany({
     where: { userId, date: todayStr },
   });
 
-  if (existing.length > 0) {
-    return existing.map((m) => ({
+  const needsReseed = existing.length !== 3 || existing.some((e) => !defaultMissions.some((dm) => dm.title === e.title));
+
+  if (needsReseed) {
+    await prisma.dailyMission.deleteMany({
+      where: { userId, date: todayStr },
+    });
+
+    const created = [];
+    for (const dm of defaultMissions) {
+      const record = await prisma.dailyMission.create({
+        data: {
+          userId,
+          date: todayStr,
+          title: dm.title,
+          module: dm.module,
+          targetCount: 1,
+          currentCount: dm.autoCompleted ? 1 : 0,
+          completed: dm.autoCompleted,
+        },
+      });
+      created.push({
+        id: record.id,
+        title: record.title,
+        module: record.module,
+        targetCount: record.targetCount,
+        currentCount: record.currentCount,
+        completed: record.completed,
+      });
+    }
+    return created;
+  }
+
+  const result = [];
+  for (const m of existing) {
+    let isCompleted = m.completed;
+    if (m.title === "Somatome Study" && hasSomatomeToday) isCompleted = true;
+    if (m.title === "Review Anki SRS Flashcards" && hasAnkiReviewToday) isCompleted = true;
+    if (m.title === "Practice New SRS Cards" && hasNewSrsPracticeToday) isCompleted = true;
+
+    if (isCompleted !== m.completed) {
+      await prisma.dailyMission.update({
+        where: { id: m.id },
+        data: { completed: isCompleted, currentCount: isCompleted ? 1 : 0 },
+      });
+    }
+
+    result.push({
       id: m.id,
       title: m.title,
       module: m.module,
       targetCount: m.targetCount,
-      currentCount: m.currentCount,
-      completed: m.completed,
-    }));
-  }
-
-  // Seed missions adjusted for plannerMode
-  const missionsByMode = {
-    "Review Focus": [
-      { title: "Review 60 SRS Flashcards (Review Focus)", module: "Anki Review", targetCount: 60 },
-      { title: "Fix 5 Weak Kanji Confusions", module: "Adaptive Engine", targetCount: 5 },
-      { title: "Complete 1 Kanji Canvas Writing", module: "Kakou Handwriting", targetCount: 1 },
-    ],
-    Intensive: [
-      { title: "Review 45 SRS Flashcards (Intensive)", module: "Anki Review", targetCount: 45 },
-      { title: "Explore 8 New Vocabulary", module: "Explore Layer", targetCount: 8 },
-      { title: "Practice 2 Grammar Lessons", module: "Bunpou Grammar", targetCount: 2 },
-      { title: "Complete 1 Kanji Canvas Writing", module: "Kakou Handwriting", targetCount: 1 },
-    ],
-    Normal: [
-      { title: "Review 30 SRS Flashcards", module: "Anki Review", targetCount: 30 },
-      { title: "Explore 5 New Vocabulary", module: "Explore Layer", targetCount: 5 },
-      { title: "Practice 1 Grammar Lesson", module: "Bunpou Grammar", targetCount: 1 },
-      { title: "Complete 1 Kanji Canvas Writing", module: "Kakou Handwriting", targetCount: 1 },
-    ],
-  };
-
-  const selectedMissions = missionsByMode[plannerMode] || missionsByMode.Normal;
-  const created = [];
-  for (const dm of selectedMissions) {
-    const record = await prisma.dailyMission.create({
-      data: {
-        userId,
-        date: todayStr,
-        title: dm.title,
-        module: dm.module,
-        targetCount: dm.targetCount,
-        currentCount: 0,
-        completed: false,
-      },
-    });
-    created.push({
-      id: record.id,
-      title: record.title,
-      module: record.module,
-      targetCount: record.targetCount,
-      currentCount: record.currentCount,
-      completed: record.completed,
+      currentCount: isCompleted ? 1 : 0,
+      completed: isCompleted,
     });
   }
 
-  return created;
+  return result;
 }
 
 export async function getLearningCalendarData(userId?: number) {

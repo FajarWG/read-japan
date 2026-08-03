@@ -7,10 +7,10 @@ import { BookOpen, Layers, Pencil, MessageSquare, Compass, Sparkles, Activity } 
 export const QuickActionGrid: React.FC = () => {
   const actions = [
     {
-      title: "Review Flashcards",
-      desc: "Anki SRS Spaced Repetition",
-      href: "/anki",
-      icon: Layers,
+      title: "Somatome Study",
+      desc: "Practice & Exercises",
+      href: "/somatome",
+      icon: BookOpen,
       color: "border-blue-200 dark:border-blue-500/30 text-blue-600 dark:text-blue-400",
     },
     {

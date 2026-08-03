@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/src/shared/lib/session";
 import { AnkiContent } from "@/src/modules/anki/components/AnkiContent";
@@ -12,5 +13,9 @@ export default async function AnkiPage() {
     redirect("/login");
   }
 
-  return <AnkiContent username={session.username} />;
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-xs text-muted">Loading Anki Flashcards...</div>}>
+      <AnkiContent username={session.username} />
+    </Suspense>
+  );
 }

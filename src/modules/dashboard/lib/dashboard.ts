@@ -97,7 +97,11 @@ export async function getDashboardSummary(): Promise<DashboardSummary | null> {
   const [streakDays, ankiDueCount, todayActivityCount] = await Promise.all([
     computeStreakDays(session.id),
     prisma.ankiProgress.count({
-      where: { userId: session.id, dueDate: { lte: new Date() } },
+      where: {
+        userId: session.id,
+        dueDate: { lte: new Date() },
+        NOT: { cardKey: { startsWith: "Bab " } },
+      },
     }),
     prisma.activityLog.count({
       where: { userId: session.id, createdAt: { gte: todayStart } },
@@ -153,7 +157,11 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     }),
     prisma.ankiProgress.count({ where: { userId: session.id } }),
     prisma.ankiProgress.count({
-      where: { userId: session.id, dueDate: { lte: now } },
+      where: {
+        userId: session.id,
+        dueDate: { lte: now },
+        NOT: { cardKey: { startsWith: "Bab " } },
+      },
     }),
     prisma.katsuyouReviewCard.count({ where: { userId: session.id } }),
     prisma.katsuyouReviewCard.count({
