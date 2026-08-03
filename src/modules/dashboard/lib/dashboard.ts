@@ -29,6 +29,7 @@ export interface ProgressStats {
   katsuyou: { cards: number; dueNow: number; lessonsCompleted: number };
   bunpou: { patternsCompleted: number };
   prep: { chaptersOpened: number };
+  somatome: { answered: number; correct: number };
   kakou: {
     sessionsCompleted: number;
     todaySeconds: number;
@@ -140,6 +141,7 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     prepLogs,
     kakouSessions,
     studyTime,
+    somatomeAgg,
   ] = await Promise.all([
     computeStreakDays(session.id),
     prisma.activityLog.count({
@@ -171,6 +173,10 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
       where: { userId: session.id, status: "COMPLETED" },
     }),
     getStudyTimerOverviewForUser(session.id),
+    prisma.somatomeAttempt.aggregate({
+      where: { userId: session.id },
+      _sum: { total: true, score: true },
+    }),
   ]);
 
   // 7-day activity chart
@@ -208,6 +214,7 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     },
     bunpou: { patternsCompleted: bunpouPatterns },
     prep: { chaptersOpened: chaptersOpened.size },
+    somatome: { answered: somatomeAgg._sum.total ?? 0, correct: somatomeAgg._sum.score ?? 0 },
     kakou: {
       sessionsCompleted: kakouSessions,
       todaySeconds: studyTime.stats.todaySeconds,

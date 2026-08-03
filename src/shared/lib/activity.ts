@@ -11,6 +11,7 @@ export type ActivityType =
   | "kotoba_review"
   | "prep_open"
   | "kakou_session"
+  | "somatome_answer"
   | "login";
 
 /**

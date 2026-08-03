@@ -41,21 +41,21 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       tl.fromTo(
         overlayRef.current,
         { opacity: 0, scale: 1.02 },
-        { opacity: 1, scale: 1, duration: 0.4, ease: "power2.inOut" }
+        { opacity: 1, scale: 1, duration: 0.2, ease: "power2.inOut" }
       )
       // 2. Text scales up with pulse
       .fromTo(
         textRef.current,
         { opacity: 0, y: 20, scale: 0.9 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.7)" },
-        "-=0.2"
+        { opacity: 1, y: 0, scale: 1, duration: 0.25, ease: "back.out(1.7)" },
+        "-=0.1"
       )
-      // 3. Hold for 1.8s (Total ~2.7s visible duration) and fade out curtain
+      // 3. Short hold and fade out curtain (~0.6s total visible duration)
       .to(overlayRef.current, {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.2,
         ease: "power2.out",
-        delay: 1.8,
+        delay: 0.15,
       });
     }
 
@@ -76,19 +76,19 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       <div
         ref={overlayRef}
         aria-hidden={!isTransitioning}
-        className={`fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-white pointer-events-none transition-opacity ${
+        className={`fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-foreground pointer-events-none transition-opacity ${
           isTransitioning ? "opacity-100" : "opacity-0 hidden"
         }`}
       >
         <div ref={textRef} className="flex flex-col items-center gap-4 text-center">
-          <div className="p-4 rounded-3xl bg-blue-500/10 border border-blue-500/20 text-blue-400 shadow-2xl shadow-blue-500/20 animate-pulse">
+          <div className="p-4 rounded-3xl bg-accent/10 border border-accent/20 text-accent shadow-2xl shadow-accent/20 animate-pulse">
             <Compass className="w-10 h-10 animate-spin" style={{ animationDuration: "3s" }} />
           </div>
           <div className="flex flex-col items-center gap-1">
-            <span className="text-xs font-bold uppercase tracking-widest text-blue-400">
+            <span className="text-xs font-bold uppercase tracking-widest text-accent">
               Navigating to...
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
               {targetTitle}
             </h2>
           </div>

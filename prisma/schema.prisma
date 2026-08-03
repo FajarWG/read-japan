@@ -79,6 +79,7 @@ model User {
   goals                    Goal[]
   missions                 DailyMission[]
   calendars                LearningCalendar[]
+  somatomeAttempts         SomatomeAttempt[]
 }
 
 // ─────────────────────────────────────────
@@ -710,6 +711,65 @@ model LearningCalendar {
 
   @@unique([userId, date])
   @@index([userId, date])
+}
+
+// ─────────────────────────────────────────
+// Tabel: SomatomeBook
+// Buku belajar mandiri (mis. Somatome N4) yang ditambahkan user sendiri
+// lewat link Google Drive (PDF) + opsional folder audio (CD).
+// ─────────────────────────────────────────
+model SomatomeBook {
+  id        Int      @id @default(autoincrement())
+  name      String
+  pdfUrl    String
+  audioUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  questions SomatomeQuestion[]
+  attempts  SomatomeAttempt[]
+}
+
+// ─────────────────────────────────────────
+// Tabel: SomatomeQuestion
+// Bank soal per Day suatu SomatomeBook. correctAnswer diisi sekali (saat
+// user submit sesi pertama untuk soal ini) lalu dipakai ulang untuk
+// validasi otomatis pada pengerjaan berikutnya.
+// ─────────────────────────────────────────
+model SomatomeQuestion {
+  id            Int          @id @default(autoincrement())
+  bookId        Int
+  book          SomatomeBook @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  day           Int          // Nomor Day di buku
+  mondai        String       // Label kelompok soal, e.g. "Mondai 1"
+  number        Int          // Nomor soal dalam mondai tsb
+  correctAnswer Int?         // Kunci jawaban 1-4
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([bookId, day, mondai, number])
+  @@index([bookId, day])
+}
+
+// ─────────────────────────────────────────
+// Tabel: SomatomeAttempt
+// Riwayat satu sesi pengerjaan (submit) soal Somatome per user, dengan
+// snapshot jawaban & hasil koreksi agar bisa ditelusuri kembali kapan pun.
+// ─────────────────────────────────────────
+model SomatomeAttempt {
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId    Int
+  book      SomatomeBook @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  day       Int
+  score     Int          // jumlah benar
+  total     Int          // jumlah soal dinilai
+  detail    Json         // Array of: { questionId, mondai, number, userAnswer, correctAnswer, isCorrect }
+  createdAt DateTime     @default(now())
+
+  @@index([userId, bookId, day])
+  @@index([userId, createdAt])
 }
 
 

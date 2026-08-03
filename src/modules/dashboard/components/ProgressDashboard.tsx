@@ -12,6 +12,7 @@ import {
   PencilLine,
   Clock3,
   Moon,
+  ClipboardCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -295,6 +296,15 @@ export function ProgressDashboard({ stats }: { stats: ProgressStats }) {
           secondary={formatStudyTime(stats.kakou.weekSeconds, false)}
           secondaryLabel="this week"
           href="/kakou"
+        />
+        <MetricCard
+          icon={ClipboardCheck}
+          title="Somatome"
+          primary={stats.somatome.answered}
+          primaryLabel="questions answered"
+          secondary={stats.somatome.correct}
+          secondaryLabel="correct"
+          href="/somatome"
         />
       </div>
     </div>
