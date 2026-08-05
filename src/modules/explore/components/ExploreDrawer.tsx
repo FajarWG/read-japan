@@ -54,7 +54,7 @@ export const ExploreDrawer: React.FC<ExploreDrawerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/70 backdrop-blur-md transition-opacity duration-200 animate-in fade-in">
+    <div className="fixed inset-0 z-[60] flex justify-end bg-slate-950/70 backdrop-blur-md transition-opacity duration-200 animate-in fade-in">
       {/* Click outside backdrop to close */}
       <div className="absolute inset-0" onClick={onClose} />
 
