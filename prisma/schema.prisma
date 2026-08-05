@@ -539,6 +539,9 @@ model KakouSession {
   progress        Int       @default(0)
   status          String    @default("ACTIVE") // "ACTIVE" | "COMPLETED" | "ABANDONED"
   difficulty      String?   // "EASY" | "OKAY" | "DIFFICULT"
+  score           Int?      // Score 0 - 100 from AI Review
+  feedbackJson    Json?     // Structured AI feedback response
+  userWriting     String?   // User typed text or notes
   startedAt       DateTime  @default(now())
   completedAt     DateTime?
   updatedAt       DateTime  @updatedAt

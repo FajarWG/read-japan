@@ -61,6 +61,22 @@ export interface KakouPrompt {
   reminder?: KakouReminder;
 }
 
+export interface KakouSentenceFeedback {
+  original: string;
+  corrected: string;
+  improved?: string;
+  meaning?: string;
+  explanation?: string;
+}
+
+export interface KakouFeedback {
+  score: number;
+  overallFeedback?: string;
+  sentences: KakouSentenceFeedback[];
+  errorPatterns?: string[];
+  reviewPoints?: string[];
+}
+
 export interface KakouSessionView {
   id: number;
   mode: KakouMode;
@@ -70,6 +86,9 @@ export interface KakouSessionView {
   progress: number;
   status: "ACTIVE" | "COMPLETED" | "ABANDONED";
   difficulty: KakouDifficulty | null;
+  score: number | null;
+  feedbackJson: KakouFeedback | null;
+  userWriting: string | null;
   startedAt: string;
   completedAt: string | null;
   actualSeconds: number;

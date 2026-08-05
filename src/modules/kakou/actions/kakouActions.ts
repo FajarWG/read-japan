@@ -41,6 +41,9 @@ type SessionRecord = {
   progress: number;
   status: string;
   difficulty: string | null;
+  score?: number | null;
+  feedbackJson?: unknown;
+  userWriting?: string | null;
   startedAt: Date;
   completedAt: Date | null;
   studyTimers?: Array<{
@@ -92,6 +95,15 @@ function readPromptIds(value: unknown): string[] {
     : [];
 }
 
+function readFeedbackJson(value: unknown) {
+  if (typeof value !== "object" || value === null) return null;
+  const candidate = value as Record<string, unknown>;
+  if (typeof candidate.score !== "number" || !Array.isArray(candidate.sentences)) {
+    return null;
+  }
+  return candidate as unknown as import("../data/types").KakouFeedback;
+}
+
 function toSessionView(record: SessionRecord): KakouSessionView {
   return {
     id: record.id,
@@ -108,6 +120,9 @@ function toSessionView(record: SessionRecord): KakouSessionView {
       record.difficulty && isDifficulty(record.difficulty)
         ? record.difficulty
         : null,
+    score: typeof record.score === "number" ? record.score : null,
+    feedbackJson: readFeedbackJson(record.feedbackJson),
+    userWriting: typeof record.userWriting === "string" ? record.userWriting : null,
     startedAt: record.startedAt.toISOString(),
     completedAt: record.completedAt?.toISOString() ?? null,
     actualSeconds: record.studyTimers?.reduce(
@@ -363,6 +378,33 @@ export async function abandonKakouSession(sessionId: number) {
   }
 
   await finishTimerForKakou(auth.id, sessionId);
+  revalidatePath("/kakou");
+  return { success: true as const, overview: await loadOverview(auth.id) };
+}
+
+export async function saveKakouAiFeedback(input: {
+  sessionId: number;
+  score: number;
+  feedbackJson: unknown;
+  userWriting?: string;
+}) {
+  const auth = await getSession();
+  if (!auth) return { success: false as const, error: "Unauthorized" };
+  if (!Number.isInteger(input.sessionId) || typeof input.score !== "number") {
+    return { success: false as const, error: "Invalid feedback data" };
+  }
+
+  const boundedScore = Math.max(0, Math.min(100, Math.round(input.score)));
+
+  await prisma.kakouSession.updateMany({
+    where: { id: input.sessionId, userId: auth.id },
+    data: {
+      score: boundedScore,
+      feedbackJson: input.feedbackJson as Prisma.InputJsonValue,
+      ...(input.userWriting ? { userWriting: input.userWriting } : {}),
+    },
+  });
+
   revalidatePath("/kakou");
   return { success: true as const, overview: await loadOverview(auth.id) };
 }
