@@ -1398,7 +1398,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 {/* KARTU FLASHCARD DENGAN ANIMASI MORPH */}
                 <div
                   className={[
-                    "relative w-full bg-surface border border-border rounded-2xl shadow-sm overflow-hidden transition-all duration-300",
+                    "relative w-full bg-surface border border-border rounded-2xl shadow-sm overflow-hidden transition-all duration-300 flex flex-col",
                     reviewDirection === "reverse" && isWritingActive && !flipped
                       ? "max-w-2xl h-auto min-h-64"
                       : deckType === "custom"
@@ -1413,7 +1413,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   {reviewDirection === "reverse" && isWritingActive && !flipped ? (
                     /* PANEL MENULIS KANJI (Hanya muncul jika mode menulis aktif & belum di-flip) */
                     <div
-                      className="w-full h-full flex flex-col justify-between p-5 select-none text-left"
+                      className="w-full flex-1 min-h-0 flex flex-col justify-between p-5 select-none text-left"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {/* Header */}
@@ -1506,7 +1506,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     </div>
                   ) : (
                     /* KARTU DENGAN ANIMASI MORPH */
-                    <div className="relative w-full h-full flex flex-col justify-between p-6 select-none">
+                    <div className="relative w-full flex-1 min-h-0 flex flex-col justify-between p-6 select-none">
                       {/* Badge / Status Indicator (Question/Answer) */}
                       <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full z-20 transition-all duration-300">
                         {flipped ? "Answer" : "Question"}
