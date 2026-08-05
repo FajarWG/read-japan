@@ -3204,5 +3204,2138 @@ export const BUNPOU_DATA: BunpouLesson[] = [
         ]
       }
     ]
+  },
+
+  {
+    "chapter": 16,
+    "titleEn": "Intentions & Purposes",
+    "titleId": "Keinginan, Niat & Tujuan",
+    "patterns": [
+      {
+        "id": "n-v-no-tame-ni",
+        "pattern": "N の / V辞書形 ために",
+        "jlpt": "N4",
+        "descEn": "Indicates purpose, intention, or sake ('in order to / for the sake of').",
+        "descId": "Menyatakan tujuan, niat, atau demi sesuatu ('demi / untuk').",
+        "examples": [
+          {
+            "exampleJp": "日本に留学するために、日本語を勉強しています。",
+            "exampleKana": "にほんにりゅうがくするために、にほんごをべんきょうしています。",
+            "exampleEn": "I am studying Japanese in order to study abroad in Japan.",
+            "exampleId": "Saya belajar bahasa Jepang untuk kuliah di Jepang."
+          },
+          {
+            "exampleJp": "家族のために、毎日一生懸命働きます。",
+            "exampleKana": "かぞくのために、まいにちいっしょうけんめいはたらきます。",
+            "exampleEn": "I work hard every day for the sake of my family.",
+            "exampleId": "Saya bekerja keras setiap hari demi keluarga."
+          },
+          {
+            "exampleJp": "新しい車を買うために、貯金しています。",
+            "exampleKana": "あたらしいくるまをかうために、ちょきんしています。",
+            "exampleEn": "I am saving money in order to buy a new car.",
+            "exampleId": "Saya menabung untuk membeli mobil baru."
+          }
+        ]
+      },
+      {
+        "id": "v-youni",
+        "pattern": "V辞書形 / Vない形 ように",
+        "jlpt": "N4",
+        "descEn": "Indicates a target state or goal ('so that / in order to').",
+        "descId": "Menyatakan kondisi sasaran atau harapan ('supaya / agar').",
+        "examples": [
+          {
+            "exampleJp": "風邪を引かないように、温かい服を着ます。",
+            "exampleKana": "かぜをひかないように、あたたかいふくをきます。",
+            "exampleEn": "I wear warm clothes so that I won't catch a cold.",
+            "exampleId": "Saya memakai baju hangat agar tidak kena flu."
+          },
+          {
+            "exampleJp": "試験に合格できるように、毎日復習します。",
+            "exampleKana": "しけんにごうかくできるように、まいにちふくしゅうします。",
+            "exampleEn": "I review every day so that I can pass the exam.",
+            "exampleId": "Saya mengulang pelajaran setiap hari supaya bisa lulus ujian."
+          },
+          {
+            "exampleJp": "忘れないように、ノートにメモしておきます。",
+            "exampleKana": "わすれないように、のーとにめもしておきます。",
+            "exampleEn": "I take notes in my notebook so I won't forget.",
+            "exampleId": "Saya mencatat di buku catatan agar tidak lupa."
+          }
+        ]
+      },
+      {
+        "id": "v-ikoukei-to-omou",
+        "pattern": "V意向形 と思う / と思っている",
+        "jlpt": "N4",
+        "descEn": "Expresses an intention to do something ('I think I will / I am planning to').",
+        "descId": "Menyatakan niat atau rencana pribadi ('berniat untuk / berencana').",
+        "examples": [
+          {
+            "exampleJp": "来年、日本へ旅行に行こうと思っています。",
+            "exampleKana": "らいねん、にほんへりょこうにいこうとおもっています。",
+            "exampleEn": "I am thinking of travelling to Japan next year.",
+            "exampleId": "Saya berniat untuk jalan-jalan ke Jepang tahun depan."
+          },
+          {
+            "exampleJp": "今週末は家でゆっくり休もうと思います。",
+            "exampleKana": "こんしゅうまつはいえでゆっくりやすもうとおもいます。",
+            "exampleEn": "I think I will rest at home this weekend.",
+            "exampleId": "Saya rasa saya akan istirahat santai di rumah akhir pekan ini."
+          },
+          {
+            "exampleJp": "会社をやめて、新しい仕事を始めようと思います。",
+            "exampleKana": "かいしゃをやめて、あたらしいしごとをはじめようとおもいます。",
+            "exampleEn": "I think I will quit the company and start a new job.",
+            "exampleId": "Saya berniat resign dan memulai pekerjaan baru."
+          }
+        ]
+      },
+      {
+        "id": "v-tsumori-desu",
+        "pattern": "V辞書形 / Vない形 つもりです",
+        "jlpt": "N4",
+        "descEn": "Expresses a definite plan or determination ('plan to / intend to').",
+        "descId": "Menyatakan rencana atau niat yang sudah pasti ('berencana untuk / bermaksud').",
+        "examples": [
+          {
+            "exampleJp": "大学を卒業したら、IT企業で働くつもりです。",
+            "exampleKana": "だいがくをそつぎょうしたら、あいてぃーきぎょうではたらくつもりです。",
+            "exampleEn": "After graduating from university, I plan to work at an IT company.",
+            "exampleId": "Setelah lulus kuliah, saya berencana bekerja di perusahaan IT."
+          },
+          {
+            "exampleJp": "今日はお酒を飲まないつもりです。",
+            "exampleKana": "きょうはおさけをのまないつもりです。",
+            "exampleEn": "I intend not to drink alcohol today.",
+            "exampleId": "Hari ini saya berniat untuk tidak minum alkohol."
+          },
+          {
+            "exampleJp": "夏休みに国へ帰るつもりです。",
+            "exampleKana": "なつやすみにくにへかえるつもりです。",
+            "exampleEn": "I plan to return to my home country during summer vacation.",
+            "exampleId": "Saya berencana pulang kampung saat libur musim panas."
+          }
+        ]
+      },
+      {
+        "id": "v-yotei-desu",
+        "pattern": "V辞書形 / N の 予定です",
+        "jlpt": "N4",
+        "descEn": "Indicates a scheduled event or arrangement ('is scheduled to').",
+        "descId": "Menyatakan agenda atau jadwal resmi ('dijadwalkan untuk').",
+        "examples": [
+          {
+            "exampleJp": "新幹線は午前10時に出発する予定です。",
+            "exampleKana": "しんかんせんはごぜんじゅうじにしゅっぱつするよていです。",
+            "exampleEn": "The Shinkansen is scheduled to depart at 10:00 AM.",
+            "exampleId": "Shinkansen dijadwalkan berangkat jam 10 pagi."
+          },
+          {
+            "exampleJp": "明日は会議の予定です。",
+            "exampleKana": "あしたはかいぎのよていです。",
+            "exampleEn": "A meeting is scheduled for tomorrow.",
+            "exampleId": "Besok ada agenda rapat."
+          },
+          {
+            "exampleJp": "社長は来週アメリカへ出張する予定です。",
+            "exampleKana": "しゃちょうはらいしゅうあめりかへしゅっちょうするよていです。",
+            "exampleEn": "The president is scheduled to go on a business trip to America next week.",
+            "exampleId": "Direktur dijadwalkan dinas ke Amerika minggu depan."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 17,
+    "titleEn": "Changes & Conjecture",
+    "titleId": "Perubahan Keadaan, Kemungkinan & Kesimpulan",
+    "patterns": [
+      {
+        "id": "v-youni-narimasu",
+        "pattern": "V可能形 / V辞書形 ように なります",
+        "jlpt": "N4",
+        "descEn": "Indicates a change in state or ability ('come to be able to / start doing').",
+        "descId": "Menyatakan perubahan kemampuan atau kebiasaan ('menjadi bisa / mulai...').",
+        "examples": [
+          {
+            "exampleJp": "日本語で日常会話ができるようになりました。",
+            "exampleKana": "にほんごでにちじょうかいわができるようになりました。",
+            "exampleEn": "I have become able to hold daily conversations in Japanese.",
+            "exampleId": "Saya sudah menjadi bisa percakapan sehari-hari dalam bahasa Jepang."
+          },
+          {
+            "exampleJp": "毎日練習して、ピアノが弾けるようになりました。",
+            "exampleKana": "まいにちれんしゅうして、ぴあのがひけるようになりました。",
+            "exampleEn": "By practicing every day, I became able to play the piano.",
+            "exampleId": "Dengan latihan tiap hari, saya jadi bisa main piano."
+          },
+          {
+            "exampleJp": "最近、野菜を食べるようになりました。",
+            "exampleKana": "さいきん、やさいをたべるようになりました。",
+            "exampleEn": "Recently, I have started eating vegetables.",
+            "exampleId": "Akhir-akhir ini saya mulai terbiasa makan sayur."
+          }
+        ]
+      },
+      {
+        "id": "v-youni-shimasu",
+        "pattern": "V辞書形 / Vない形 ように します",
+        "jlpt": "N4",
+        "descEn": "Indicates making an effort to form a habit ('try to / make sure to').",
+        "descId": "Menyatakan usaha atau upaya terus-menerus ('berusaha untuk / mengusahakan').",
+        "examples": [
+          {
+            "exampleJp": "健康のために、毎日運動するようにしています。",
+            "exampleKana": "けんこうのために、まいにちうんどうするようにしています。",
+            "exampleEn": "For my health, I make sure to exercise every day.",
+            "exampleId": "Demi kesehatan, saya mengusahakan olahraga setiap hari."
+          },
+          {
+            "exampleJp": "夜遅くファーストフードを食べないようにします。",
+            "exampleKana": "よるおそくふぁーすとふーどをたべないようにします。",
+            "exampleEn": "I will try not to eat fast food late at night.",
+            "exampleId": "Saya akan berusaha tidak makan fast food larut malam."
+          },
+          {
+            "exampleJp": "寝る前にスマホを見ないようにしてください。",
+            "exampleKana": "ねるまえにすまほをみないようにしてください。",
+            "exampleEn": "Please make sure not to look at your smartphone before sleeping.",
+            "exampleId": "Tolong usahakan jangan melihat HP sebelum tidur."
+          }
+        ]
+      },
+      {
+        "id": "toori-ni",
+        "pattern": "普通形 とおりに / N の とおりに",
+        "jlpt": "N4",
+        "descEn": "Indicates doing something exactly as shown or instructed ('just as / according to').",
+        "descId": "Melakukan sesuatu sesuai atau sama persis dengan yang diajarkan/ditunjukkan.",
+        "examples": [
+          {
+            "exampleJp": "先生が言ったとおりに書いてください。",
+            "exampleKana": "せんせいがいったとおりにかいてください。",
+            "exampleEn": "Please write exactly as the teacher said.",
+            "exampleId": "Tolong tulis sesuai seperti yang dikatakan guru."
+          },
+          {
+            "exampleJp": "説明書のとおりに組み立てました。",
+            "exampleKana": "せつめいしょのとおりにくみたてました。",
+            "exampleEn": "I assembled it according to the instruction manual.",
+            "exampleId": "Saya merakitnya sesuai petunjuk manual."
+          },
+          {
+            "exampleJp": "私がやるのとおりに真似してください。",
+            "exampleKana": "わたしがやるのとおりにまねしてください。",
+            "exampleEn": "Please imitate just as I do.",
+            "exampleId": "Tolong tirukan persis seperti yang saya lakukan."
+          }
+        ]
+      },
+      {
+        "id": "hazusu-desu",
+        "pattern": "普通形 はずです / はずがない",
+        "jlpt": "N4",
+        "descEn": "Expresses an expectation based on knowledge or logic ('should be / ought to be').",
+        "descId": "Menyatakan dugaan berlandaskan logika/bukti ('seharusnya / tidak mungkin').",
+        "examples": [
+          {
+            "exampleJp": "彼は昨日しっかり勉強したから、テストに合格するはずです。",
+            "exampleKana": "かれはきのうしっかりべんきょうしたから、てすとにごうかくするはずです。",
+            "exampleEn": "Since he studied hard yesterday, he should pass the test.",
+            "exampleId": "Karena dia kemarin belajar keras, dia seharusnya lulus tes."
+          },
+          {
+            "exampleJp": "鍵はポケットにあるはずですが、見つかりません。",
+            "exampleKana": "かぎはぽけっとにあるはずですが、みつかりません。",
+            "exampleEn": "The key should be in my pocket, but I can't find it.",
+            "exampleId": "Kunci seharusnya ada di kantong, tapi tidak ketemu."
+          },
+          {
+            "exampleJp": "真面目な田中さんが嘘をつくはずがありません。",
+            "exampleKana": "まじめなたなかさんがうそをつくはずがありません。",
+            "exampleEn": "There is no way that serious Mr. Tanaka would lie.",
+            "exampleId": "Pak Tanaka yang serius tidak mungkin berbohong."
+          }
+        ]
+      },
+      {
+        "id": "kamo-shiremasen",
+        "pattern": "普通形 かも しれません",
+        "jlpt": "N4",
+        "descEn": "Indicates possibility ('might / may / perhaps').",
+        "descId": "Menyatakan kemungkinan yang belum pasti ('mungkin / bisa jadi').",
+        "examples": [
+          {
+            "exampleJp": "午後から雨が降るかもしれません。",
+            "exampleKana": "ごごからあめがふるかもしれません。",
+            "exampleEn": "It might rain in the afternoon.",
+            "exampleId": "Bisa jadi sore nanti turun hujan."
+          },
+          {
+            "exampleJp": "彼は道を間違えたかもしれません。",
+            "exampleKana": "かれはみちをまちがえたかもしれません。",
+            "exampleEn": "He might have taken the wrong road.",
+            "exampleId": "Dia mungkin salah jalan."
+          },
+          {
+            "exampleJp": "明日、時間に間に合わないかもしれません。",
+            "exampleKana": "あした、じかんにまにあわないかもしれません。",
+            "exampleEn": "I might not make it on time tomorrow.",
+            "exampleId": "Besok saya mungkin tidak tepat waktu."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 18,
+    "titleEn": "Causative, Passive & Benefactives",
+    "titleId": "Kausatif, Pasif & Hubungan Bantuan",
+    "patterns": [
+      {
+        "id": "v-ukemi",
+        "pattern": "V受身 (～られる / ～される)",
+        "jlpt": "N4",
+        "descEn": "Expresses passive voice ('is done by someone').",
+        "descId": "Bentuk pasif (dikenai tindakan oleh orang lain).",
+        "examples": [
+          {
+            "exampleJp": "私は先生にほめられました。",
+            "exampleKana": "わたしはせんせいにほめられました。",
+            "exampleEn": "I was praised by the teacher.",
+            "exampleId": "Saya dipuji oleh guru."
+          },
+          {
+            "exampleJp": "泥棒に財布を盗まれました。",
+            "exampleKana": "どろぼうにさいふをぬすまれました。",
+            "exampleEn": "My wallet was stolen by a thief.",
+            "exampleId": "Dompet saya dicuri oleh pencuri."
+          },
+          {
+            "exampleJp": "この本は世界中で読まれています。",
+            "exampleKana": "このほんはせかいじゅうでよまれています。",
+            "exampleEn": "This book is read all over the world.",
+            "exampleId": "Buku ini dibaca di seluruh dunia."
+          }
+        ]
+      },
+      {
+        "id": "v-shieki",
+        "pattern": "V使役 (～させる)",
+        "jlpt": "N4",
+        "descEn": "Expresses causative voice ('make someone do / let someone do').",
+        "descId": "Bentuk kausatif (menyuruh atau membiarkan seseorang melakukan).",
+        "examples": [
+          {
+            "exampleJp": "お母さんは子どもに部屋を掃除させました。",
+            "exampleKana": "おかあさんはこどもにへやをそうじさせました。",
+            "exampleEn": "The mother made the child clean the room.",
+            "exampleId": "Ibu menyuruh anaknya membersihkan kamar."
+          },
+          {
+            "exampleJp": "先生は学生に作文を書かせます。",
+            "exampleKana": "せんせいはがくせいにさくぶんをかかせます。",
+            "exampleEn": "The teacher makes the students write essays.",
+            "exampleId": "Guru menyuruh siswa menulis karangan."
+          },
+          {
+            "exampleJp": "部下を早く帰らせてあげました。",
+            "exampleKana": "ぶかをはやくかえらせてあげました。",
+            "exampleEn": "I let my subordinate go home early.",
+            "exampleId": "Saya membiarkan bawahan pulang lebih awal."
+          }
+        ]
+      },
+      {
+        "id": "v-shieki-ukemi",
+        "pattern": "V使役受身 (～させられる)",
+        "jlpt": "N4",
+        "descEn": "Expresses causative-passive voice ('be forced / coerced into doing something').",
+        "descId": "Bentuk kausatif-pasif (dipaksa melakukan sesuatu oleh orang lain).",
+        "examples": [
+          {
+            "exampleJp": "嫌な仕事をさせられました。",
+            "exampleKana": "いやなしごとをさせられました。",
+            "exampleEn": "I was forced to do an unpleasant job.",
+            "exampleId": "Saya dipaksa melakukan pekerjaan yang tidak saya sukai."
+          },
+          {
+            "exampleJp": "子供の頃、毎日ピアノを練習させられました。",
+            "exampleKana": "こどものころ、まいにちぴあのをれんしゅうさせられました。",
+            "exampleEn": "When I was a child, I was forced to practice the piano every day.",
+            "exampleId": "Sewaktu kecil, saya dipaksa latihan piano tiap hari."
+          },
+          {
+            "exampleJp": "雨の中、1時間も待たされました。",
+            "exampleKana": "あめのなか、いちじかんもまたされました。",
+            "exampleEn": "I was made to wait for an hour in the rain.",
+            "exampleId": "Saya dipaksa menunggu 1 jam di tengah hujan."
+          }
+        ]
+      },
+      {
+        "id": "v-te-agemasu-moraimasu-kuremasu",
+        "pattern": "Vて あげます / もらいます / くれます",
+        "jlpt": "N4",
+        "descEn": "Indicates doing an action for someone or receiving a favor of action.",
+        "descId": "Menyatakan memberi bantuan aksi atau menerima kebaikan dari aksi orang lain.",
+        "examples": [
+          {
+            "exampleJp": "友達に日本語を教えてあげました。",
+            "exampleKana": "ともだちににほんごをおしえてあげました。",
+            "exampleEn": "I taught Japanese to my friend.",
+            "exampleId": "Saya mengajarkan bahasa Jepang kepada teman."
+          },
+          {
+            "exampleJp": "田中さんに荷物を持ってもらいました。",
+            "exampleKana": "たなかさんににもつをもってもらいました。",
+            "exampleEn": "I had Mr. Tanaka carry my luggage.",
+            "exampleId": "Saya dibantu Pak Tanaka dibawakan barangnya."
+          },
+          {
+            "exampleJp": "先輩が美味しい料理を奢ってくれました。",
+            "exampleKana": "せんぱいがおいしいりょうりをおごってくれました。",
+            "exampleEn": "My senior treated me to delicious food.",
+            "exampleId": "Senior meraktir saya makanan enak."
+          }
+        ]
+      },
+      {
+        "id": "v-te-itadakemasenka",
+        "pattern": "Vて いただけませんか / くれませんか",
+        "jlpt": "N4",
+        "descEn": "Polite request asking if someone could do a favor ('could you please...?').",
+        "descId": "Permohonan sopan meminta seseorang melakukan sesuatu ('bisakah Anda tolong...?').",
+        "examples": [
+          {
+            "exampleJp": "この漢字の読み方を教えていただけませんか。",
+            "exampleKana": "このかんじのよみかたをおしえていただけませんか。",
+            "exampleEn": "Could you please teach me how to read this kanji?",
+            "exampleId": "Bolehkah Anda tolong ajarkan cara membaca kanji ini?"
+          },
+          {
+            "exampleJp": "写真を撮っていただけませんか。",
+            "exampleKana": "しゃしんをとっていただけませんか。",
+            "exampleEn": "Could you please take a photo for me?",
+            "exampleId": "Bisakah Anda tolong ambilkan foto?"
+          },
+          {
+            "exampleJp": "もう少しゆっくり話してくれませんか。",
+            "exampleKana": "もうすこしゆっくりはなしてくれませんか。",
+            "exampleEn": "Could you please speak a little more slowly?",
+            "exampleId": "Bisakah kamu bicara sedikit lebih pelan?"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 19,
+    "titleEn": "Conditionals & Conjectures",
+    "titleId": "Pengandaian, Syarat & Conjectures",
+    "patterns": [
+      {
+        "id": "v-ba-conditional",
+        "pattern": "Vば / Aければ / N・Aなら",
+        "jlpt": "N4",
+        "descEn": "Conditional form expressing a hypothetical condition ('if').",
+        "descId": "Bentuk pengandaian Ba untuk syarat hipotesis ('jika / kalau').",
+        "examples": [
+          {
+            "exampleJp": "安ければ、買いましょう。",
+            "exampleKana": "やすければ、かいましょう。",
+            "exampleEn": "If it is cheap, let me buy it.",
+            "exampleId": "Jika murah, mari kita beli."
+          },
+          {
+            "exampleJp": "時間があれば、一緒に行きましょう。",
+            "exampleKana": "じかんがあれば、いっしょにいきましょう。",
+            "exampleEn": "If you have time, let's go together.",
+            "exampleId": "Jika ada waktu, ayo pergi bareng."
+          },
+          {
+            "exampleJp": "明日雨が降らなければ、ハイキングに行きます。",
+            "exampleKana": "あしたあめがふらなければ、はいきんぐにいきます。",
+            "exampleEn": "If it doesn't rain tomorrow, I will go hiking.",
+            "exampleId": "Jika besok tidak hujan, saya akan pergi hiking."
+          }
+        ]
+      },
+      {
+        "id": "n-v-nara",
+        "pattern": "普通形 なら",
+        "jlpt": "N4",
+        "descEn": "Indicates a topic-based conditional ('if it is the case that / as for').",
+        "descId": "Pengandaian berdasarkan konteks ucapan orang lain ('kalau soal / jika memang').",
+        "examples": [
+          {
+            "exampleJp": "京都へ行くなら、秋が一番おすすめですよ。",
+            "exampleKana": "きょうとへいくなら、あきがいちばんおすすめですよ。",
+            "exampleEn": "If you are going to Kyoto, autumn is most recommended.",
+            "exampleId": "Kalau mau pergi ke Kyoto, musim gugur paling direkomendasikan."
+          },
+          {
+            "exampleJp": "カメラを買うなら、あの店がいいです。",
+            "exampleKana": "かめらをかうなら、あのみせがいいです。",
+            "exampleEn": "If you are buying a camera, that shop is good.",
+            "exampleId": "Kalau mau beli kamera, toko itu bagus."
+          },
+          {
+            "exampleJp": "日本語の辞書なら、これが便利ですよ。",
+            "exampleKana": "にほんごのじしょなら、これがべんりですよ。",
+            "exampleEn": "If it's a Japanese dictionary, this one is convenient.",
+            "exampleId": "Kalau kamus bahasa Jepang, yang ini praktis."
+          }
+        ]
+      },
+      {
+        "id": "v-temo-demo",
+        "pattern": "Vて も / Aくても / N・Aでも",
+        "jlpt": "N4",
+        "descEn": "Expresses a concessive condition ('even if / even though').",
+        "descId": "Pengandaian pertentangan ('meskipun / walaupun').",
+        "examples": [
+          {
+            "exampleJp": "雨が降っても、試合は行われます。",
+            "exampleKana": "あめがふっても、しあいはおこなわれます。",
+            "exampleEn": "Even if it rains, the match will be held.",
+            "exampleId": "Meskipun hujan, pertandingan tetap dilaksanakan."
+          },
+          {
+            "exampleJp": "高くても、品質が良いものを買いたいです。",
+            "exampleKana": "たかくても、ひんしつがよいものをかいたいです。",
+            "exampleEn": "Even if it is expensive, I want to buy good quality items.",
+            "exampleId": "Meskipun mahal, saya ingin beli barang berkualiatas."
+          },
+          {
+            "exampleJp": "いくら大変でも、途中で諦めません。",
+            "exampleKana": "いくらたいへんでも、とちゅうであきらめません。",
+            "exampleEn": "No matter how tough it is, I won't give up halfway.",
+            "exampleId": "Seberat apapun itu, saya tidak akan menyerah di tengah jalan."
+          }
+        ]
+      },
+      {
+        "id": "v-so-desu",
+        "pattern": "Vstem / A stem そうです",
+        "jlpt": "N4",
+        "descEn": "Indicates visual conjecture ('looks like / seems about to').",
+        "descId": "Dugaan berdasarkan penampilan penglihatan ('kelihatannya / tampaknya').",
+        "examples": [
+          {
+            "exampleJp": "空が暗くなってきたから、今にも雨が降りそうです。",
+            "exampleKana": "そらがくらくなってきたから、いまにもあめがふりそうです。",
+            "exampleEn": "The sky has turned dark, so it looks like it's about to rain any minute.",
+            "exampleId": "Langit mulai gelap, sepertinya akan segera turun hujan."
+          },
+          {
+            "exampleJp": "このケーキはとても美味しそうです。",
+            "exampleKana": "このけーきはとてもおいしそうです。",
+            "exampleEn": "This cake looks very delicious.",
+            "exampleId": "Kue ini kelihatannya sangat lezat."
+          },
+          {
+            "exampleJp": "荷物が重そうですね。手伝いましょうか。",
+            "exampleKana": "にもつがおもそうですね。てつだいましょうか。",
+            "exampleEn": "Your luggage looks heavy. Shall I help you?",
+            "exampleId": "Barang bapak kelihatannya berat ya. Boleh saya bantu?"
+          }
+        ]
+      },
+      {
+        "id": "v-rashii-desu",
+        "pattern": "普通形 らしいです",
+        "jlpt": "N4",
+        "descEn": "Indicates hearsay or conjecture based on reliable information ('it seems that / word is that').",
+        "descId": "Sepertinya / kabar beritanya (berdasarkan bukti atau kabar tepercaya).",
+        "examples": [
+          {
+            "exampleJp": "噂によると、あの二人は来年結婚するらしいです。",
+            "exampleKana": "うわさによると、あのふたりはらいねんけっこんするらしいです。",
+            "exampleEn": "According to rumor, it seems those two are getting married next year.",
+            "exampleId": "Menurut rumor, sepertinya mereka berdua akan menikah tahun depan."
+          },
+          {
+            "exampleJp": "明日は大雨になるらしいです。",
+            "exampleKana": "あしたはおおあめになるらしいです。",
+            "exampleEn": "It seems it will rain heavily tomorrow.",
+            "exampleId": "Katanya besok akan turun hujan deras."
+          },
+          {
+            "exampleJp": "田中さんは風邪で休んでいるらしいです。",
+            "exampleKana": "たなかさんはかぜでやすんでいるらしいです。",
+            "exampleEn": "It seems Tanaka-san is absent due to a cold.",
+            "exampleId": "Sepertinya Pak Tanaka absen karena flu."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 20,
+    "titleEn": "Sequential Time Events",
+    "titleId": "Transisi & Hubungan Waktu",
+    "patterns": [
+      {
+        "id": "v-te-kara-v-ta-ato-de",
+        "pattern": "Vてから / Vた あとで",
+        "jlpt": "N4",
+        "descEn": "Indicates action sequence ('after doing V').",
+        "descId": "Menunjukkan urutan tindakan ('setelah melakukan V').",
+        "examples": [
+          {
+            "exampleJp": "手を洗ってから、ご飯を食べます。",
+            "exampleKana": "てをあらってから、ごはんをたべます。",
+            "exampleEn": "After washing my hands, I eat meals.",
+            "exampleId": "Setelah mencuci tangan, saya makan nasi."
+          },
+          {
+            "exampleJp": "仕事が終わったあとで、飲みに行きませんか。",
+            "exampleKana": "しごとがおわったあとで、のみにいきませんか。",
+            "exampleEn": "After work finishes, would you like to go drinking?",
+            "exampleId": "Setelah kerjaan selesai, bagaimana kalau kita minum?"
+          },
+          {
+            "exampleJp": "薬を飲んだあとで、ゆっくり休んでください。",
+            "exampleKana": "くすりをのんだあとで、ゆっくりやすんでください。",
+            "exampleEn": "After taking the medicine, please rest well.",
+            "exampleId": "Setelah minum obat, tolong istirahat dengan tenang."
+          }
+        ]
+      },
+      {
+        "id": "v-toki-n4",
+        "pattern": "V辞書形 とき / Vた とき",
+        "jlpt": "N4",
+        "descEn": "Indicates timing of action depending on completed or incomplete status.",
+        "descId": "Menyatakan momen waktu sebelum (V辞書形) atau sesudah (Vた) aksi.",
+        "examples": [
+          {
+            "exampleJp": "家を出るとき、「いってきます」と言います。",
+            "exampleKana": "いえをでるとき、「いってきます」といいます。",
+            "exampleEn": "When leaving home, I say 'Ittekimasu'.",
+            "exampleId": "Saat akan keluar rumah, saya mengucapkan 'Ittekimasu'."
+          },
+          {
+            "exampleJp": "日本に着いたとき、友達に電話しました。",
+            "exampleKana": "にほんについたとき、ともだちにでんわしました。",
+            "exampleEn": "When I arrived in Japan, I called my friend.",
+            "exampleId": "Ketika sudah sampai di Jepang, saya menelepon teman."
+          },
+          {
+            "exampleJp": "困ったときは、いつでも連絡してください。",
+            "exampleKana": "こまったときは、いつでもれんらくしてください。",
+            "exampleEn": "When you are in trouble, please contact me anytime.",
+            "exampleId": "Saat sedang kesulitan, silakan hubungi saya kapan saja."
+          }
+        ]
+      },
+      {
+        "id": "v-nagara",
+        "pattern": "Vstem ながら",
+        "jlpt": "N4",
+        "descEn": "Indicates two actions taking place simultaneously by the same subject.",
+        "descId": "Melakukan dua pekerjaan secara bersamaan ('sambil').",
+        "examples": [
+          {
+            "exampleJp": "音楽を聞きながら、勉強します。",
+            "exampleKana": "おんがくをききながら、べんきょうします。",
+            "exampleEn": "I study while listening to music.",
+            "exampleId": "Saya belajar sambil mendengarkan musik."
+          },
+          {
+            "exampleJp": "歩きながら、スマホを見るのは危険です。",
+            "exampleKana": "あるきながら、すまほをみるのはきけんです。",
+            "exampleEn": "Looking at your phone while walking is dangerous.",
+            "exampleId": "Melihat HP sambil berjalan itu berbahaya."
+          },
+          {
+            "exampleJp": "コーヒーを飲みながら、友達とおしゃべりしました。",
+            "exampleKana": "こーひーをのみながら、ともだちとおしゃべりしました。",
+            "exampleEn": "I chatted with my friend while drinking coffee.",
+            "exampleId": "Saya mengobrol dengan teman sambil minum kopi."
+          }
+        ]
+      },
+      {
+        "id": "v-tsuzukemasu",
+        "pattern": "Vstem つづけます",
+        "jlpt": "N4",
+        "descEn": "Indicates continuation of an action ('continue doing').",
+        "descId": "Melanjutkan aksi secara terus menerus ('terus melakukan').",
+        "examples": [
+          {
+            "exampleJp": "雨が降り続いています。",
+            "exampleKana": "あめがふりつづけています。",
+            "exampleEn": "The rain continues to fall.",
+            "exampleId": "Hujan terus menerus turun."
+          },
+          {
+            "exampleJp": "諦めないで、走り続けてください。",
+            "exampleKana": "あきらめないで、はしりつづけてください。",
+            "exampleEn": "Don't give up, keep running.",
+            "exampleId": "Jangan menyerah, teruslah berlari."
+          },
+          {
+            "exampleJp": "彼は10年間、日本語を勉強し続けています。",
+            "exampleKana": "かれはじゅうねんかん、にほんごをべんきょうしつづけています。",
+            "exampleEn": "He has continued studying Japanese for 10 years.",
+            "exampleId": "Dia terus belajar bahasa Jepang selama 10 tahun."
+          }
+        ]
+      },
+      {
+        "id": "v-owarimasu-hajimemasu",
+        "pattern": "Vstem おわります / はじめます",
+        "jlpt": "N4",
+        "descEn": "Indicates the start or completion of an action ('finish doing / start doing').",
+        "descId": "Selesai atau mulai melakukan suatu aktivitas.",
+        "examples": [
+          {
+            "exampleJp": "この本を読み終わったら、貸してください。",
+            "exampleKana": "このほんをよみおわったら、かしてください。",
+            "exampleEn": "When you finish reading this book, please lend it to me.",
+            "exampleId": "Jika sudah selesai membaca buku ini, tolong pinjamkan ke saya."
+          },
+          {
+            "exampleJp": "赤ちゃんが急に泣き始めました。",
+            "exampleKana": "あかちゃんがきゅうになきはじめました。",
+            "exampleEn": "The baby suddenly started crying.",
+            "exampleId": "Bayi itu mendadak mulai menangis."
+          },
+          {
+            "exampleJp": "全員が書き終わるまで待ってください。",
+            "exampleKana": "ぜんいんがかきおわるまでまってください。",
+            "exampleEn": "Please wait until everyone finishes writing.",
+            "exampleId": "Tolong tunggu sampai semuanya selesai menulis."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 21,
+    "titleEn": "Appearances & Degree",
+    "titleId": "Dugaan Visual, Tingkat Kemudahan & Berlebihan",
+    "patterns": [
+      {
+        "id": "v-mitai-desu",
+        "pattern": "普通形 みたいです",
+        "jlpt": "N4",
+        "descEn": "Expresses similitude or informal conjecture based on appearance ('looks like / resembles').",
+        "descId": "Menyatakan kemiripan atau dugaan informal ('seperti / mirip').",
+        "examples": [
+          {
+            "exampleJp": "あの雲はまるで泳いでいる魚みたいです。",
+            "exampleKana": "あのくもはまるでおよいでいるさかなみたいです。",
+            "exampleEn": "That cloud looks just like a swimming fish.",
+            "exampleId": "Awan itu tampak persis seperti ikan yang berenang."
+          },
+          {
+            "exampleJp": "彼はまるで日本人のように日本語がペラペラです。",
+            "exampleKana": "かれはまるでにほんじんのようににほんごがぺらぺらです。",
+            "exampleEn": "He speaks Japanese fluently just like a native Japanese person.",
+            "exampleId": "Dia fasih bahasa Jepang seperti orang Jepang asli."
+          },
+          {
+            "exampleJp": "隣の部屋でパーティーをやっているみたいです。",
+            "exampleKana": "となりのへやでぱーてぃーをやっているみたいです。",
+            "exampleEn": "It looks like they are having a party in the next room.",
+            "exampleId": "Sepertinya kamar sebelah lagi pesta."
+          }
+        ]
+      },
+      {
+        "id": "v-yasui-nikui",
+        "pattern": "Vstem やすい / にくい",
+        "jlpt": "N4",
+        "descEn": "Indicates ease or difficulty of performing an action ('easy to / hard to').",
+        "descId": "Tingkat kemudahan atau kesulitan melakukan sesuatu ('mudah / sulit').",
+        "examples": [
+          {
+            "exampleJp": "このペンは軽くてとても書きやすいです。",
+            "exampleKana": "このぺんはかるくてとてもかきやすいです。",
+            "exampleEn": "This pen is light and very easy to write with.",
+            "exampleId": "Pulpen ini ringan dan sangat mudah dipakai menulis."
+          },
+          {
+            "exampleJp": "彼の説明は分かりにくいです。",
+            "exampleKana": "かれのせつめいはわかりにくいです。",
+            "exampleEn": "His explanation is difficult to understand.",
+            "exampleId": "Penjelasannya sulit dipahami."
+          },
+          {
+            "exampleJp": "この靴は滑りにくくて安全です。",
+            "exampleKana": "このくつはすべりにくくてあんぜんです。",
+            "exampleEn": "These shoes are slip-resistant and safe.",
+            "exampleId": "Sepatu ini tidak mudah licin dan aman."
+          }
+        ]
+      },
+      {
+        "id": "v-sugimasu",
+        "pattern": "Vstem / A stem すぎます",
+        "jlpt": "N4",
+        "descEn": "Indicates excessiveness or going beyond limits ('too much / overly').",
+        "descId": "Menyatakan tindakan atau kondisi yang berlebihan ('terlalu').",
+        "examples": [
+          {
+            "exampleJp": "昨夜、お酒を飲みすぎました。",
+            "exampleKana": "さくや、おさけをのみすぎました。",
+            "exampleEn": "I drank too much alcohol last night.",
+            "exampleId": "Semalam saya terlalu banyak minum alkohol."
+          },
+          {
+            "exampleJp": "この部屋は狭すぎますから、引っ越したいです。",
+            "exampleKana": "このへやはせますぎますから、ひっこしたいです。",
+            "exampleEn": "This room is too small, so I want to move out.",
+            "exampleId": "Kamar ini terlalu sempit, jadi saya ingin pindah."
+          },
+          {
+            "exampleJp": "冗談を言いすぎて、彼を怒らせてしまいました。",
+            "exampleKana": "じょうだんをいいすぎて、かれをおこらせてしまいました。",
+            "exampleEn": "I made too many jokes and made him angry.",
+            "exampleId": "Saya terlalu banyak bercanda sampai membuat dia marah."
+          }
+        ]
+      },
+      {
+        "id": "v-soni-nai",
+        "pattern": "Vstem そうにない",
+        "jlpt": "N4",
+        "descEn": "Indicates that something seems unlikely to happen ('does not look like it will').",
+        "descId": "Tampaknya tidak akan terjadi (berdasarkan pengamatan saat ini).",
+        "examples": [
+          {
+            "exampleJp": "雨は当分やみそうにありません。",
+            "exampleKana": "あめはとうぶんやみそうにありません。",
+            "exampleEn": "The rain doesn't look like it will stop anytime soon.",
+            "exampleId": "Hujan kelihatannya tidak akan reda dalam waktu dekat."
+          },
+          {
+            "exampleJp": "今日の仕事は時間内に終わりそうにないです。",
+            "exampleKana": "きょうのしごとはじかん内におわりそうにないです。",
+            "exampleEn": "Today's work doesn't seem like it will finish on time.",
+            "exampleId": "Pekerjaan hari ini sepertinya tidak akan kelar tepat waktu."
+          },
+          {
+            "exampleJp": "彼が約束を守りそうにないです。",
+            "exampleKana": "かれがやくそくをまもりそうにないです。",
+            "exampleEn": "It doesn't seem like he will keep his promise.",
+            "exampleId": "Dia kelihatannya tidak akan menepati janji."
+          }
+        ]
+      },
+      {
+        "id": "v-zurai",
+        "pattern": "Vstem づらい",
+        "jlpt": "N4",
+        "descEn": "Indicates emotional or physical hardship/reluctance in doing an action.",
+        "descId": "Sukar / enggan / sungkan dilakukan karena beban perasaan.",
+        "examples": [
+          {
+            "exampleJp": "先輩には意見を言いづらいです。",
+            "exampleKana": "せんぱいにはいけんをいいづらいです。",
+            "exampleEn": "It is hard to express opinions to seniors.",
+            "exampleId": "Sungkan untuk menyampaikan pendapat kepada senior."
+          },
+          {
+            "exampleJp": "この部屋は暗くて本が読みづらいです。",
+            "exampleKana": "このへやはくらくてもとがよみづらいです。",
+            "exampleEn": "This room is dark, making it hard to read books.",
+            "exampleId": "Kamar ini gelap sehingga susah membaca buku."
+          },
+          {
+            "exampleJp": "傷が痛むので、歩きづらいです。",
+            "exampleKana": "きずがいたむので、あるきづらいです。",
+            "exampleEn": "Because the wound hurts, it is hard to walk.",
+            "exampleId": "Karena lukanya sakit, jadi susah berjalan."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 22,
+    "titleEn": "Experience & Obligations",
+    "titleId": "Pengalaman, Kebiasaan & Keharusan",
+    "patterns": [
+      {
+        "id": "v-ta-koto-ga-aru",
+        "pattern": "Vた ことが あります",
+        "jlpt": "N4",
+        "descEn": "Indicates past experience ('have done something before').",
+        "descId": "Menyatakan pengalaman di masa lalu ('pernah melakukan').",
+        "examples": [
+          {
+            "exampleJp": "私は富士山に登ったことがあります。",
+            "exampleKana": "わたしはふじさんにのぼったことがあります。",
+            "exampleEn": "I have climbed Mt. Fuji before.",
+            "exampleId": "Saya pernah mendaki Gunung Fuji."
+          },
+          {
+            "exampleJp": "本場の歌舞伎を見たことがありますか。",
+            "exampleKana": "ほんばのかぶきをみたことがありますか。",
+            "exampleEn": "Have you ever watched authentic Kabuki?",
+            "exampleId": "Apakah kamu pernah menonton pertunjukkan Kabuki?"
+          },
+          {
+            "exampleJp": "納豆を食べたことがありません。",
+            "exampleKana": "なっとうをたべたことがありません。",
+            "exampleEn": "I have never eaten Natto before.",
+            "exampleId": "Saya belum pernah makan Natto."
+          }
+        ]
+      },
+      {
+        "id": "v-tari-v-tari-n4",
+        "pattern": "Vたり Vたり します",
+        "jlpt": "N4",
+        "descEn": "Lists representative actions among others without chronological order.",
+        "descId": "Menyebutkan contoh beberapa kegiatan tanpa urutan waktu.",
+        "examples": [
+          {
+            "exampleJp": "休みの日は本を読んだり、音楽を聞いたりします。",
+            "exampleKana": "やすみのひはほんをよんだり、おんがくをきいたりします。",
+            "exampleEn": "On holidays, I do things like reading books and listening to music.",
+            "exampleId": "Saat hari libur, saya melakukan kegiatan seperti membaca buku dan mendengarkan musik."
+          },
+          {
+            "exampleJp": "昨日は買い物に行ったり、友達と会ったりしました。",
+            "exampleKana": "きのうはかいものにいったり、ともだちとあったりしました。",
+            "exampleEn": "Yesterday I did things like going shopping and meeting friends.",
+            "exampleId": "Kemarin saya pergi belanja, bertemu teman, dan lain-lain."
+          },
+          {
+            "exampleJp": "部屋の温度が上がったり下がったりしています。",
+            "exampleKana": "へやのおんどがあがったりさがったりしています。",
+            "exampleEn": "The room temperature keeps going up and down.",
+            "exampleId": "Suhu ruangan naik turun terus."
+          }
+        ]
+      },
+      {
+        "id": "v-nakereba-narimasen-n4",
+        "pattern": "Vなければ なりません",
+        "jlpt": "N4",
+        "descEn": "Expresses necessity or obligation ('must / have to do').",
+        "descId": "Menyatakan keharusan atau kewajiban ('harus melakukan').",
+        "examples": [
+          {
+            "exampleJp": "明日、試験がありますから、勉強しなければなりません。",
+            "exampleKana": "あした、しけんがありますから、べんきょうしなければなりません。",
+            "exampleEn": "Since there is an exam tomorrow, I must study.",
+            "exampleId": "Karena besok ada ujian, saya harus belajar."
+          },
+          {
+            "exampleJp": "パスポートを更新しなければなりません。",
+            "exampleKana": "ぱすぽーとをこうしんしなければなりません。",
+            "exampleEn": "I must renew my passport.",
+            "exampleId": "Saya harus memperpanjang paspor."
+          },
+          {
+            "exampleJp": "時間通りにレポートを提出しなければなりません。",
+            "exampleKana": "じかんどおりにれぽーとをていしゅつしなければなりません。",
+            "exampleEn": "I must submit the report on time.",
+            "exampleId": "Saya harus mengumpulkan laporan tepat waktu."
+          }
+        ]
+      },
+      {
+        "id": "v-nakute-mo-ii-n4",
+        "pattern": "Vなくても いいです",
+        "jlpt": "N4",
+        "descEn": "Indicates absence of obligation ('don't have to / optional').",
+        "descId": "Menyatakan tidak adanya keharusan ('tidak perlu / tidak usah').",
+        "examples": [
+          {
+            "exampleJp": "明日は日曜日ですから、早起きしなくてもいいです。",
+            "exampleKana": "あしたはにちようびですから、はやおきしなくてもいいです。",
+            "exampleEn": "Tomorrow is Sunday, so you don't have to wake up early.",
+            "exampleId": "Besok hari Minggu, jadi tidak perlu bangun pagi."
+          },
+          {
+            "exampleJp": "名前を漢字で書かなくてもいいです。",
+            "exampleKana": "なまえをかんじでかかなくてもいいです。",
+            "exampleEn": "You don't have to write your name in Kanji.",
+            "exampleId": "Tidak usah menulis nama menggunakan Kanji."
+          },
+          {
+            "exampleJp": "無理して全部食べなくてもいいですよ。",
+            "exampleKana": "むりしてぜんぶたべなくてもいいですよ。",
+            "exampleEn": "You don't have to force yourself to eat everything.",
+            "exampleId": "Tidak perlu memaksakan diri menghabiskan semuanya."
+          }
+        ]
+      },
+      {
+        "id": "v-naide-n4",
+        "pattern": "Vないで",
+        "jlpt": "N4",
+        "descEn": "Indicates doing something without doing another action ('without doing').",
+        "descId": "Melakukan suatu aksi tanpa melakukan tindakan lain sebelumnya.",
+        "examples": [
+          {
+            "exampleJp": "朝ご飯を食べないで、会社へ行きました。",
+            "exampleKana": "あさごはんをたべないで、かいしゃへいきました。",
+            "exampleEn": "I went to work without eating breakfast.",
+            "exampleId": "Saya pergi bekerja tanpa sarapan."
+          },
+          {
+            "exampleJp": "辞書を使わないで、文章を訳しました。",
+            "exampleKana": "じしょをつかわないで、ぶんしょうをやくしました。",
+            "exampleEn": "I translated the text without using a dictionary.",
+            "exampleId": "Saya menerjemahkan kalimat tanpa menggunakan kamus."
+          },
+          {
+            "exampleJp": "傘を持たないで出かけたら、雨に降られました。",
+            "exampleKana": "かさをもたないででかけたら、あめにふられました。",
+            "exampleEn": "I went out without taking an umbrella and got rained on.",
+            "exampleId": "Saya pergi tanpa membawa payung lalu kehujanan."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 23,
+    "titleEn": "Reasons, Regret & Limits",
+    "titleId": "Alasan Beruntun, Penyesalan & Batasan",
+    "patterns": [
+      {
+        "id": "plain-shi-shi",
+        "pattern": "普通形 し、～し",
+        "jlpt": "N4",
+        "descEn": "Lists multiple reasons ('not only... but also / furthermore').",
+        "descId": "Menyebutkan beberapa alasan beruntun ('selain... juga...').",
+        "examples": [
+          {
+            "exampleJp": "この店は美味しいし、安いし、いつも賑わっています。",
+            "exampleKana": "このみせはおいしいし、やすいし、いつもにぎわっています。",
+            "exampleEn": "This shop is delicious and cheap, so it's always crowded.",
+            "exampleId": "Toko ini makanannya enak, murah lagi, makanya selalu ramai."
+          },
+          {
+            "exampleJp": "雨も降っているし、体調も悪いし、今日は家から出ません。",
+            "exampleKana": "あめもふっているし、たいちょうもわるいし、きょうはいえからでません。",
+            "exampleEn": "It's raining and I feel unwell, so I won't leave home today.",
+            "exampleId": "Sudah hujan, badan kurang sehat lagi, hari ini saya tidak keluar rumah."
+          },
+          {
+            "exampleJp": "彼は優しいし、頭もいいし、みんなに人気があります。",
+            "exampleKana": "かれはやさしいし、あたまもいいし、みんなににんきがあります。",
+            "exampleEn": "He is kind and smart, so he is popular with everyone.",
+            "exampleId": "Dia baik, pinter lagi, makanya populer di antara semua orang."
+          }
+        ]
+      },
+      {
+        "id": "plain-node",
+        "pattern": "普通形 ので",
+        "jlpt": "N4",
+        "descEn": "States objective reason or cause politely ('because / since').",
+        "descId": "Menyatakan sebab/alasan secara objektif & sopan ('karena / sebab').",
+        "examples": [
+          {
+            "exampleJp": "電車が遅れたので、会議に遅れました。",
+            "exampleKana": "でんしゃがおくれたので、かいぎにおくれました。",
+            "exampleEn": "Because the train was delayed, I was late for the meeting.",
+            "exampleId": "Karena kereta terlambat, saya jadi terlambat rapat."
+          },
+          {
+            "exampleJp": "気分が悪いので、お先に失礼します。",
+            "exampleKana": "きぶんがわるいので、おさきにしつれいします。",
+            "exampleEn": "Since I feel unwell, I will excuse myself early.",
+            "exampleId": "Karena kurang enak badan, saya pamit lebih awal."
+          },
+          {
+            "exampleJp": "危険ですので、この線より内側にお下がりください。",
+            "exampleKana": "きけんですので、このせんよりうちがわにおさがりください。",
+            "exampleEn": "Since it is dangerous, please stand behind this line.",
+            "exampleId": "Karena berbahaya, mohon mundur di belakang garis ini."
+          }
+        ]
+      },
+      {
+        "id": "plain-noni",
+        "pattern": "普通形 のに",
+        "jlpt": "N4",
+        "descEn": "Expresses contradiction, surprise, or complaint ('even though / despite').",
+        "descId": "Pertentangan atau kekecewaan ('padahal / meskipun').",
+        "examples": [
+          {
+            "exampleJp": "一生懸命勉強したのに、不合格でした。",
+            "exampleKana": "いっしょうけんめいべんきょうしたのに、ふごうかくでした。",
+            "exampleEn": "Even though I studied hard, I failed.",
+            "exampleId": "Padahal sudah belajar keras, tapi tidak lulus."
+          },
+          {
+            "exampleJp": "約束したのに、彼は来ませんでした。",
+            "exampleKana": "やくそくしたのに、かれはきませんでした。",
+            "exampleEn": "Even though he promised, he didn't come.",
+            "exampleId": "Padahal sudah berjanji, tapi dia tidak datang."
+          },
+          {
+            "exampleJp": "薬を飲んだのに、熱が下がりません。",
+            "exampleKana": "くすりをのんだのに、ねつがさがりません。",
+            "exampleEn": "Even though I took medicine, the fever won't go down.",
+            "exampleId": "Padahal sudah minum obat, tapi demam tidak turun."
+          }
+        ]
+      },
+      {
+        "id": "dake-shika-nai",
+        "pattern": "N だけ / N しか ～ない",
+        "jlpt": "N4",
+        "descEn": "Indicates limitation ('only / nothing except').",
+        "descId": "Menunjukkan batasan ('hanya / tidak ada selain').",
+        "examples": [
+          {
+            "exampleJp": "財布の中に100円しかありません。",
+            "exampleKana": "さいふのなかになんひゃくえんしかありません。",
+            "exampleEn": "There is only 100 yen in my wallet.",
+            "exampleId": "Di dalam dompet hanya ada 100 yen."
+          },
+          {
+            "exampleJp": "ひらがなだけ書くことができます。",
+            "exampleKana": "ひらがなだけかくことができます。",
+            "exampleEn": "I can only write Hiragana.",
+            "exampleId": "Saya hanya bisa menulis Hiragana."
+          },
+          {
+            "exampleJp": "クラスで田中さんしか合格しませんでした。",
+            "exampleKana": "くらすであなかさんしかごうかくしませんでした。",
+            "exampleEn": "No one except Tanaka-san passed in the class.",
+            "exampleId": "Di kelas tidak ada yang lulus selain Pak Tanaka."
+          }
+        ]
+      },
+      {
+        "id": "ni-tsuite",
+        "pattern": "N に ついて",
+        "jlpt": "N4",
+        "descEn": "Indicates topic or subject matter ('about / regarding').",
+        "descId": "Menunjukkan topik pembahasan ('mengenai / tentang').",
+        "examples": [
+          {
+            "exampleJp": "日本の文化について調べたいです。",
+            "exampleKana": "にほんのぶんかについてしらべたいです。",
+            "exampleEn": "I want to research about Japanese culture.",
+            "exampleId": "Saya ingin mencari tahu mengenai kebudayaan Jepang."
+          },
+          {
+            "exampleJp": "この問題についてどう思いますか。",
+            "exampleKana": "このもんだいについてどうおもいますか。",
+            "exampleEn": "What do you think about this issue?",
+            "exampleId": "Apa pendapatmu tentang masalah ini?"
+          },
+          {
+            "exampleJp": "新プロジェクトについて話し合いましょう。",
+            "exampleKana": "しんぷろじぇくとについてはなしあいましょう。",
+            "exampleEn": "Let's discuss about the new project.",
+            "exampleId": "Mari kita diskusikan tentang proyek baru."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 24,
+    "titleEn": "Honorific Language (Keigo)",
+    "titleId": "Bahasa Kehormatan (Keigo - Sonkeigo & Kenjougo)",
+    "patterns": [
+      {
+        "id": "o-ni-narimasu",
+        "pattern": "お Vstem に なります",
+        "jlpt": "N4",
+        "descEn": "Honorific form (Sonkeigo) to show respect to superiors' actions.",
+        "descId": "Bentuk hormat (Sonkeigo) untuk menghormati tindakan atasan/orang lain.",
+        "examples": [
+          {
+            "exampleJp": "社長はお帰りになりました。",
+            "exampleKana": "しゃちょうはおかえりになりました。",
+            "exampleEn": "The company president has returned home.",
+            "exampleId": "Bapak Direktur sudah pulang."
+          },
+          {
+            "exampleJp": "こちらの資料をお読みになりましたか。",
+            "exampleKana": "こちらのしりょうをおよみになりましたか。",
+            "exampleEn": "Have you read these documents?",
+            "exampleId": "Apakah Bapak/Ibu sudah membaca dokumen ini?"
+          },
+          {
+            "exampleJp": "少々お待ちいただけますか。",
+            "exampleKana": "しょうしょうおまちいただけますか。",
+            "exampleEn": "Could you please wait a moment?",
+            "exampleId": "Bolehkah mohon menunggu sebentar?"
+          }
+        ]
+      },
+      {
+        "id": "o-shimasu",
+        "pattern": "お Vstem します / いたします",
+        "jlpt": "N4",
+        "descEn": "Humble form (Kenjougo) when speaking about one's own actions to superiors.",
+        "descId": "Bentuk merendah diri (Kenjougo) saat menceritakan tindakan sendiri kepada atasan.",
+        "examples": [
+          {
+            "exampleJp": "重い荷物をお持ちします。",
+            "exampleKana": "おもいにもつをおもちします。",
+            "exampleEn": "I will carry your heavy luggage.",
+            "exampleId": "Saya akan bantu membawakan barang berat Anda."
+          },
+          {
+            "exampleJp": "駅までお送りいたします。",
+            "exampleKana": "えきまでおおくりいたします。",
+            "exampleEn": "I will escort you to the station.",
+            "exampleId": "Saya akan mengantar Anda sampai stasiun."
+          },
+          {
+            "exampleJp": "後ほどご連絡いたします。",
+            "exampleKana": "のちほどごれんらくいたします。",
+            "exampleEn": "I will contact you later.",
+            "exampleId": "Saya akan menghubungi Anda sebentar lagi."
+          }
+        ]
+      },
+      {
+        "id": "sonkeigo-special",
+        "pattern": "いらっしゃいます / おっしゃいます / ご覧になります",
+        "jlpt": "N4",
+        "descEn": "Special Sonkeigo verbs for 行く/来る/いる, 言う, 見る.",
+        "descId": "Kata kerja khusus Sonkeigo untuk Pergi/Datang/Ada, Berkata, dan Melihat.",
+        "examples": [
+          {
+            "exampleJp": "先生は明日どちらへいらっしゃいますか。",
+            "exampleKana": "せんせいはあしたどちらへいらっしゃいますか。",
+            "exampleEn": "Where will the teacher go tomorrow?",
+            "exampleId": "Besok Bapak Guru akan pergi ke mana?"
+          },
+          {
+            "exampleJp": "社長がそうおっしゃいました。",
+            "exampleKana": "しゃちょうがそうおっしゃいました。",
+            "exampleEn": "The company president said so.",
+            "exampleId": "Bapak Direktur menyampaikan demikian."
+          },
+          {
+            "exampleJp": "こちらの写真をご覧になりましたか。",
+            "exampleKana": "こちらのしゃしんをごらんになりましたか。",
+            "exampleEn": "Have you seen this photo?",
+            "exampleId": "Apakah Bapak/Ibu sudah melihat foto ini?"
+          }
+        ]
+      },
+      {
+        "id": "kenjougo-special",
+        "pattern": "参ります / 申します / いたします / いただきます",
+        "jlpt": "N4",
+        "descEn": "Special Kenjougo verbs for 行く/来る, 言う, する, 食べる/飲む.",
+        "descId": "Kata kerja khusus Kenjougo untuk Pergi/Datang, Berkata, Melakukan, dan Makan/Minum.",
+        "examples": [
+          {
+            "exampleJp": "私、田中と申します。",
+            "exampleKana": "わたし、たなかともうします。",
+            "exampleEn": "My name is Tanaka.",
+            "exampleId": "Nama saya Tanaka."
+          },
+          {
+            "exampleJp": "明日10時に伺います。",
+            "exampleKana": "あしたじゅうじにうかがいます。",
+            "exampleEn": "I will visit tomorrow at 10:00.",
+            "exampleId": "Besok jam 10 saya akan berkunjung."
+          },
+          {
+            "exampleJp": "美味しくいただきました。",
+            "exampleKana": "おいしくいただきました。",
+            "exampleEn": "I enjoyed the meal.",
+            "exampleId": "Saya telah menikmati santapannya."
+          }
+        ]
+      },
+      {
+        "id": "de-gozaimasu",
+        "pattern": "～で ございます",
+        "jlpt": "N4",
+        "descEn": "Polite form (Teineigo) of 'desu'.",
+        "descId": "Bentuk sangat sopan (Teineigo) menggantikan 'desu'.",
+        "examples": [
+          {
+            "exampleJp": "お電話ありがとうございます。ABC商事の田中と申します。",
+            "exampleKana": "おでんわありがとうございます。えーびーしーしょうじのたなかともうします。",
+            "exampleEn": "Thank you for calling. This is Tanaka from ABC Trading.",
+            "exampleId": "Terima kasih telah menelepon. Ini Tanaka dari ABC Trading."
+          },
+          {
+            "exampleJp": "お手洗いはあちらでございます。",
+            "exampleKana": "おてあらいであちらでございます。",
+            "exampleEn": "The restroom is over there.",
+            "exampleId": "Toilet ada di sebelah sana."
+          },
+          {
+            "exampleJp": "本日の営業は終了でございます。",
+            "exampleKana": "ほんじつのえいぎょうはしゅうりょうでございます。",
+            "exampleEn": "Business operations for today have finished.",
+            "exampleId": "Jam operasional hari ini sudah selesai."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 25,
+    "titleEn": "States & Preparation",
+    "titleId": "Keadaan Lanjutan & Persiapan",
+    "patterns": [
+      {
+        "id": "v-te-arimasu",
+        "pattern": "Vて あります",
+        "jlpt": "N4",
+        "descEn": "Indicates a state resulting from a purposeful action ('has been done and remains so').",
+        "descId": "Keadaan yang sengaja dilakukan dan masih bertahan sampai sekarang.",
+        "examples": [
+          {
+            "exampleJp": "壁にカレンダーが貼ってあります。",
+            "exampleKana": "かべにかれんだーがはってあります。",
+            "exampleEn": "A calendar is posted on the wall.",
+            "exampleId": "Kalender sudah sengaja ditempel di dinding."
+          },
+          {
+            "exampleJp": "パーティーの準備はもうしてあります。",
+            "exampleKana": "ぱーてぃーのじゅんびはもうしてあります。",
+            "exampleEn": "Preparations for the party have already been done.",
+            "exampleId": "Persiapan pesta sudah dilakukan."
+          },
+          {
+            "exampleJp": "冷蔵庫にビールが冷やしてあります。",
+            "exampleKana": "れいぞうこにびーるがひやしてあります。",
+            "exampleEn": "Beer is chilled in the refrigerator.",
+            "exampleId": "Bir sudah sengaja didinginkan di kulkas."
+          }
+        ]
+      },
+      {
+        "id": "v-te-okimasu",
+        "pattern": "Vて おきます",
+        "jlpt": "N4",
+        "descEn": "Indicates performing an action in advance for future convenience ('in advance / ahead of time').",
+        "descId": "Melakukan tindakan terlebih dahulu untuk persiapan masa depan.",
+        "examples": [
+          {
+            "exampleJp": "旅行の前に、ホテルの予約をしておきます。",
+            "exampleKana": "りょこうのまえに、ほてるのよやくをしておきます。",
+            "exampleEn": "Before the trip, I will make a hotel reservation in advance.",
+            "exampleId": "Sebelum jalan-jalan, saya akan reservasi hotel terlebih dahulu."
+          },
+          {
+            "exampleJp": "使ったハサミは元の場所に戻しておいてください。",
+            "exampleKana": "つかったはさみはもとのばしょにもどしておいてください。",
+            "exampleEn": "Please put the used scissors back in their original place.",
+            "exampleId": "Gunting yang sudah dipakai tolong kembalikan ke tempat semula."
+          },
+          {
+            "exampleJp": "お客様が来るので、部屋を掃除しておきました。",
+            "exampleKana": "おきゃくさまがくるので、へやをそうじしておきました。",
+            "exampleEn": "Because guests are coming, I cleaned the room in advance.",
+            "exampleId": "Karena tamu mau datang, saya sudah bersihkan ruangan terlebih dahulu."
+          }
+        ]
+      },
+      {
+        "id": "v-te-shimaimashita",
+        "pattern": "Vて しまいました / しまう",
+        "jlpt": "N4",
+        "descEn": "Indicates completion of action or expression of regret/unintentional error ('completely / unfortunately').",
+        "descId": "Selesai secara total atau penyesalan atas ketidaksengajaan.",
+        "examples": [
+          {
+            "exampleJp": "大事な書類を家に忘れてしまいました。",
+            "exampleKana": "だいじなしょるいをいえにわすれてしまいました。",
+            "exampleEn": "Unfortunately, I forgot the important document at home.",
+            "exampleId": "Sayang sekali, dokumen penting ketinggalan di rumah."
+          },
+          {
+            "exampleJp": "宿題を全部やってしまいました。",
+            "exampleKana": "しゅくだいをぜんぶやってしまいました。",
+            "exampleEn": "I have completely finished all my homework.",
+            "exampleId": "Saya sudah menyelesaikan seluruh PR secara tuntas."
+          },
+          {
+            "exampleJp": "お気に入りのコップを割ってしまいました。",
+            "exampleKana": "おきにいりのこっぷをわってしまいました。",
+            "exampleEn": "I accidentally broke my favorite glass.",
+            "exampleId": "Saya tidak sengaja memecahkan gelas kesayangan saya."
+          }
+        ]
+      },
+      {
+        "id": "v-te-mimasu",
+        "pattern": "Vて みます",
+        "jlpt": "N4",
+        "descEn": "Indicates trying something to see what it's like ('try doing').",
+        "descId": "Mencoba melakukan sesuatu untuk melihat hasilnya.",
+        "examples": [
+          {
+            "exampleJp": "新しいレストランの料理を食べてみます。",
+            "exampleKana": "あたらしいれすとらんのりょうりをたべてみます。",
+            "exampleEn": "I will try eating the food at the new restaurant.",
+            "exampleId": "Saya akan mencoba makan hidangan di restoran baru."
+          },
+          {
+            "exampleJp": "この服を着てみてもいいですか。",
+            "exampleKana": "このふくをきてみてもいいですか。",
+            "exampleEn": "May I try on these clothes?",
+            "exampleId": "Bolehkah saya mencoba memakai baju ini?"
+          },
+          {
+            "exampleJp": "難しそうですが、やってみます。",
+            "exampleKana": "むずかしそうですが、やってみます。",
+            "exampleEn": "It looks difficult, but I will try.",
+            "exampleId": "Kelihatannya susah, tapi saya akan coba."
+          }
+        ]
+      },
+      {
+        "id": "v-yasuku-shimasu",
+        "pattern": "Vstem + やすく します",
+        "jlpt": "N4",
+        "descEn": "Indicates altering or adjusting something to make it easier to do.",
+        "descId": "Mengubah atau menyesuaikan sesuatu agar lebih mudah dilakukan.",
+        "examples": [
+          {
+            "exampleJp": "文字を大きくして、読みやすくします。",
+            "exampleKana": "もじをおおきくして、よみやすくします。",
+            "exampleEn": "I will enlarge the text to make it easier to read.",
+            "exampleId": "Saya akan memperbesar tulisan agar lebih mudah dibaca."
+          },
+          {
+            "exampleJp": "説明を簡潔にして、分かりやすくしました。",
+            "exampleKana": "せつめいをかんけつにして、わかりやすくしました。",
+            "exampleEn": "I made the explanation concise to make it easier to understand.",
+            "exampleId": "Saya buat penjelasannya singkat agar lebih mudah dipahami."
+          },
+          {
+            "exampleJp": "部屋を片付けて、住みやすくします。",
+            "exampleKana": "へやをかたづけて、すみやすくします。",
+            "exampleEn": "I will tidy up the room to make it more comfortable to live in.",
+            "exampleId": "Saya merapikan kamar agar lebih nyaman ditinggali."
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "chapter": 26,
+    "titleEn": "Time Intervals & Maintained States",
+    "titleId": "Durasi, Jangka Waktu & Kondisi Tetap",
+    "patterns": [
+      {
+        "id": "v-aida-aidani",
+        "pattern": "V辞書形 / N の あいだ / あいだに",
+        "jlpt": "N4",
+        "descEn": "Indicates continuous action during a time period (あいだ) or an action happening at a specific moment within a period (あいだに).",
+        "descId": "Menyatakan tindakan terus menerus sepanjang periode (あいだ) atau kejadian di sela-sela periode tertentu (あいだに).",
+        "examples": [
+          {
+            "exampleJp": "夏休みのあいだ、ずっと祖父母の家にいました。",
+            "exampleKana": "なつやすみのあいだ、ずっとそふぼのいえにいました。",
+            "exampleEn": "During the summer vacation, I stayed at my grandparents' house the whole time.",
+            "exampleId": "Selama liburan musim panas, saya terus berada di rumah kakek nenek."
+          },
+          {
+            "exampleJp": "お母さんが寝ているあいだに、宿題を終わらせました。",
+            "exampleKana": "おかあさんがねているあいだに、しゅくだいをおわらせました。",
+            "exampleEn": "While my mother was sleeping, I finished my homework.",
+            "exampleId": "Saat ibu sedang tidur, saya menyelesaikan PR."
+          },
+          {
+            "exampleJp": "日本にいるあいだに、一度京都に行きたいです。",
+            "exampleKana": "にほんにいるあいだに、いちどきょうとにいきたいです。",
+            "exampleEn": "While I am in Japan, I want to visit Kyoto at least once.",
+            "exampleId": "Mumpung / selagi berada di Jepang, saya ingin pergi ke Kyoto sekali."
+          }
+        ]
+      },
+      {
+        "id": "v-mama",
+        "pattern": "Vた / N の まま",
+        "jlpt": "N4",
+        "descEn": "Indicates doing something while leaving a state unchanged ('as it is / without changing').",
+        "descId": "Melakukan tindakan lain dalam kondisi yang tetap / tanpa mengubah keadaan semula.",
+        "examples": [
+          {
+            "exampleJp": "電気をつけたまま寝てしまいました。",
+            "exampleKana": "でんきをつけたままねてしまいました。",
+            "exampleEn": "I ended up sleeping with the light still on.",
+            "exampleId": "Saya tertidur dalam keadaan lampu tetap menyala."
+          },
+          {
+            "exampleJp": "靴のまま部屋に入らないでください。",
+            "exampleKana": "くつのままへやにはいらないでください。",
+            "exampleEn": "Please do not enter the room with your shoes on.",
+            "exampleId": "Tolong jangan masuk kamar memakai sepatu."
+          },
+          {
+            "exampleJp": "窓を開けたまま出かけてしまいました。",
+            "exampleKana": "まどをあけたままでかけてしまいました。",
+            "exampleEn": "I went out leaving the window open.",
+            "exampleId": "Saya pergi dengan jendela tetap terbuka."
+          }
+        ]
+      },
+      {
+        "id": "v-tabi-ni",
+        "pattern": "V辞書形 / N の たび に",
+        "jlpt": "N4",
+        "descEn": "Indicates every time an action occurs, another action always happens ('every time / whenever').",
+        "descId": "Setiap kali / tiap kali melakukan aksi ini, kejadian itu selalu terjadi.",
+        "examples": [
+          {
+            "exampleJp": "この写真を見るたびに、楽しかった旅行を思いだします。",
+            "exampleKana": "このしゃしんをみるたびに、たのしかったりょこうをおもいだします。",
+            "exampleEn": "Every time I look at this photo, I remember the fun trip.",
+            "exampleId": "Setiap kali melihat foto ini, saya teringat liburan yang menyenangkan."
+          },
+          {
+            "exampleJp": "父は出張のたびに、お土産を買ってきてくれます。",
+            "exampleKana": "ちちはしゅっちょうのたびに、おみやげをかってきてくれます。",
+            "exampleEn": "Every time my father goes on a business trip, he buys me souvenirs.",
+            "exampleId": "Tiap kali ayah dinas luar, dia selalu membelikan oleh-oleh."
+          },
+          {
+            "exampleJp": "会うたびに、彼女は綺麗になります。",
+            "exampleKana": "あうたびに、かのじょはきれいになります。",
+            "exampleEn": "Every time I meet her, she gets prettier.",
+            "exampleId": "Tiap kali bertemu, dia makin cantik."
+          }
+        ]
+      },
+      {
+        "id": "v-tsuide-ni",
+        "pattern": "Vた / V辞書形 / N の ついでに",
+        "jlpt": "N4",
+        "descEn": "Indicates taking advantage of an opportunity to do a secondary task ('while you're at it / on the way').",
+        "descId": "Sekalian / mumpung sedang melakukan suatu hal, melakukan hal lain yang sejalan.",
+        "examples": [
+          {
+            "exampleJp": "散歩のついでに、手紙を出してきました。",
+            "exampleKana": "さんぽのついでに、てがみをだしてきました。",
+            "exampleEn": "While out for a walk, I dropped off the letter.",
+            "exampleId": "Sekalian jalan-jalan santai, saya sekalian poskan surat."
+          },
+          {
+            "exampleJp": "コンビニへ行くなら、ついでにお茶を買ってきてください。",
+            "exampleKana": "こんびにへいくなら、ついでにおちゃをかってきてください。",
+            "exampleEn": "If you're going to the convenience store, please buy me green tea while you're at it.",
+            "exampleId": "Kalau mau ke minimarket, sekalian belikan teh ya."
+          },
+          {
+            "exampleJp": "買い物のついでに、図書館で本を返しました。",
+            "exampleKana": "かいもののついでに、としょかんでほんをかえしました。",
+            "exampleEn": "On my way shopping, I returned the book to the library.",
+            "exampleId": "Mumpung lagi belanja, saya sekalian mengembalikan buku di perpustakaan."
+          }
+        ]
+      },
+      {
+        "id": "v-kawarini",
+        "pattern": "V辞書形 / N の かわりに",
+        "jlpt": "N4",
+        "descEn": "Indicates doing something instead of another or in compensation for ('in place of / instead of').",
+        "descId": "Sebagai ganti / alih-alih melakukan hal tersebut atau menggantikan seseorang.",
+        "examples": [
+          {
+            "exampleJp": "病気の先生のかわりに、新しい先生が来ました。",
+            "exampleKana": "びょうきのせんせいのかわりに、あたらしいせんせいがきました。",
+            "exampleEn": "Instead of the sick teacher, a new teacher came.",
+            "exampleId": "Sebagai ganti guru yang sakit, datang guru baru."
+          },
+          {
+            "exampleJp": "コーヒーのかわりに、紅茶を飲みます。",
+            "exampleKana": "こーひーのかわりに、こうちゃをのみます。",
+            "exampleEn": "I drink black tea instead of coffee.",
+            "exampleId": "Saya minum teh hitam sebagai ganti kopi."
+          },
+          {
+            "exampleJp": "英語を教えてもらうかわりに、日本語を教えてあげます。",
+            "exampleKana": "えいごをおしえてもらうかわりに、にほんごをおしえてあげます。",
+            "exampleEn": "In exchange for being taught English, I teach them Japanese.",
+            "exampleId": "Sebagai balasan diajarkan bahasa Inggris, saya mengajarkan bahasa Jepang."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 27,
+    "titleEn": "Rules, Decisions & Casual Nuances",
+    "titleId": "Aturan, Keputusan & Ragam Bahasa",
+    "patterns": [
+      {
+        "id": "koto-ni-nattte-iru",
+        "pattern": "V辞書形 / Vない形 ことになっている",
+        "jlpt": "N4",
+        "descEn": "Indicates a rule, custom, or decision made by an external authority ('it is arranged that / rule says').",
+        "descId": "Menyatakan aturan, norma, atau keputusan pihak luar yang harus dipatuhi.",
+        "examples": [
+          {
+            "exampleJp": "この部屋では靴を脱ぐことになっています。",
+            "exampleKana": "このへやではくつをぬぐことになっています。",
+            "exampleEn": "It is a rule to take off shoes in this room.",
+            "exampleId": "Di ruangan ini sudah menjadi aturan untuk melepas sepatu."
+          },
+          {
+            "exampleJp": "来月から東京へ転勤することになりました。",
+            "exampleKana": "らいげつからとうきょうへてんきんすることになりました。",
+            "exampleEn": "It has been decided that I will transfer to Tokyo starting next month.",
+            "exampleId": "Sudah diputuskan bahwa mulai bulan depan saya pindah tugas ke Tokyo."
+          },
+          {
+            "exampleJp": "館内では写真をとってはいけないことになっています。",
+            "exampleKana": "かんないではしゃしんをとってはいけないことになっています。",
+            "exampleEn": "It is arranged that taking photos inside the building is prohibited.",
+            "exampleId": "Di dalam gedung ada aturan tidak boleh mengambil foto."
+          }
+        ]
+      },
+      {
+        "id": "koto-ni-suru",
+        "pattern": "V辞書形 / Vない形 ことにする",
+        "jlpt": "N4",
+        "descEn": "Indicates a personal decision or determination ('decide to / make it a rule to').",
+        "descId": "Keputusan pribadi yang diambil sendiri untuk melakukan/tidak melakukan sesuatu.",
+        "examples": [
+          {
+            "exampleJp": "毎日30分ジョギングすることにしました。",
+            "exampleKana": "まいにちさんじゅっぷんじょぎんぐすることにしました。",
+            "exampleEn": "I decided to go jogging for 30 minutes every day.",
+            "exampleId": "Saya memutuskan untuk jogging 30 menit setiap hari."
+          },
+          {
+            "exampleJp": "健康のために、甘いものを食べないことにします。",
+            "exampleKana": "けんこうのために、あまいものをたべないことにします。",
+            "exampleEn": "For my health, I decided not to eat sweet things.",
+            "exampleId": "Demi kesehatan, saya memutuskan untuk tidak makan makanan manis."
+          },
+          {
+            "exampleJp": "今年の夏休みはどこへも行かないことにしました。",
+            "exampleKana": "ことしのなつやすみはどこへもいかないことにしました。",
+            "exampleEn": "I decided not to go anywhere during this summer vacation.",
+            "exampleId": "Saya memutuskan libur musim panas tahun ini tidak pergi ke mana-mana."
+          }
+        ]
+      },
+      {
+        "id": "v-zuni",
+        "pattern": "Vない形 + ずに (する→せずに)",
+        "jlpt": "N4",
+        "descEn": "Indicates doing something without doing another action (written formal equivalent of ないで).",
+        "descId": "Tanpa melakukan aksi tersebut (Bentuk bahasa tulisan / formal dari ないで).",
+        "examples": [
+          {
+            "exampleJp": "昨夜は寝ずに勉強しました。",
+            "exampleKana": "さくやはねずにべんきょうしました。",
+            "exampleEn": "I studied last night without sleeping.",
+            "exampleId": "Semalam saya belajar tanpa tidur."
+          },
+          {
+            "exampleJp": "朝ご飯を食べずに学校へ来ました。",
+            "exampleKana": "あさごはんをたべずにがっこうへきました。",
+            "exampleEn": "I came to school without eating breakfast.",
+            "exampleId": "Saya datang ke sekolah tanpa sarapan."
+          },
+          {
+            "exampleJp": "あきらめずに最後まで頑張ってください。",
+            "exampleKana": "あきらめずにさいごまでがんばってください。",
+            "exampleEn": "Please do your best until the end without giving up.",
+            "exampleId": "Tolong berjuanglah sampai akhir tanpa menyerah."
+          }
+        ]
+      },
+      {
+        "id": "kke-particle",
+        "pattern": "普通形 ＋ っけ",
+        "jlpt": "N4",
+        "descEn": "Casual sentence ending particle used to confirm something the speaker forgot ('was it...? / right?').",
+        "descId": "Partikel kasual di akhir kalimat untuk mengonfirmasi ingatan yang lupa ('...kan ya?').",
+        "examples": [
+          {
+            "exampleJp": "彼の誕生日はいつだっけ。",
+            "exampleKana": "かれのたんじょうびはいつだっけ。",
+            "exampleEn": "When was his birthday again?",
+            "exampleId": "Ulang tahun dia kapan kan ya?"
+          },
+          {
+            "exampleJp": "明日の会議は何時からだっけ。",
+            "exampleKana": "あしたのかいぎはなんじからだっけ。",
+            "exampleEn": "What time does tomorrow's meeting start again?",
+            "exampleId": "Rapat besok mulai jam berapa kan ya?"
+          },
+          {
+            "exampleJp": "田中さんって、納豆が嫌いだっけ。",
+            "exampleKana": "たなかさんって、なっとうがきらいだっけ。",
+            "exampleEn": "Does Tanaka-san dislike Natto again?",
+            "exampleId": "Pak Tanaka itu benci Natto kan ya?"
+          }
+        ]
+      },
+      {
+        "id": "kana-kashira",
+        "pattern": "普通形 ＋ かな / かしら",
+        "jlpt": "N4",
+        "descEn": "Sentence ending particle indicating self-wondering or subtle question ('I wonder if...').",
+        "descId": "Partikel di akhir kalimat untuk mementahkan gumaman / penasaran pada diri sendiri.",
+        "examples": [
+          {
+            "exampleJp": "明日は晴れるかな。",
+            "exampleKana": "あしたははれるかな。",
+            "exampleEn": "I wonder if it will be sunny tomorrow.",
+            "exampleId": "Apakah besok bakal cerah ya?"
+          },
+          {
+            "exampleJp": "彼は無事に着いたかしら。",
+            "exampleKana": "かれはぶじについたかしら。",
+            "exampleEn": "I wonder if he arrived safely.",
+            "exampleId": "Apakah dia sudah sampai dengan selamat ya?"
+          },
+          {
+            "exampleJp": "この服、私に似合うかな。",
+            "exampleKana": "このふく、わたしににあうかな。",
+            "exampleEn": "I wonder if this dress suits me.",
+            "exampleId": "Baju ini cocok untuk saya tidak ya?"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 28,
+    "titleEn": "Basis, Comparison & Viewpoint",
+    "titleId": "Berdasarkan, Perbandingan & Sudut Pandang",
+    "patterns": [
+      {
+        "id": "ni-yoruto",
+        "pattern": "N に よると / に よれば",
+        "jlpt": "N4",
+        "descEn": "Indicates source of news or information ('according to').",
+        "descId": "Menunjukkan sumber informasi atau berita ('menurut / berdasarkan').",
+        "examples": [
+          {
+            "exampleJp": "天気予報によると、明日は大雨になるそうです。",
+            "exampleKana": "てんきよほうによると、あしたはおおあめになるそうです。",
+            "exampleEn": "According to the weather forecast, it will rain heavily tomorrow.",
+            "exampleId": "Menurut prakiraan cuaca, katanya besok akan turun hujan deras."
+          },
+          {
+            "exampleJp": "ニュースによれば、事故の原因はまだ分かっていません。",
+            "exampleKana": "にゅーすによれば、じこのげんいんはまだわかっていません。",
+            "exampleEn": "According to the news, the cause of the accident is not yet known.",
+            "exampleId": "Berdasarkan berita, penyebab kecelakaan belum diketahui."
+          },
+          {
+            "exampleJp": "噂によると、あの店は近々閉店するらしいです。",
+            "exampleKana": "うわさによると、あのみせはちかぢかへいてんするらしいです。",
+            "exampleEn": "According to rumors, that shop seems to be closing down soon.",
+            "exampleId": "Menurut rumor, toko itu sepertinya akan tutup dalam waktu dekat."
+          }
+        ]
+      },
+      {
+        "id": "ni-yotte",
+        "pattern": "N に よって / に より",
+        "jlpt": "N4",
+        "descEn": "Indicates means, cause, creator, or variation depending on cases ('by / depending on / due to').",
+        "descId": "Oleh (pencipta/penemu), karena (sebab), atau tergantung pada variasi.",
+        "examples": [
+          {
+            "exampleJp": "この電話はベルによって発明されました。",
+            "exampleKana": "このでんわはべるによってはつめいされました。",
+            "exampleEn": "This telephone was invented by Bell.",
+            "exampleId": "Telepon ini ditemukan oleh Bell."
+          },
+          {
+            "exampleJp": "人によって考え方が違います。",
+            "exampleKana": "ひとによってかんがえかたがちがいます。",
+            "exampleEn": "Ways of thinking differ depending on the person.",
+            "exampleId": "Cara berpikir berbeda-beda tergantung orangnya."
+          },
+          {
+            "exampleJp": "台風によって、多くの家が被害を受けました。",
+            "exampleKana": "たいふうによって、おおくのいえがひがいをうけました。",
+            "exampleEn": "Due to the typhoon, many houses suffered damage.",
+            "exampleId": "Karena angin topan, banyak rumah mengalami kerusakan."
+          }
+        ]
+      },
+      {
+        "id": "ni-totte",
+        "pattern": "N に とって",
+        "jlpt": "N4",
+        "descEn": "Indicates evaluation or stance from the viewpoint of someone ('for / to / from the stance of').",
+        "descId": "Bagi / menurut sudut pandang atau penilaian subjek tersebut.",
+        "examples": [
+          {
+            "exampleJp": "私にとって、家族が番大切です。",
+            "exampleKana": "わたしにとって、かぞくがいちばんたいせつです。",
+            "exampleEn": "For me, family is the most important.",
+            "exampleId": "Bagi saya, keluarga adalah yang paling penting."
+          },
+          {
+            "exampleJp": "外国人にとって、日本語の漢字は難しいです。",
+            "exampleKana": "がいこくじんにとって、にほんごのかんじはむずかしいです。",
+            "exampleEn": "For foreigners, Japanese Kanji is difficult.",
+            "exampleId": "Bagi orang asing, Kanji bahasa Jepang itu sulit."
+          },
+          {
+            "exampleJp": "水は人間にとって不可欠なものです。",
+            "exampleKana": "みずはにんげんにとってふかけつなものです。",
+            "exampleEn": "Water is indispensable for human beings.",
+            "exampleId": "Air adalah hal yang sangat krusial bagi manusia."
+          }
+        ]
+      },
+      {
+        "id": "ni-kurabete",
+        "pattern": "N に くらべて",
+        "jlpt": "N4",
+        "descEn": "Expresses comparison between two things ('compared to').",
+        "descId": "Menyatakan perbandingan langsung dengan hal lain ('dibandingkan dengan').",
+        "examples": [
+          {
+            "exampleJp": "去年のにくらべて、今年の夏はとても暑いです。",
+            "exampleKana": "きょねんのにくらべて、ことしのなつはとてもあついです。",
+            "exampleEn": "Compared to last year, this summer is very hot.",
+            "exampleId": "Dibandingkan tahun lalu, musim panas tahun ini sangat panas."
+          },
+          {
+            "exampleJp": "東京にくらべて、私の田舎は空気が綺麗です。",
+            "exampleKana": "とうきょうにくらべて、わたしのいなかはくうきがきれいです。",
+            "exampleEn": "Compared to Tokyo, the air in my hometown is clean.",
+            "exampleId": "Dibandingkan dengan Tokyo, udara di kampung halaman saya bersih."
+          },
+          {
+            "exampleJp": "姉にくらべて、妹はおとなしい性格です。",
+            "exampleKana": "あねにくらべて、いもうとはおとなしいせいかくです。",
+            "exampleEn": "Compared to the older sister, the younger sister has a quiet personality.",
+            "exampleId": "Dibandingkan kakak perempuannya, adiknya berkepribadian pendiam."
+          }
+        ]
+      },
+      {
+        "id": "nanka-nado",
+        "pattern": "N なんか / など",
+        "jlpt": "N4",
+        "descEn": "Indicates exemplification or modest light evaluation ('things like / for instance').",
+        "descId": "Menunjukkan contoh ringan atau merendah ('hal seperti / semacam').",
+        "examples": [
+          {
+            "exampleJp": "休日は映画なんかを見て過ごします。",
+            "exampleKana": "きゅうじつはえいがなんかをみてすごします。",
+            "exampleEn": "On holidays, I spend time watching things like movies.",
+            "exampleId": "Saat libur, saya menghabiskan waktu menonton hal seperti film."
+          },
+          {
+            "exampleJp": "私なんか、まだまだ勉強が足りません。",
+            "exampleKana": "わたしなんか、まだまだべんきょうがたりません。",
+            "exampleEn": "Someone like me still has a lot to study.",
+            "exampleId": "Orang seperti saya ini masih sangat kurang belajarnya."
+          },
+          {
+            "exampleJp": "お茶などはいかがですか。",
+            "exampleKana": "おちゃなどはいかがですか。",
+            "exampleEn": "How about something like tea?",
+            "exampleId": "Bagaimana kalau minum sejenis teh?"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 29,
+    "titleEn": "Action Moments & Metaphors",
+    "titleId": "Usaha Momen, Perubahan Mendadak & Kiasan",
+    "patterns": [
+      {
+        "id": "v-yoto-suru",
+        "pattern": "V意向形 と する / と しない",
+        "jlpt": "N4",
+        "descEn": "Indicates being just about to do something (とする) or refusing to try doing something (としない).",
+        "descId": "Hampir / baru mau melakukan sesuatu (とする) atau tidak mau berusaha sama sekali (としない).",
+        "examples": [
+          {
+            "exampleJp": "出かけようとした時、電話が鳴りました。",
+            "exampleKana": "でかけようとしたとき、でんわがなりました。",
+            "exampleEn": "Just as I was about to go out, the phone rang.",
+            "exampleId": "Pas baru mau pergi keluar, telepon berdering."
+          },
+          {
+            "exampleJp": "電車に乗ろうとしたら、ドアが閉まってしまいました。",
+            "exampleKana": "でんしゃにのろうとしたら、どあがしまってしまいました。",
+            "exampleEn": "When I tried to get on the train, the door closed.",
+            "exampleId": "Ketika mencoba naik kereta, pintunya keburu tutup."
+          },
+          {
+            "exampleJp": "彼は自分の間違いを認めようとしません。",
+            "exampleKana": "かれはじぶんのまちがいをみとめようとしません。",
+            "exampleEn": "He makes no attempt to admit his mistake.",
+            "exampleId": "Dia tidak mau sama sekali mengakui kesalahannya."
+          }
+        ]
+      },
+      {
+        "id": "v-dasu",
+        "pattern": "Vstem 出す (だす)",
+        "jlpt": "N4",
+        "descEn": "Indicates sudden initiation of an action ('suddenly burst into / start').",
+        "descId": "Mendadak mulai melakukan suatu aksi secara tiba-tiba.",
+        "examples": [
+          {
+            "exampleJp": "さっきまで笑っていた赤ちゃんが、突然泣き出しました。",
+            "exampleKana": "さっきまでわらっていたあかちゃんが、とつぜんなきだしました。",
+            "exampleEn": "The baby who was laughing until a moment ago suddenly burst out crying.",
+            "exampleId": "Bayi yang tadi tertawa mendadak mulai menangis."
+          },
+          {
+            "exampleJp": "急に強い雨が降り出しました。",
+            "exampleKana": "きゅうにつよいあめがふりだしました。",
+            "exampleEn": "Heavy rain suddenly started falling.",
+            "exampleId": "Tiba-tiba hujan deras mulai turun."
+          },
+          {
+            "exampleJp": "彼らは喧嘩を走り出しました。",
+            "exampleKana": "かれらはけんかをはしりだしました。",
+            "exampleEn": "They suddenly started running.",
+            "exampleId": "Mereka mendadak mulai berlari."
+          }
+        ]
+      },
+      {
+        "id": "ikura-temo",
+        "pattern": "いくら / どんなに ～ても",
+        "jlpt": "N4",
+        "descEn": "Indicates strong concession regardless of degree ('no matter how much').",
+        "descId": "Betapapun / berapapun usahanya, hasilnya tidak berubah ('seberapa pun').",
+        "examples": [
+          {
+            "exampleJp": "いくら安くても、要らないものは買いません。",
+            "exampleKana": "いくらやすくても、いらないものはかいません。",
+            "exampleEn": "No matter how cheap it is, I won't buy things I don't need.",
+            "exampleId": "Seberapa murah pun itu, saya tidak beli barang yang tidak perlu."
+          },
+          {
+            "exampleJp": "どんなに大変でも、夢を諦めません。",
+            "exampleKana": "どんなにたいへんでも、ゆめをあきらめません。",
+            "exampleEn": "No matter how hard it is, I won't give up on my dream.",
+            "exampleId": "Betapapun beratnya, saya tidak akan menyerah pada impian."
+          },
+          {
+            "exampleJp": "いくら考えても、答えが分かりません。",
+            "exampleKana": "いくらかんがえても、こたえがわかりません。",
+            "exampleEn": "No matter how much I think, I can't figure out the answer.",
+            "exampleId": "Seberapa lama pun saya pikirkan, saya tidak tahu jawabannya."
+          }
+        ]
+      },
+      {
+        "id": "marude-yoda",
+        "pattern": "まるで N の ようだ / みたいだ",
+        "jlpt": "N4",
+        "descEn": "Expresses vivid figurative comparison or metaphor ('just like / as if').",
+        "descId": "Kiasan atau metafora yang sangat mirip ('bagaikan / seolah-olah').",
+        "examples": [
+          {
+            "exampleJp": "今日は春なのに、まるで冬のように寒いです。",
+            "exampleKana": "きょうははるなのに、まるでふゆのようにさむいです。",
+            "exampleEn": "Although it is spring today, it is cold just like winter.",
+            "exampleId": "Padahal hari ini musim semi, tapi dinginnya bagaikan musim dingin."
+          },
+          {
+            "exampleJp": "彼女の肌はまるで雪のように白いです。",
+            "exampleKana": "かのじょのはだはまるでゆきのようにしろいです。",
+            "exampleEn": "Her skin is white just like snow.",
+            "exampleId": "Kulitnya putih bagaikan salju."
+          },
+          {
+            "exampleJp": "まるで夢を見ているようです。",
+            "exampleKana": "まるでゆめをみているようです。",
+            "exampleEn": "It is just like dreaming.",
+            "exampleId": "Rasanya seperti sedang bermimpi."
+          }
+        ]
+      },
+      {
+        "id": "to-iu-koto-wa",
+        "pattern": "～という ことは / というのは",
+        "jlpt": "N4",
+        "descEn": "Used to explain the meaning or logical conclusion of something ('which means that...').",
+        "descId": "Menjelaskan arti kata atau kesimpulan logis ('berarti / maksudnya adalah').",
+        "examples": [
+          {
+            "exampleJp": "彼が来ないということは、約束を忘れたということです。",
+            "exampleKana": "かれがこないということは、やくそくをわすれたということです。",
+            "exampleEn": "That he hasn't come means that he forgot the appointment.",
+            "exampleId": "Bahwa dia tidak datang berarti dia lupa janji."
+          },
+          {
+            "exampleJp": "「禁煙」というのは、タバコを吸ってはいけないということです。",
+            "exampleKana": "「きんえん」というのは、たばこをすってはいけないということです。",
+            "exampleEn": "'Kin-en' means that you must not smoke tobacco.",
+            "exampleId": "'Kin-en' itu maksudnya adalah tidak boleh merokok."
+          },
+          {
+            "exampleJp": "電気はついている。ということは、誰か部屋にいるはずだ。",
+            "exampleKana": "でんきはついている。ということは、だれかへやにいるはずだ。",
+            "exampleEn": "The light is on. Which means someone should be in the room.",
+            "exampleId": "Lampu menyala. Berarti seharusnya ada orang di dalam kamar."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "chapter": 30,
+    "titleEn": "Polite Requests, Correlation & Wishes",
+    "titleId": "Permohonan Izin Sopan, Korelasi & Doa",
+    "patterns": [
+      {
+        "id": "v-sasete-itadakemasenka",
+        "pattern": "V使役て いただけませんか / くれませんか",
+        "jlpt": "N4",
+        "descEn": "Extremely polite request asking for permission to allow the speaker to do an action ('would you please allow me to...?').",
+        "descId": "Permohonan izin sangat sopan meminta agar pembicara diperbolehkan melakukan sesuatu.",
+        "examples": [
+          {
+            "exampleJp": "体調が悪いので、早退させていただけませんか。",
+            "exampleKana": "たいちょうがわるいので、そうたいさせていただけませんか。",
+            "exampleEn": "Since I feel unwell, could you please allow me to leave early?",
+            "exampleId": "Karena kurang sehat, bolehkah saya minta izin pulang lebih awal?"
+          },
+          {
+            "exampleJp": "この資料をコピーさせていただけませんか。",
+            "exampleKana": "このしりょうをこぴーさせていただけませんか。",
+            "exampleEn": "Could you please let me make a copy of this document?",
+            "exampleId": "Bolehkah saya diperkenankan mengopi dokumen ini?"
+          },
+          {
+            "exampleJp": "少し考えさせてくれませんか。",
+            "exampleKana": "すこしかんがえさせてくれませんか。",
+            "exampleEn": "Could you please let me think for a moment?",
+            "exampleId": "Bisakah beri saya waktu sebentar untuk berpikir?"
+          }
+        ]
+      },
+      {
+        "id": "v-ba-hodo",
+        "pattern": "Vば V辞書形 ほど / Aければ Aい ほど",
+        "jlpt": "N4",
+        "descEn": "Indicates proportional correlation between two states ('the more..., the more...').",
+        "descId": "Menyatakan korelasi sebanding ('semakin... semakin...').",
+        "examples": [
+          {
+            "exampleJp": "日本語は勉強すればするほど難しくなりますが、面白いです。",
+            "exampleKana": "にほんごはべんきょうすればするほどむずかしくなりますが、おもしろいです。",
+            "exampleEn": "The more you study Japanese, the harder it gets, but it is interesting.",
+            "exampleId": "Bahasa Jepang semakin dipelajari semakin susah, tapi menarik."
+          },
+          {
+            "exampleJp": "早ければ早いほどいいです。",
+            "exampleKana": "はやければはやいほどいいです。",
+            "exampleEn": "The sooner, the better.",
+            "exampleId": "Semakin cepat semakin baik."
+          },
+          {
+            "exampleJp": "この本は読めば読むほど味がでます。",
+            "exampleKana": "このほんはよめばよむほどあじがでます。",
+            "exampleEn": "The more you read this book, the more meaningful it becomes.",
+            "exampleId": "Buku ini semakin dibaca semakin terasa maknanya."
+          }
+        ]
+      },
+      {
+        "id": "v-te-hajimete",
+        "pattern": "Vて はじめて",
+        "jlpt": "N4",
+        "descEn": "Indicates realizing something only after experiencing an action for the first time ('only after doing V did I realize').",
+        "descId": "Baru setelah mengalami/melakukan hal itu, seseorang pertama kali menyadari.",
+        "examples": [
+          {
+            "exampleJp": "病気になってはじめて、健康の難しさを知りました。",
+            "exampleKana": "びょうきになってはじめて、けんこうのむずかしさをしりました。",
+            "exampleEn": "Only after becoming sick did I realize the value of health.",
+            "exampleId": "Baru setelah jatuh sakit, saya menyadari berharganya kesehatan."
+          },
+          {
+            "exampleJp": "日本へ行ってはじめて、本物の歌舞伎を見ました。",
+            "exampleKana": "にほんへいってはじめて、ほんもののかぶきをみました。",
+            "exampleEn": "Only after going to Japan did I watch real Kabuki for the first time.",
+            "exampleId": "Baru setelah pergi ke Jepang, saya pertama kali nonton Kabuki asli."
+          },
+          {
+            "exampleJp": "自分で一人暮らしをしてはじめて、親のありがたみが分かりました。",
+            "exampleKana": "じぶんでひとりぐらしをしてはじめて、おやのありがたみがわかりました。",
+            "exampleEn": "Only after living alone did I understand my parents' gratitude.",
+            "exampleId": "Baru setelah tinggal sendiri, saya memahami kebaikan orang tua."
+          }
+        ]
+      },
+      {
+        "id": "v-kata",
+        "pattern": "Vstem ＋ 方 (かた)",
+        "jlpt": "N4",
+        "descEn": "Indicates method or way of doing an action ('way of / how to').",
+        "descId": "Cara atau metode melakukan suatu pekerjaan.",
+        "examples": [
+          {
+            "exampleJp": "このパソコンの使い方を教えてください。",
+            "exampleKana": "このぱそこんのつかいかたをおしえてください。",
+            "exampleEn": "Please teach me how to use this computer.",
+            "exampleId": "Tolong ajari saya cara memakai laptop ini."
+          },
+          {
+            "exampleJp": "漢字の書き方を練習しています。",
+            "exampleKana": "かんじのかきかたをれんしゅうしています。",
+            "exampleEn": "I am practicing how to write Kanji.",
+            "exampleId": "Saya sedang latihan cara menulis Kanji."
+          },
+          {
+            "exampleJp": "美味しいお寿司の作り方を知りたいです。",
+            "exampleKana": "おいしいおすしのつくりかたをしりたいです。",
+            "exampleEn": "I want to know how to make delicious sushi.",
+            "exampleId": "Saya ingin tahu cara membuat sushi yang enak."
+          }
+        ]
+      },
+      {
+        "id": "v-to-iitara-ii",
+        "pattern": "普通形 といい / たらいい / といいですね",
+        "jlpt": "N4",
+        "descEn": "Expresses hopes, wishes for oneself or others ('I hope that / it would be good if').",
+        "descId": "Mendoakan atau berharap agar sesuatu berjalan baik ('semoga / alangkah baiknya jika').",
+        "examples": [
+          {
+            "exampleJp": "明日は晴れるといいですね。",
+            "exampleKana": "あしたははれるといいですね。",
+            "exampleEn": "I hope it will be sunny tomorrow.",
+            "exampleId": "Semoga besok cerah ya."
+          },
+          {
+            "exampleJp": "試験に合格できるといいですね。",
+            "exampleKana": "しけんにごうかくできるといいですね。",
+            "exampleEn": "I hope you can pass the exam.",
+            "exampleId": "Semoga bisa lulus ujian ya."
+          },
+          {
+            "exampleJp": "早く風邪が治るといいですね。",
+            "exampleKana": "はやくかぜがなおるといいですね。",
+            "exampleEn": "I hope your cold gets better soon.",
+            "exampleId": "Semoga flu-nya cepat sembuh ya."
+          }
+        ]
+      }
+    ]
   }
+
 ];
