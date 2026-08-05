@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Button,
   Card,
@@ -15,7 +15,6 @@ import {
   HelpCircle,
   Pencil,
   MousePointerClick,
-  PartyPopper,
   Lightbulb,
   BookOpen,
   Flame,
@@ -24,10 +23,12 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
-  ChevronRight,
-  Compass,
 } from "lucide-react";
-import { ExploreDrawer, ExploreTarget } from "@/src/modules/explore/components/ExploreDrawer";
+import {
+  AnkiRecapItem,
+  mergeRecapItem,
+  saveSessionRecap,
+} from "@/src/modules/anki/lib/sessionRecap";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
@@ -186,13 +187,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     {},
   );
   const [soundSetting, setSoundSetting] = useState<"on" | "off">("on");
-  const [isExploreOpen, setIsExploreOpen] = useState(false);
-  const [exploreTarget, setExploreTarget] = useState<ExploreTarget | null>(null);
-
-  const handleOpenExplore = (word: string) => {
-    setExploreTarget({ type: "vocab", query: word });
-    setIsExploreOpen(true);
-  };
+  const router = useRouter();
   const searchParams = useSearchParams();
   const deckParam = searchParams.get("deck");
 
@@ -243,10 +238,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [isWritingActive, setIsWritingActive] = useState(false);
   const [gradingScore, setGradingScore] = useState<number | null>(null);
 
-  // Kanji/vocab yang sudah direview di sesi ini (untuk recap Explore setelah sesi selesai)
-  const [sessionRecap, setSessionRecap] = useState<
-    Array<{ cardKey: string; kanji: string; hiragana: string; translation: string }>
-  >([]);
+  // Kanji/vocab yang sudah direview di sesi ini beserta ratingnya (bahan halaman recap)
+  const [sessionRecap, setSessionRecap] = useState<AnkiRecapItem[]>([]);
+  const [sessionStartedAt, setSessionStartedAt] = useState<number>(0);
 
   const currentCard = sessionQueue[currentIndex];
 
@@ -626,6 +620,32 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setSessionFinished(false);
     setPendingReviews([]);
     setSessionRecap([]);
+    setSessionStartedAt(Date.now());
+  };
+
+  // Label dek untuk ditampilkan di halaman recap
+  const deckLabel = useMemo(() => {
+    if (deckType === "dekiru") {
+      return `Dekiru Nihongo · ${selectedChaptersText}`;
+    }
+    return customCards[0]?.chapter || "Custom Deck";
+  }, [deckType, selectedChaptersText, customCards]);
+
+  // Sesi selesai: simpan recap lalu pindah ke halaman recap
+  const finishSession = (recapItems: AnkiRecapItem[], totalReviews: number) => {
+    saveSessionRecap({
+      version: 1,
+      mode: ankiMode,
+      deckLabel,
+      direction: reviewDirection,
+      startedAt: sessionStartedAt || Date.now(),
+      endedAt: Date.now(),
+      totalReviews,
+      items: recapItems,
+    });
+    setSessionFinished(true);
+    setIsWritingActive(false);
+    router.push("/anki/recap");
   };
 
   // Kirim semua review yang tertunda ke API dalam satu batch
@@ -690,20 +710,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
       setAnkiIsCorrect(false);
       setAnkiUsedHint(false);
       setIsWritingActive(false);
-      setReviewedCount((prev) => prev + 1);
-      setSessionRecap((prev) =>
-        prev.some((c) => c.cardKey === currentCard.cardKey)
-          ? prev
-          : [
-              ...prev,
-              {
-                cardKey: currentCard.cardKey,
-                kanji: currentCard.kanji,
-                hiragana: currentCard.hiragana,
-                translation: currentCard.translation,
-              },
-            ],
-      );
+      const nextReviewedCount = reviewedCount + 1;
+      setReviewedCount(nextReviewedCount);
+      const nextRecap = mergeRecapItem(sessionRecap, currentCard, rating);
+      setSessionRecap(nextRecap);
 
       const cardReview = {
         cardKey: currentCard.cardKey,
@@ -729,7 +739,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
       } else {
         // Sudah tahu: lanjut ke kartu berikutnya (keluarkan dari sisa sesi)
         if (currentIndex + 1 >= sessionQueue.length) {
-          setSessionFinished(true);
           if (postMode === "session") {
             const nextReviews = [
               ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
@@ -737,6 +746,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
             ];
             await triggerSaveBatch(nextReviews);
           }
+          finishSession(nextRecap, nextReviewedCount);
         } else {
           setCurrentIndex((prev) => prev + 1);
         }
@@ -760,20 +770,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
       setAnkiIsCorrect(false);
       setAnkiUsedHint(false);
       setIsWritingActive(false);
-      setReviewedCount((prev) => prev + 1);
-      setSessionRecap((prev) =>
-        prev.some((c) => c.cardKey === currentCard.cardKey)
-          ? prev
-          : [
-              ...prev,
-              {
-                cardKey: currentCard.cardKey,
-                kanji: currentCard.kanji,
-                hiragana: currentCard.hiragana,
-                translation: currentCard.translation,
-              },
-            ],
-      );
+      const nextReviewedCount = reviewedCount + 1;
+      setReviewedCount(nextReviewedCount);
+      const nextRecap = mergeRecapItem(sessionRecap, currentCard, rating);
+      setSessionRecap(nextRecap);
 
       const cardReview = {
         cardKey: currentCard.cardKey,
@@ -799,7 +799,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
       } else {
         // Pindah ke kartu berikutnya
         if (currentIndex + 1 >= sessionQueue.length) {
-          setSessionFinished(true);
           if (postMode === "session") {
             const nextReviews = [
               ...pendingReviews.filter((r) => r.cardKey !== currentCard.cardKey),
@@ -807,6 +806,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
             ];
             await triggerSaveBatch(nextReviews);
           }
+          finishSession(nextRecap, nextReviewedCount);
         } else {
           setCurrentIndex((prev) => prev + 1);
         }
@@ -1941,86 +1941,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
         </Modal.Backdrop>
       </Modal>
 
-      {/* Modal Sesi Selesai */}
-      <Modal
-        isOpen={sessionFinished}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSessionQueue([]);
-            setSessionFinished(false);
-          }
-        }}
-      >
-        <Modal.Backdrop>
-          <Modal.Container className="flex items-center justify-center min-h-screen w-screen">
-            <Modal.Dialog className="sm:max-w-md">
-              <Modal.CloseTrigger />
-              <Modal.Header className="flex flex-col items-center text-center pt-6">
-                <PartyPopper size={44} className="mb-2 text-accent" />
-                <Modal.Heading className="font-bold text-foreground text-xl">
-                  {t.ankiFinishedTitle || "Session complete"}
-                </Modal.Heading>
-              </Modal.Header>
-              <Modal.Body className="flex flex-col items-center text-center gap-4 py-4">
-                <p className="text-sm text-muted">
-                  {t.ankiFinishedDesc ||
-                    "You have reviewed all the cards in this session."}
-                </p>
-                <div className="text-xs bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 px-3 py-1.5 rounded-full font-bold">
-                  Reviewed: {reviewedCount} Cards
-                </div>
-
-                {sessionRecap.length > 0 && (
-                  <div className="w-full flex flex-col items-stretch gap-2 mt-1 text-left">
-                    <p className="flex items-center gap-1.5 text-xs font-bold text-muted uppercase tracking-wide">
-                      <Compass size={13} />
-                      Explore what you studied
-                    </p>
-                    <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto pr-1">
-                      {sessionRecap.map((item) => (
-                        <button
-                          key={item.cardKey}
-                          type="button"
-                          onClick={() => {
-                            setSessionFinished(false);
-                            handleOpenExplore(
-                              item.kanji !== "-" ? item.kanji : item.hiragana,
-                            );
-                          }}
-                          className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-border/60 rounded-xl text-left transition-colors cursor-pointer"
-                        >
-                          <span className="flex flex-col min-w-0">
-                            <span className="font-jp text-sm font-bold text-foreground truncate">
-                              {item.kanji !== "-" ? item.kanji : item.hiragana}
-                            </span>
-                            <span className="text-xs text-muted truncate">
-                              {item.translation}
-                            </span>
-                          </span>
-                          <ChevronRight
-                            size={16}
-                            className="text-muted shrink-0"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </Modal.Body>
-              <Modal.Footer className="flex justify-center pb-6">
-                <Button
-                  slot="close"
-                  variant="primary"
-                  className="w-full font-semibold cursor-pointer"
-                >
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
-
       {/* Modal Pengaturan Anki */}
       <Modal
         isOpen={isSettingsOpen}
@@ -2201,12 +2121,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
         </Modal.Backdrop>
       </Modal>
 
-      {/* Explore Layer Drawer */}
-      <ExploreDrawer
-        isOpen={isExploreOpen}
-        onClose={() => setIsExploreOpen(false)}
-        initialTarget={exploreTarget}
-      />
     </div>
   );
 }

@@ -1,7 +1,16 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Volume2, Loader2, Sparkles, BookOpen, Layers } from "lucide-react";
+import {
+  Volume2,
+  Loader2,
+  Sparkles,
+  BookOpen,
+  Layers,
+  Brain,
+  AlertTriangle,
+  Image as ImageIcon,
+} from "lucide-react";
 import { ProgressBadge, ProgressStatus } from "./ProgressBadge";
 import { cleanJMdictArray, cleanJMdictString } from "@/src/shared/lib/sanitize";
 
@@ -12,9 +21,33 @@ interface KanjiGridItem {
   strokeCount: number;
   grade: number | null;
   jlpt: number | null;
+  status?: ProgressStatus;
   meanings: string[];
   onyomi: string[];
   kunyomi: string[];
+}
+
+interface SrsSnapshot {
+  interval: number;
+  ease: number;
+  repetitions: number;
+  dueDate: string | null;
+  status: ProgressStatus;
+}
+
+interface SimilarKanjiItem {
+  kanji: string;
+  similarKanji: string;
+  reason: string;
+  difficulty: string;
+}
+
+interface MnemonicItem {
+  moji: string;
+  yomi: string;
+  imi: string;
+  mnemonic: string | null;
+  examples: Array<{ word: string; yomi: string; imi: string }>;
 }
 
 interface RelatedWordItem {
@@ -28,6 +61,9 @@ interface RelatedWordItem {
 interface VocabularyExploreData {
   queryWord: string;
   userStatus?: ProgressStatus;
+  srs?: SrsSnapshot | null;
+  similarKanji?: SimilarKanjiItem[];
+  mnemonics?: MnemonicItem[];
   vocabulary: {
     id: number | null;
     entrySeq: number | null;
@@ -113,10 +149,39 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
     );
   }
 
-  const { vocabulary, ankiData, kanjiGrid, relatedWords, userStatus } = data;
+  const {
+    vocabulary,
+    ankiData,
+    kanjiGrid,
+    relatedWords,
+    userStatus,
+    srs,
+    similarKanji = [],
+    mnemonics = [],
+  } = data;
 
   // Format and clean meanings
   const meaningLines = cleanJMdictArray(vocabulary.meanings);
+
+  // Sisa hari sampai review berikutnya (null kalau kata ini belum pernah direview)
+  const daysUntilDue = (() => {
+    if (!srs?.dueDate) return null;
+    const diffMs = new Date(srs.dueDate).getTime() - Date.now();
+    return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  })();
+
+  const dueLabel =
+    daysUntilDue === null
+      ? "—"
+      : daysUntilDue <= 0
+        ? "Due now"
+        : daysUntilDue === 1
+          ? "Tomorrow"
+          : `In ${daysUntilDue} days`;
+
+  const hasMemoryHooks = mnemonics.some(
+    (m) => m.mnemonic || m.examples.length > 0,
+  );
 
   return (
     <div className="flex flex-col gap-6 py-2 text-slate-900 dark:text-slate-100">
@@ -166,6 +231,55 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
         </div>
       </div>
 
+      {/* Your Memory (SRS snapshot) */}
+      {srs && (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 px-1 text-base font-semibold text-slate-800 dark:text-slate-300">
+            <Brain className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+            <span>Your Memory</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { label: "Next review", value: dueLabel },
+              { label: "Interval", value: `${srs.interval}d` },
+              { label: "Reviews", value: String(srs.repetitions) },
+              { label: "Ease", value: srs.ease.toFixed(2) },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="flex flex-col gap-1 p-3 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl"
+              >
+                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  {stat.label}
+                </span>
+                <span className="text-lg font-black leading-none text-slate-900 dark:text-white">
+                  {stat.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Visual Hook (gambar kartu Anki) */}
+      {ankiData?.image && (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 px-1 text-base font-semibold text-slate-800 dark:text-slate-300">
+            <ImageIcon className="w-4 h-4 text-pink-500 dark:text-pink-400" />
+            <span>Visual Hook</span>
+          </div>
+          <div className="flex justify-center p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`/anki-media/${ankiData.image}`}
+              alt={vocabulary.kanji}
+              className="max-h-56 w-auto rounded-xl object-contain"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Kanji Breakdown Section */}
       {kanjiGrid.length > 0 && (
         <div className="flex flex-col gap-3">
@@ -187,12 +301,25 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
                 <div className="w-11 h-11 flex items-center justify-center bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-2xl font-black text-slate-900 dark:text-white group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors font-japanese">
                   {k.literal}
                 </div>
-                <div className="flex flex-col min-w-0">
+                <div className="flex flex-col min-w-0 gap-1">
                   <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
                     {cleanJMdictString(k.meanings.slice(0, 2).join(", "))}
                   </span>
                   <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                     {k.onyomi.concat(k.kunyomi).slice(0, 2).join(" • ")}
+                  </span>
+                  <span className="flex flex-wrap items-center gap-1">
+                    <span className="px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[9px] font-bold text-slate-600 dark:text-slate-300">
+                      {k.strokeCount} strokes
+                    </span>
+                    {k.jlpt && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-indigo-500/10 text-[9px] font-bold text-indigo-500">
+                        N{k.jlpt}
+                      </span>
+                    )}
+                    {k.status && k.status !== "new" && (
+                      <ProgressBadge status={k.status} size="sm" />
+                    )}
                   </span>
                 </div>
               </button>
@@ -227,6 +354,106 @@ export const VocabularyExploreView: React.FC<VocabularyExploreViewProps> = ({
                 Listen Sentence
               </button>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Memory Hooks: mnemonic buatan user + contoh pemakaian per kanji */}
+      {hasMemoryHooks && (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 px-1 text-base font-semibold text-slate-800 dark:text-slate-300">
+            <Brain className="w-4 h-4 text-teal-500 dark:text-teal-400" />
+            <span>Memory Hooks</span>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {mnemonics
+              .filter((m) => m.mnemonic || m.examples.length > 0)
+              .map((m) => (
+                <div
+                  key={m.moji}
+                  className="flex flex-col gap-3 p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-2xl font-black font-japanese text-slate-900 dark:text-white">
+                      {m.moji}
+                    </span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
+                        {m.imi}
+                      </span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-japanese truncate">
+                        {m.yomi}
+                      </span>
+                    </div>
+                  </div>
+
+                  {m.mnemonic && (
+                    <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300 border-l-2 border-teal-500/60 pl-3 italic">
+                      {m.mnemonic}
+                    </p>
+                  )}
+
+                  {m.examples.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {m.examples.map((ex, i) => (
+                        <button
+                          key={`${m.moji}-${i}`}
+                          onClick={() => onSelectWord(ex.word)}
+                          className="flex flex-col items-start px-3 py-1.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-teal-500/50 rounded-xl text-left transition-colors"
+                        >
+                          <span className="text-sm font-bold font-japanese text-slate-900 dark:text-slate-100">
+                            {ex.word}
+                          </span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                            {ex.yomi} · {ex.imi}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* Easily Confused: kanji yang bentuknya mirip */}
+      {similarKanji.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 px-1 text-base font-semibold text-slate-800 dark:text-slate-300">
+            <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+            <span>Easily Confused</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {similarKanji.map((s) => (
+              <button
+                key={`${s.kanji}-${s.similarKanji}`}
+                onClick={() => onSelectKanji(s.similarKanji)}
+                className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 hover:border-amber-500/60 rounded-2xl text-left transition-colors"
+              >
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="text-2xl font-black font-japanese text-slate-900 dark:text-white">
+                    {s.kanji}
+                  </span>
+                  <span className="text-xs text-amber-600 dark:text-amber-500 font-bold">
+                    vs
+                  </span>
+                  <span className="text-2xl font-black font-japanese text-amber-600 dark:text-amber-400">
+                    {s.similarKanji}
+                  </span>
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs text-slate-700 dark:text-slate-300 leading-snug">
+                    {s.reason}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wide text-amber-600/80 dark:text-amber-500/80 mt-1">
+                    {s.difficulty}
+                  </span>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       )}

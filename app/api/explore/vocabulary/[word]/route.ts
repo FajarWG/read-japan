@@ -56,21 +56,43 @@ export async function GET(
     // 3. User progress status calculation
     let userProgressStatus: "learned" | "learning" | "weak" | "new" = "new";
     let progressMap: Record<string, "learned" | "learning" | "weak" | "new"> = {};
+    // Detail SRS kata ini, dipakai untuk panel "Your memory" di Explore
+    let srs: {
+      interval: number;
+      ease: number;
+      repetitions: number;
+      dueDate: string | null;
+      status: "learned" | "learning" | "weak" | "new";
+    } | null = null;
 
     if (session?.id) {
       const userProgressRecords = await prisma.ankiProgress.findMany({
         where: { userId: session.id },
-        select: { cardKey: true, interval: true, ease: true, repetitions: true },
+        select: {
+          cardKey: true,
+          interval: true,
+          ease: true,
+          repetitions: true,
+          dueDate: true,
+        },
       });
 
       for (const rec of userProgressRecords) {
         const status = calculateStatus(rec);
         progressMap[rec.cardKey] = status;
         // Key matching: custom-{id} or cardKey containing kanji
-        if (ankiCard && rec.cardKey === `custom-${ankiCard.id}`) {
+        const isThisWord =
+          (ankiCard && rec.cardKey === `custom-${ankiCard.id}`) ||
+          rec.cardKey.includes(word);
+        if (isThisWord) {
           userProgressStatus = status;
-        } else if (rec.cardKey.includes(word)) {
-          userProgressStatus = status;
+          srs = {
+            interval: rec.interval,
+            ease: rec.ease,
+            repetitions: rec.repetitions,
+            dueDate: rec.dueDate ? new Date(rec.dueDate).toISOString() : null,
+            status,
+          };
         }
       }
     }
@@ -159,9 +181,87 @@ export async function GET(
         .slice(0, 10);
     }
 
+    // 6. Kanji yang mudah tertukar dengan komponen kata ini (bahan waspada saat menghafal)
+    let similarKanji: Array<{
+      kanji: string;
+      similarKanji: string;
+      reason: string;
+      difficulty: string;
+    }> = [];
+
+    if (kanjiChars.length > 0) {
+      const similarRows = await prisma.similarKanji.findMany({
+        where: { kanji: { in: kanjiChars } },
+        select: {
+          kanji: true,
+          similarKanji: true,
+          reason: true,
+          difficulty: true,
+        },
+        take: 8,
+      });
+      similarKanji = similarRows;
+    }
+
+    // 7. Mnemonic buatan user + contoh pemakaian dari Kanji Tamago
+    let mnemonics: Array<{
+      moji: string;
+      yomi: string;
+      imi: string;
+      mnemonic: string | null;
+      examples: Array<{ word: string; yomi: string; imi: string }>;
+    }> = [];
+
+    if (kanjiChars.length > 0) {
+      const tamagoEntries = await prisma.kanjiTamago.findMany({
+        where: { moji: { in: kanjiChars } },
+        select: {
+          id: true,
+          moji: true,
+          yomi: true,
+          imi: true,
+          examples: true,
+        },
+      });
+
+      let mnemonicByKanjiId: Record<number, string | null> = {};
+      if (session?.id && tamagoEntries.length > 0) {
+        const tamagoProgress = await prisma.kanjiTamagoProgress.findMany({
+          where: {
+            userId: session.id,
+            kanjiId: { in: tamagoEntries.map((e: { id: number }) => e.id) },
+          },
+          select: { kanjiId: true, mnemonic: true },
+        });
+        for (const p of tamagoProgress) {
+          mnemonicByKanjiId[p.kanjiId] = p.mnemonic;
+        }
+      }
+
+      const seenMoji = new Set<string>();
+      for (const entry of tamagoEntries) {
+        if (seenMoji.has(entry.moji)) continue;
+        seenMoji.add(entry.moji);
+        const rawExamples =
+          typeof entry.examples === "string"
+            ? JSON.parse(entry.examples)
+            : entry.examples;
+        mnemonics.push({
+          moji: entry.moji,
+          yomi: entry.yomi,
+          imi: entry.imi,
+          mnemonic: mnemonicByKanjiId[entry.id] ?? null,
+          examples: Array.isArray(rawExamples) ? rawExamples.slice(0, 4) : [],
+        });
+      }
+    }
+
     return NextResponse.json({
       queryWord: word,
       userStatus: userProgressStatus,
+      srs,
+      similarKanji,
+      mnemonics,
       vocabulary: vocab ? {
         id: vocab.id,
         entrySeq: vocab.entrySeq,
