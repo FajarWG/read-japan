@@ -67,6 +67,7 @@ export interface KakouSentenceFeedback {
   improved?: string;
   meaning?: string;
   explanation?: string;
+  suggestedKanji?: string[];
 }
 
 export interface KakouFeedback {

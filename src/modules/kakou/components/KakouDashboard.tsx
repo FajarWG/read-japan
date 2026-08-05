@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { Modal } from "@heroui/react";
 import {
   Award,
   BookOpen,
@@ -96,7 +97,11 @@ Gunakan struktur JSON berikut:
       "corrected": "koreksi minimum tata bahasa/partikel/ejaan agar benar",
       "improved": "versi yang lebih alami/natural bagi penutur asli",
       "meaning": "arti kalimat versi improved dalam bahasa indonesia",
-      "explanation": "alasan singkat perbaikan tata bahasa/partikel"
+      "explanation": "alasan singkat perbaikan tata bahasa/partikel",
+      "suggestedKanji": [
+        "わたし → 私 (JLPT N5)",
+        "ともだち → 友達 (JLPT N5)"
+      ]
     }
   ],
   "errorPatterns": [
@@ -107,6 +112,9 @@ Gunakan struktur JSON berikut:
   ]
 }
 \`\`\`
+
+Catatan Tambahan:
+- Jika user masih menulis kata menggunakan Hiragana padahal kata tersebut lazim ditulis dengan Kanji sesuai level JLPT ini, berikan saran Kanji pada array "suggestedKanji" (contoh: ["たべます → 食べます (JLPT N5)", "とうきょう → 東京 (JLPT N5)"]).
 
 Ketentuan Skor (0 - 100):
 - 90-100: Sangat alami & tata bahasa tepat.
@@ -129,7 +137,8 @@ ${session.prompts
 CRITICAL REQUIREMENT:
 1. Transkripsikan tulisan tangan pada foto secara akurat.
 2. Periksa tata bahasa, partikel, ejaan, dan kealamian kalimat.
-3. Kembalikan SELURUH hasil evaluasi HANYA dalam format JSON valid (di dalam kode blok \`\`\`json ... \`\`\`) tanpa teks tambahan di luar JSON.
+3. Jika tulisan masih menggunakan Hiragana untuk kata yang lazim memakai Kanji sesuai level JLPT ${session.level}, berikan saran Kanji pada array "suggestedKanji" (contoh: ["わたし → 私", "たべます → 食べます"]).
+4. Kembalikan SELURUH hasil evaluasi HANYA dalam format JSON valid (di dalam kode blok \`\`\`json ... \`\`\`) tanpa teks tambahan di luar JSON.
 
 Gunakan struktur JSON berikut:
 \`\`\`json
@@ -142,7 +151,11 @@ Gunakan struktur JSON berikut:
       "corrected": "koreksi minimum agar kalimat benar",
       "improved": "versi yang lebih alami/natural",
       "meaning": "arti dalam bahasa indonesia",
-      "explanation": "penjelasan kesalahan partikel/kanji/tata bahasa"
+      "explanation": "penjelasan kesalahan partikel/kanji/tata bahasa",
+      "suggestedKanji": [
+        "わたし → 私 (JLPT N5)",
+        "ともだち → 友達 (JLPT N5)"
+      ]
     }
   ],
   "errorPatterns": [
@@ -236,6 +249,20 @@ function ReviewDisplayCard({ feedback }: { feedback: KakouFeedback }) {
                   <div className="rounded-xl bg-blue-500/5 p-3 border border-blue-500/20">
                     <span className="text-[10px] font-bold uppercase text-blue-600 block mb-0.5">Versi Alami / Natural</span>
                     <p className="font-jp text-sm text-blue-700 dark:text-blue-300 font-medium">{item.improved}</p>
+                  </div>
+                )}
+                {item.suggestedKanji && item.suggestedKanji.length > 0 && (
+                  <div className="rounded-xl bg-purple-500/10 p-3 border border-purple-500/20">
+                    <span className="text-[10px] font-bold uppercase text-purple-600 dark:text-purple-400 block mb-1">
+                      ✏️ Saran Kanji (dari Hiragana)
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {item.suggestedKanji.map((kanji, kIdx) => (
+                        <span key={kIdx} className="font-jp text-xs bg-background px-2.5 py-1 rounded-md border border-purple-500/30 text-foreground font-medium">
+                          {kanji}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
                 {item.meaning && (
@@ -807,65 +834,65 @@ export function KakouDashboard({
         </section>
       </div>
 
-      {/* History Detail Modal */}
-      {selectedHistorySession && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-border bg-background p-6 shadow-xl flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div>
+      {/* History Detail Modal via Hero UI */}
+      <Modal isOpen={Boolean(selectedHistorySession)} onOpenChange={(open) => { if (!open) setSelectedHistorySession(null); }}>
+        <Modal.Backdrop>
+          <Modal.Container className="flex items-center justify-center min-h-screen w-screen p-4">
+            <Modal.Dialog className="sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-background rounded-3xl border border-border p-6 shadow-xl flex flex-col gap-4">
+              <Modal.CloseTrigger />
+              <Modal.Header className="pb-3 border-b border-border/20 flex flex-col">
                 <p className="text-xs font-bold text-accent uppercase">Writing History Details</p>
-                <h2 className="text-lg font-bold text-foreground">
-                  {KAKOU_MODE_LABELS[selectedHistorySession.mode].title} ({selectedHistorySession.level})
-                </h2>
-                <p className="text-xs text-muted">{formatDate(selectedHistorySession.completedAt ?? selectedHistorySession.startedAt)}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedHistorySession(null)}
-                className="rounded-full p-2 text-muted hover:bg-surface-muted hover:text-foreground"
-              >
-                <X size={20} />
-              </button>
-            </div>
+                <Modal.Heading className="text-lg font-bold text-foreground">
+                  {selectedHistorySession ? KAKOU_MODE_LABELS[selectedHistorySession.mode].title : ""} ({selectedHistorySession?.level})
+                </Modal.Heading>
+                {selectedHistorySession && (
+                  <p className="text-xs text-muted mt-0.5">{formatDate(selectedHistorySession.completedAt ?? selectedHistorySession.startedAt)}</p>
+                )}
+              </Modal.Header>
 
-            {selectedHistorySession.score !== null && (
-              <div className="flex items-center justify-between rounded-2xl border border-border bg-surface p-4">
-                <span className="text-sm font-bold text-foreground">Score Evaluation</span>
-                <ScoreBadge score={selectedHistorySession.score} />
-              </div>
-            )}
+              <Modal.Body className="py-4 flex flex-col gap-4">
+                {selectedHistorySession && selectedHistorySession.score !== null && (
+                  <div className="flex items-center justify-between rounded-2xl border border-border bg-surface p-4">
+                    <span className="text-sm font-bold text-foreground">Score Evaluation</span>
+                    <ScoreBadge score={selectedHistorySession.score} />
+                  </div>
+                )}
 
-            {selectedHistorySession.feedbackJson ? (
-              <ReviewDisplayCard feedback={selectedHistorySession.feedbackJson} />
-            ) : (
-              <div className="rounded-2xl bg-surface-muted p-4 text-center text-xs text-muted">
-                Belum ada AI Review JSON yang disimpan untuk sesi ini.
-              </div>
-            )}
+                {selectedHistorySession?.feedbackJson ? (
+                  <ReviewDisplayCard feedback={selectedHistorySession.feedbackJson} />
+                ) : (
+                  <div className="rounded-2xl bg-surface-muted p-4 text-center text-xs text-muted">
+                    Belum ada AI Review JSON yang disimpan untuk sesi ini.
+                  </div>
+                )}
 
-            <div className="flex flex-col gap-3 mt-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-muted">Kartu Soal Sesi Ini</p>
-              {selectedHistorySession.prompts.map((p, idx) => (
-                <div key={idx} className="rounded-2xl border border-border bg-surface p-4 text-xs">
-                  <span className="font-bold text-accent block mb-1">Step {idx + 1}: {p.title}</span>
-                  <p className="font-jp text-sm font-medium text-foreground mb-1">{p.japanese}</p>
-                  <p className="text-muted">{p.instruction}</p>
-                </div>
-              ))}
-            </div>
+                {selectedHistorySession && selectedHistorySession.prompts.length > 0 && (
+                  <div className="flex flex-col gap-3 mt-2">
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted">Kartu Soal Sesi Ini</p>
+                    {selectedHistorySession.prompts.map((p, idx) => (
+                      <div key={idx} className="rounded-2xl border border-border bg-surface p-4 text-xs">
+                        <span className="font-bold text-accent block mb-1">Step {idx + 1}: {p.title}</span>
+                        <p className="font-jp text-sm font-medium text-foreground mb-1">{p.japanese}</p>
+                        <p className="text-muted">{p.instruction}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Modal.Body>
 
-            <div className="mt-2 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setSelectedHistorySession(null)}
-                className="rounded-xl bg-accent px-5 py-2 text-xs font-bold text-white shadow-sm hover:brightness-95"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <Modal.Footer className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setSelectedHistorySession(null)}
+                  className="rounded-xl bg-accent px-5 py-2 text-xs font-bold text-white shadow-sm hover:brightness-95 cursor-pointer"
+                >
+                  Close
+                </button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </main>
   );
 }
