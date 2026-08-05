@@ -39,10 +39,8 @@ import {
   type KakouSessionView,
   type KakouSourceType,
 } from "@/src/modules/kakou/data/types";
-import { startStudyTimer } from "@/src/modules/study-timer/actions/studyTimerActions";
 import {
   formatStudyTime,
-  StudyTimerBar,
 } from "@/src/modules/study-timer/components/StudyTimerBar";
 import type { StudyTimerView } from "@/src/modules/study-timer/types";
 
@@ -236,8 +234,6 @@ export function KakouDashboard({
 }) {
   const [overview, setOverview] = useState(initialOverview);
   const [active, setActive] = useState(initialOverview.activeSession);
-  const [timer, setTimer] = useState<StudyTimerView | null>(initialOverview.timer.activeTimer);
-  const [timerEnabled, setTimerEnabled] = useState(true);
   const [mode, setMode] = useState<KakouMode>("DAILY_MIX");
   const [level, setLevel] = useState<KakouLevel>("N5");
   const [duration, setDuration] = useState<KakouDuration>(10);
@@ -260,11 +256,7 @@ export function KakouDashboard({
         return;
       }
       setActive(result.session);
-      if (timerEnabled && (!timer || timer.kakouSessionId !== result.session.id)) {
-        const timerResult = await startStudyTimer(result.session.id);
-        if (timerResult.success) setTimer(timerResult.timer);
-        else setMessage(timerResult.error);
-      } else if (result.resumed) {
+      if (result.resumed) {
         setMessage("Your unfinished session has been restored.");
       }
     });
@@ -294,7 +286,6 @@ export function KakouDashboard({
       }
       setOverview(result.overview);
       setActive(null);
-      setTimer(result.overview.timer.activeTimer);
       setCopied(null);
       setMessage("Session saved. Nice work — your streak has been updated.");
     });
@@ -311,7 +302,6 @@ export function KakouDashboard({
       }
       setOverview(result.overview);
       setActive(null);
-      setTimer(result.overview.timer.activeTimer);
       setCopied(null);
     });
   };
@@ -350,13 +340,6 @@ export function KakouDashboard({
               <X size={14} /> Abandon
             </button>
           </header>
-
-          <StudyTimerBar
-            kakouSessionId={active.id}
-            timer={timer?.kakouSessionId === active.id ? timer : null}
-            onChange={setTimer}
-            onError={setMessage}
-          />
 
           <section className="rounded-2xl border border-border bg-surface px-4 py-3">
             <div className="mb-2 flex items-center justify-between text-xs">
@@ -555,22 +538,6 @@ export function KakouDashboard({
                 ))}
               </div>
             </fieldset>
-          </div>
-
-          <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl border border-border bg-background p-4">
-            <div>
-              <p className="text-sm font-bold text-foreground">Track actual study time</p>
-              <p className="mt-0.5 text-xs text-muted">The timer stays visible and can be paused anytime.</p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={timerEnabled}
-              onClick={() => setTimerEnabled((value) => !value)}
-              className={`relative h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors ${timerEnabled ? "bg-accent" : "bg-border"}`}
-            >
-              <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${timerEnabled ? "translate-x-6" : "translate-x-1"}`} />
-            </button>
           </div>
 
           <button
