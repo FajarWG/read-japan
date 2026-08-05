@@ -1,12 +1,4 @@
-import type { KakouFeedback, KakouPrompt, KakouSessionView } from "@/src/modules/kakou/data/types";
-
-const KIND_LABELS: Record<KakouPrompt["kind"], string> = {
-  JOURNAL: "Guided journal",
-  COPY_CHANGE_CREATE: "Copy → Change → Create",
-  GRAMMAR: "Grammar challenge",
-  SENTENCE_BUILDER: "Sentence builder",
-  CONJUGATION: "Conjugation drill",
-};
+import type { KakouFeedback, KakouSessionView } from "@/src/modules/kakou/data/types";
 
 const PER_PROMPT_JSON_SCHEMA = `{
   "overallFeedback": "Ringkasan apresiasi & ulasan umum singkat dalam bahasa Indonesia untuk seluruh sesi.",
@@ -32,47 +24,16 @@ const PER_PROMPT_JSON_SCHEMA = `{
       ],
       "reviewPoints": [
         "saran latihan yang perlu diperbaiki untuk latihan ini"
+      ],
+      "additionalExamples": [
+        {
+          "japanese": "contoh kalimat lain yang baik/natural memakai pola atau bentuk yang sama dengan latihan ini",
+          "meaning": "artinya dalam bahasa Indonesia"
+        }
       ]
     }
   ]
 }`;
-
-export function buildTextReviewPrompt(session: KakouSessionView): string {
-  const requirements = session.prompts
-    .map(
-      (item, index) =>
-        `${index + 1}. ${KIND_LABELS[item.kind]}\nTugas: ${item.instruction}${
-          item.pattern ? `\nPola target: ${item.pattern}` : ""
-        }`,
-    )
-    .join("\n\n");
-
-  return `Saya sedang belajar menulis bahasa Jepang secara mandiri. Tolong periksa tulisan saya sebagai guru bahasa Jepang yang teliti.
-
-Level: JLPT ${session.level}
-Latihan:
-${requirements}
-
-Tulisan saya:
-[TULIS ATAU TEMPEL TULISAN BAHASA JEPANGMU DI SINI — pisahkan per nomor latihan sesuai daftar di atas]
-
-CRITICAL REQUIREMENT:
-Kembalikan SELURUH hasil evaluasi HANYA dalam format JSON valid (di dalam kode blok \`\`\`json ... \`\`\`) tanpa teks tambahan di luar JSON. Beri SATU entri "perPrompt" untuk SETIAP nomor latihan di atas (cocokkan "promptIndex" dengan nomornya) — jangan gabungkan semua kalimat jadi satu skor.
-
-Gunakan struktur JSON berikut:
-\`\`\`json
-${PER_PROMPT_JSON_SCHEMA}
-\`\`\`
-
-Catatan Tambahan:
-- Jika user masih menulis kata menggunakan Hiragana padahal kata tersebut lazim ditulis dengan Kanji sesuai level JLPT ini, berikan saran Kanji pada array "suggestedKanji" (contoh: ["たべます → 食べます (JLPT N5)", "とうきょう → 東京 (JLPT N5)"]).
-
-Ketentuan Skor per latihan (0 - 100):
-- 90-100: Sangat alami & tata bahasa tepat.
-- 75-89: Baik dan mudah dipahami, ada 1-2 kesalahan kecil partikel/ejaan.
-- 60-74: Ada kesalahan tata bahasa/partikel yang mengganggu pemahaman.
-- <60: Banyak kesalahan mendasar.`;
-}
 
 export function buildPhotoReviewPrompt(session: KakouSessionView): string {
   return `Saya mengunggah foto tulisan tangan bahasa Jepang untuk diperiksa. Level saya JLPT ${session.level}.
@@ -90,7 +51,8 @@ CRITICAL REQUIREMENT:
 2. Periksa tata bahasa, partikel, ejaan, dan kealamian kalimat.
 3. Cocokkan tulisan pada foto ke nomor latihan di atas berdasarkan urutan/konteksnya, dan beri SATU entri "perPrompt" per nomor latihan (cocokkan "promptIndex" dengan nomornya) — jangan gabungkan semua kalimat jadi satu skor.
 4. Jika tulisan masih menggunakan Hiragana untuk kata yang lazim memakai Kanji sesuai level JLPT ${session.level}, berikan saran Kanji pada array "suggestedKanji" (contoh: ["わたし → 私", "たべます → 食べます"]).
-5. Kembalikan SELURUH hasil evaluasi HANYA dalam format JSON valid (di dalam kode blok \`\`\`json ... \`\`\`) tanpa teks tambahan di luar JSON.
+5. Untuk SETIAP latihan, tambahkan 1-2 "additionalExamples": contoh kalimat LAIN yang baik/natural (bukan koreksi dari tulisan user, tapi contoh baru) yang memakai pola/bentuk tata bahasa yang sama dengan latihan tersebut, lengkap dengan artinya dalam bahasa Indonesia — supaya user punya referensi tambahan seperti apa kalimat yang bagus.
+6. Kembalikan SELURUH hasil evaluasi HANYA dalam format JSON valid (di dalam kode blok \`\`\`json ... \`\`\`) tanpa teks tambahan di luar JSON.
 
 Gunakan struktur JSON berikut:
 \`\`\`json

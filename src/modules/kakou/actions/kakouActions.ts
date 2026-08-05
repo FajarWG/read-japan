@@ -23,12 +23,14 @@ import {
   KAKOU_DURATIONS,
   KAKOU_LEVELS,
   KAKOU_MODES,
+  KAKOU_SESSION_FOCUSES,
   type KakouDifficulty,
   type KakouDuration,
   type KakouLevel,
   type KakouMode,
   type KakouOverview,
   type KakouPrompt,
+  type KakouSessionFocus,
   type KakouSessionView,
   type KakouSourceType,
 } from "@/src/modules/kakou/data/types";
@@ -81,6 +83,10 @@ function isSourceType(value: string | undefined): value is KakouSourceType {
 
 function isDuration(value: number): value is KakouDuration {
   return (KAKOU_DURATIONS as readonly number[]).includes(value);
+}
+
+function isSessionFocus(value: string | undefined): value is KakouSessionFocus {
+  return (KAKOU_SESSION_FOCUSES as readonly string[]).includes(value ?? "");
 }
 
 function isDifficulty(value: string): value is KakouDifficulty {
@@ -216,16 +222,12 @@ function sessionLevelFromPrompts(prompts: KakouPrompt[]): KakouLevel {
 async function buildSequentialSession(
   userId: number,
   durationMinutes: KakouDuration,
+  focus: KakouSessionFocus,
 ): Promise<KakouPrompt[]> {
   const itemCount = SESSION_ITEM_COUNTS[durationMinutes];
   const now = new Date();
 
-  const [dueCards, practicedFormRows, bunpouCompletedIds] = await Promise.all([
-    prisma.katsuyouReviewCard.findMany({
-      where: { userId, nextReview: { lte: now } },
-      orderBy: { nextReview: "asc" },
-      take: itemCount,
-    }),
+  const [practicedFormRows, bunpouCompletedIds] = await Promise.all([
     prisma.katsuyouReviewCard.findMany({
       where: { userId },
       select: { conjugationForm: true },
@@ -233,15 +235,27 @@ async function buildSequentialSession(
     }),
     getBunpouProgress(),
   ]);
-
-  const practicedFormKeys = new Set(practicedFormRows.map((row) => row.conjugationForm));
-  const remainingForms = CONJUGATION_FORMS.filter((form) => !practicedFormKeys.has(form.key));
+  const dueCards =
+    focus === "NEW"
+      ? []
+      : await prisma.katsuyouReviewCard.findMany({
+          where: { userId, nextReview: { lte: now } },
+          orderBy: { nextReview: "asc" },
+          take: itemCount,
+        });
 
   const prompts: KakouPrompt[] = [];
   for (const card of dueCards) {
     const prompt = buildKatsuyouPracticePrompt(card.conjugationForm, card.verbId);
     if (prompt) prompts.push(prompt);
   }
+
+  if (focus === "REVIEW") {
+    return prompts;
+  }
+
+  const practicedFormKeys = new Set(practicedFormRows.map((row) => row.conjugationForm));
+  const remainingForms = CONJUGATION_FORMS.filter((form) => !practicedFormKeys.has(form.key));
 
   let nextNewFormIndex = 0;
   const pickedBunpouIds = [...bunpouCompletedIds];
@@ -277,6 +291,7 @@ async function buildSequentialSession(
 
 export async function createKakouSession(input: {
   durationMinutes: number;
+  focus?: string;
   sourceType?: string;
   sourceId?: string;
 }) {
@@ -310,16 +325,23 @@ export async function createKakouSession(input: {
     return { success: false as const, error: "Library material was not found" };
   }
 
+  const sessionFocus: KakouSessionFocus = isSessionFocus(input.focus) ? input.focus : "MIXED";
+
   const prompts = (
     focusedPrompt
       ? [focusedPrompt]
-      : await buildSequentialSession(auth.id, input.durationMinutes)
+      : await buildSequentialSession(auth.id, input.durationMinutes, sessionFocus)
   ).map(hydrateKakouPrompt);
 
   if (prompts.length === 0) {
     return {
       success: false as const,
-      error: "You're all caught up — nothing due in Katsuyou or Bunpou right now.",
+      error:
+        sessionFocus === "REVIEW"
+          ? "Nothing is due for review right now."
+          : sessionFocus === "NEW"
+            ? "You've started every Katsuyou form and Bunpou pattern — nothing new left to introduce."
+            : "You're all caught up — nothing due in Katsuyou or Bunpou right now.",
     };
   }
 

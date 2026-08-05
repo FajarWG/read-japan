@@ -1,5 +1,6 @@
 import { BUNPOU_DATA } from "@/src/modules/bunpou/data/bunpouData";
 import { CONJUGATION_GUIDES } from "@/src/modules/katsuyou/data/conjugationGuides";
+import { CONJUGATION_EXAMPLES } from "@/src/modules/katsuyou/data/conjugationExamples";
 import { mockVerbs, type VerbConjugations } from "@/src/modules/katsuyou/data/verbs";
 import { CONJUGATION_FORMS } from "@/src/modules/katsuyou/data/conjugationForms";
 import type {
@@ -184,6 +185,10 @@ export function findFirstIncompleteBunpouPattern(completedIds: string[]): string
   return null;
 }
 
+function randomItem<T>(items: T[]): T | undefined {
+  return items.length > 0 ? items[Math.floor(Math.random() * items.length)] : undefined;
+}
+
 export function buildFocusedKakouPrompt(
   sourceType: KakouSourceType,
   sourceId: string,
@@ -202,6 +207,7 @@ export function buildFocusedKakouPrompt(
         "Salin pola dan dua contoh ke buku. Setelah itu, buat tiga kalimatmu sendiri dengan pola yang sama.",
       pattern: found.pattern.pattern,
       example: found.pattern.examples[0]?.exampleJp,
+      exampleIndonesian: randomItem(found.pattern.examples)?.exampleId,
       source: reminder.source,
       reminder,
     };
@@ -219,6 +225,7 @@ export function buildFocusedKakouPrompt(
     instruction:
       "Tulis ringkasan aturan untuk setiap kelompok kata kerja. Salin tiga contoh, lalu konjugasikan tiga kata kerja lain dengan bentuk yang sama.",
     pattern: form.labelId,
+    exampleIndonesian: randomItem(CONJUGATION_EXAMPLES[sourceId] ?? [])?.indonesian,
     source: reminder.source,
     reminder,
   };
@@ -251,6 +258,7 @@ export function buildKatsuyouPracticePrompt(formKey: string, verbId: string): Ka
       "Salin contoh di atas, lalu tulis tiga kalimatmu sendiri menggunakan kata kerja ini dalam bentuk yang sama.",
     pattern: form.labelId,
     example: `${verb.kanji} (${verb.romaji}) → ${conjugated.kanji} (${conjugated.romaji})`,
+    exampleIndonesian: randomItem(CONJUGATION_EXAMPLES[formKey] ?? [])?.indonesian,
     source,
     reminder: {
       ...reminder,

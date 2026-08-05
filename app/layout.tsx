@@ -133,7 +133,7 @@ export default async function RootLayout({
       <body
         className={`${
           geistSans.variable
-        } ${geistMono.variable} ${notoSerifJP.variable} antialiased bg-background text-foreground pb-24`}
+        } ${geistMono.variable} ${notoSerifJP.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider>
           <LanguageProvider>

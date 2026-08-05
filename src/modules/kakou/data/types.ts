@@ -19,7 +19,16 @@ export const KAKOU_LEVELS = ["N5", "N4", "N3"] as const;
 export const KAKOU_DURATIONS = [5, 10, 20] as const;
 export const KAKOU_DIFFICULTIES = ["EASY", "OKAY", "DIFFICULT"] as const;
 
+/**
+ * Which slice of the auto-sequential queue a session pulls from:
+ * MIXED (default) = due reviews first, then new items to fill remaining slots.
+ * REVIEW = only due Katsuyou reviews (nothing new introduced).
+ * NEW = only never-practiced Katsuyou forms / incomplete Bunpou patterns.
+ */
+export const KAKOU_SESSION_FOCUSES = ["MIXED", "REVIEW", "NEW"] as const;
+
 export type KakouMode = (typeof KAKOU_MODES)[number];
+export type KakouSessionFocus = (typeof KAKOU_SESSION_FOCUSES)[number];
 export type KakouLevel = (typeof KAKOU_LEVELS)[number];
 export type KakouDuration = (typeof KAKOU_DURATIONS)[number];
 export type KakouDifficulty = (typeof KAKOU_DIFFICULTIES)[number];
@@ -66,6 +75,9 @@ export interface KakouPrompt {
   instruction: string;
   pattern?: string;
   example?: string;
+  /** An Indonesian-language example sentence idea — reference only, to help
+   *  when stuck on what to write. Not the required answer. */
+  exampleIndonesian?: string;
   hints?: string[];
   source?: KakouSource;
   reminder?: KakouReminder;
@@ -80,6 +92,11 @@ export interface KakouSentenceFeedback {
   suggestedKanji?: string[];
 }
 
+export interface KakouAdditionalExample {
+  japanese: string;
+  meaning: string;
+}
+
 export interface KakouPerPromptFeedback {
   /** 1-based, matching the numbered "Latihan" list the prompt was built from. */
   promptIndex: number;
@@ -87,6 +104,9 @@ export interface KakouPerPromptFeedback {
   sentences: KakouSentenceFeedback[];
   errorPatterns?: string[];
   reviewPoints?: string[];
+  /** Fresh AI-generated example sentences using the same pattern — reference
+   *  only, not a correction of what the user wrote. */
+  additionalExamples?: KakouAdditionalExample[];
 }
 
 export interface KakouFeedback {
