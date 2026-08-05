@@ -14,8 +14,8 @@ export function KakouSidebar({ materials, onSelectItem }: KakouSidebarProps) {
   const [tab, setTab] = useState<"katsuyou" | "bunpou">("katsuyou");
 
   return (
-    <div className="flex w-full flex-col gap-4 md:w-64 shrink-0">
-      <div className="flex rounded-xl border border-border/50 bg-surface/50 overflow-hidden shrink-0">
+    <div className="flex w-full min-w-0 flex-col gap-4 shrink-0">
+      <div className="sticky top-0 z-10 flex shrink-0 overflow-hidden rounded-xl border border-border/50 bg-background/95 backdrop-blur-sm">
         <button
           type="button"
           onClick={() => setTab("katsuyou")}
@@ -65,7 +65,7 @@ function KatsuyouPane({
   };
 
   return (
-    <div className="flex flex-col gap-5 max-h-[65vh] overflow-y-auto pr-1">
+    <div className="flex flex-col gap-5">
       {Object.entries(groups).map(([level, group]) => (
         <div key={level} className="flex flex-col gap-1.5">
           <h3 className="px-2 text-[10px] font-bold uppercase tracking-wider text-muted/80 select-none">
@@ -148,7 +148,7 @@ function BunpouPane({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative shrink-0">
+      <div className="relative">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" />
         <input
           type="text"
@@ -160,7 +160,7 @@ function BunpouPane({
       </div>
 
       {searchResults ? (
-        <div className="flex max-h-[55vh] flex-col gap-1 overflow-y-auto pr-1">
+        <div className="flex flex-col gap-1">
           {searchResults.length === 0 && (
             <p className="px-2 text-xs italic text-muted">No matches.</p>
           )}
@@ -174,8 +174,8 @@ function BunpouPane({
           ))}
         </div>
       ) : (
-        <>
-          <div className="flex max-h-56 flex-row gap-1 overflow-x-auto pb-2 scrollbar-none md:max-h-none md:flex-col md:overflow-x-visible md:pb-0">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-row gap-1 overflow-x-auto pb-2 scrollbar-none md:flex-col md:overflow-x-visible md:pb-0">
             {materials.lessons.map((lesson) => {
               const stats = chapterStats[lesson.chapter] || { total: 0, learned: 0 };
               const isFinished = stats.total > 0 && stats.learned === stats.total;
@@ -214,7 +214,7 @@ function BunpouPane({
           </div>
 
           {activeLesson && (
-            <div className="flex max-h-[40vh] flex-col gap-1 overflow-y-auto border-t border-border/40 pt-2 pr-1">
+            <div className="flex flex-col gap-1 border-t border-border/40 pt-2">
               {activeLesson.patterns.map((pattern) => (
                 <PatternRow
                   key={pattern.id}
@@ -225,7 +225,7 @@ function BunpouPane({
               ))}
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

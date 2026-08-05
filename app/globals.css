@@ -72,3 +72,13 @@ body {
 .font-jp {
   font-family: var(--font-jp);
 }
+
+/* Sembunyikan scrollbar tapi tetap bisa discroll */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

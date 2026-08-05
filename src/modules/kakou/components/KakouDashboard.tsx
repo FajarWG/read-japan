@@ -460,10 +460,10 @@ function KakouLayout({
       <div
         className={[
           "shrink-0 overflow-hidden transition-all duration-300 ease-in-out",
-          showSidebar ? "w-0 px-0 py-0 md:w-64 md:px-4 md:py-8 md:opacity-100" : "w-0 px-0 py-0 opacity-0",
+          showSidebar ? "w-0 md:w-80 md:opacity-100" : "w-0 opacity-0",
         ].join(" ")}
       >
-        <div className="hidden md:block">
+        <div className="hidden md:sticky md:top-0 md:block md:max-h-screen md:overflow-y-auto md:px-4 md:py-8 scrollbar-none">
           <KakouSidebar materials={materials} onSelectItem={onSelectItem} />
         </div>
       </div>
