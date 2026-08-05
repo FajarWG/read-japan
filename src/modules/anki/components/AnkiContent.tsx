@@ -24,6 +24,7 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Compass,
 } from "lucide-react";
 import { ExploreDrawer, ExploreTarget } from "@/src/modules/explore/components/ExploreDrawer";
@@ -241,6 +242,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [ankiUsedHint, setAnkiUsedHint] = useState(false);
   const [isWritingActive, setIsWritingActive] = useState(false);
   const [gradingScore, setGradingScore] = useState<number | null>(null);
+
+  // Kanji/vocab yang sudah direview di sesi ini (untuk recap Explore setelah sesi selesai)
+  const [sessionRecap, setSessionRecap] = useState<
+    Array<{ cardKey: string; kanji: string; hiragana: string; translation: string }>
+  >([]);
 
   const currentCard = sessionQueue[currentIndex];
 
@@ -619,6 +625,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setReviewedCount(0);
     setSessionFinished(false);
     setPendingReviews([]);
+    setSessionRecap([]);
   };
 
   // Kirim semua review yang tertunda ke API dalam satu batch
@@ -684,6 +691,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
       setAnkiUsedHint(false);
       setIsWritingActive(false);
       setReviewedCount((prev) => prev + 1);
+      setSessionRecap((prev) =>
+        prev.some((c) => c.cardKey === currentCard.cardKey)
+          ? prev
+          : [
+              ...prev,
+              {
+                cardKey: currentCard.cardKey,
+                kanji: currentCard.kanji,
+                hiragana: currentCard.hiragana,
+                translation: currentCard.translation,
+              },
+            ],
+      );
 
       const cardReview = {
         cardKey: currentCard.cardKey,
@@ -741,6 +761,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
       setAnkiUsedHint(false);
       setIsWritingActive(false);
       setReviewedCount((prev) => prev + 1);
+      setSessionRecap((prev) =>
+        prev.some((c) => c.cardKey === currentCard.cardKey)
+          ? prev
+          : [
+              ...prev,
+              {
+                cardKey: currentCard.cardKey,
+                kanji: currentCard.kanji,
+                hiragana: currentCard.hiragana,
+                translation: currentCard.translation,
+              },
+            ],
+      );
 
       const cardReview = {
         cardKey: currentCard.cardKey,
@@ -1609,20 +1642,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                       )}
                                     </div>
                                   )}
-
-                                  {/* Explore Layer Button */}
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      const targetWord = currentCard.kanji !== "-" ? currentCard.kanji : currentCard.hiragana;
-                                      handleOpenExplore(targetWord);
-                                    }}
-                                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border border-blue-500/30 rounded-xl transition-all duration-200 shadow-sm cursor-pointer"
-                                  >
-                                    <Compass size={14} />
-                                    Explore →
-                                  </button>
                                 </div>
                               )}
                             </div>
@@ -1934,7 +1953,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       >
         <Modal.Backdrop>
           <Modal.Container className="flex items-center justify-center min-h-screen w-screen">
-            <Modal.Dialog className="sm:max-w-[360px]">
+            <Modal.Dialog className="sm:max-w-md">
               <Modal.CloseTrigger />
               <Modal.Header className="flex flex-col items-center text-center pt-6">
                 <PartyPopper size={44} className="mb-2 text-accent" />
@@ -1950,6 +1969,43 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 <div className="text-xs bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 px-3 py-1.5 rounded-full font-bold">
                   Reviewed: {reviewedCount} Cards
                 </div>
+
+                {sessionRecap.length > 0 && (
+                  <div className="w-full flex flex-col items-stretch gap-2 mt-1 text-left">
+                    <p className="flex items-center gap-1.5 text-xs font-bold text-muted uppercase tracking-wide">
+                      <Compass size={13} />
+                      Explore what you studied
+                    </p>
+                    <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto pr-1">
+                      {sessionRecap.map((item) => (
+                        <button
+                          key={item.cardKey}
+                          type="button"
+                          onClick={() => {
+                            setSessionFinished(false);
+                            handleOpenExplore(
+                              item.kanji !== "-" ? item.kanji : item.hiragana,
+                            );
+                          }}
+                          className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 border border-border/60 rounded-xl text-left transition-colors cursor-pointer"
+                        >
+                          <span className="flex flex-col min-w-0">
+                            <span className="font-jp text-sm font-bold text-foreground truncate">
+                              {item.kanji !== "-" ? item.kanji : item.hiragana}
+                            </span>
+                            <span className="text-xs text-muted truncate">
+                              {item.translation}
+                            </span>
+                          </span>
+                          <ChevronRight
+                            size={16}
+                            className="text-muted shrink-0"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </Modal.Body>
               <Modal.Footer className="flex justify-center pb-6">
                 <Button
