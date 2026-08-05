@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Search, Table2 } from "lucide-react";
 import { mockVerbs } from "../data/verbs";
-import { CONJUGATION_FORMS } from "./KatsuyouSidebar";
+import { CONJUGATION_FORMS } from "../data/conjugationForms";
 import { VerbGroupBadge, JLPTBadge } from "./KatsuyouComponents";
 
 interface ConjugationTableTabProps {

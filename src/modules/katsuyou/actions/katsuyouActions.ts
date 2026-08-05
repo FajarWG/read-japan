@@ -3,6 +3,7 @@
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
 import { mockVerbs } from "../data/verbs";
+import { applySm2 } from "../lib/sm2";
 
 /**
  * Get overall progress statistics for Japanese Verb Conjugation (Katsuyou).
@@ -23,9 +24,10 @@ export async function getKatsuyouStats() {
     const userId = session.id;
 
     const [completedLessons, reviewStats, practiceCount] = await Promise.all([
-      prisma.katsuyouLessonProgress.findMany({
-        where: { userId, completed: true },
+      prisma.katsuyouReviewCard.findMany({
+        where: { userId },
         select: { conjugationForm: true },
+        distinct: ["conjugationForm"],
       }),
       prisma.katsuyouReviewCard.aggregate({
         where: { userId },
@@ -81,41 +83,6 @@ export async function getKatsuyouStats() {
       totalCardsCount: 0,
       practiceCount: 0,
     };
-  }
-}
-
-/**
- * Mark a conjugation lesson form as completed.
- */
-export async function completeLesson(conjugationForm: string) {
-  const session = await getSession();
-  if (!session) return { success: false, error: "Unauthorized" };
-
-  try {
-    const userId = session.id;
-
-    await prisma.katsuyouLessonProgress.upsert({
-      where: {
-        userId_conjugationForm: {
-          userId,
-          conjugationForm,
-        },
-      },
-      create: {
-        userId,
-        conjugationForm,
-        completed: true,
-      },
-      update: {
-        completed: true,
-        completedAt: new Date(),
-      },
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error completing lesson:", error);
-    return { success: false, error: "Failed to save progress" };
   }
 }
 
@@ -256,41 +223,7 @@ export async function submitReview(cardId: number, rating: "easy" | "good" | "ha
       return { success: false, error: "Card not found" };
     }
 
-    let repetitions = card.repetitions;
-    let easeFactor = card.easeFactor;
-    let interval = card.interval;
-
-    if (rating === "hard") {
-      repetitions = 0;
-      interval = 1; // back to 1 day
-      easeFactor = Math.max(1.3, easeFactor - 0.2);
-    } else if (rating === "good") {
-      repetitions += 1;
-      if (repetitions === 1) {
-        interval = 1;
-      } else if (repetitions === 2) {
-        interval = 6;
-      } else {
-        interval = Math.round(interval * easeFactor);
-      }
-      // easeFactor remains the same
-    } else if (rating === "easy") {
-      repetitions += 1;
-      if (repetitions === 1) {
-        interval = 2;
-      } else if (repetitions === 2) {
-        interval = 8;
-      } else {
-        interval = Math.round(interval * easeFactor * 1.3);
-      }
-      easeFactor = Math.min(3.0, easeFactor + 0.15);
-    }
-
-    // Set nextReview
-    const nextReview = new Date();
-    nextReview.setDate(nextReview.getDate() + interval);
-    // Remove minutes/seconds to keep reviews structured by days
-    nextReview.setHours(0, 0, 0, 0);
+    const { repetitions, easeFactor, interval, nextReview } = applySm2(card, rating);
 
     const [updatedCard] = await Promise.all([
       prisma.katsuyouReviewCard.update({

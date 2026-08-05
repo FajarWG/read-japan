@@ -1,18 +1,16 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Modal } from "@heroui/react";
-import { Check, CheckCircle, CheckCircle2, PenLine } from "lucide-react";
+import { CheckCircle2, PenLine } from "lucide-react";
 
 import { CONJUGATION_FORMS } from "@/src/modules/katsuyou/data/conjugationForms";
 import { CONJUGATION_GUIDES } from "@/src/modules/katsuyou/data/conjugationGuides";
 import { CONJUGATION_EXAMPLES } from "@/src/modules/katsuyou/data/conjugationExamples";
 import { MistakeCallout } from "@/src/modules/katsuyou/components/KatsuyouComponents";
 import { ConjugationTableTab } from "@/src/modules/katsuyou/components/ConjugationTableTab";
-import { completeLesson } from "@/src/modules/katsuyou/actions/katsuyouActions";
 import { BUNPOU_DATA } from "@/src/modules/bunpou/data/bunpouData";
-import { toggleBunpouProgress } from "@/src/modules/bunpou/actions/bunpouActions";
 import type { KakouMaterialSelection } from "../data/types";
 
 interface MaterialReferenceModalProps {
@@ -20,8 +18,6 @@ interface MaterialReferenceModalProps {
   completedLessons: string[];
   completedPatternIds: string[];
   onClose: () => void;
-  onLessonCompleted: (formKey: string) => void;
-  onPatternToggled: (patternId: string, learned: boolean) => void;
 }
 
 export function MaterialReferenceModal({
@@ -29,8 +25,6 @@ export function MaterialReferenceModal({
   completedLessons,
   completedPatternIds,
   onClose,
-  onLessonCompleted,
-  onPatternToggled,
 }: MaterialReferenceModalProps) {
   return (
     <Modal isOpen={Boolean(item)} onOpenChange={(open) => { if (!open) onClose(); }}>
@@ -42,7 +36,6 @@ export function MaterialReferenceModal({
               <KatsuyouReference
                 formKey={item.id}
                 isCompleted={completedLessons.includes(item.id)}
-                onLessonCompleted={onLessonCompleted}
                 onClose={onClose}
               />
             )}
@@ -50,7 +43,6 @@ export function MaterialReferenceModal({
               <BunpouReference
                 patternId={item.id}
                 isLearned={completedPatternIds.includes(item.id)}
-                onToggle={onPatternToggled}
                 onClose={onClose}
               />
             )}
@@ -64,27 +56,17 @@ export function MaterialReferenceModal({
 function KatsuyouReference({
   formKey,
   isCompleted,
-  onLessonCompleted,
   onClose,
 }: {
   formKey: string;
   isCompleted: boolean;
-  onLessonCompleted: (formKey: string) => void;
   onClose: () => void;
 }) {
   const [tab, setTab] = useState<"learn" | "examples" | "table">("learn");
-  const [isPending, startTransition] = useTransition();
 
   const form = CONJUGATION_FORMS.find((f) => f.key === formKey);
   const guide = CONJUGATION_GUIDES[formKey];
   const sentences = CONJUGATION_EXAMPLES[formKey] || [];
-
-  const handleComplete = () => {
-    startTransition(async () => {
-      const res = await completeLesson(formKey);
-      if (res.success) onLessonCompleted(formKey);
-    });
-  };
 
   if (!form) return null;
 
@@ -145,17 +127,10 @@ function KatsuyouReference({
             <div className="flex justify-center pt-2">
               {isCompleted ? (
                 <div className="flex items-center gap-2 text-sm font-bold text-emerald-500">
-                  <CheckCircle2 size={18} /> Lesson Completed
+                  <CheckCircle2 size={18} /> Practiced in Kakou
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={handleComplete}
-                  disabled={isPending}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-emerald-600 disabled:opacity-50"
-                >
-                  <CheckCircle size={16} /> {isPending ? "Saving..." : "Mark Lesson as Completed"}
-                </button>
+                <p className="text-xs text-muted">Practice this in Kakou to mark it as learned.</p>
               )}
             </div>
           </div>
@@ -201,16 +176,12 @@ function KatsuyouReference({
 function BunpouReference({
   patternId,
   isLearned,
-  onToggle,
   onClose,
 }: {
   patternId: string;
   isLearned: boolean;
-  onToggle: (patternId: string, learned: boolean) => void;
   onClose: () => void;
 }) {
-  const [isPending, startTransition] = useTransition();
-
   let found: { lesson: (typeof BUNPOU_DATA)[number]; pattern: (typeof BUNPOU_DATA)[number]["patterns"][number] } | null = null;
   for (const lesson of BUNPOU_DATA) {
     const pattern = lesson.patterns.find((p) => p.id === patternId);
@@ -219,13 +190,6 @@ function BunpouReference({
       break;
     }
   }
-
-  const handleToggle = () => {
-    startTransition(async () => {
-      const res = await toggleBunpouProgress(patternId);
-      if (res.success) onToggle(patternId, !isLearned);
-    });
-  };
 
   if (!found) return null;
   const { lesson, pattern } = found;
@@ -249,18 +213,15 @@ function BunpouReference({
           </div>
         ))}
 
-        <button
-          type="button"
-          onClick={handleToggle}
-          disabled={isPending}
-          className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-bold transition-all ${
-            isLearned
-              ? "border-emerald-600 bg-emerald-500 text-white"
-              : "border-border bg-background text-muted hover:text-foreground"
-          }`}
-        >
-          <Check size={16} /> {isPending ? "Saving..." : isLearned ? "Marked as Learned" : "Mark as Learned"}
-        </button>
+        <div className="flex justify-center">
+          {isLearned ? (
+            <div className="flex items-center gap-2 text-sm font-bold text-emerald-500">
+              <CheckCircle2 size={18} /> Practiced in Kakou
+            </div>
+          ) : (
+            <p className="text-xs text-muted">Practice this in Kakou to mark it as learned.</p>
+          )}
+        </div>
       </Modal.Body>
 
       <Modal.Footer className="flex justify-between gap-2 pt-2">

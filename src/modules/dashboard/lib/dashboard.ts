@@ -167,8 +167,10 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     prisma.katsuyouReviewCard.count({
       where: { userId: session.id, nextReview: { lte: now } },
     }),
-    prisma.katsuyouLessonProgress.count({
-      where: { userId: session.id, completed: true },
+    prisma.katsuyouReviewCard.findMany({
+      where: { userId: session.id },
+      select: { conjugationForm: true },
+      distinct: ["conjugationForm"],
     }),
     prisma.bunpouProgress.count({
       where: { userId: session.id, completed: true },
@@ -218,7 +220,7 @@ export async function getProgressStats(): Promise<ProgressStats | null> {
     katsuyou: {
       cards: katsuyouCards,
       dueNow: katsuyouDue,
-      lessonsCompleted: katsuyouLessons,
+      lessonsCompleted: katsuyouLessons.length,
     },
     bunpou: { patternsCompleted: bunpouPatterns },
     prep: { chaptersOpened: chaptersOpened.size },

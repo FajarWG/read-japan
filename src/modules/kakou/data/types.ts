@@ -2,7 +2,12 @@ import type { StudyTimerOverview } from "@/src/modules/study-timer/types";
 import type { SidebarForm } from "@/src/modules/katsuyou/data/conjugationForms";
 import type { BunpouLesson } from "@/src/modules/bunpou/data/bunpouData";
 
+// "PRACTICE" is the only mode new sessions are created with (auto-sequential,
+// driven by Katsuyou/Bunpou progress). The rest are kept only so old session
+// history (frozen promptSnapshot/mode from before this redesign) still
+// type-checks and displays correctly.
 export const KAKOU_MODES = [
+  "PRACTICE",
   "DAILY_MIX",
   "GUIDED_JOURNAL",
   "COPY_CHANGE_CREATE",
@@ -32,6 +37,9 @@ export interface KakouSource {
   id: string;
   href: string;
   label: string;
+  /** Set for KATSUYOU sources: which of mockVerbs this prompt pinned, so
+   *  SRS updates can key KatsuyouReviewCard by (verbId, conjugationForm). */
+  verbId?: string;
 }
 
 export interface KakouReminderExample {
@@ -72,12 +80,18 @@ export interface KakouSentenceFeedback {
   suggestedKanji?: string[];
 }
 
-export interface KakouFeedback {
+export interface KakouPerPromptFeedback {
+  /** 1-based, matching the numbered "Latihan" list the prompt was built from. */
+  promptIndex: number;
   score: number;
-  overallFeedback?: string;
   sentences: KakouSentenceFeedback[];
   errorPatterns?: string[];
   reviewPoints?: string[];
+}
+
+export interface KakouFeedback {
+  overallFeedback?: string;
+  perPrompt: KakouPerPromptFeedback[];
 }
 
 export interface KakouSessionView {
@@ -126,6 +140,10 @@ export type KakouMaterialSelection =
   | { type: "BUNPOU"; id: string };
 
 export const KAKOU_MODE_LABELS: Record<KakouMode, { title: string; description: string }> = {
+  PRACTICE: {
+    title: "Practice",
+    description: "Auto-picked from what's due or new in Katsuyou and Bunpou.",
+  },
   DAILY_MIX: {
     title: "Daily Mix",
     description: "A balanced page of journaling, grammar, sentences, and conjugation.",

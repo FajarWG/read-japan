@@ -67,7 +67,6 @@ model User {
   achievements    UserAchievement[]
   chatMessages    ChatMessage[]
   
-  katsuyouProgress         KatsuyouLessonProgress[]
   katsuyouReviewCards      KatsuyouReviewCard[]
   katsuyouReviewLogs       KatsuyouReviewLog[]
   katsuyouPracticeAttempts KatsuyouPracticeAttempt[]
@@ -375,21 +374,6 @@ model ChatMessage {
 }
 
 // ─────────────────────────────────────────
-// Tabel: KatsuyouLessonProgress
-// Melacak pelajaran konjugasi kata kerja yang selesai per user
-// ─────────────────────────────────────────
-model KatsuyouLessonProgress {
-  id              Int      @id @default(autoincrement())
-  userId          Int
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  conjugationForm String   // e.g. "masu", "te", "ta", etc.
-  completed       Boolean  @default(true)
-  completedAt     DateTime @default(now())
-
-  @@unique([userId, conjugationForm])
-}
-
-// ─────────────────────────────────────────
 // Tabel: KatsuyouReviewCard
 // Melacak progres flashcard konjugasi kata kerja (SRS) per user
 // ─────────────────────────────────────────
@@ -457,23 +441,6 @@ model BunpouProgress {
   createdAt DateTime @default(now())
 
   @@unique([userId, patternId])
-}
-
-// ─────────────────────────────────────────
-// Tabel: BunpouQuestion
-// Bank soal latihan menyusun kalimat untuk pola tata bahasa Bunpou.
-// ─────────────────────────────────────────
-model BunpouQuestion {
-  id           Int      @id @default(autoincrement())
-  patternId    String
-  english      String
-  indonesian   String
-  sentenceJp   String
-  sentenceKana String
-  words        Json
-  createdAt    DateTime @default(now())
-
-  @@index([patternId])
 }
 
 // ─────────────────────────────────────────

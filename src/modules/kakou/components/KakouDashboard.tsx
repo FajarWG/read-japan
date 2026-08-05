@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useTransition, type ReactNode } from "react";
+import { useState, useTransition, type ChangeEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { Modal } from "@heroui/react";
 import {
   Award,
   BookOpen,
   BookOpenCheck,
+  Camera,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -15,6 +16,7 @@ import {
   ExternalLink,
   History,
   Info,
+  Loader2,
   NotebookPen,
   PenLine,
   RotateCcw,
@@ -31,17 +33,15 @@ import {
   createKakouSession,
   saveKakouProgress,
   saveKakouAiFeedback,
+  submitKakouPhotoReview,
 } from "@/src/modules/kakou/actions/kakouActions";
 import {
   KAKOU_MODE_LABELS,
-  KAKOU_MODES,
   type KakouDifficulty,
   type KakouDuration,
   type KakouFeedback,
-  type KakouLevel,
   type KakouMaterials,
   type KakouMaterialSelection,
-  type KakouMode,
   type KakouOverview,
   type KakouPrompt,
   type KakouSessionView,
@@ -50,6 +50,11 @@ import {
 import { formatStudyTime } from "@/src/modules/study-timer/components/StudyTimerBar";
 import { KakouSidebar } from "@/src/modules/kakou/components/KakouSidebar";
 import { MaterialReferenceModal } from "@/src/modules/kakou/components/MaterialReferenceModal";
+import {
+  buildPhotoReviewPrompt,
+  buildTextReviewPrompt,
+  parseKakouFeedbackJson,
+} from "@/src/modules/kakou/data/reviewPrompts";
 
 const KIND_LABELS: Record<KakouPrompt["kind"], string> = {
   JOURNAL: "Guided journal",
@@ -69,116 +74,6 @@ const DIFFICULTY_OPTIONS: Array<{
   { value: "DIFFICULT", label: "Difficult", note: "I need to review this" },
 ];
 
-function buildTextReviewPrompt(session: KakouSessionView): string {
-  const requirements = session.prompts
-    .map(
-      (item, index) =>
-        `${index + 1}. ${KIND_LABELS[item.kind]}\nTugas: ${item.instruction}${
-          item.pattern ? `\nPola target: ${item.pattern}` : ""
-        }`,
-    )
-    .join("\n\n");
-
-  return `Saya sedang belajar menulis bahasa Jepang secara mandiri. Tolong periksa tulisan saya sebagai guru bahasa Jepang yang teliti.
-
-Level: JLPT ${session.level}
-Latihan:
-${requirements}
-
-Tulisan saya:
-[TULIS ATAU TEMPEL TULISAN BAHASA JEPANGMU DI SINI]
-
-CRITICAL REQUIREMENT:
-Kembalikan SELURUH hasil evaluasi HANYA dalam format JSON valid (di dalam kode blok \`\`\`json ... \`\`\`) tanpa teks tambahan di luar JSON.
-
-Gunakan struktur JSON berikut:
-\`\`\`json
-{
-  "score": 85,
-  "overallFeedback": "Ringkasan apresiasi & ulasan umum singkat dalam bahasa Indonesia.",
-  "sentences": [
-    {
-      "original": "kalimat asli user",
-      "corrected": "koreksi minimum tata bahasa/partikel/ejaan agar benar",
-      "improved": "versi yang lebih alami/natural bagi penutur asli",
-      "meaning": "arti kalimat versi improved dalam bahasa indonesia",
-      "explanation": "alasan singkat perbaikan tata bahasa/partikel",
-      "suggestedKanji": [
-        "わたし → 私 (JLPT N5)",
-        "ともだち → 友達 (JLPT N5)"
-      ]
-    }
-  ],
-  "errorPatterns": [
-    "pola kesalahan 1 yang perlu diperhatikan"
-  ],
-  "reviewPoints": [
-    "saran latihan 1 yang perlu diperbaiki"
-  ]
-}
-\`\`\`
-
-Catatan Tambahan:
-- Jika user masih menulis kata menggunakan Hiragana padahal kata tersebut lazim ditulis dengan Kanji sesuai level JLPT ini, berikan saran Kanji pada array "suggestedKanji" (contoh: ["たべます → 食べます (JLPT N5)", "とうきょう → 東京 (JLPT N5)"]).
-
-Ketentuan Skor (0 - 100):
-- 90-100: Sangat alami & tata bahasa tepat.
-- 75-89: Baik dan mudah dipahami, ada 1-2 kesalahan kecil partikel/ejaan.
-- 60-74: Ada kesalahan tata bahasa/partikel yang mengganggu pemahaman.
-- <60: Banyak kesalahan mendasar.`;
-}
-
-function buildPhotoReviewPrompt(session: KakouSessionView): string {
-  return `Saya mengunggah foto tulisan tangan bahasa Jepang untuk diperiksa. Level saya JLPT ${session.level}.
-
-Konteks latihan:
-${session.prompts
-  .map(
-    (item, index) =>
-      `${index + 1}. ${item.instruction}${item.pattern ? ` (Target: ${item.pattern})` : ""}`,
-  )
-  .join("\n")}
-
-CRITICAL REQUIREMENT:
-1. Transkripsikan tulisan tangan pada foto secara akurat.
-2. Periksa tata bahasa, partikel, ejaan, dan kealamian kalimat.
-3. Jika tulisan masih menggunakan Hiragana untuk kata yang lazim memakai Kanji sesuai level JLPT ${session.level}, berikan saran Kanji pada array "suggestedKanji" (contoh: ["わたし → 私", "たべます → 食べます"]).
-4. Kembalikan SELURUH hasil evaluasi HANYA dalam format JSON valid (di dalam kode blok \`\`\`json ... \`\`\`) tanpa teks tambahan di luar JSON.
-
-Gunakan struktur JSON berikut:
-\`\`\`json
-{
-  "score": 85,
-  "overallFeedback": "Ringkasan evaluasi dalam bahasa Indonesia",
-  "sentences": [
-    {
-      "original": "transkripsi persis dari foto tulisan tangan",
-      "corrected": "koreksi minimum agar kalimat benar",
-      "improved": "versi yang lebih alami/natural",
-      "meaning": "arti dalam bahasa indonesia",
-      "explanation": "penjelasan kesalahan partikel/kanji/tata bahasa",
-      "suggestedKanji": [
-        "わたし → 私 (JLPT N5)",
-        "ともだち → 友達 (JLPT N5)"
-      ]
-    }
-  ],
-  "errorPatterns": [
-    "pola kesalahan 1"
-  ],
-  "reviewPoints": [
-    "hal yang perlu dilatih kembali"
-  ]
-}
-\`\`\`
-
-Ketentuan Skor (0 - 100):
-- 90-100: Sangat alami, bentuk kanji/kana dan tata bahasa sangat baik.
-- 75-89: Tulisan terbaca dan tata bahasa secara umum baik dengan 1-2 koreksi kecil.
-- 60-74: Ada kesalahan partikel/kana yang mengganggu.
-- <60: Banyak kesalahan atau karakter tidak terbaca [?].`;
-}
-
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat("en", {
     day: "numeric",
@@ -187,7 +82,7 @@ function formatDate(value: string): string {
   }).format(new Date(value));
 }
 
-function ScoreBadge({ score }: { score: number }) {
+function ScoreBadge({ score, compact }: { score: number; compact?: boolean }) {
   let badgeStyle = "bg-emerald-500/10 text-emerald-600 border-emerald-500/30";
   let Icon = Star;
   let label = "Sangat Baik";
@@ -207,15 +102,19 @@ function ScoreBadge({ score }: { score: number }) {
   }
 
   return (
-    <div className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold ${badgeStyle}`}>
+    <div className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold whitespace-nowrap ${badgeStyle}`}>
       <Icon size={14} />
       <span>{score}/100</span>
-      <span className="text-[10px] opacity-80">({label})</span>
+      {!compact && <span className="text-[10px] opacity-80">({label})</span>}
     </div>
   );
 }
 
-function ReviewDisplayCard({ feedback }: { feedback: KakouFeedback }) {
+function ReviewDisplayCard({ feedback, prompts }: { feedback: KakouFeedback; prompts: KakouPrompt[] }) {
+  const overallScore = Math.round(
+    feedback.perPrompt.reduce((sum, item) => sum + item.score, 0) / feedback.perPrompt.length,
+  );
+
   return (
     <div className="flex flex-col gap-4 rounded-3xl border border-border bg-surface p-5 sm:p-6 shadow-sm">
       <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
@@ -223,7 +122,7 @@ function ReviewDisplayCard({ feedback }: { feedback: KakouFeedback }) {
           <p className="text-xs font-bold uppercase tracking-wider text-muted">AI Review & Score</p>
           <h3 className="text-lg font-bold text-foreground">Hasil Evaluasi Tulisan</h3>
         </div>
-        <ScoreBadge score={feedback.score} />
+        <ScoreBadge score={overallScore} />
       </div>
 
       {feedback.overallFeedback && (
@@ -233,78 +132,95 @@ function ReviewDisplayCard({ feedback }: { feedback: KakouFeedback }) {
         </div>
       )}
 
-      {feedback.sentences && feedback.sentences.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted">Koreksi Per Kalimat</p>
-          {feedback.sentences.map((item, idx) => (
-            <div key={idx} className="rounded-2xl border border-border bg-background p-4 flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-muted">
-                <span>Kalimat {idx + 1}</span>
-              </div>
-              <div className="grid gap-2">
-                <div className="rounded-xl bg-surface p-3 border border-border">
-                  <span className="text-[10px] font-bold uppercase text-muted block mb-0.5">Tulisan Asli</span>
-                  <p className="font-jp text-sm text-foreground">{item.original}</p>
-                </div>
-                <div className="rounded-xl bg-emerald-500/5 p-3 border border-emerald-500/20">
-                  <span className="text-[10px] font-bold uppercase text-emerald-600 block mb-0.5">Koreksi Standar</span>
-                  <p className="font-jp text-sm text-emerald-700 dark:text-emerald-300 font-medium">{item.corrected}</p>
-                </div>
-                {item.improved && item.improved !== item.corrected && (
-                  <div className="rounded-xl bg-blue-500/5 p-3 border border-blue-500/20">
-                    <span className="text-[10px] font-bold uppercase text-blue-600 block mb-0.5">Versi Alami / Natural</span>
-                    <p className="font-jp text-sm text-blue-700 dark:text-blue-300 font-medium">{item.improved}</p>
-                  </div>
-                )}
-                {item.suggestedKanji && item.suggestedKanji.length > 0 && (
-                  <div className="rounded-xl bg-purple-500/10 p-3 border border-purple-500/20">
-                    <span className="text-[10px] font-bold uppercase text-purple-600 dark:text-purple-400 block mb-1">
-                      ✏️ Saran Kanji (dari Hiragana)
-                    </span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {item.suggestedKanji.map((kanji, kIdx) => (
-                        <span key={kIdx} className="font-jp text-xs bg-background px-2.5 py-1 rounded-md border border-purple-500/30 text-foreground font-medium">
-                          {kanji}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {item.meaning && (
-                  <p className="text-xs italic text-muted mt-1">Arti: "{item.meaning}"</p>
-                )}
-                {item.explanation && (
-                  <p className="text-xs text-foreground bg-surface-muted p-2.5 rounded-lg border border-border">
-                    💡 <strong>Penjelasan:</strong> {item.explanation}
+      <div className="flex flex-col gap-5">
+        {[...feedback.perPrompt]
+          .sort((a, b) => a.promptIndex - b.promptIndex)
+          .map((entry) => {
+            const prompt = prompts[entry.promptIndex - 1];
+            return (
+              <div key={entry.promptIndex} className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-background p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted">
+                    Latihan {entry.promptIndex}{prompt ? ` — ${prompt.title}` : ""}
                   </p>
+                  <ScoreBadge score={entry.score} />
+                </div>
+
+                {entry.sentences.length > 0 && (
+                  <div className="flex flex-col gap-3">
+                    {entry.sentences.map((item, idx) => (
+                      <div key={idx} className="rounded-2xl border border-border bg-surface p-4 flex flex-col gap-2">
+                        <div className="flex items-center gap-2 text-xs font-bold text-muted">
+                          <span>Kalimat {idx + 1}</span>
+                        </div>
+                        <div className="grid gap-2">
+                          <div className="rounded-xl bg-background p-3 border border-border">
+                            <span className="text-[10px] font-bold uppercase text-muted block mb-0.5">Tulisan Asli</span>
+                            <p className="font-jp text-sm text-foreground">{item.original}</p>
+                          </div>
+                          <div className="rounded-xl bg-emerald-500/5 p-3 border border-emerald-500/20">
+                            <span className="text-[10px] font-bold uppercase text-emerald-600 block mb-0.5">Koreksi Standar</span>
+                            <p className="font-jp text-sm text-emerald-700 dark:text-emerald-300 font-medium">{item.corrected}</p>
+                          </div>
+                          {item.improved && item.improved !== item.corrected && (
+                            <div className="rounded-xl bg-blue-500/5 p-3 border border-blue-500/20">
+                              <span className="text-[10px] font-bold uppercase text-blue-600 block mb-0.5">Versi Alami / Natural</span>
+                              <p className="font-jp text-sm text-blue-700 dark:text-blue-300 font-medium">{item.improved}</p>
+                            </div>
+                          )}
+                          {item.suggestedKanji && item.suggestedKanji.length > 0 && (
+                            <div className="rounded-xl bg-purple-500/10 p-3 border border-purple-500/20">
+                              <span className="text-[10px] font-bold uppercase text-purple-600 dark:text-purple-400 block mb-1">
+                                ✏️ Saran Kanji (dari Hiragana)
+                              </span>
+                              <div className="flex flex-wrap gap-1.5">
+                                {item.suggestedKanji.map((kanji, kIdx) => (
+                                  <span key={kIdx} className="font-jp text-xs bg-background px-2.5 py-1 rounded-md border border-purple-500/30 text-foreground font-medium">
+                                    {kanji}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {item.meaning && (
+                            <p className="text-xs italic text-muted mt-1">Arti: &quot;{item.meaning}&quot;</p>
+                          )}
+                          {item.explanation && (
+                            <p className="text-xs text-foreground bg-surface-muted p-2.5 rounded-lg border border-border">
+                              💡 <strong>Penjelasan:</strong> {item.explanation}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {entry.errorPatterns && entry.errorPatterns.length > 0 && (
+                  <div className="rounded-2xl border border-border bg-surface-muted p-4">
+                    <p className="text-xs font-bold text-muted mb-2">⚠️ Pola Kesalahan Perlu Diperhatikan</p>
+                    <ul className="list-disc list-inside text-xs text-foreground space-y-1">
+                      {entry.errorPatterns.map((err, i) => (
+                        <li key={i}>{err}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {entry.reviewPoints && entry.reviewPoints.length > 0 && (
+                  <div className="rounded-2xl border border-accent/20 bg-accent/5 p-4">
+                    <p className="text-xs font-bold text-accent mb-2">📌 Saran Latihan Selanjutnya</p>
+                    <ul className="list-disc list-inside text-xs text-foreground space-y-1">
+                      {entry.reviewPoints.map((pt, i) => (
+                        <li key={i}>{pt}</li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {feedback.errorPatterns && feedback.errorPatterns.length > 0 && (
-        <div className="rounded-2xl border border-border bg-surface-muted p-4">
-          <p className="text-xs font-bold text-muted mb-2">⚠️ Pola Kesalahan Perlu Diperhatikan</p>
-          <ul className="list-disc list-inside text-xs text-foreground space-y-1">
-            {feedback.errorPatterns.map((err, i) => (
-              <li key={i}>{err}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {feedback.reviewPoints && feedback.reviewPoints.length > 0 && (
-        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-4">
-          <p className="text-xs font-bold text-accent mb-2">📌 Saran Latihan Selanjutnya</p>
-          <ul className="list-disc list-inside text-xs text-foreground space-y-1">
-            {feedback.reviewPoints.map((pt, i) => (
-              <li key={i}>{pt}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+            );
+          })}
+      </div>
     </div>
   );
 }
@@ -441,8 +357,6 @@ function KakouLayout({
   sidebarItem,
   onSelectItem,
   onCloseModal,
-  onLessonCompleted,
-  onPatternToggled,
   children,
 }: {
   materials: KakouMaterials;
@@ -451,19 +365,17 @@ function KakouLayout({
   sidebarItem: KakouMaterialSelection | null;
   onSelectItem: (item: KakouMaterialSelection) => void;
   onCloseModal: () => void;
-  onLessonCompleted: (formKey: string) => void;
-  onPatternToggled: (patternId: string, learned: boolean) => void;
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background md:h-[calc(100vh-6rem)] md:overflow-hidden">
       <div
         className={[
           "shrink-0 overflow-hidden transition-all duration-300 ease-in-out",
           showSidebar ? "w-0 md:w-80 md:opacity-100" : "w-0 opacity-0",
         ].join(" ")}
       >
-        <div className="hidden md:sticky md:top-0 md:block md:max-h-screen md:overflow-y-auto md:px-4 md:py-8 scrollbar-none">
+        <div className="hidden md:sticky md:top-0 md:block md:h-full md:overflow-y-auto md:px-4 md:py-6 scrollbar-none">
           <KakouSidebar materials={materials} onSelectItem={onSelectItem} />
         </div>
       </div>
@@ -479,15 +391,13 @@ function KakouLayout({
         </div>
       </button>
 
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="min-w-0 flex-1 md:h-full md:overflow-y-auto">{children}</div>
 
       <MaterialReferenceModal
         item={sidebarItem}
         completedLessons={materials.katsuyou.completedLessons}
         completedPatternIds={materials.bunpou.completedPatternIds}
         onClose={onCloseModal}
-        onLessonCompleted={onLessonCompleted}
-        onPatternToggled={onPatternToggled}
       />
     </div>
   );
@@ -504,51 +414,26 @@ export function KakouDashboard({
 }) {
   const [overview, setOverview] = useState(initialOverview);
   const [active, setActive] = useState(initialOverview.activeSession);
-  const [mode, setMode] = useState<KakouMode>("DAILY_MIX");
-  const [level, setLevel] = useState<KakouLevel>("N5");
   const [duration, setDuration] = useState<KakouDuration>(10);
   const [message, setMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState<"text" | "photo" | null>(null);
   const [showJsonSubmit, setShowJsonSubmit] = useState(false);
   const [rawJsonInput, setRawJsonInput] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const [photoReviewPending, setPhotoReviewPending] = useState(false);
+  const [photoReviewError, setPhotoReviewError] = useState<string | null>(null);
+  const [showManualFallback, setShowManualFallback] = useState(false);
   const [selectedHistorySession, setSelectedHistorySession] = useState<KakouSessionView | null>(null);
   const [isPending, startTransition] = useTransition();
-  const [materials, setMaterials] = useState(initialMaterials);
+  const materials = initialMaterials;
   const [sidebarItem, setSidebarItem] = useState<KakouMaterialSelection | null>(null);
   const [showSidebar, setShowSidebar] = useState(true);
-
-  const handleLessonCompleted = (formKey: string) => {
-    setMaterials((prev) => ({
-      ...prev,
-      katsuyou: {
-        ...prev.katsuyou,
-        completedLessons: prev.katsuyou.completedLessons.includes(formKey)
-          ? prev.katsuyou.completedLessons
-          : [...prev.katsuyou.completedLessons, formKey],
-      },
-    }));
-  };
-
-  const handlePatternToggled = (patternId: string, learned: boolean) => {
-    setMaterials((prev) => ({
-      ...prev,
-      bunpou: {
-        ...prev.bunpou,
-        completedPatternIds: learned
-          ? prev.bunpou.completedPatternIds.includes(patternId)
-            ? prev.bunpou.completedPatternIds
-            : [...prev.bunpou.completedPatternIds, patternId]
-          : prev.bunpou.completedPatternIds.filter((id) => id !== patternId),
-      },
-    }));
-  };
 
   const startSession = () => {
     setMessage(null);
     startTransition(async () => {
       const result = await createKakouSession({
-        mode,
-        level,
         durationMinutes: duration,
         sourceType: initialSource?.type,
         sourceId: initialSource?.id,
@@ -620,45 +505,72 @@ export function KakouDashboard({
     }
   };
 
+  const handlePhotoSelected = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    setPhotoFile(file);
+    setPhotoPreviewUrl(file ? URL.createObjectURL(file) : null);
+    setPhotoReviewError(null);
+  };
+
+  const clearSelectedPhoto = () => {
+    if (photoPreviewUrl) URL.revokeObjectURL(photoPreviewUrl);
+    setPhotoFile(null);
+    setPhotoPreviewUrl(null);
+    setPhotoReviewError(null);
+  };
+
+  const submitPhotoReview = async () => {
+    if (!active || !photoFile) return;
+    setPhotoReviewPending(true);
+    setPhotoReviewError(null);
+    try {
+      const formData = new FormData();
+      formData.append("photo", photoFile);
+      const res = await submitKakouPhotoReview(active.id, formData);
+      if (res.success && res.overview) {
+        setOverview(res.overview);
+        const updatedActive = res.overview.history.find((h) => h.id === active.id);
+        if (updatedActive) setActive(updatedActive);
+        clearSelectedPhoto();
+        setMessage("Photo reviewed by AI — score and corrections saved to your history!");
+      } else {
+        setPhotoReviewError(res.error ?? "In-app AI review failed.");
+        if ("fallbackToManual" in res && res.fallbackToManual) {
+          setShowManualFallback(true);
+        }
+      }
+    } finally {
+      setPhotoReviewPending(false);
+    }
+  };
+
   const handleJsonSubmit = () => {
     if (!active) return;
     setMessage(null);
-    try {
-      let jsonStr = rawJsonInput.trim();
-      const codeblockMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-      if (codeblockMatch) {
-        jsonStr = codeblockMatch[1].trim();
-      } else {
-        const braceMatch = jsonStr.match(/\{[\s\S]*\}/);
-        if (braceMatch) jsonStr = braceMatch[0];
-      }
 
-      const parsed = JSON.parse(jsonStr) as KakouFeedback;
-      if (typeof parsed.score !== "number" || !Array.isArray(parsed.sentences)) {
-        setMessage("Format JSON tidak valid. Pastikan JSON memiliki field 'score' dan 'sentences'.");
-        return;
-      }
-
-      startTransition(async () => {
-        const res = await saveKakouAiFeedback({
-          sessionId: active.id,
-          score: parsed.score,
-          feedbackJson: parsed,
-        });
-        if (res.success && res.overview) {
-          setOverview(res.overview);
-          const updatedActive = res.overview.history.find(h => h.id === active.id);
-          if (updatedActive) setActive(updatedActive);
-          setShowJsonSubmit(false);
-          setRawJsonInput("");
-          setMessage("Hasil AI Review berhasil disimpan dan dimasukkan ke histori!");
-        } else if (res.error) {
-          setMessage(res.error);
-        }
-      });
-    } catch {
-      setMessage("Gagal membaca JSON. Pastikan format JSON sudah benar dari AI.");
+    const parsed = parseKakouFeedbackJson(rawJsonInput);
+    if (!parsed) {
+      setMessage("Format JSON tidak valid. Pastikan JSON memiliki field 'perPrompt'.");
+      return;
     }
+
+    startTransition(async () => {
+      const res = await saveKakouAiFeedback({
+        sessionId: active.id,
+        feedbackJson: parsed,
+      });
+      if (res.success && res.overview) {
+        setOverview(res.overview);
+        const updatedActive = res.overview.history.find(h => h.id === active.id);
+        if (updatedActive) setActive(updatedActive);
+        setShowJsonSubmit(false);
+        setRawJsonInput("");
+        setMessage("Hasil AI Review berhasil disimpan dan dimasukkan ke histori!");
+      } else if (res.error) {
+        setMessage(res.error);
+      }
+    });
   };
 
   if (active) {
@@ -674,8 +586,6 @@ export function KakouDashboard({
         sidebarItem={sidebarItem}
         onSelectItem={setSidebarItem}
         onCloseModal={() => setSidebarItem(null)}
-        onLessonCompleted={handleLessonCompleted}
-        onPatternToggled={handlePatternToggled}
       >
       <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
@@ -737,75 +647,145 @@ export function KakouDashboard({
               </section>
 
               {active.feedbackJson ? (
-                <ReviewDisplayCard feedback={active.feedbackJson} />
+                <ReviewDisplayCard feedback={active.feedbackJson} prompts={active.prompts} />
               ) : (
-                <section className="rounded-3xl border border-border bg-surface p-5 sm:p-6">
-                  <div className="mb-4 flex items-start gap-3">
-                    <ShieldCheck className="mt-0.5 shrink-0 text-accent" size={20} />
-                    <div>
-                      <h3 className="font-bold text-foreground">External AI Review (Optional)</h3>
-                      <p className="mt-1 text-xs leading-relaxed text-muted">
-                        Copy the prompt below to ChatGPT/AI. When AI replies with JSON, paste the JSON back here to get score badges and sentence corrections saved to your history!
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid gap-2 sm:grid-cols-2 mb-4">
-                    <button
-                      type="button"
-                      onClick={() => copyPrompt("text")}
-                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground hover:border-accent/50"
-                    >
-                      {copied === "text" ? <Check size={16} /> : <Clipboard size={16} />}
-                      {copied === "text" ? "Copied Text Prompt" : "Copy text review prompt"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => copyPrompt("photo")}
-                      className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground hover:border-accent/50"
-                    >
-                      {copied === "photo" ? <Check size={16} /> : <Clipboard size={16} />}
-                      {copied === "photo" ? "Copied Photo Prompt" : "Copy photo review prompt"}
-                    </button>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowJsonSubmit(true)}
-                    className="w-full inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-accent/10 border border-accent/30 text-accent px-4 py-3 text-sm font-bold hover:bg-accent/20"
-                  >
-                    <Sparkles size={16} /> Submit AI Review JSON Response
-                  </button>
-
-                  {showJsonSubmit && (
-                    <div className="mt-4 rounded-2xl border border-border bg-background p-4 flex flex-col gap-3">
-                      <p className="text-xs font-bold text-foreground">Paste JSON Response From ChatGPT / AI:</p>
-                      <textarea
-                        rows={6}
-                        value={rawJsonInput}
-                        onChange={(e) => setRawJsonInput(e.target.value)}
-                        placeholder={`Paste standard JSON or code block output from ChatGPT here...\nExample: {"score": 85, "sentences": [...]}`}
-                        className="w-full rounded-xl border border-border bg-surface p-3 font-mono text-xs text-foreground focus:border-accent focus:outline-none"
-                      />
-                      <div className="flex justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setShowJsonSubmit(false)}
-                          className="px-3 py-1.5 text-xs font-semibold text-muted hover:text-foreground"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleJsonSubmit}
-                          disabled={isPending || !rawJsonInput.trim()}
-                          className="rounded-xl bg-accent px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:brightness-95 disabled:opacity-50"
-                        >
-                          {isPending ? "Saving..." : "Parse & Save Review"}
-                        </button>
+                <>
+                  <section className="rounded-3xl border border-accent/25 bg-surface p-5 sm:p-6">
+                    <div className="mb-4 flex items-start gap-3">
+                      <Camera className="mt-0.5 shrink-0 text-accent" size={20} />
+                      <div>
+                        <h3 className="font-bold text-foreground">AI Review — Photo (In-app)</h3>
+                        <p className="mt-1 text-xs leading-relaxed text-muted">
+                          Upload a photo of your handwritten notebook page — it&apos;s resized automatically before being sent to the AI for scoring.
+                        </p>
                       </div>
                     </div>
+
+                    {photoPreviewUrl ? (
+                      <div className="mb-4 flex items-center gap-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photoPreviewUrl}
+                          alt="Selected handwriting photo"
+                          className="h-24 w-24 shrink-0 rounded-xl border border-border object-cover"
+                        />
+                        <div className="flex flex-col gap-1.5">
+                          <p className="text-xs text-muted break-all">{photoFile?.name}</p>
+                          <button
+                            type="button"
+                            onClick={clearSelectedPhoto}
+                            disabled={photoReviewPending}
+                            className="w-fit text-xs font-semibold text-muted hover:text-foreground disabled:opacity-50"
+                          >
+                            Remove photo
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="mb-4 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-background px-4 py-6 text-sm font-semibold text-muted hover:border-accent/50 hover:text-foreground">
+                        <Camera size={16} />
+                        Choose a photo
+                        <input type="file" accept="image/*" onChange={handlePhotoSelected} className="hidden" />
+                      </label>
+                    )}
+
+                    {photoReviewError && (
+                      <p className="mb-3 rounded-xl border border-red-500/30 bg-red-500/5 px-3 py-2 text-xs text-red-600">
+                        {photoReviewError}
+                      </p>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={submitPhotoReview}
+                      disabled={!photoFile || photoReviewPending}
+                      className="w-full inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-bold text-white shadow-sm hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {photoReviewPending ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                      {photoReviewPending ? "Analyzing with AI…" : "Analyze photo with AI"}
+                    </button>
+
+                    {!showManualFallback && (
+                      <button
+                        type="button"
+                        onClick={() => setShowManualFallback(true)}
+                        className="mt-3 w-full text-center text-xs font-semibold text-muted hover:text-foreground"
+                      >
+                        Prefer to review manually with ChatGPT/Claude instead?
+                      </button>
+                    )}
+                  </section>
+
+                  {showManualFallback && (
+                    <section className="rounded-3xl border border-border bg-surface p-5 sm:p-6">
+                      <div className="mb-4 flex items-start gap-3">
+                        <ShieldCheck className="mt-0.5 shrink-0 text-accent" size={20} />
+                        <div>
+                          <h3 className="font-bold text-foreground">External AI Review (Optional)</h3>
+                          <p className="mt-1 text-xs leading-relaxed text-muted">
+                            Copy the prompt below to ChatGPT/AI. When AI replies with JSON, paste the JSON back here to get score badges and sentence corrections saved to your history!
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid gap-2 sm:grid-cols-2 mb-4">
+                        <button
+                          type="button"
+                          onClick={() => copyPrompt("text")}
+                          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground hover:border-accent/50"
+                        >
+                          {copied === "text" ? <Check size={16} /> : <Clipboard size={16} />}
+                          {copied === "text" ? "Copied Text Prompt" : "Copy text review prompt"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => copyPrompt("photo")}
+                          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground hover:border-accent/50"
+                        >
+                          {copied === "photo" ? <Check size={16} /> : <Clipboard size={16} />}
+                          {copied === "photo" ? "Copied Photo Prompt" : "Copy photo review prompt"}
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowJsonSubmit(true)}
+                        className="w-full inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-accent/10 border border-accent/30 text-accent px-4 py-3 text-sm font-bold hover:bg-accent/20"
+                      >
+                        <Sparkles size={16} /> Submit AI Review JSON Response
+                      </button>
+
+                      {showJsonSubmit && (
+                        <div className="mt-4 rounded-2xl border border-border bg-background p-4 flex flex-col gap-3">
+                          <p className="text-xs font-bold text-foreground">Paste JSON Response From ChatGPT / AI:</p>
+                          <textarea
+                            rows={6}
+                            value={rawJsonInput}
+                            onChange={(e) => setRawJsonInput(e.target.value)}
+                            placeholder={`Paste standard JSON or code block output from ChatGPT here...\nExample: {"score": 85, "sentences": [...]}`}
+                            className="w-full rounded-xl border border-border bg-surface p-3 font-mono text-xs text-foreground focus:border-accent focus:outline-none"
+                          />
+                          <div className="flex justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setShowJsonSubmit(false)}
+                              className="px-3 py-1.5 text-xs font-semibold text-muted hover:text-foreground"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleJsonSubmit}
+                              disabled={isPending || !rawJsonInput.trim()}
+                              className="rounded-xl bg-accent px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:brightness-95 disabled:opacity-50"
+                            >
+                              {isPending ? "Saving..." : "Parse & Save Review"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </section>
                   )}
-                </section>
+                </>
               )}
 
               {active.status === "ACTIVE" && (
@@ -854,8 +834,6 @@ export function KakouDashboard({
       sidebarItem={sidebarItem}
       onSelectItem={setSidebarItem}
       onCloseModal={() => setSidebarItem(null)}
-      onLessonCompleted={handleLessonCompleted}
-      onPatternToggled={handlePatternToggled}
     >
     <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
@@ -869,7 +847,8 @@ export function KakouDashboard({
               <p className="font-jp text-sm font-bold text-accent">書こう · Kakou</p>
               <h1 className="mt-1 text-2xl font-bold text-foreground sm:text-3xl">What should I write today?</h1>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-                Pick a session, open your paper notebook, and follow the prompts. The exercise bank is static—no AI is used to generate your study material.
+                Open your paper notebook and follow the prompts — auto-picked from what&apos;s
+                due or new in Katsuyou and Bunpou.
               </p>
             </div>
           </div>
@@ -901,63 +880,30 @@ export function KakouDashboard({
             </div>
           )}
 
-          <div className={`${initialSource ? "hidden" : "grid"} gap-3 sm:grid-cols-2`}>
-            {KAKOU_MODES.map((item) => {
-              const selected = mode === item;
-              return (
+          {!initialSource && (
+            <p className="mb-5 text-sm leading-relaxed text-muted">
+              Auto-picked from what&apos;s due for review or new in Katsuyou and Bunpou —
+              no need to choose a mode or level.
+            </p>
+          )}
+
+          <fieldset className={initialSource ? "hidden" : "mt-1"}>
+            <legend className="mb-2 text-xs font-bold uppercase tracking-wide text-muted">Session length</legend>
+            <div className="grid grid-cols-3 gap-2">
+              {([5, 10, 20] as KakouDuration[]).map((item) => (
                 <button
                   key={item}
                   type="button"
-                  onClick={() => setMode(item)}
-                  className={`cursor-pointer rounded-2xl border p-4 text-left transition-all ${
-                    selected
-                      ? "border-accent bg-accent/5 shadow-sm"
-                      : "border-border bg-background hover:border-accent/40"
-                  } ${item === "DAILY_MIX" ? "sm:col-span-2" : ""}`}
+                  onClick={() => setDuration(item)}
+                  className={`cursor-pointer rounded-xl border px-3 py-2.5 text-sm font-bold ${
+                    duration === item ? "border-accent bg-accent text-white" : "border-border bg-background text-foreground"
+                  }`}
                 >
-                  <span className="text-sm font-bold text-foreground">{KAKOU_MODE_LABELS[item].title}</span>
-                  <span className="mt-1 block text-xs leading-relaxed text-muted">{KAKOU_MODE_LABELS[item].description}</span>
+                  {item} min
                 </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <fieldset className={initialSource ? "hidden" : ""}>
-              <legend className="mb-2 text-xs font-bold uppercase tracking-wide text-muted">JLPT level</legend>
-              <div className="grid grid-cols-3 gap-2">
-                {(["N5", "N4", "N3"] as KakouLevel[]).map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setLevel(item)}
-                    className={`cursor-pointer rounded-xl border px-3 py-2.5 text-sm font-bold ${
-                      level === item ? "border-accent bg-accent text-white" : "border-border bg-background text-foreground"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend className="mb-2 text-xs font-bold uppercase tracking-wide text-muted">Session length</legend>
-              <div className="grid grid-cols-3 gap-2">
-                {([5, 10, 20] as KakouDuration[]).map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setDuration(item)}
-                    className={`cursor-pointer rounded-xl border px-3 py-2.5 text-sm font-bold ${
-                      duration === item ? "border-accent bg-accent text-white" : "border-border bg-background text-foreground"
-                    }`}
-                  >
-                    {item} min
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-          </div>
+              ))}
+            </div>
+          </fieldset>
 
           <button
             type="button"
@@ -984,24 +930,24 @@ export function KakouDashboard({
               <p className="mt-1 text-xs text-muted">Completed writing sessions will appear here.</p>
             </div>
           ) : (
-            <div className="divide-y divide-border max-h-[70vh] overflow-y-auto">
+            <div className="divide-y divide-border max-h-[70vh] overflow-y-auto scrollbar-none">
               {overview.history.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setSelectedHistorySession(item)}
-                  className="flex cursor-pointer items-center justify-between gap-3 py-3 font-medium transition-colors hover:bg-surface-muted/50 px-2 rounded-xl"
+                  className="flex cursor-pointer flex-col gap-2 rounded-xl px-2 py-3 font-medium transition-colors hover:bg-surface-muted/50"
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-foreground">{KAKOU_MODE_LABELS[item.mode].title}</p>
-                    <p className="mt-0.5 text-[11px] text-muted">
+                    <p className="mt-0.5 truncate text-[11px] text-muted">
                       {formatDate(item.completedAt ?? item.startedAt)} · {item.level} · {item.prompts.length} steps
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     {typeof item.score === "number" && (
-                      <ScoreBadge score={item.score} />
+                      <ScoreBadge score={item.score} compact />
                     )}
-                    <span className="rounded-full bg-surface-muted px-2.5 py-1 text-[10px] font-bold text-muted">
+                    <span className="shrink-0 rounded-full bg-surface-muted px-2.5 py-1 text-[10px] font-bold text-muted">
                       {item.difficulty ?? "DONE"}
                     </span>
                   </div>
@@ -1038,7 +984,7 @@ export function KakouDashboard({
                 )}
 
                 {selectedHistorySession?.feedbackJson ? (
-                  <ReviewDisplayCard feedback={selectedHistorySession.feedbackJson} />
+                  <ReviewDisplayCard feedback={selectedHistorySession.feedbackJson} prompts={selectedHistorySession.prompts} />
                 ) : (
                   <div className="rounded-2xl bg-surface-muted p-4 text-center text-xs text-muted">
                     Belum ada AI Review JSON yang disimpan untuk sesi ini.

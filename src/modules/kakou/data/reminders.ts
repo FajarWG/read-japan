@@ -6,6 +6,7 @@ import type {
   KakouLevel,
   KakouPrompt,
   KakouReminder,
+  KakouSource,
   KakouSourceType,
 } from "@/src/modules/kakou/data/types";
 
@@ -220,5 +221,41 @@ export function buildFocusedKakouPrompt(
     pattern: form.labelId,
     source: reminder.source,
     reminder,
+  };
+}
+
+/**
+ * Like buildFocusedKakouPrompt("KATSUYOU", formKey) but pins a specific verb
+ * (instead of showing generic group examples) and stamps source.verbId, so
+ * the resulting prompt can drive a KatsuyouReviewCard SRS update after
+ * review — used by the sequential session picker, which always knows exactly
+ * which verb it chose for a given form.
+ */
+export function buildKatsuyouPracticePrompt(formKey: string, verbId: string): KakouPrompt | null {
+  const form = CONJUGATION_FORMS.find((item) => item.key === formKey);
+  const verb = mockVerbs.find((item) => item.id === verbId);
+  const reminder = guideReminder(formKey);
+  if (!form || !verb || !reminder) return null;
+
+  const conjugated = verb.conjugations[formKey as keyof VerbConjugations];
+  if (!conjugated || !reminder.source) return null;
+  const source: KakouSource = { ...reminder.source, verbId };
+
+  return {
+    id: `katsuyou-${formKey}-${verbId}`,
+    kind: "CONJUGATION",
+    level: levelFrom(form.jlpt),
+    title: `Practice ${form.labelEn} — ${verb.kanji}`,
+    japanese: `${verb.kanji} → ${conjugated.kanji}`,
+    instruction:
+      "Salin contoh di atas, lalu tulis tiga kalimatmu sendiri menggunakan kata kerja ini dalam bentuk yang sama.",
+    pattern: form.labelId,
+    example: `${verb.kanji} (${verb.romaji}) → ${conjugated.kanji} (${conjugated.romaji})`,
+    source,
+    reminder: {
+      ...reminder,
+      examples: [{ japanese: `${verb.kanji} → ${conjugated.kanji}`, reading: conjugated.kana }],
+      source,
+    },
   };
 }

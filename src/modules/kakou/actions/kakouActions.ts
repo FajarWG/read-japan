@@ -1,16 +1,23 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import sharp from "sharp";
 
 import type { Prisma } from "@/app/generated/prisma/client";
-import { KAKOU_PROMPTS } from "@/src/modules/kakou/data/prompts";
 import {
   buildFocusedKakouPrompt,
+  buildKatsuyouPracticePrompt,
   findFirstIncompleteBunpouPattern,
   hydrateKakouPrompt,
 } from "@/src/modules/kakou/data/reminders";
-import { getKatsuyouStats } from "@/src/modules/katsuyou/actions/katsuyouActions";
+import {
+  buildPhotoReviewPrompt,
+  parseKakouFeedbackJson,
+} from "@/src/modules/kakou/data/reviewPrompts";
 import { getBunpouProgress } from "@/src/modules/bunpou/actions/bunpouActions";
+import { CONJUGATION_FORMS } from "@/src/modules/katsuyou/data/conjugationForms";
+import { mockVerbs } from "@/src/modules/katsuyou/data/verbs";
+import { applySm2, ratingFromScore, type Sm2Rating } from "@/src/modules/katsuyou/lib/sm2";
 import {
   KAKOU_DIFFICULTIES,
   KAKOU_DURATIONS,
@@ -22,7 +29,6 @@ import {
   type KakouMode,
   type KakouOverview,
   type KakouPrompt,
-  type KakouPromptKind,
   type KakouSessionView,
   type KakouSourceType,
 } from "@/src/modules/kakou/data/types";
@@ -34,6 +40,11 @@ import {
 import { logActivity } from "@/src/shared/lib/activity";
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
+import {
+  AllModelsExhaustedError,
+  callGeminiVision,
+  RateLimitError,
+} from "@/src/shared/lib/gemini-limiter";
 
 type SessionRecord = {
   id: number;
@@ -92,16 +103,10 @@ function readPrompts(value: unknown): KakouPrompt[] {
   });
 }
 
-function readPromptIds(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string")
-    : [];
-}
-
 function readFeedbackJson(value: unknown) {
   if (typeof value !== "object" || value === null) return null;
   const candidate = value as Record<string, unknown>;
-  if (typeof candidate.score !== "number" || !Array.isArray(candidate.sentences)) {
+  if (!Array.isArray(candidate.perPrompt)) {
     return null;
   }
   return candidate as unknown as import("../data/types").KakouFeedback;
@@ -182,54 +187,95 @@ export async function getKakouOverview(): Promise<KakouOverview | null> {
   return loadOverview(session.id);
 }
 
-function shuffled<T>(items: T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+const SESSION_ITEM_COUNTS: Record<KakouDuration, number> = { 5: 2, 10: 3, 20: 5 };
+
+const JLPT_RANK: Record<string, number> = { N5: 5, N4: 4, N3: 3, N2: 2, N1: 1 };
+
+/** The "hardest" (lowest-rank) level among a session's prompts, for display. */
+function sessionLevelFromPrompts(prompts: KakouPrompt[]): KakouLevel {
+  let best: KakouLevel = "N5";
+  let bestRank = JLPT_RANK.N5;
+  for (const prompt of prompts) {
+    const rank = JLPT_RANK[prompt.level] ?? JLPT_RANK.N5;
+    if (rank < bestRank) {
+      best = prompt.level;
+      bestRank = rank;
+    }
   }
-  return result;
+  return best;
 }
 
-function pickPrompts(
-  level: KakouLevel,
-  mode: KakouMode,
-  duration: KakouDuration,
-  recentIds: Set<string>,
-): KakouPrompt[] {
-  const kindsByMode: Record<Exclude<KakouMode, "DAILY_MIX">, KakouPromptKind> = {
-    GUIDED_JOURNAL: "JOURNAL",
-    COPY_CHANGE_CREATE: "COPY_CHANGE_CREATE",
-    GRAMMAR_CHALLENGE: "GRAMMAR",
-    CONJUGATION_DRILL: "CONJUGATION",
-  };
+/**
+ * Auto-sequenced session: due Katsuyou reviews first (they decay), then
+ * alternates the next not-yet-started Katsuyou form and the next incomplete
+ * Bunpou pattern to fill the remaining slots. Replaces the old random static
+ * prompt bank + "sprinkle one due item" heuristic — every prompt this
+ * produces has a reliable `source` (and Katsuyou prompts a `verbId`), so AI
+ * review results can always be routed back to the right SRS card / pattern.
+ */
+async function buildSequentialSession(
+  userId: number,
+  durationMinutes: KakouDuration,
+): Promise<KakouPrompt[]> {
+  const itemCount = SESSION_ITEM_COUNTS[durationMinutes];
+  const now = new Date();
 
-  const byLevel = KAKOU_PROMPTS.filter((item) => item.level === level);
-  const available = (kind: KakouPromptKind) => {
-    const matching = byLevel.filter((item) => item.kind === kind);
-    const fresh = matching.filter((item) => !recentIds.has(item.id));
-    return shuffled(fresh.length > 0 ? fresh : matching);
-  };
+  const [dueCards, practicedFormRows, bunpouCompletedIds] = await Promise.all([
+    prisma.katsuyouReviewCard.findMany({
+      where: { userId, nextReview: { lte: now } },
+      orderBy: { nextReview: "asc" },
+      take: itemCount,
+    }),
+    prisma.katsuyouReviewCard.findMany({
+      where: { userId },
+      select: { conjugationForm: true },
+      distinct: ["conjugationForm"],
+    }),
+    getBunpouProgress(),
+  ]);
 
-  if (mode === "DAILY_MIX") {
-    const kindOrder: KakouPromptKind[] = [
-      "JOURNAL",
-      "GRAMMAR",
-      "SENTENCE_BUILDER",
-      "CONJUGATION",
-      "COPY_CHANGE_CREATE",
-    ];
-    const count = duration === 5 ? 2 : duration === 10 ? 3 : 5;
-    return kindOrder.slice(0, count).flatMap((kind) => available(kind).slice(0, 1));
+  const practicedFormKeys = new Set(practicedFormRows.map((row) => row.conjugationForm));
+  const remainingForms = CONJUGATION_FORMS.filter((form) => !practicedFormKeys.has(form.key));
+
+  const prompts: KakouPrompt[] = [];
+  for (const card of dueCards) {
+    const prompt = buildKatsuyouPracticePrompt(card.conjugationForm, card.verbId);
+    if (prompt) prompts.push(prompt);
   }
 
-  const count = duration === 5 ? 1 : duration === 10 ? 2 : 3;
-  return available(kindsByMode[mode]).slice(0, count);
+  let nextNewFormIndex = 0;
+  const pickedBunpouIds = [...bunpouCompletedIds];
+  let turn: "katsuyou" | "bunpou" = "katsuyou";
+  let stuckRounds = 0;
+
+  while (prompts.length < itemCount && stuckRounds < 2) {
+    const before = prompts.length;
+
+    if (turn === "katsuyou" && nextNewFormIndex < remainingForms.length) {
+      const form = remainingForms[nextNewFormIndex];
+      nextNewFormIndex += 1;
+      const verb = mockVerbs[Math.floor(Math.random() * mockVerbs.length)];
+      const prompt = buildKatsuyouPracticePrompt(form.key, verb.id);
+      if (prompt) prompts.push(prompt);
+    } else if (turn === "bunpou") {
+      const patternId = findFirstIncompleteBunpouPattern(pickedBunpouIds);
+      if (patternId) {
+        const prompt = buildFocusedKakouPrompt("BUNPOU", patternId);
+        if (prompt) {
+          prompts.push(prompt);
+          pickedBunpouIds.push(patternId);
+        }
+      }
+    }
+
+    stuckRounds = prompts.length === before ? stuckRounds + 1 : 0;
+    turn = turn === "katsuyou" ? "bunpou" : "katsuyou";
+  }
+
+  return prompts;
 }
 
 export async function createKakouSession(input: {
-  mode: string;
-  level: string;
   durationMinutes: number;
   sourceType?: string;
   sourceId?: string;
@@ -237,7 +283,7 @@ export async function createKakouSession(input: {
   const auth = await getSession();
   if (!auth) return { success: false as const, error: "Unauthorized" };
 
-  if (!isMode(input.mode) || !isLevel(input.level) || !isDuration(input.durationMinutes)) {
+  if (!isDuration(input.durationMinutes)) {
     return { success: false as const, error: "Invalid session settings" };
   }
   if (
@@ -256,16 +302,6 @@ export async function createKakouSession(input: {
     return { success: true as const, session: toSessionView(current), resumed: true };
   }
 
-  const recentSessions = await prisma.kakouSession.findMany({
-    where: { userId: auth.id },
-    select: { promptIds: true },
-    orderBy: { startedAt: "desc" },
-    take: 12,
-  });
-  const recentIds = new Set(
-    recentSessions.flatMap((item) => readPromptIds(item.promptIds)),
-  );
-
   const focusedPrompt =
     isSourceType(input.sourceType) && input.sourceId
       ? buildFocusedKakouPrompt(input.sourceType, input.sourceId)
@@ -274,52 +310,24 @@ export async function createKakouSession(input: {
     return { success: false as const, error: "Library material was not found" };
   }
 
-  const effectiveMode: KakouMode = focusedPrompt
-    ? focusedPrompt.kind === "GRAMMAR"
-      ? "GRAMMAR_CHALLENGE"
-      : "CONJUGATION_DRILL"
-    : input.mode;
-  const effectiveLevel = focusedPrompt?.level ?? input.level;
-
-  const basePrompts = focusedPrompt
-    ? [focusedPrompt]
-    : pickPrompts(effectiveLevel, effectiveMode, input.durationMinutes, recentIds);
-
-  // Heuristic: sprinkle one real due/weak item from Katsuyou or Bunpou into Daily
-  // Mix sessions when available, instead of only ever picking from the static
-  // prompt bank. Not full SRS-driven prioritization — that's a later milestone.
-  let dueMaterialPrompt: KakouPrompt | null = null;
-  if (!focusedPrompt && effectiveMode === "DAILY_MIX") {
-    const [katsuyouStats, bunpouCompletedIds] = await Promise.all([
-      getKatsuyouStats(),
-      getBunpouProgress(),
-    ]);
-    const dueFormKey = Object.keys(katsuyouStats.dueReviewsByForm)[0];
-    dueMaterialPrompt = dueFormKey
-      ? buildFocusedKakouPrompt("KATSUYOU", dueFormKey)
-      : (() => {
-          const incompletePatternId = findFirstIncompleteBunpouPattern(bunpouCompletedIds);
-          return incompletePatternId ? buildFocusedKakouPrompt("BUNPOU", incompletePatternId) : null;
-        })();
-  }
-
   const prompts = (
-    dueMaterialPrompt && basePrompts.length > 0
-      ? [dueMaterialPrompt, ...basePrompts.slice(1)]
-      : dueMaterialPrompt
-        ? [dueMaterialPrompt]
-        : basePrompts
+    focusedPrompt
+      ? [focusedPrompt]
+      : await buildSequentialSession(auth.id, input.durationMinutes)
   ).map(hydrateKakouPrompt);
 
   if (prompts.length === 0) {
-    return { success: false as const, error: "No prompts available for these settings" };
+    return {
+      success: false as const,
+      error: "You're all caught up — nothing due in Katsuyou or Bunpou right now.",
+    };
   }
 
   const created = await prisma.kakouSession.create({
     data: {
       userId: auth.id,
-      mode: effectiveMode,
-      level: effectiveLevel,
+      mode: "PRACTICE",
+      level: sessionLevelFromPrompts(prompts),
       durationMinutes: input.durationMinutes,
       promptIds: prompts.map((item) => item.id),
       promptSnapshot: prompts as unknown as Prisma.InputJsonValue,
@@ -384,6 +392,11 @@ export async function completeKakouSession(
     return { success: false as const, error: "Session was already completed" };
   }
 
+  if (!target.feedbackJson) {
+    const prompts = readPrompts(target.promptSnapshot).map(hydrateKakouPrompt);
+    await applyCoarseDifficultyToProgress(auth.id, prompts, difficulty);
+  }
+
   await finishTimerForKakou(auth.id, target.id);
   await logActivity(auth.id, "kakou_session", String(target.id));
   revalidatePath("/kakou");
@@ -411,29 +424,187 @@ export async function abandonKakouSession(sessionId: number) {
   return { success: true as const, overview: await loadOverview(auth.id) };
 }
 
+/**
+ * Route a rating (from AI review score or self-rated session difficulty)
+ * back to whatever the prompt's source was: SM-2 update on the matching
+ * KatsuyouReviewCard (find-or-create, since a due queue only creates cards on
+ * first practice), or a completed toggle on BunpouProgress.
+ */
+async function applyRatingToSource(
+  userId: number,
+  source: KakouPrompt["source"],
+  rating: Sm2Rating,
+  bunpouCompleted: boolean,
+): Promise<void> {
+  if (!source) return;
+
+  if (source.type === "KATSUYOU" && source.verbId) {
+    const card = await prisma.katsuyouReviewCard.upsert({
+      where: {
+        userId_verbId_conjugationForm: {
+          userId,
+          verbId: source.verbId,
+          conjugationForm: source.id,
+        },
+      },
+      create: { userId, verbId: source.verbId, conjugationForm: source.id },
+      update: {},
+    });
+    const next = applySm2(card, rating);
+    await prisma.katsuyouReviewCard.update({
+      where: { id: card.id },
+      data: { ...next, lastReviewed: new Date() },
+    });
+  } else if (source.type === "BUNPOU") {
+    await prisma.bunpouProgress.upsert({
+      where: { userId_patternId: { userId, patternId: source.id } },
+      create: { userId, patternId: source.id, completed: bunpouCompleted },
+      update: { completed: bunpouCompleted },
+    });
+  }
+}
+
+async function applyKakouReviewToProgress(
+  userId: number,
+  prompts: KakouPrompt[],
+  feedback: import("../data/types").KakouFeedback,
+): Promise<void> {
+  for (const entry of feedback.perPrompt) {
+    const prompt = prompts[entry.promptIndex - 1];
+    if (!prompt) continue;
+    await applyRatingToSource(userId, prompt.source, ratingFromScore(entry.score), entry.score >= 60);
+  }
+}
+
+/**
+ * Coarser fallback for sessions finished without ever running AI review:
+ * the self-rated Easy/Okay/Difficult applies uniformly to every prompt's
+ * source. Only called when a session has no feedbackJson yet — if AI review
+ * is submitted for the same session later, that applies its own (more
+ * precise) per-prompt update on top.
+ */
+async function applyCoarseDifficultyToProgress(
+  userId: number,
+  prompts: KakouPrompt[],
+  difficulty: KakouDifficulty,
+): Promise<void> {
+  const rating: Sm2Rating = difficulty === "EASY" ? "easy" : difficulty === "OKAY" ? "good" : "hard";
+  const bunpouCompleted = difficulty !== "DIFFICULT";
+  for (const prompt of prompts) {
+    await applyRatingToSource(userId, prompt.source, rating, bunpouCompleted);
+  }
+}
+
 export async function saveKakouAiFeedback(input: {
   sessionId: number;
-  score: number;
-  feedbackJson: unknown;
+  feedbackJson: import("../data/types").KakouFeedback;
   userWriting?: string;
 }) {
   const auth = await getSession();
   if (!auth) return { success: false as const, error: "Unauthorized" };
-  if (!Number.isInteger(input.sessionId) || typeof input.score !== "number") {
+  if (
+    !Number.isInteger(input.sessionId) ||
+    !Array.isArray(input.feedbackJson?.perPrompt) ||
+    input.feedbackJson.perPrompt.length === 0
+  ) {
     return { success: false as const, error: "Invalid feedback data" };
   }
 
-  const boundedScore = Math.max(0, Math.min(100, Math.round(input.score)));
+  const record = await prisma.kakouSession.findFirst({
+    where: { id: input.sessionId, userId: auth.id },
+  });
+  if (!record) return { success: false as const, error: "Session not found" };
+
+  const averageScore =
+    input.feedbackJson.perPrompt.reduce((sum, item) => sum + item.score, 0) /
+    input.feedbackJson.perPrompt.length;
+  const boundedScore = Math.max(0, Math.min(100, Math.round(averageScore)));
 
   await prisma.kakouSession.updateMany({
     where: { id: input.sessionId, userId: auth.id },
     data: {
       score: boundedScore,
-      feedbackJson: input.feedbackJson as Prisma.InputJsonValue,
+      feedbackJson: input.feedbackJson as unknown as Prisma.InputJsonValue,
       ...(input.userWriting ? { userWriting: input.userWriting } : {}),
     },
   });
 
+  const prompts = readPrompts(record.promptSnapshot).map(hydrateKakouPrompt);
+  await applyKakouReviewToProgress(auth.id, prompts, input.feedbackJson);
+
   revalidatePath("/kakou");
   return { success: true as const, overview: await loadOverview(auth.id) };
+}
+
+const MAX_PHOTO_UPLOAD_BYTES = 8 * 1024 * 1024;
+
+/**
+ * In-app AI review from an uploaded photo of handwriting. Normalizes the
+ * upload (any format incl. HEIC, arbitrary size) to a resized JPEG server-side
+ * via sharp, then sends it to Gemini vision. On rate-limit or any failure,
+ * signals fallbackToManual so the client can fall back to the existing
+ * copy-paste-into-external-AI flow instead of erroring out.
+ */
+export async function submitKakouPhotoReview(sessionId: number, formData: FormData) {
+  const auth = await getSession();
+  if (!auth) return { success: false as const, error: "Unauthorized" };
+
+  const file = formData.get("photo");
+  if (!(file instanceof File)) {
+    return { success: false as const, error: "No photo provided" };
+  }
+  if (file.size > MAX_PHOTO_UPLOAD_BYTES) {
+    return { success: false as const, error: "Photo is too large (max 8MB)." };
+  }
+
+  const record = await prisma.kakouSession.findFirst({
+    where: { id: sessionId, userId: auth.id },
+    include: { studyTimers: true },
+  });
+  if (!record) return { success: false as const, error: "Session not found" };
+  const sessionView = toSessionView(record);
+
+  let image: { base64: string; mimeType: string };
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const jpeg = await sharp(buffer)
+      .rotate() // auto-orient from EXIF before stripping it
+      .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 82 })
+      .toBuffer();
+    image = { base64: jpeg.toString("base64"), mimeType: "image/jpeg" };
+  } catch {
+    return {
+      success: false as const,
+      error: "Couldn't read that photo. Try a different file, or use the manual flow below.",
+      fallbackToManual: true as const,
+    };
+  }
+
+  try {
+    const prompt = buildPhotoReviewPrompt(sessionView);
+    const result = await callGeminiVision(prompt, image);
+    const parsed = parseKakouFeedbackJson(result.text);
+    if (!parsed) {
+      return {
+        success: false as const,
+        error: "AI response wasn't valid JSON. Try again, or use the manual flow below.",
+        fallbackToManual: true as const,
+      };
+    }
+    return saveKakouAiFeedback({ sessionId, feedbackJson: parsed });
+  } catch (err) {
+    if (err instanceof RateLimitError || err instanceof AllModelsExhaustedError) {
+      return {
+        success: false as const,
+        error: "In-app AI review is at capacity right now (free tier limit). Use the manual copy-paste flow below instead.",
+        fallbackToManual: true as const,
+      };
+    }
+    return {
+      success: false as const,
+      error: "In-app AI review failed. Use the manual copy-paste flow below instead.",
+      fallbackToManual: true as const,
+    };
+  }
 }

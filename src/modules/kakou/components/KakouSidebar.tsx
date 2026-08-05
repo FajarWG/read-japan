@@ -65,13 +65,13 @@ function KatsuyouPane({
   };
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-3.5">
       {Object.entries(groups).map(([level, group]) => (
-        <div key={level} className="flex flex-col gap-1.5">
+        <div key={level} className="flex flex-col gap-1">
           <h3 className="px-2 text-[10px] font-bold uppercase tracking-wider text-muted/80 select-none">
             {group.title}
           </h3>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
             {group.items.map((form) => {
               const isCompleted = materials.completedLessons.includes(form.key);
               const dueCount = materials.dueReviewsByForm[form.key] || 0;
@@ -80,7 +80,7 @@ function KatsuyouPane({
                   key={form.key}
                   type="button"
                   onClick={() => onSelect(form.key)}
-                  className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border/40 bg-surface/50 px-3 py-2 text-left text-xs font-semibold transition-all hover:border-border hover:bg-surface-muted"
+                  className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border/40 bg-surface/50 px-3 py-1.5 text-left text-xs font-semibold transition-all hover:border-border hover:bg-surface-muted"
                 >
                   <div className="flex min-w-0 flex-col">
                     <span className="truncate font-jp text-[10px] opacity-75">{form.jpName}</span>
@@ -244,7 +244,7 @@ function PatternRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex cursor-pointer items-center justify-between gap-2 rounded-xl border border-border/40 bg-surface/50 px-3 py-2 text-left text-xs font-semibold transition-all hover:border-border hover:bg-surface-muted"
+      className="flex cursor-pointer items-center justify-between gap-2 rounded-xl border border-border/40 bg-surface/50 px-3 py-1.5 text-left text-xs font-semibold transition-all hover:border-border hover:bg-surface-muted"
     >
       <span className="truncate font-jp">{pattern.pattern}</span>
       <div className="ml-2 flex shrink-0 items-center gap-1.5">

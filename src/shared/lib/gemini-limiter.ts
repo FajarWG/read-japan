@@ -39,8 +39,8 @@ const TIERS: Record<GeminiModel, TierConfig> = {
     model: "gemini-3.5-flash",
     endpoint:
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
-    rpm: 15,
-    rpd: 100,
+    rpm: 5,
+    rpd: 20,
   },
   "gemini-3.1-flash-lite": {
     model: "gemini-3.1-flash-lite",
@@ -189,9 +189,13 @@ if (!API_KEY) {
   console.warn("[gemini-limiter] GEMINI_API_KEY not set — chat will fail");
 }
 
+export type GeminiPart =
+  | { text: string }
+  | { inlineData: { mimeType: string; data: string } };
+
 export interface GeminiMessage {
   role: "user" | "model";
-  parts: Array<{ text: string }>;
+  parts: GeminiPart[];
 }
 
 export interface GeminiResponse {
@@ -204,29 +208,12 @@ export interface GeminiResponse {
  * Call Gemini dengan system prompt + history + new user message.
  * Otomatis pilih model & acquire slot. Throws pada rate limit.
  */
-export async function callGemini(
-  systemPrompt: string,
-  history: GeminiMessage[],
-  userMessage: string,
-  preferredModel?: GeminiModel,
+async function sendGeminiRequest(
+  model: GeminiModel,
+  contents: GeminiMessage[],
 ): Promise<GeminiResponse> {
-  const model = preferredModel ?? pickAvailableModel();
   acquireSlot(model);
-
   const tier = TIERS[model];
-  const contents: GeminiMessage[] = [
-    { role: "user", parts: [{ text: systemPrompt }] },
-    {
-      role: "model",
-      parts: [
-        {
-          text: "Understood. I'll help with Japanese learning at the appropriate level.",
-        },
-      ],
-    },
-    ...history,
-    { role: "user", parts: [{ text: userMessage }] },
-  ];
 
   const res = await fetch(`${tier.endpoint}?key=${API_KEY}`, {
     method: "POST",
@@ -258,6 +245,53 @@ export async function callGemini(
     data.candidates?.[0]?.content?.parts?.[0]?.text ?? "(no response)";
   const tokens = data.usageMetadata?.totalTokenCount;
   return { text, model, tokens };
+}
+
+export async function callGemini(
+  systemPrompt: string,
+  history: GeminiMessage[],
+  userMessage: string,
+  preferredModel?: GeminiModel,
+): Promise<GeminiResponse> {
+  const model = preferredModel ?? pickAvailableModel();
+  const contents: GeminiMessage[] = [
+    { role: "user", parts: [{ text: systemPrompt }] },
+    {
+      role: "model",
+      parts: [
+        {
+          text: "Understood. I'll help with Japanese learning at the appropriate level.",
+        },
+      ],
+    },
+    ...history,
+    { role: "user", parts: [{ text: userMessage }] },
+  ];
+
+  return sendGeminiRequest(model, contents);
+}
+
+/**
+ * Single-turn call with an inline image (e.g. a photo of handwriting) alongside
+ * a text prompt. Used for Kakou's in-app photo AI review.
+ */
+export async function callGeminiVision(
+  systemPrompt: string,
+  image: { mimeType: string; base64: string },
+  preferredModel?: GeminiModel,
+): Promise<GeminiResponse> {
+  const model = preferredModel ?? pickAvailableModel();
+  const contents: GeminiMessage[] = [
+    {
+      role: "user",
+      parts: [
+        { text: systemPrompt },
+        { inlineData: { mimeType: image.mimeType, data: image.base64 } },
+      ],
+    },
+  ];
+
+  return sendGeminiRequest(model, contents);
 }
 
 /**
