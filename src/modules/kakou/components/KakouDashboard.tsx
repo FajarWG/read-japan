@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactNode } from "react";
 import Link from "next/link";
 import { Modal } from "@heroui/react";
 import {
@@ -9,6 +9,7 @@ import {
   BookOpenCheck,
   Check,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Clipboard,
   ExternalLink,
@@ -38,6 +39,8 @@ import {
   type KakouDuration,
   type KakouFeedback,
   type KakouLevel,
+  type KakouMaterials,
+  type KakouMaterialSelection,
   type KakouMode,
   type KakouOverview,
   type KakouPrompt,
@@ -45,6 +48,8 @@ import {
   type KakouSourceType,
 } from "@/src/modules/kakou/data/types";
 import { formatStudyTime } from "@/src/modules/study-timer/components/StudyTimerBar";
+import { KakouSidebar } from "@/src/modules/kakou/components/KakouSidebar";
+import { MaterialReferenceModal } from "@/src/modules/kakou/components/MaterialReferenceModal";
 
 const KIND_LABELS: Record<KakouPrompt["kind"], string> = {
   JOURNAL: "Guided journal",
@@ -304,7 +309,17 @@ function ReviewDisplayCard({ feedback }: { feedback: KakouFeedback }) {
   );
 }
 
-function PromptCard({ prompt, index }: { prompt: KakouPrompt; index: number }) {
+function PromptCard({
+  prompt,
+  index,
+  onOpenReference,
+}: {
+  prompt: KakouPrompt;
+  index: number;
+  onOpenReference?: (item: KakouMaterialSelection) => void;
+}) {
+  const [showReminder, setShowReminder] = useState(false);
+
   return (
     <article className="rounded-3xl border border-border bg-surface p-5 shadow-sm sm:p-7">
       <div className="mb-5 flex items-start justify-between gap-3">
@@ -343,6 +358,55 @@ function PromptCard({ prompt, index }: { prompt: KakouPrompt; index: number }) {
           </div>
         )}
       </div>
+
+      {prompt.reminder && (
+        <div className="mt-5 border-t border-border/40 pt-4">
+          <button
+            type="button"
+            onClick={() => setShowReminder((v) => !v)}
+            className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-bold text-accent hover:underline"
+          >
+            <Info size={14} /> {showReminder ? "Hide reference" : "Show reference"}
+          </button>
+          {showReminder && (
+            <div className="mt-3 flex flex-col gap-2 rounded-2xl bg-surface-muted p-4">
+              <p className="text-xs font-bold text-foreground">{prompt.reminder.title}</p>
+              <p className="text-xs text-muted">{prompt.reminder.meaning}</p>
+              {prompt.reminder.examples.length > 0 && (
+                <div className="mt-1 flex flex-col gap-1">
+                  {prompt.reminder.examples.map((ex, idx) => (
+                    <p key={idx} className="font-jp text-xs text-foreground">
+                      {ex.japanese}
+                      {ex.meaning ? <span className="ml-2 font-sans text-muted">— {ex.meaning}</span> : null}
+                    </p>
+                  ))}
+                </div>
+              )}
+              {prompt.reminder.commonMistakes && prompt.reminder.commonMistakes.length > 0 && (
+                <ul className="mt-1 list-inside list-disc text-xs text-muted">
+                  {prompt.reminder.commonMistakes.map((mistake, idx) => (
+                    <li key={idx}>{mistake}</li>
+                  ))}
+                </ul>
+              )}
+              {prompt.source && onOpenReference && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    onOpenReference({
+                      type: prompt.source!.type,
+                      id: prompt.source!.id,
+                    })
+                  }
+                  className="mt-1 inline-flex w-fit cursor-pointer items-center gap-1 text-xs font-bold text-accent hover:underline"
+                >
+                  <ExternalLink size={12} /> View full guide
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -370,12 +434,73 @@ function Stats({ overview }: { overview: KakouOverview }) {
   );
 }
 
+function KakouLayout({
+  materials,
+  showSidebar,
+  onToggleSidebar,
+  sidebarItem,
+  onSelectItem,
+  onCloseModal,
+  onLessonCompleted,
+  onPatternToggled,
+  children,
+}: {
+  materials: KakouMaterials;
+  showSidebar: boolean;
+  onToggleSidebar: () => void;
+  sidebarItem: KakouMaterialSelection | null;
+  onSelectItem: (item: KakouMaterialSelection) => void;
+  onCloseModal: () => void;
+  onLessonCompleted: (formKey: string) => void;
+  onPatternToggled: (patternId: string, learned: boolean) => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="flex min-h-screen bg-background">
+      <div
+        className={[
+          "shrink-0 overflow-hidden transition-all duration-300 ease-in-out",
+          showSidebar ? "w-0 px-0 py-0 md:w-64 md:px-4 md:py-8 md:opacity-100" : "w-0 px-0 py-0 opacity-0",
+        ].join(" ")}
+      >
+        <div className="hidden md:block">
+          <KakouSidebar materials={materials} onSelectItem={onSelectItem} />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={onToggleSidebar}
+        className="relative hidden w-3.5 shrink-0 cursor-pointer items-center justify-center border-r border-border/30 transition-all duration-200 hover:bg-border/20 md:flex"
+        title={showSidebar ? "Hide sidebar" : "Show sidebar"}
+      >
+        <div className="rounded-full border border-border bg-white p-1.5 shadow-xs dark:bg-surface">
+          {showSidebar ? <ChevronLeft className="h-3.5 w-3.5 text-foreground" /> : <ChevronRight className="h-3.5 w-3.5 text-foreground" />}
+        </div>
+      </button>
+
+      <div className="min-w-0 flex-1">{children}</div>
+
+      <MaterialReferenceModal
+        item={sidebarItem}
+        completedLessons={materials.katsuyou.completedLessons}
+        completedPatternIds={materials.bunpou.completedPatternIds}
+        onClose={onCloseModal}
+        onLessonCompleted={onLessonCompleted}
+        onPatternToggled={onPatternToggled}
+      />
+    </div>
+  );
+}
+
 export function KakouDashboard({
   initialOverview,
   initialSource,
+  initialMaterials,
 }: {
   initialOverview: KakouOverview;
   initialSource?: { type: KakouSourceType; id: string };
+  initialMaterials: KakouMaterials;
 }) {
   const [overview, setOverview] = useState(initialOverview);
   const [active, setActive] = useState(initialOverview.activeSession);
@@ -388,6 +513,35 @@ export function KakouDashboard({
   const [rawJsonInput, setRawJsonInput] = useState("");
   const [selectedHistorySession, setSelectedHistorySession] = useState<KakouSessionView | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [materials, setMaterials] = useState(initialMaterials);
+  const [sidebarItem, setSidebarItem] = useState<KakouMaterialSelection | null>(null);
+  const [showSidebar, setShowSidebar] = useState(true);
+
+  const handleLessonCompleted = (formKey: string) => {
+    setMaterials((prev) => ({
+      ...prev,
+      katsuyou: {
+        ...prev.katsuyou,
+        completedLessons: prev.katsuyou.completedLessons.includes(formKey)
+          ? prev.katsuyou.completedLessons
+          : [...prev.katsuyou.completedLessons, formKey],
+      },
+    }));
+  };
+
+  const handlePatternToggled = (patternId: string, learned: boolean) => {
+    setMaterials((prev) => ({
+      ...prev,
+      bunpou: {
+        ...prev.bunpou,
+        completedPatternIds: learned
+          ? prev.bunpou.completedPatternIds.includes(patternId)
+            ? prev.bunpou.completedPatternIds
+            : [...prev.bunpou.completedPatternIds, patternId]
+          : prev.bunpou.completedPatternIds.filter((id) => id !== patternId),
+      },
+    }));
+  };
 
   const startSession = () => {
     setMessage(null);
@@ -513,6 +667,16 @@ export function KakouDashboard({
     const currentPrompt = active.prompts[Math.min(active.progress, total - 1)];
 
     return (
+      <KakouLayout
+        materials={materials}
+        showSidebar={showSidebar}
+        onToggleSidebar={() => setShowSidebar((v) => !v)}
+        sidebarItem={sidebarItem}
+        onSelectItem={setSidebarItem}
+        onCloseModal={() => setSidebarItem(null)}
+        onLessonCompleted={handleLessonCompleted}
+        onPatternToggled={handlePatternToggled}
+      >
       <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
           <header className="flex items-center justify-between gap-3">
@@ -549,7 +713,7 @@ export function KakouDashboard({
 
           {!allDone && currentPrompt && (
             <>
-              <PromptCard prompt={currentPrompt} index={active.progress} />
+              <PromptCard prompt={currentPrompt} index={active.progress} onOpenReference={setSidebarItem} />
               <button
                 type="button"
                 onClick={markStepDone}
@@ -678,12 +842,24 @@ export function KakouDashboard({
           )}
         </div>
       </main>
+      </KakouLayout>
     );
   }
 
   return (
+    <KakouLayout
+      materials={materials}
+      showSidebar={showSidebar}
+      onToggleSidebar={() => setShowSidebar((v) => !v)}
+      sidebarItem={sidebarItem}
+      onSelectItem={setSidebarItem}
+      onCloseModal={() => setSidebarItem(null)}
+      onLessonCompleted={handleLessonCompleted}
+      onPatternToggled={handlePatternToggled}
+    >
     <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+      <div className="mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+      <div className="flex w-full flex-col gap-6">
         <header className="rounded-3xl border border-border bg-surface p-6 shadow-sm sm:p-8">
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -793,7 +969,9 @@ export function KakouDashboard({
             {!isPending && <ChevronRight size={18} />}
           </button>
         </section>
+      </div>
 
+      <aside className="flex w-full flex-col gap-4 lg:sticky lg:top-8">
         <section className="rounded-3xl border border-border bg-surface p-5 shadow-sm sm:p-7">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 font-bold text-foreground"><History size={18} className="text-accent" /> Recent sessions history</h2>
@@ -806,7 +984,7 @@ export function KakouDashboard({
               <p className="mt-1 text-xs text-muted">Completed writing sessions will appear here.</p>
             </div>
           ) : (
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border max-h-[70vh] overflow-y-auto">
               {overview.history.map((item) => (
                 <div
                   key={item.id}
@@ -832,6 +1010,7 @@ export function KakouDashboard({
             </div>
           )}
         </section>
+      </aside>
       </div>
 
       {/* History Detail Modal via Hero UI */}
@@ -894,5 +1073,6 @@ export function KakouDashboard({
         </Modal.Backdrop>
       </Modal>
     </main>
+    </KakouLayout>
   );
 }

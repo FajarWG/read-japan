@@ -271,7 +271,7 @@ export function ProgressDashboard({ stats }: { stats: ProgressStats }) {
           secondary={stats.katsuyou.dueNow}
           secondaryLabel="cards due"
           highlightSecondary
-          href="/katsuyou"
+          href="/kakou"
           cta="Start review"
         />
         <MetricCard
@@ -279,7 +279,7 @@ export function ProgressDashboard({ stats }: { stats: ProgressStats }) {
           title="Bunpou"
           primary={stats.bunpou.patternsCompleted}
           primaryLabel="patterns done"
-          href="/bunpou"
+          href="/kakou"
         />
         <MetricCard
           icon={FileText}

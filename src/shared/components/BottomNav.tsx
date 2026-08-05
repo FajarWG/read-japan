@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Tabs } from "@heroui/react";
-import { Layers, BookOpen, RefreshCw, NotebookPen, PencilLine, Home } from "lucide-react";
+import { Layers, Book, MessageCircle, PencilLine, Home } from "lucide-react";
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -29,18 +29,18 @@ export function BottomNav() {
   const NAV_ITEMS = [
     { id: "anki", route: "/anki", label: "Anki", icon: Layers },
     { id: "kakou", route: "/kakou", label: "Kakou", icon: PencilLine },
-    { id: "bunpou", route: "/bunpou", label: "Bunpou", icon: BookOpen },
-    { id: "katsuyou", route: "/katsuyou", label: "Katsuyou", icon: RefreshCw },
+    { id: "book", route: "/somatome", label: "Book", icon: Book },
+    { id: "conversation", route: "/conversation", label: "Conversation", icon: MessageCircle },
   ] as const;
 
   const selectedKey = pathname.startsWith("/anki")
     ? "anki"
-    : pathname.startsWith("/bunpou")
-      ? "bunpou"
-      : pathname.startsWith("/katsuyou")
-        ? "katsuyou"
-        : pathname.startsWith("/kakou")
-          ? "kakou"
+    : pathname.startsWith("/kakou")
+      ? "kakou"
+      : pathname.startsWith("/somatome")
+        ? "book"
+        : pathname.startsWith("/conversation")
+          ? "conversation"
           : "none";
 
   // Hide on auth pages or when forced by active review session

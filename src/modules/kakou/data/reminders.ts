@@ -81,7 +81,7 @@ function bunpouReminder(id: string): KakouReminder | null {
     source: {
       type: "BUNPOU",
       id,
-      href: `/bunpou?chapter=${found.lesson.chapter}#pattern-${id}`,
+      href: `/kakou?source=bunpou&sourceId=${encodeURIComponent(id)}`,
       label: "Open full lesson in Bunpou",
     },
   };
@@ -106,7 +106,7 @@ function guideReminder(formKey: string): KakouReminder | null {
     source: {
       type: "KATSUYOU",
       id: formKey,
-      href: `/katsuyou?form=${formKey}`,
+      href: `/kakou?source=katsuyou&sourceId=${encodeURIComponent(formKey)}`,
       label: "Open full guide in Katsuyou",
     },
   };
@@ -172,6 +172,15 @@ export function hydrateKakouPrompt(prompt: KakouPrompt): KakouPrompt {
     reminder: reminder ?? undefined,
     source: reminder?.source,
   };
+}
+
+export function findFirstIncompleteBunpouPattern(completedIds: string[]): string | null {
+  for (const lesson of BUNPOU_DATA) {
+    for (const pattern of lesson.patterns) {
+      if (!completedIds.includes(pattern.id)) return pattern.id;
+    }
+  }
+  return null;
 }
 
 export function buildFocusedKakouPrompt(

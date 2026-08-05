@@ -9,8 +9,6 @@ const ROUTE_NAMES: Record<string, string> = {
   "/": "Learning Hub",
   "/anki": "Anki Review Engine",
   "/adaptive": "Adaptive Learning Engine",
-  "/bunpou": "Bunpou Grammar",
-  "/katsuyou": "Katsuyou Conjugation",
   "/kakou": "Kakou Handwriting",
   "/prep": "Pre-Class Cheat Sheet",
   "/kanji-tamago": "Kanji Tamago Mnemonic",

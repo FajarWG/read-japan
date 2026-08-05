@@ -1,4 +1,6 @@
 import type { StudyTimerOverview } from "@/src/modules/study-timer/types";
+import type { SidebarForm } from "@/src/modules/katsuyou/data/conjugationForms";
+import type { BunpouLesson } from "@/src/modules/bunpou/data/bunpouData";
 
 export const KAKOU_MODES = [
   "DAILY_MIX",
@@ -106,6 +108,22 @@ export interface KakouOverview {
     totalSeconds: number;
   };
 }
+
+export interface KakouMaterials {
+  katsuyou: {
+    forms: SidebarForm[];
+    completedLessons: string[];
+    dueReviewsByForm: Record<string, number>;
+  };
+  bunpou: {
+    lessons: BunpouLesson[];
+    completedPatternIds: string[];
+  };
+}
+
+export type KakouMaterialSelection =
+  | { type: "KATSUYOU"; id: string }
+  | { type: "BUNPOU"; id: string };
 
 export const KAKOU_MODE_LABELS: Record<KakouMode, { title: string; description: string }> = {
   DAILY_MIX: {

@@ -64,7 +64,7 @@ export async function toggleBunpouProgress(patternId: string) {
       });
     }
 
-    revalidatePath("/bunpou");
+    revalidatePath("/kakou");
     return { success: true };
   } catch (error) {
     console.error("Error toggling Bunpou progress:", error);
@@ -205,7 +205,7 @@ Rules:
       data: dataToInsert,
     });
 
-    revalidatePath("/bunpou");
+    revalidatePath("/kakou");
 
     // Fetch and return the updated pool
     const updatedQuestions = await prisma.bunpouQuestion.findMany({

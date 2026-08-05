@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { getKakouOverview } from "@/src/modules/kakou/actions/kakouActions";
+import { getKakouMaterials } from "@/src/modules/kakou/actions/materialsActions";
 import { KakouDashboard } from "@/src/modules/kakou/components/KakouDashboard";
 import type { KakouSourceType } from "@/src/modules/kakou/data/types";
 
@@ -20,7 +21,11 @@ export default async function KakouPage({
 }: {
   searchParams: Promise<{ source?: string; sourceId?: string }>;
 }) {
-  const [overview, params] = await Promise.all([getKakouOverview(), searchParams]);
+  const [overview, materials, params] = await Promise.all([
+    getKakouOverview(),
+    getKakouMaterials(),
+    searchParams,
+  ]);
   if (!overview) return null;
 
   const sourceType: KakouSourceType | undefined =
@@ -38,6 +43,7 @@ export default async function KakouPage({
     <KakouDashboard
       initialOverview={overview}
       initialSource={initialSource}
+      initialMaterials={materials}
     />
   );
 }

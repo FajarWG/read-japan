@@ -41,8 +41,8 @@ export async function getLastUserActivity(userId?: number): Promise<ContinueLear
 
   const moduleMap: Record<string, { module: string; title: string; href: string }> = {
     anki_review: { module: "Anki Review", title: "JLPT N5-N4 Flashcard Review", href: "/anki?deck=custom" },
-    bunpou_lesson: { module: "Bunpou Grammar", title: "Japanese Grammar Lessons", href: "/bunpou" },
-    katsuyou_practice: { module: "Katsuyou Conjugation", title: "Verb & Adjective Conjugation", href: "/katsuyou" },
+    bunpou_lesson: { module: "Bunpou Grammar", title: "Japanese Grammar Lessons", href: "/kakou" },
+    katsuyou_practice: { module: "Katsuyou Conjugation", title: "Verb & Adjective Conjugation", href: "/kakou" },
     kakou_handwriting: { module: "Kakou Handwriting", title: "Kanji Canvas Handwriting", href: "/kakou" },
     prep_sheet: { module: "Dekiru Prep", title: "Pre-class Study Sheets", href: "/prep" },
     conversation: { module: "AI Conversation", title: "3D VRM Japanese Practice", href: "/conversation" },
@@ -96,14 +96,14 @@ export async function getCrossModuleRecommendations(userId?: number) {
       module: "Katsuyou Conjugation",
       title: "Verb & Adjective Conjugation",
       description: "Master te-form, past tense, and potential form conjugations.",
-      href: "/katsuyou",
+      href: "/kakou",
       badge: "Grammar",
     },
     {
       module: "Bunpou Grammar",
       title: "Dekiru Grammar Lessons",
       description: "Study sentence patterns and real-life conversation sheets.",
-      href: "/bunpou",
+      href: "/kakou",
       badge: "Sentence",
     },
   ];

@@ -35,13 +35,6 @@ export const QuickActionGrid: React.FC = () => {
       color: "border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-400",
     },
     {
-      title: "Verb Conjugation",
-      desc: "Katsuyou Lessons",
-      href: "/katsuyou",
-      icon: BookOpen,
-      color: "border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
-    },
-    {
       title: "AI Conversation",
       desc: "3D VRM Avatar Practice",
       href: "/conversation",

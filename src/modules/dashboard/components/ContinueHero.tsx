@@ -5,8 +5,6 @@ import {
   Flame,
   Zap,
   Layers,
-  BookOpen,
-  RefreshCw,
   NotebookPen,
   PencilLine,
   FileText,
@@ -27,11 +25,9 @@ const FEATURES: Array<{
   title: string;
   desc: string;
 }> = [
-  { href: "/kakou", icon: PencilLine, title: "Start Kakou (書こう)", desc: "Your daily guided notebook session with study timer." },
+  { href: "/kakou", icon: PencilLine, title: "Start Kakou (書こう)", desc: "Daily guided notebook session — grammar, conjugation & study timer, all in one place." },
   { href: "/anki", icon: Layers, title: "Anki", desc: "SRS recall for vocabulary." },
   { href: "/kanji-tamago", icon: Sparkles, title: "Kanji Tamago (漢字)", desc: "SRS kanji writing & recognition." },
-  { href: "/bunpou", icon: BookOpen, title: "Bunpou Library", desc: "Look up grammar explanations and examples." },
-  { href: "/katsuyou", icon: RefreshCw, title: "Katsuyou Library", desc: "Look up verb conjugation rules and tables." },
   { href: "/kotoba", icon: NotebookPen, title: "Kotoba (言葉)", desc: "Your vocabulary notebook." },
   { href: "/prep", icon: FileText, title: "Prep", desc: "Pre-class study & cheat sheets." },
   { href: "/conversation", icon: MessageCircle, title: "AI Conversation", desc: "Voice chat with Gemini Live — practice speaking!" },

@@ -6,8 +6,11 @@ import type { Prisma } from "@/app/generated/prisma/client";
 import { KAKOU_PROMPTS } from "@/src/modules/kakou/data/prompts";
 import {
   buildFocusedKakouPrompt,
+  findFirstIncompleteBunpouPattern,
   hydrateKakouPrompt,
 } from "@/src/modules/kakou/data/reminders";
+import { getKatsuyouStats } from "@/src/modules/katsuyou/actions/katsuyouActions";
+import { getBunpouProgress } from "@/src/modules/bunpou/actions/bunpouActions";
 import {
   KAKOU_DIFFICULTIES,
   KAKOU_DURATIONS,
@@ -277,9 +280,35 @@ export async function createKakouSession(input: {
       : "CONJUGATION_DRILL"
     : input.mode;
   const effectiveLevel = focusedPrompt?.level ?? input.level;
-  const prompts = (focusedPrompt
+
+  const basePrompts = focusedPrompt
     ? [focusedPrompt]
-    : pickPrompts(effectiveLevel, effectiveMode, input.durationMinutes, recentIds)
+    : pickPrompts(effectiveLevel, effectiveMode, input.durationMinutes, recentIds);
+
+  // Heuristic: sprinkle one real due/weak item from Katsuyou or Bunpou into Daily
+  // Mix sessions when available, instead of only ever picking from the static
+  // prompt bank. Not full SRS-driven prioritization — that's a later milestone.
+  let dueMaterialPrompt: KakouPrompt | null = null;
+  if (!focusedPrompt && effectiveMode === "DAILY_MIX") {
+    const [katsuyouStats, bunpouCompletedIds] = await Promise.all([
+      getKatsuyouStats(),
+      getBunpouProgress(),
+    ]);
+    const dueFormKey = Object.keys(katsuyouStats.dueReviewsByForm)[0];
+    dueMaterialPrompt = dueFormKey
+      ? buildFocusedKakouPrompt("KATSUYOU", dueFormKey)
+      : (() => {
+          const incompletePatternId = findFirstIncompleteBunpouPattern(bunpouCompletedIds);
+          return incompletePatternId ? buildFocusedKakouPrompt("BUNPOU", incompletePatternId) : null;
+        })();
+  }
+
+  const prompts = (
+    dueMaterialPrompt && basePrompts.length > 0
+      ? [dueMaterialPrompt, ...basePrompts.slice(1)]
+      : dueMaterialPrompt
+        ? [dueMaterialPrompt]
+        : basePrompts
   ).map(hydrateKakouPrompt);
 
   if (prompts.length === 0) {
