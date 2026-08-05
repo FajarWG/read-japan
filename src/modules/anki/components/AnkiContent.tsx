@@ -1369,7 +1369,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     reviewDirection === "reverse" && isWritingActive && !flipped
                       ? "max-w-2xl h-auto min-h-64"
                       : deckType === "custom"
-                        ? "max-w-2xl h-80 sm:h-96 md:h-[400px]"
+                        ? "max-w-2xl h-auto min-h-80 sm:min-h-96 md:min-h-[400px]"
                         : "max-w-2xl h-64",
                     reviewDirection === "normal" && !flipped ? "cursor-pointer hover:border-indigo-500/40 hover:shadow-md" : "",
                   ].join(" ")}
