@@ -23,6 +23,12 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Eye,
+  Calendar,
+  Search,
+  Grid,
+  List,
+  Clock,
 } from "lucide-react";
 import {
   AnkiRecapItem,
@@ -285,6 +291,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [isCreditsExpanded, setIsCreditsExpanded] = useState<boolean>(false);
   const [isKanjiListExpanded, setIsKanjiListExpanded] = useState<boolean>(false);
   const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
+
+  // Review Queue Kanji & Card list state
+  const [isReviewQueueExpanded, setIsReviewQueueExpanded] = useState<boolean>(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
+  const [reviewTabFilter, setReviewTabFilter] = useState<"due" | "all">("due");
+  const [reviewViewMode, setReviewViewMode] = useState<"kanji" | "cards">("kanji");
+  const [reviewSearchQuery, setReviewSearchQuery] = useState<string>("");
 
   // Settings
 
@@ -558,11 +571,165 @@ export function AnkiContent({ username }: AnkiContentProps) {
     return Array.from(kanjiMap.values());
   }, [progressMap, activeVocabularyList]);
 
+  // Ekstrak karakter Kanji unik yang dipelajari dan yang akan direview
+  const reviewQueueKanji = useMemo(() => {
+    const kanjiMap = new Map<
+      string,
+      {
+        character: string;
+        isDueNow: boolean;
+        dueWordsCount: number;
+        totalWordsCount: number;
+        earliestDueDate: Date;
+        vocabWords: Array<{
+          cardKey: string;
+          word: string;
+          reading: string;
+          meaning: string;
+          chapter: string;
+          sectionIndex: number;
+          reps: number;
+          interval: number;
+          dueDate: Date;
+          isDueNow: boolean;
+        }>;
+      }
+    >();
+
+    const now = new Date();
+
+    activeVocabularyList.forEach((card) => {
+      const prog = progressMap[card.cardKey];
+      if (!prog) return; // Belum masuk SRS
+
+      const dueDate = new Date(prog.dueDate);
+      const isDueNow = dueDate <= now;
+      const kanjiWord = card.kanji;
+      const hiragana = card.hiragana;
+      const meaning = card.translation;
+
+      if (kanjiWord && kanjiWord !== "-") {
+        for (let i = 0; i < kanjiWord.length; i++) {
+          const char = kanjiWord[i];
+          if (/[\u4e00-\u9faf]/.test(char)) {
+            if (!kanjiMap.has(char)) {
+              kanjiMap.set(char, {
+                character: char,
+                isDueNow: false,
+                dueWordsCount: 0,
+                totalWordsCount: 0,
+                earliestDueDate: dueDate,
+                vocabWords: [],
+              });
+            }
+            const kData = kanjiMap.get(char)!;
+            if (isDueNow) {
+              kData.isDueNow = true;
+              kData.dueWordsCount += 1;
+            }
+            kData.totalWordsCount += 1;
+            if (dueDate < kData.earliestDueDate) {
+              kData.earliestDueDate = dueDate;
+            }
+
+            if (!kData.vocabWords.some((w) => w.cardKey === card.cardKey)) {
+              kData.vocabWords.push({
+                cardKey: card.cardKey,
+                word: kanjiWord,
+                reading: hiragana,
+                meaning,
+                chapter: card.chapter,
+                sectionIndex: card.sectionIndex,
+                reps: prog.repetitions,
+                interval: prog.interval,
+                dueDate,
+                isDueNow,
+              });
+            }
+          }
+        }
+      }
+    });
+
+    return Array.from(kanjiMap.values());
+  }, [progressMap, activeVocabularyList]);
+
+  const reviewQueueCards = useMemo(() => {
+    const now = new Date();
+    return activeVocabularyList
+      .filter((card) => progressMap[card.cardKey])
+      .map((card) => {
+        const prog = progressMap[card.cardKey];
+        const dueDate = new Date(prog.dueDate);
+        return {
+          ...card,
+          dueDate,
+          isDueNow: dueDate <= now,
+          reps: prog.repetitions,
+          interval: prog.interval,
+          ease: prog.ease,
+        };
+      })
+      .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
+  }, [activeVocabularyList, progressMap]);
+
+  const filteredReviewKanji = useMemo(() => {
+    return reviewQueueKanji.filter((item) => {
+      if (reviewTabFilter === "due" && !item.isDueNow) return false;
+
+      if (reviewSearchQuery.trim() !== "") {
+        const query = reviewSearchQuery.toLowerCase();
+        const matchesKanji = item.character.includes(query);
+        const matchesVocab = item.vocabWords.some(
+          (v) =>
+            v.word.toLowerCase().includes(query) ||
+            v.reading.toLowerCase().includes(query) ||
+            v.meaning.toLowerCase().includes(query)
+        );
+        return matchesKanji || matchesVocab;
+      }
+
+      return true;
+    });
+  }, [reviewQueueKanji, reviewTabFilter, reviewSearchQuery]);
+
+  const filteredReviewCards = useMemo(() => {
+    return reviewQueueCards.filter((card) => {
+      if (reviewTabFilter === "due" && !card.isDueNow) return false;
+
+      if (reviewSearchQuery.trim() !== "") {
+        const query = reviewSearchQuery.toLowerCase();
+        return (
+          card.kanji.toLowerCase().includes(query) ||
+          card.hiragana.toLowerCase().includes(query) ||
+          card.translation.toLowerCase().includes(query)
+        );
+      }
+
+      return true;
+    });
+  }, [reviewQueueCards, reviewTabFilter, reviewSearchQuery]);
+
   // Detail Kanji yang terpilih
   const selectedKanjiDetail = useMemo(() => {
     if (!selectedKanji) return null;
-    return learnedVocabKanji.find((k) => k.character === selectedKanji) || null;
-  }, [selectedKanji, learnedVocabKanji]);
+    const fromLearned = learnedVocabKanji.find((k) => k.character === selectedKanji);
+    if (fromLearned) return fromLearned;
+    const fromReview = reviewQueueKanji.find((k) => k.character === selectedKanji);
+    if (fromReview) {
+      return {
+        character: fromReview.character,
+        vocabWords: fromReview.vocabWords.map((v) => ({
+          word: v.word,
+          reading: v.reading,
+          meaning: v.meaning,
+          reps: v.reps,
+          interval: v.interval,
+        })),
+      };
+    }
+    return null;
+  }, [selectedKanji, learnedVocabKanji, reviewQueueKanji]);
 
   const kanjiDbInfo = useMemo(() => {
     if (!selectedKanji) return null;
@@ -1192,27 +1359,37 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         </div>
 
                         {/* Tombol Mulai Sesi SRS */}
-                        <div className="flex flex-row gap-3 border-t border-border pt-4">
+                        <div className="flex flex-col gap-2 border-t border-border pt-4">
+                          <div className="flex flex-row gap-3">
+                            <Button
+                              variant="secondary"
+                              className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer text-xs sm:text-sm"
+                              onClick={() => startSession("due")}
+                              isDisabled={cardStats.due === 0}
+                            >
+                              Review ({cardStats.due})
+                            </Button>
+                            <Button
+                              variant="primary"
+                              className="font-semibold shadow-xs flex-1 cursor-pointer text-xs sm:text-sm"
+                              onClick={() => startSession("all")}
+                              isDisabled={activeVocabularyList.length === 0}
+                            >
+                              Learn (
+                              {Math.min(
+                                activeVocabularyList.length,
+                                cardStats.due + 20,
+                              )}
+                              )
+                            </Button>
+                          </div>
                           <Button
                             variant="secondary"
-                            className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer text-xs sm:text-sm"
-                            onClick={() => startSession("due")}
-                            isDisabled={cardStats.due === 0}
+                            className="font-semibold shadow-xs w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center gap-2 cursor-pointer text-xs py-2"
+                            onClick={() => setIsReviewModalOpen(true)}
                           >
-                            Review ({cardStats.due})
-                          </Button>
-                          <Button
-                            variant="primary"
-                            className="font-semibold shadow-xs flex-1 cursor-pointer text-xs sm:text-sm"
-                            onClick={() => startSession("all")}
-                            isDisabled={activeVocabularyList.length === 0}
-                          >
-                            Learn (
-                            {Math.min(
-                              activeVocabularyList.length,
-                              cardStats.due + 20,
-                            )}
-                            )
+                            <Eye size={14} />
+                            {t.ankiViewReviewList || "Lihat List Review"} ({cardStats.due})
                           </Button>
                         </div>
                       </>
@@ -1289,6 +1466,207 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             >
                               Source: AnkiWeb
                             </a>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </Card>
+
+                  {/* List Kanji & Kosakata yang Akan Direview (Review Queue) */}
+                  <Card className="border border-border bg-surface shadow-sm overflow-hidden transition-all duration-300">
+                    <button
+                      type="button"
+                      onClick={() => setIsReviewQueueExpanded(!isReviewQueueExpanded)}
+                      className="w-full flex items-center justify-between p-5 bg-surface hover:bg-slate-50 dark:hover:bg-zinc-900/30 transition-colors text-left select-none cursor-pointer"
+                    >
+                      <div className="flex flex-col gap-0.5">
+                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <Calendar size={18} className="text-amber-500" />
+                          {t.ankiReviewQueueTitle || "Kanji & Kosakata Akan Direview"}
+                          <Chip size="sm" variant="soft" color={cardStats.due > 0 ? "warning" : "default"}>
+                            {cardStats.due} Jatuh Tempo
+                          </Chip>
+                        </h3>
+                        <p className="text-[10px] text-muted">
+                          {t.ankiReviewQueueDesc ||
+                            "Daftar karakter Kanji dan kosakata yang terjadwal untuk diulangi (SRS)."}
+                        </p>
+                      </div>
+                      <span className="text-muted ml-4 shrink-0">
+                        {isReviewQueueExpanded ? (
+                          <ChevronUp size={16} strokeWidth={2.5} />
+                        ) : (
+                          <ChevronDown size={16} strokeWidth={2.5} />
+                        )}
+                      </span>
+                    </button>
+
+                    {isReviewQueueExpanded && (
+                      <div className="p-5 pt-1 border-t border-border/40 animate-in fade-in duration-200 flex flex-col gap-4">
+                        {/* Control Bar: Tabs, Search & View Switcher */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface-muted/30 p-2.5 rounded-xl border border-border/50">
+                          {/* Filter Tabs */}
+                          <div className="flex rounded-lg bg-surface-muted p-1 border border-border shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setReviewTabFilter("due")}
+                              className={[
+                                "px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                                reviewTabFilter === "due"
+                                  ? "bg-amber-500 text-white shadow-xs"
+                                  : "text-muted hover:text-foreground",
+                              ].join(" ")}
+                            >
+                              {t.ankiDueNowTab || "Jatuh Tempo"} ({reviewQueueKanji.filter((k) => k.isDueNow).length})
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setReviewTabFilter("all")}
+                              className={[
+                                "px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                                reviewTabFilter === "all"
+                                  ? "bg-indigo-600 text-white shadow-xs"
+                                  : "text-muted hover:text-foreground",
+                              ].join(" ")}
+                            >
+                              {t.ankiAllScheduledTab || "Semua Terjadwal"} ({reviewQueueKanji.length})
+                            </button>
+                          </div>
+
+                          {/* Search Input */}
+                          <div className="relative flex-1 max-w-xs">
+                            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
+                            <input
+                              type="text"
+                              value={reviewSearchQuery}
+                              onChange={(e) => setReviewSearchQuery(e.target.value)}
+                              placeholder={t.ankiSearchPlaceholder || "Cari kanji, pembacaan, atau arti..."}
+                              className="w-full pl-8 pr-3 py-1.5 text-xs bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-indigo-500"
+                            />
+                          </div>
+
+                          {/* Mode Switcher */}
+                          <div className="flex rounded-lg bg-surface-muted p-1 border border-border shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setReviewViewMode("kanji")}
+                              className={[
+                                "p-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1",
+                                reviewViewMode === "kanji"
+                                  ? "bg-surface text-foreground shadow-xs"
+                                  : "text-muted hover:text-foreground",
+                              ].join(" ")}
+                              title={t.ankiViewKanjiGrid || "Grid Kanji"}
+                            >
+                              <Grid size={14} />
+                              <span className="hidden md:inline">{t.ankiViewKanjiGrid || "Kanji"}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setReviewViewMode("cards")}
+                              className={[
+                                "p-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1",
+                                reviewViewMode === "cards"
+                                  ? "bg-surface text-foreground shadow-xs"
+                                  : "text-muted hover:text-foreground",
+                              ].join(" ")}
+                              title={t.ankiViewCardList || "Daftar Kosakata"}
+                            >
+                              <List size={14} />
+                              <span className="hidden md:inline">{t.ankiViewCardList || "Kosakata"}</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* List Content */}
+                        {reviewViewMode === "kanji" ? (
+                          filteredReviewKanji.length === 0 ? (
+                            <p className="text-xs text-muted text-center py-6">
+                              {t.ankiReviewQueueEmpty ||
+                                "Tidak ada kanji yang terjadwal untuk direview dalam pilihan ini."}
+                            </p>
+                          ) : (
+                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2.5">
+                              {filteredReviewKanji.map((k) => (
+                                <button
+                                  key={k.character}
+                                  type="button"
+                                  onClick={() => setSelectedKanji(k.character)}
+                                  className={[
+                                    "relative flex flex-col items-center justify-center p-2.5 rounded-xl border-2 transition-all cursor-pointer group",
+                                    k.isDueNow
+                                      ? "border-amber-500/60 bg-amber-500/10 hover:border-amber-500 hover:bg-amber-500/20 shadow-xs"
+                                      : "border-border bg-surface hover:border-indigo-500/50 hover:bg-indigo-500/5",
+                                  ].join(" ")}
+                                >
+                                  {k.isDueNow && (
+                                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                                    </span>
+                                  )}
+                                  <span className="font-jp text-2xl font-bold text-foreground group-hover:scale-110 transition-transform">
+                                    {k.character}
+                                  </span>
+                                  <span className="text-[9px] font-medium text-muted mt-1 truncate max-w-full">
+                                    {k.isDueNow ? `${k.dueWordsCount} Due` : "Mendatang"}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          )
+                        ) : filteredReviewCards.length === 0 ? (
+                          <p className="text-xs text-muted text-center py-6">
+                            {t.ankiReviewQueueEmpty ||
+                              "Tidak ada kosakata yang terjadwal untuk direview."}
+                          </p>
+                        ) : (
+                          <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-1">
+                            {filteredReviewCards.map((card, idx) => (
+                              <div
+                                key={card.cardKey || idx}
+                                className={[
+                                  "flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-xl border transition-all",
+                                  card.isDueNow
+                                    ? "border-amber-500/40 bg-amber-500/5"
+                                    : "border-border bg-surface-muted/20",
+                                ].join(" ")}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="font-jp text-xl font-bold text-foreground px-2 py-1 bg-surface border border-border rounded-lg shrink-0">
+                                    {card.kanji}
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-jp text-xs font-semibold text-indigo-500">
+                                        〔{card.hiragana}〕
+                                      </span>
+                                      <Chip size="sm" variant="soft" color="default" className="text-[9px] h-4">
+                                        {card.chapter}
+                                      </Chip>
+                                    </div>
+                                    <span className="text-xs font-medium text-foreground">
+                                      {card.translation}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-[10px] text-muted self-end sm:self-center shrink-0">
+                                  {card.isDueNow ? (
+                                    <span className="px-2 py-0.5 rounded-full font-bold bg-amber-500 text-white flex items-center gap-1">
+                                      <Clock size={10} /> Jatuh Tempo
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-0.5 rounded-full font-medium bg-slate-200 dark:bg-zinc-800 text-foreground flex items-center gap-1">
+                                      <Calendar size={10} /> {card.dueDate.toLocaleDateString()}
+                                    </span>
+                                  )}
+                                  <span className="font-mono text-muted">
+                                    (Int: {card.interval}d, Rep: {card.reps})
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -2121,6 +2499,210 @@ export function AnkiContent({ username }: AnkiContentProps) {
         </Modal.Backdrop>
       </Modal>
 
+      {/* Modal Full List Kanji & Kosakata Review */}
+      <Modal isOpen={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
+        <Modal.Backdrop>
+          <Modal.Container className="flex items-center justify-center min-h-screen w-screen p-4">
+            <Modal.Dialog className="sm:max-w-2xl w-full">
+              <Modal.CloseTrigger />
+              <Modal.Header className="flex items-center justify-between">
+                <Modal.Heading className="flex items-center gap-2">
+                  <Calendar size={20} className="text-amber-500" />
+                  {t.ankiReviewQueueTitle || "Kanji & Kosakata Akan Direview"}
+                </Modal.Heading>
+              </Modal.Header>
+              <Modal.Body className="flex flex-col gap-4 text-xs">
+                <p className="text-muted">
+                  {t.ankiReviewQueueDesc ||
+                    "Daftar karakter Kanji dan kosakata yang terjadwal untuk diulangi (SRS)."}
+                </p>
+
+                {/* Controls */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface-muted/40 p-3 rounded-xl border border-border">
+                  <div className="flex rounded-lg bg-surface-muted p-1 border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setReviewTabFilter("due")}
+                      className={[
+                        "px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                        reviewTabFilter === "due"
+                          ? "bg-amber-500 text-white shadow-xs"
+                          : "text-muted hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      {t.ankiDueNowTab || "Jatuh Tempo"} ({reviewQueueKanji.filter((k) => k.isDueNow).length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReviewTabFilter("all")}
+                      className={[
+                        "px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                        reviewTabFilter === "all"
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-muted hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      {t.ankiAllScheduledTab || "Semua Terjadwal"} ({reviewQueueKanji.length})
+                    </button>
+                  </div>
+
+                  <div className="relative flex-1">
+                    <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted" />
+                    <input
+                      type="text"
+                      value={reviewSearchQuery}
+                      onChange={(e) => setReviewSearchQuery(e.target.value)}
+                      placeholder={t.ankiSearchPlaceholder || "Cari kanji, pembacaan, atau arti..."}
+                      className="w-full pl-8 pr-3 py-1.5 text-xs bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div className="flex rounded-lg bg-surface-muted p-1 border border-border shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setReviewViewMode("kanji")}
+                      className={[
+                        "px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1",
+                        reviewViewMode === "kanji"
+                          ? "bg-surface text-foreground shadow-xs"
+                          : "text-muted hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      <Grid size={14} /> Grid Kanji
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReviewViewMode("cards")}
+                      className={[
+                        "px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-1",
+                        reviewViewMode === "cards"
+                          ? "bg-surface text-foreground shadow-xs"
+                          : "text-muted hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      <List size={14} /> Daftar Kosakata
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                {reviewViewMode === "kanji" ? (
+                  filteredReviewKanji.length === 0 ? (
+                    <div className="text-center py-10 text-muted">
+                      {t.ankiReviewQueueEmpty ||
+                        "Tidak ada kanji yang terjadwal untuk direview dalam pilihan ini."}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 max-h-[380px] overflow-y-auto p-1">
+                      {filteredReviewKanji.map((k) => (
+                        <button
+                          key={k.character}
+                          type="button"
+                          onClick={() => {
+                            setIsReviewModalOpen(false);
+                            setSelectedKanji(k.character);
+                          }}
+                          className={[
+                            "relative flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all cursor-pointer group",
+                            k.isDueNow
+                              ? "border-amber-500/60 bg-amber-500/10 hover:border-amber-500 hover:bg-amber-500/20 shadow-xs"
+                              : "border-border bg-surface hover:border-indigo-500/50 hover:bg-indigo-500/5",
+                          ].join(" ")}
+                        >
+                          {k.isDueNow && (
+                            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                            </span>
+                          )}
+                          <span className="font-jp text-3xl font-bold text-foreground group-hover:scale-110 transition-transform">
+                            {k.character}
+                          </span>
+                          <span className="text-[9px] font-medium text-muted mt-1 truncate max-w-full">
+                            {k.isDueNow ? `${k.dueWordsCount} Due` : "Mendatang"}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )
+                ) : filteredReviewCards.length === 0 ? (
+                  <div className="text-center py-10 text-muted">
+                    {t.ankiReviewQueueEmpty ||
+                      "Tidak ada kosakata yang terjadwal untuk direview."}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2 max-h-[380px] overflow-y-auto p-1">
+                    {filteredReviewCards.map((card, idx) => (
+                      <div
+                        key={card.cardKey || idx}
+                        className={[
+                          "flex items-center justify-between gap-3 p-3 rounded-xl border transition-all",
+                          card.isDueNow
+                            ? "border-amber-500/40 bg-amber-500/5"
+                            : "border-border bg-surface-muted/20",
+                        ].join(" ")}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="font-jp text-2xl font-bold text-foreground px-2.5 py-1 bg-surface border border-border rounded-lg shrink-0">
+                            {card.kanji}
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="font-jp text-xs font-semibold text-indigo-500">
+                                〔{card.hiragana}〕
+                              </span>
+                              <Chip size="sm" variant="soft" color="default" className="text-[9px] h-4">
+                                {card.chapter}
+                              </Chip>
+                            </div>
+                            <span className="text-xs font-medium text-foreground">
+                              {card.translation}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 shrink-0">
+                          {card.isDueNow ? (
+                            <span className="px-2.5 py-1 rounded-full font-bold bg-amber-500 text-white flex items-center gap-1 text-[10px]">
+                              <Clock size={12} /> Jatuh Tempo
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full font-medium bg-slate-200 dark:bg-zinc-800 text-foreground flex items-center gap-1 text-[10px]">
+                              <Calendar size={12} /> {card.dueDate.toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Modal.Body>
+              <Modal.Footer className="flex items-center justify-between">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="font-semibold bg-amber-500 hover:bg-amber-600 text-white border-none cursor-pointer"
+                  onClick={() => {
+                    setIsReviewModalOpen(false);
+                    startSession("due");
+                  }}
+                  isDisabled={cardStats.due === 0}
+                >
+                  Mulai Review ({cardStats.due})
+                </Button>
+                <Button
+                  slot="close"
+                  variant="secondary"
+                  size="sm"
+                  className="font-semibold cursor-pointer"
+                >
+                  Tutup
+                </Button>
+              </Modal.Footer>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </div>
   );
 }

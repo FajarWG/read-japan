@@ -338,6 +338,16 @@ export const translations = {
     ankiLearnedKanjiDesc: "Kanji characters from vocabulary you have studied.",
     ankiLearnedKanjiEmpty:
       "No kanji studied yet. Start learning vocab to see them here!",
+    ankiReviewQueueTitle: "Review Kanji & Words",
+    ankiReviewQueueDesc:
+      "Kanji characters and vocabulary cards scheduled for SRS review.",
+    ankiReviewQueueEmpty: "No kanji scheduled for review in this selection.",
+    ankiViewReviewList: "View Review List",
+    ankiDueNowTab: "Due Now",
+    ankiAllScheduledTab: "All Scheduled",
+    ankiViewKanjiGrid: "Kanji Grid",
+    ankiViewCardList: "Word List",
+    ankiSearchPlaceholder: "Search kanji, reading, or translation...",
     ankiLearnedKanjiTabVocab: "Vocab Kanji",
     ankiLearnedKanjiTabN5: "N5 Characters",
   },
@@ -683,6 +693,17 @@ export const translations = {
       "Karakter kanji dari kosakata yang telah Anda pelajari.",
     ankiLearnedKanjiEmpty:
       "Belum ada kanji yang dipelajari. Mulai pelajari kosakata untuk melihatnya di sini!",
+    ankiReviewQueueTitle: "Kanji & Kosakata Akan Direview",
+    ankiReviewQueueDesc:
+      "Daftar karakter Kanji dan kosakata yang terjadwal untuk diulangi (SRS).",
+    ankiReviewQueueEmpty:
+      "Tidak ada kanji yang terjadwal untuk direview dalam pilihan ini.",
+    ankiViewReviewList: "Lihat List Review",
+    ankiDueNowTab: "Jatuh Tempo",
+    ankiAllScheduledTab: "Semua Terjadwal",
+    ankiViewKanjiGrid: "Grid Kanji",
+    ankiViewCardList: "Daftar Kosakata",
+    ankiSearchPlaceholder: "Cari kanji, pembacaan, atau arti...",
     ankiLearnedKanjiTabVocab: "Kanji Kosakata",
     ankiLearnedKanjiTabN5: "Karakter N5",
   },
