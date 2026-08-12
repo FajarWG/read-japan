@@ -222,7 +222,7 @@ export function FloatingStudyTimer() {
       {/* Container tunggal yang mekar/melebar & mengecil secara mulus */}
       <div
         ref={containerRef}
-        className={`fixed bottom-28 right-4 z-50 border shadow-xl backdrop-blur-xl transition-all duration-300 ease-in-out overflow-hidden sm:bottom-24 sm:right-6 ${
+        className={`fixed bottom-6 right-4 z-50 border shadow-xl backdrop-blur-xl transition-all duration-300 ease-in-out overflow-hidden sm:bottom-6 sm:right-6 ${
           expanded
             ? "w-64 rounded-3xl border-border bg-surface/95 p-4 text-foreground shadow-2xl"
             : timer
