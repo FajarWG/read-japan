@@ -854,12 +854,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
     }
   };
 
-  const handleCancelSession = async () => {
-    if (postMode === "session") {
+  const handleEndSession = async () => {
+    if (postMode === "session" && pendingReviews.length > 0) {
       await triggerSaveBatch(pendingReviews);
     }
-    setSessionQueue([]);
-    setIsWritingActive(false);
+    finishSession(sessionRecap, reviewedCount);
   };
 
   // Jawaban untuk Quick Memorization Mode (Sudah Tahu / Tidak Tahu)
@@ -1756,10 +1755,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <Button
                     size="sm"
                     variant="danger-soft"
-                    className="font-semibold h-8 min-w-16"
-                    onClick={handleCancelSession}
+                    className="font-semibold h-8 min-w-20 cursor-pointer"
+                    onClick={handleEndSession}
                   >
-                    Cancel
+                    {t.ankiEndSession || "End Session"}
                   </Button>
                 </div>
 
