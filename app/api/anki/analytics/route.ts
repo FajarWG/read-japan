@@ -17,5 +17,16 @@ export async function GET() {
     select: { direction: true, rating: true, responseTimeMs: true, createdAt: true },
     orderBy: { createdAt: "asc" },
   });
-  return NextResponse.json({ events });
+  const scheduled = await prisma.ankiProgress.findMany({
+    where: { userId: session.id },
+    select: { cardKey: true, direction: true, dueDate: true, repetitions: true },
+    orderBy: { dueDate: "asc" },
+  });
+  const customIds = scheduled
+    .filter((item) => item.cardKey.startsWith("custom-"))
+    .map((item) => item.cardKey.slice("custom-".length));
+  const customCards = customIds.length
+    ? await prisma.ankiCard.findMany({ where: { id: { in: customIds } }, select: { id: true, kanji: true, hiragana: true, translation: true } })
+    : [];
+  return NextResponse.json({ events, scheduled, customCards });
 }

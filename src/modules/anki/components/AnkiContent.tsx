@@ -301,6 +301,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [sessionFinished, setSessionFinished] = useState<boolean>(false);
   const [ankiMode, setAnkiMode] = useState<"srs" | "quick">("srs");
   const [studyDose, setStudyDose] = useState<"normal" | "intensive">("normal");
+  const [pendingStartMode, setPendingStartMode] = useState<"due" | "all" | "quick" | null>(null);
   const [pendingReviews, setPendingReviews] = useState<
     Array<{
       cardKey: string;
@@ -564,15 +565,15 @@ export function AnkiContent({ username }: AnkiContentProps) {
       ? QUIZ_DIRECTIONS.slice(0, 2)
       : QUIZ_DIRECTIONS;
 
-  const cardHasDueDirection = (card: VocabularyCard, now = new Date()) =>
-    activeDirections.some((direction) => {
+  const cardHasDueDirection = (card: VocabularyCard, now = new Date(), directions = activeDirections) =>
+    directions.some((direction) => {
       if (!supportsDirection(card, direction)) return false;
       const progress = directionProgressMap[`${card.cardKey}:${direction}`];
       return Boolean(progress && new Date(progress.dueDate) <= now);
     });
 
-  const cardHasNewDirection = (card: VocabularyCard) =>
-    activeDirections.some((direction) =>
+  const cardHasNewDirection = (card: VocabularyCard, directions = activeDirections) =>
+    directions.some((direction) =>
       supportsDirection(card, direction) &&
       !directionProgressMap[`${card.cardKey}:${direction}`],
     );
@@ -837,7 +838,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
   }, [selectedKanji]);
 
   // Mulai sesi belajar
-  const startSession = (mode: "due" | "all" | "quick") => {
+  const startSession = (mode: "due" | "all" | "quick", dose = studyDose) => {
+    const directions = dose === "normal" ? QUIZ_DIRECTIONS.slice(0, 2) : QUIZ_DIRECTIONS;
     let queue: VocabularyCard[] = [];
 
     if (mode === "quick") {
@@ -847,20 +849,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
       const now = new Date();
       if (mode === "due") {
         // Ambil yang jatuh tempo saja
-        let dueCards = activeVocabularyList.filter((card) => cardHasDueDirection(card, now));
+        let dueCards = activeVocabularyList.filter((card) => cardHasDueDirection(card, now, directions));
         if (dailyReviewLimit !== "unlimited") {
           dueCards = dueCards.slice(0, Number(dailyReviewLimit));
         }
         queue = dueCards;
       } else {
         // Campur: Ambil yang jatuh tempo dahulu, baru yang Baru (maksimal limit kartu baru)
-        let dueCards = activeVocabularyList.filter((card) => cardHasDueDirection(card, now));
+        let dueCards = activeVocabularyList.filter((card) => cardHasDueDirection(card, now, directions));
         if (dailyReviewLimit !== "unlimited") {
           dueCards = dueCards.slice(0, Number(dailyReviewLimit));
         }
 
         const newCards = activeVocabularyList
-          .filter((card) => cardHasNewDirection(card))
+          .filter((card) => cardHasNewDirection(card, directions))
           .slice(0, dailyNewCardsLimit); // Batasi kartu baru per sesi berdasarkan konfigurasi
 
         queue = [...dueCards, ...newCards];
@@ -1164,6 +1166,16 @@ export function AnkiContent({ username }: AnkiContentProps) {
               >
                 <HelpCircle size={16} />
               </button>
+              {deckType !== null && (
+                <button
+                  type="button"
+                  onClick={() => router.push(`/anki/analytics?deck=${deckType}`)}
+                  className="flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer"
+                  title="Anki analytics"
+                >
+                  <Calendar size={16} />
+                </button>
+              )}
               <SettingsDropdown />
             </div>
           </div>
@@ -1308,11 +1320,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       >
                         Practice All Cards
                       </button>
-                    </div>
-
-                    <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
-                      <button type="button" onClick={() => setStudyDose("normal")} className={["flex-1 rounded-lg py-2 text-xs font-semibold transition-all", studyDose === "normal" ? "bg-surface text-foreground shadow-sm" : "text-muted"].join(" ")}>Normal · 2 directions</button>
-                      <button type="button" onClick={() => setStudyDose("intensive")} className={["flex-1 rounded-lg py-2 text-xs font-semibold transition-all", studyDose === "intensive" ? "bg-surface text-foreground shadow-sm" : "text-muted"].join(" ")}>Intensive · 4 directions</button>
                     </div>
 
                     {deckType === "dekiru" && (
@@ -1463,7 +1470,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             <Button
                               variant="secondary"
                               className="font-semibold shadow-xs flex-1 text-white bg-amber-500 hover:bg-amber-600 border-none cursor-pointer text-xs sm:text-sm"
-                              onClick={() => startSession("due")}
+                              onClick={() => setPendingStartMode("due")}
                               isDisabled={cardStats.due === 0}
                             >
                               Review ({cardStats.due})
@@ -1471,7 +1478,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             <Button
                               variant="primary"
                               className="font-semibold shadow-xs flex-1 cursor-pointer text-xs sm:text-sm"
-                              onClick={() => startSession("all")}
+                              onClick={() => setPendingStartMode("all")}
                               isDisabled={activeVocabularyList.length === 0}
                             >
                               Learn (
@@ -1509,7 +1516,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           <Button
                             variant="primary"
                             className="font-bold shadow-xs w-full cursor-pointer py-5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none"
-                            onClick={() => startSession("quick")}
+                            onClick={() => setPendingStartMode("quick")}
                             isDisabled={activeVocabularyList.length === 0}
                           >
                             Practice all cards ({activeVocabularyList.length}{" "}
@@ -1571,8 +1578,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     )}
                   </Card>
 
-                  {/* List Kanji & Kosakata yang Akan Direview (Review Queue) */}
-                  <Card className="border border-border bg-surface shadow-sm overflow-hidden transition-all duration-300">
+                  {/* Review queue moved to Analytics. */}
+                  {false && <Card className="border border-border bg-surface shadow-sm overflow-hidden transition-all duration-300">
                     <button
                       type="button"
                       onClick={() => setIsReviewQueueExpanded(!isReviewQueueExpanded)}
@@ -1773,10 +1780,14 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         )}
                       </div>
                     )}
-                  </Card>
+                  </Card>}
+                  <button type="button" onClick={() => router.push(`/anki/analytics?deck=${deckType}`)} className="w-full rounded-2xl border border-indigo-500/30 bg-indigo-500/5 p-5 text-left transition-colors hover:bg-indigo-500/10">
+                    <span className="flex items-center gap-2 text-sm font-bold text-foreground"><Calendar size={18} className="text-indigo-500" /> Anki Analytics</span>
+                    <span className="mt-1 block text-[10px] text-muted">View scheduled kanji, review words, accuracy, and response-time trends.</span>
+                  </button>
 
-                  {/* List Kanji yang Sudah Dipelajari */}
-                  <Card className="border border-border bg-surface shadow-sm overflow-hidden transition-all duration-300">
+                  {/* Learned-kanji grid moved to Analytics. */}
+                  {false && <Card className="border border-border bg-surface shadow-sm overflow-hidden transition-all duration-300">
                     <button
                       type="button"
                       onClick={() => setIsKanjiListExpanded(!isKanjiListExpanded)}
@@ -1835,7 +1846,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         )}
                       </div>
                     )}
-                  </Card>
+                  </Card>}
                 </div>
               )
             ) : (
@@ -2341,6 +2352,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
         </Modal.Backdrop>
       </Modal>
 
+      <Modal isOpen={pendingStartMode !== null} onOpenChange={(open) => !open && setPendingStartMode(null)}>
+        <Modal.Backdrop><Modal.Container className="flex min-h-screen w-screen items-center justify-center"><Modal.Dialog className="sm:max-w-md"><Modal.CloseTrigger />
+          <Modal.Header><Modal.Heading>Choose study dose</Modal.Heading></Modal.Header>
+          <Modal.Body className="flex flex-col gap-3 text-xs">
+            <p className="text-muted">Normal focuses on two core directions. Intensive practices all four directions.</p>
+            {(["normal", "intensive"] as const).map((dose) => <button key={dose} type="button" onClick={() => { setStudyDose(dose); if (pendingStartMode) startSession(pendingStartMode, dose); setPendingStartMode(null); }} className={["rounded-xl border p-4 text-left transition-colors", dose === "normal" ? "border-indigo-500/40 hover:bg-indigo-500/5" : "border-amber-500/40 hover:bg-amber-500/5"].join(" ")}>
+              <span className="block font-bold text-foreground">{dose === "normal" ? "Normal · 2 directions" : "Intensive · 4 directions"}</span>
+              <span className="mt-1 block text-muted">{dose === "normal" ? "Kanji → Furigana, Kanji → Arti" : "Includes Furigana → Arti and Arti → Kanji"}</span>
+            </button>)}
+          </Modal.Body>
+        </Modal.Dialog></Modal.Container></Modal.Backdrop>
+      </Modal>
+
       {/* Modal Pengaturan Anki */}
       <Modal
         isOpen={isSettingsOpen}
@@ -2701,7 +2725,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   className="font-semibold bg-amber-500 hover:bg-amber-600 text-white border-none cursor-pointer"
                   onClick={() => {
                     setIsReviewModalOpen(false);
-                    startSession("due");
+                    setPendingStartMode("due");
                   }}
                   isDisabled={cardStats.due === 0}
                 >
