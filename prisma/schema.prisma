@@ -128,6 +128,7 @@ model AnkiProgress {
   userId       Int
   user         User     @relation(fields: userId, references: [id], onDelete: Cascade)
   cardKey      String   // Format: "Bab {chapterIndex}-{sectionIndex}-{kanji}-{hiragana}"
+  direction    String   @default("kanji_to_reading") // Arah recall, e.g. kanji_to_reading
   chapter      String   // E.g., "Bab １"
   sectionIndex Int      // E.g., 0, 1, 2
   interval     Int      @default(0) // Hari untuk review berikutnya
@@ -137,7 +138,7 @@ model AnkiProgress {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@unique([userId, cardKey])
+  @@unique([userId, cardKey, direction])
 }
 
 // ─────────────────────────────────────────

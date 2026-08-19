@@ -5,6 +5,17 @@ import { logActivity } from "@/src/shared/lib/activity";
 
 export const dynamic = "force-dynamic";
 
+const DIRECTIONS = new Set([
+  "kanji_to_reading",
+  "kanji_to_meaning",
+  "reading_to_meaning",
+  "meaning_to_kanji",
+]);
+
+function validDirection(value: unknown): value is string {
+  return typeof value === "string" && DIRECTIONS.has(value);
+}
+
 export async function GET() {
   const session = await getSession();
   if (!session) {
@@ -16,6 +27,7 @@ export async function GET() {
       where: { userId: session.id },
       select: {
         cardKey: true,
+        direction: true,
         dueDate: true,
         interval: true,
         repetitions: true,
@@ -51,11 +63,16 @@ export async function POST(request: NextRequest) {
           cardKey: { in: cardKeys },
         },
       });
-      const existingMap = new Map(existingRecords.map((r) => [r.cardKey, r]));
+      const existingMap = new Map(
+        existingRecords.map((r) => [`${r.cardKey}:${r.direction}`, r]),
+      );
 
       const upserts = [];
       for (const item of body) {
         const { cardKey, chapter, sectionIndex, rating } = item;
+        const direction = validDirection(item.direction)
+          ? item.direction
+          : "kanji_to_reading";
         if (
           !cardKey ||
           !chapter ||
@@ -67,7 +84,7 @@ export async function POST(request: NextRequest) {
           continue; // skip invalid entries
         }
 
-        const existing = existingMap.get(cardKey);
+        const existing = existingMap.get(`${cardKey}:${direction}`);
         let ease = existing?.ease ?? 2.5;
         let repetitions = existing?.repetitions ?? 0;
         let interval = existing?.interval ?? 0;
@@ -100,9 +117,10 @@ export async function POST(request: NextRequest) {
         upserts.push(
           prisma.ankiProgress.upsert({
             where: {
-              userId_cardKey: {
+              userId_cardKey_direction: {
                 userId: session.id,
                 cardKey,
+                direction,
               },
             },
             update: {
@@ -114,6 +132,7 @@ export async function POST(request: NextRequest) {
             create: {
               userId: session.id,
               cardKey,
+              direction,
               chapter,
               sectionIndex,
               interval,
@@ -131,6 +150,9 @@ export async function POST(request: NextRequest) {
     } else {
       // SINGLE MODE
       const { cardKey, chapter, sectionIndex, rating } = body;
+      const direction = validDirection(body.direction)
+        ? body.direction
+        : "kanji_to_reading";
 
       if (
         !cardKey ||
@@ -149,9 +171,10 @@ export async function POST(request: NextRequest) {
       // Ambil data progres lama jika ada
       const existing = await prisma.ankiProgress.findUnique({
         where: {
-          userId_cardKey: {
+          userId_cardKey_direction: {
             userId: session.id,
             cardKey,
+            direction,
           },
         },
       });
@@ -191,9 +214,10 @@ export async function POST(request: NextRequest) {
       // Simpan progres baru
       const updated = await prisma.ankiProgress.upsert({
         where: {
-          userId_cardKey: {
+          userId_cardKey_direction: {
             userId: session.id,
             cardKey,
+            direction,
           },
         },
         update: {
@@ -205,6 +229,7 @@ export async function POST(request: NextRequest) {
         create: {
           userId: session.id,
           cardKey,
+          direction,
           chapter,
           sectionIndex,
           interval,
