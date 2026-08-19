@@ -84,7 +84,18 @@ const QUIZ_DIRECTIONS: QuizDirection[] = [
 ];
 
 function supportsDirection(card: VocabularyCard, direction: QuizDirection) {
-  return direction !== "meaning_to_kanji" || card.kanji !== "-";
+  if (card.kanji === "-") {
+    return direction === "reading_to_meaning";
+  }
+  return true;
+}
+
+function readingShape(reading: string) {
+  const word = reading.trim();
+  if (word.endsWith("する")) return "suru";
+  if (word.endsWith("い")) return "i-adjective";
+  if (word.endsWith("える") || word.endsWith("いる")) return "ru-verb";
+  return word.slice(-1);
 }
 
 function quizPrompt(card: VocabularyCard, direction: QuizDirection) {
@@ -577,11 +588,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
       .map((card) => quizAnswer(card, currentQuizDirection))
       .filter((answer) => answer !== correct)
       .filter((value, index, values) => values.indexOf(value) === index);
+    const shapedCandidates = activeVocabularyList
+      .filter((card) =>
+        card.cardKey !== currentCard.cardKey &&
+        supportsDirection(card, currentQuizDirection) &&
+        readingShape(quizAnswer(card, currentQuizDirection)) === readingShape(correct),
+      )
+      .map((card) => quizAnswer(card, currentQuizDirection))
+      .filter((answer) => answer !== correct && candidates.includes(answer));
     const sameChapter = activeVocabularyList
       .filter((card) => card.chapter === currentCard.chapter && card.cardKey !== currentCard.cardKey)
       .map((card) => quizAnswer(card, currentQuizDirection))
       .filter((answer) => answer !== correct && candidates.includes(answer));
-    const distractors = [...new Set([...sameChapter, ...candidates])]
+    const distractors = [...new Set([...sameChapter, ...shapedCandidates, ...candidates])]
       .sort(() => Math.random() - 0.5).slice(0, 3);
     return [correct, ...distractors].sort(() => Math.random() - 0.5);
   }, [currentCard?.cardKey, activeVocabularyList, currentQuizDirection]);
