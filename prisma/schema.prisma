@@ -58,6 +58,7 @@ model User {
 
   progress        LearningProgress[]
   ankiProgress    AnkiProgress[]
+  ankiReviewEvents AnkiReviewEvent[]
   kanaProgress    KanaProgress[]
   kanjiProgress   KanjiProgress[]
   bookmarks       Bookmark[]
@@ -139,6 +140,19 @@ model AnkiProgress {
   updatedAt    DateTime @updatedAt
 
   @@unique([userId, cardKey, direction])
+}
+
+model AnkiReviewEvent {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardKey        String
+  direction      String
+  rating         Int
+  responseTimeMs Int?
+  createdAt      DateTime @default(now())
+
+  @@index([userId, cardKey, direction, createdAt])
 }
 
 // ─────────────────────────────────────────

@@ -68,6 +68,13 @@ export async function POST(request: NextRequest) {
       );
 
       const upserts = [];
+      const reviewEvents: Array<{
+        userId: number;
+        cardKey: string;
+        direction: string;
+        rating: number;
+        responseTimeMs?: number;
+      }> = [];
       for (const item of body) {
         const { cardKey, chapter, sectionIndex, rating } = item;
         const direction = validDirection(item.direction)
@@ -142,9 +149,22 @@ export async function POST(request: NextRequest) {
             },
           })
         );
+        reviewEvents.push({
+          userId: session.id,
+          cardKey,
+          direction,
+          rating,
+          responseTimeMs:
+            typeof item.responseTimeMs === "number" && item.responseTimeMs >= 0
+              ? Math.round(item.responseTimeMs)
+              : undefined,
+        });
       }
 
       const results = await prisma.$transaction(upserts);
+      if (reviewEvents.length > 0) {
+        await prisma.ankiReviewEvent.createMany({ data: reviewEvents });
+      }
       if (results.length > 0) await logActivity(session.id, "anki_review");
       return NextResponse.json({ success: true, progress: results });
     } else {
@@ -240,6 +260,18 @@ export async function POST(request: NextRequest) {
       });
 
       await logActivity(session.id, "anki_review", cardKey);
+      await prisma.ankiReviewEvent.create({
+        data: {
+          userId: session.id,
+          cardKey,
+          direction,
+          rating,
+          responseTimeMs:
+            typeof body.responseTimeMs === "number" && body.responseTimeMs >= 0
+              ? Math.round(body.responseTimeMs)
+              : null,
+        },
+      });
       return NextResponse.json({ success: true, progress: updated });
     }
   } catch (error) {

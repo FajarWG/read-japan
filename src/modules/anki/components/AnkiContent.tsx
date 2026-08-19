@@ -289,6 +289,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [reviewedCount, setReviewedCount] = useState<number>(0);
   const [sessionFinished, setSessionFinished] = useState<boolean>(false);
   const [ankiMode, setAnkiMode] = useState<"srs" | "quick">("srs");
+  const [studyDose, setStudyDose] = useState<"normal" | "intensive">("normal");
   const [pendingReviews, setPendingReviews] = useState<
     Array<{
       cardKey: string;
@@ -296,6 +297,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       sectionIndex: number;
       rating: number;
       direction: string;
+      responseTimeMs?: number;
     }>
   >([]);
 
@@ -303,6 +305,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [cardStartedAt, setCardStartedAt] = useState<number>(0);
   const [selectedQuizAnswer, setSelectedQuizAnswer] = useState<string | null>(null);
   const [autoRating, setAutoRating] = useState<number | null>(null);
+  const [autoResponseTimeMs, setAutoResponseTimeMs] = useState<number | null>(null);
   const [currentQuizDirection, setCurrentQuizDirection] =
     useState<QuizDirection>("kanji_to_reading");
 
@@ -440,6 +443,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       setCardStartedAt(Date.now());
       setSelectedQuizAnswer(null);
       setAutoRating(null);
+      setAutoResponseTimeMs(null);
     }
   }, [currentCard?.cardKey, currentIndex]);
 
@@ -452,7 +456,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       return;
     }
     const now = Date.now();
-    const candidates = QUIZ_DIRECTIONS.filter((direction) =>
+    const candidates = activeDirections.filter((direction) =>
       supportsDirection(currentCard, direction),
     ).sort((left, right) => {
       const leftProgress = directionProgressMap[`${currentCard.cardKey}:${left}`];
@@ -463,7 +467,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       return (leftProgress?.repetitions ?? 0) - (rightProgress?.repetitions ?? 0);
     });
     setCurrentQuizDirection(candidates[0] ?? "kanji_to_reading");
-  }, [currentCard?.cardKey, currentIndex, directionProgressMap]);
+  }, [currentCard?.cardKey, currentIndex, directionProgressMap, studyDose]);
 
   // Hide bottom navigation bar during active learning session
   useEffect(() => {
@@ -544,16 +548,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const activeVocabularyList = useMemo(() => {
     return deckType === "dekiru" ? filteredVocabulary : customCards;
   }, [deckType, filteredVocabulary, customCards]);
+  const activeDirections =
+    studyDose === "normal"
+      ? QUIZ_DIRECTIONS.slice(0, 2)
+      : QUIZ_DIRECTIONS;
 
   const cardHasDueDirection = (card: VocabularyCard, now = new Date()) =>
-    QUIZ_DIRECTIONS.some((direction) => {
+    activeDirections.some((direction) => {
       if (!supportsDirection(card, direction)) return false;
       const progress = directionProgressMap[`${card.cardKey}:${direction}`];
       return Boolean(progress && new Date(progress.dueDate) <= now);
     });
 
   const cardHasNewDirection = (card: VocabularyCard) =>
-    QUIZ_DIRECTIONS.some((direction) =>
+    activeDirections.some((direction) =>
       supportsDirection(card, direction) &&
       !directionProgressMap[`${card.cardKey}:${direction}`],
     );
@@ -562,15 +570,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const quizOptions = useMemo(() => {
     if (!currentCard) return [];
     const correct = quizAnswer(currentCard, currentQuizDirection);
-    const distractors = activeVocabularyList
+    const candidates = activeVocabularyList
       .filter((card) =>
         card.cardKey !== currentCard.cardKey && supportsDirection(card, currentQuizDirection),
       )
       .map((card) => quizAnswer(card, currentQuizDirection))
       .filter((answer) => answer !== correct)
-      .filter((value, index, values) => values.indexOf(value) === index)
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 3);
+      .filter((value, index, values) => values.indexOf(value) === index);
+    const sameChapter = activeVocabularyList
+      .filter((card) => card.chapter === currentCard.chapter && card.cardKey !== currentCard.cardKey)
+      .map((card) => quizAnswer(card, currentQuizDirection))
+      .filter((answer) => answer !== correct && candidates.includes(answer));
+    const distractors = [...new Set([...sameChapter, ...candidates])]
+      .sort(() => Math.random() - 0.5).slice(0, 3);
     return [correct, ...distractors].sort(() => Math.random() - 0.5);
   }, [currentCard?.cardKey, activeVocabularyList, currentQuizDirection]);
 
@@ -731,22 +743,16 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
   const reviewQueueCards = useMemo(() => {
     const now = new Date();
-    return activeVocabularyList
-      .filter((card) => progressMap[card.cardKey])
-      .map((card) => {
-        const prog = progressMap[card.cardKey];
+    return activeVocabularyList.flatMap((card) =>
+      QUIZ_DIRECTIONS.flatMap((direction) => {
+        const prog = directionProgressMap[`${card.cardKey}:${direction}`];
+        if (!prog || !supportsDirection(card, direction)) return [];
         const dueDate = new Date(prog.dueDate);
-        return {
-          ...card,
-          dueDate,
-          isDueNow: dueDate <= now,
-          reps: prog.repetitions,
-          interval: prog.interval,
-          ease: prog.ease,
-        };
-      })
+        return [{ ...card, direction, dueDate, isDueNow: dueDate <= now, reps: prog.repetitions, interval: prog.interval, ease: prog.ease }];
+      }),
+    )
       .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
-  }, [activeVocabularyList, progressMap]);
+  }, [activeVocabularyList, directionProgressMap]);
 
   const filteredReviewKanji = useMemo(() => {
     return reviewQueueKanji.filter((item) => {
@@ -962,6 +968,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
         sectionIndex: currentCard.sectionIndex,
         rating,
         direction: currentQuizDirection,
+        responseTimeMs: autoResponseTimeMs ?? undefined,
       };
 
       if (postMode === "card") {
@@ -1018,6 +1025,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
         sectionIndex: currentCard.sectionIndex,
         rating,
         direction: currentQuizDirection,
+        responseTimeMs: autoResponseTimeMs ?? undefined,
       };
 
       if (postMode === "card") {
@@ -1075,6 +1083,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
     setSelectedQuizAnswer(answer);
     setAutoRating(rating);
+    setAutoResponseTimeMs(Math.round(elapsedMs));
     setFlipped(true);
   };
 
@@ -1280,6 +1289,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       >
                         Practice All Cards
                       </button>
+                    </div>
+
+                    <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
+                      <button type="button" onClick={() => setStudyDose("normal")} className={["flex-1 rounded-lg py-2 text-xs font-semibold transition-all", studyDose === "normal" ? "bg-surface text-foreground shadow-sm" : "text-muted"].join(" ")}>Normal · 2 directions</button>
+                      <button type="button" onClick={() => setStudyDose("intensive")} className={["flex-1 rounded-lg py-2 text-xs font-semibold transition-all", studyDose === "intensive" ? "bg-surface text-foreground shadow-sm" : "text-muted"].join(" ")}>Intensive · 4 directions</button>
                     </div>
 
                     {deckType === "dekiru" && (
@@ -1704,10 +1718,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                   </div>
                                   <div className="flex flex-col">
                                     <div className="flex items-center gap-2">
-                                      <span className="font-jp text-xs font-semibold text-indigo-500">
-                                        〔{card.hiragana}〕
-                                      </span>
-                                      <Chip size="sm" variant="soft" color="default" className="text-[9px] h-4">
+                                    <span className="font-jp text-xs font-semibold text-indigo-500">
+                                      〔{card.hiragana}〕
+                                    </span>
+                                    <Chip size="sm" variant="soft" color="accent" className="text-[9px] h-4">
+                                      {quizDirectionLabel(card.direction)}
+                                    </Chip>
+                                    <Chip size="sm" variant="soft" color="default" className="text-[9px] h-4">
                                         {card.chapter}
                                       </Chip>
                                     </div>
