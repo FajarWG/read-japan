@@ -13,7 +13,6 @@ import {
 } from "@heroui/react";
 import {
   HelpCircle,
-  Pencil,
   MousePointerClick,
   Lightbulb,
   BookOpen,
@@ -38,7 +37,6 @@ import {
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
-import { HandwritingCanvas } from "@/src/shared/components/HandwritingCanvas";
 
 interface AnkiContentProps {
   username: string;
@@ -66,6 +64,69 @@ interface VocabularyCard {
   sentenceTranslation?: string | null;
   sentenceAudio?: string | null;
   image?: string | null;
+}
+
+interface SessionCard extends VocabularyCard {
+  quizDirection?: QuizDirection;
+}
+
+type QuizDirection =
+  | "kanji_to_reading"
+  | "kanji_to_meaning"
+  | "reading_to_meaning"
+  | "meaning_to_kanji";
+
+const QUIZ_DIRECTIONS: QuizDirection[] = [
+  "kanji_to_reading",
+  "kanji_to_meaning",
+  "reading_to_meaning",
+  "meaning_to_kanji",
+];
+
+function supportsDirection(card: VocabularyCard, direction: QuizDirection) {
+  return direction !== "meaning_to_kanji" || card.kanji !== "-";
+}
+
+function quizPrompt(card: VocabularyCard, direction: QuizDirection) {
+  switch (direction) {
+    case "kanji_to_reading":
+    case "kanji_to_meaning":
+      return card.kanji === "-" ? card.hiragana : card.kanji;
+    case "reading_to_meaning":
+      return card.hiragana;
+    case "meaning_to_kanji":
+      return card.translation;
+  }
+}
+
+function quizAnswer(card: VocabularyCard, direction: QuizDirection) {
+  switch (direction) {
+    case "kanji_to_reading":
+      return card.hiragana;
+    case "kanji_to_meaning":
+    case "reading_to_meaning":
+      return card.translation;
+    case "meaning_to_kanji":
+      return card.kanji;
+  }
+}
+
+function quizInstruction(direction: QuizDirection) {
+  switch (direction) {
+    case "kanji_to_reading": return "Choose the correct furigana";
+    case "kanji_to_meaning":
+    case "reading_to_meaning": return "Choose the correct meaning";
+    case "meaning_to_kanji": return "Choose the correct kanji";
+  }
+}
+
+function quizDirectionLabel(direction: QuizDirection) {
+  switch (direction) {
+    case "kanji_to_reading": return "Kanji → Furigana";
+    case "kanji_to_meaning": return "Kanji → Arti";
+    case "reading_to_meaning": return "Furigana → Arti";
+    case "meaning_to_kanji": return "Arti → Kanji";
+  }
 }
 
 export function AnkiContent({ username }: AnkiContentProps) {
@@ -193,6 +254,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [progressMap, setProgressMap] = useState<Record<string, SRSProgress>>(
     {},
   );
+  const [directionProgressMap, setDirectionProgressMap] = useState<
+    Record<string, SRSProgress>
+  >({});
   const [soundSetting, setSoundSetting] = useState<"on" | "off">("on");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -219,20 +283,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
   };
 
   // Sesi belajar saat ini
-  const [sessionQueue, setSessionQueue] = useState<VocabularyCard[]>([]);
+  const [sessionQueue, setSessionQueue] = useState<SessionCard[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [flipped, setFlipped] = useState<boolean>(false);
   const [reviewedCount, setReviewedCount] = useState<number>(0);
   const [sessionFinished, setSessionFinished] = useState<boolean>(false);
   const [ankiMode, setAnkiMode] = useState<"srs" | "quick">("srs");
-  const [reviewDirection] = useState<"normal" | "reverse">("normal");
-  // Legacy writing state is retained temporarily for backwards-compatible
-  // markup, but the reverse-mode entry point has been removed from the UI.
-  const [ankiWriteInput, setAnkiWriteInput] = useState("");
-  const [ankiAnswerChecked, setAnkiAnswerChecked] = useState(false);
-  const [ankiIsCorrect, setAnkiIsCorrect] = useState(false);
-  const [ankiUsedHint, setAnkiUsedHint] = useState(false);
-  const [isWritingActive, setIsWritingActive] = useState(false);
   const [pendingReviews, setPendingReviews] = useState<
     Array<{
       cardKey: string;
@@ -247,23 +303,14 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [cardStartedAt, setCardStartedAt] = useState<number>(0);
   const [selectedQuizAnswer, setSelectedQuizAnswer] = useState<string | null>(null);
   const [autoRating, setAutoRating] = useState<number | null>(null);
+  const [currentQuizDirection, setCurrentQuizDirection] =
+    useState<QuizDirection>("kanji_to_reading");
 
   // Kanji/vocab yang sudah direview di sesi ini beserta ratingnya (bahan halaman recap)
   const [sessionRecap, setSessionRecap] = useState<AnkiRecapItem[]>([]);
   const [sessionStartedAt, setSessionStartedAt] = useState<number>(0);
 
   const currentCard = sessionQueue[currentIndex];
-
-  const checkAnkiAnswer = (written: string) => {
-    if (!currentCard) return;
-    const cleanTarget = (currentCard.kanji !== "-" ? currentCard.kanji : currentCard.hiragana)
-      .replace(/\s*[\(（].*?[\)）]/g, "").trim();
-    const correct = written.replace(/\s*[\(（].*?[\)）]/g, "").trim() === cleanTarget;
-    setAnkiIsCorrect(correct);
-    setAnkiAnswerChecked(true);
-    if (correct) setFlipped(true);
-  };
-
 
   // Learned Kanji state (derived from vocabulary progress)
   const [selectedKanji, setSelectedKanji] = useState<string | null>(null);
@@ -335,12 +382,15 @@ export function AnkiContent({ username }: AnkiContentProps) {
         if (res.ok) {
           const json = await res.json();
           const pMap: Record<string, SRSProgress> = {};
+          const directionMap: Record<string, SRSProgress> = {};
           (json.progress || []).forEach((item: SRSProgress) => {
+            directionMap[`${item.cardKey}:${item.direction}`] = item;
             if (item.direction === "kanji_to_reading") {
               pMap[item.cardKey] = item;
             }
           });
           setProgressMap(pMap);
+          setDirectionProgressMap(directionMap);
         }
 
         if (customRes.ok) {
@@ -392,6 +442,28 @@ export function AnkiContent({ username }: AnkiContentProps) {
       setAutoRating(null);
     }
   }, [currentCard?.cardKey, currentIndex]);
+
+  // A word can be strong in one direction and weak in another. Pick the
+  // least-established direction for this appearance in the session.
+  useEffect(() => {
+    if (!currentCard) return;
+    if (currentCard.quizDirection) {
+      setCurrentQuizDirection(currentCard.quizDirection);
+      return;
+    }
+    const now = Date.now();
+    const candidates = QUIZ_DIRECTIONS.filter((direction) =>
+      supportsDirection(currentCard, direction),
+    ).sort((left, right) => {
+      const leftProgress = directionProgressMap[`${currentCard.cardKey}:${left}`];
+      const rightProgress = directionProgressMap[`${currentCard.cardKey}:${right}`];
+      const leftDue = !leftProgress || new Date(leftProgress.dueDate).getTime() <= now;
+      const rightDue = !rightProgress || new Date(rightProgress.dueDate).getTime() <= now;
+      if (leftDue !== rightDue) return leftDue ? -1 : 1;
+      return (leftProgress?.repetitions ?? 0) - (rightProgress?.repetitions ?? 0);
+    });
+    setCurrentQuizDirection(candidates[0] ?? "kanji_to_reading");
+  }, [currentCard?.cardKey, currentIndex, directionProgressMap]);
 
   // Hide bottom navigation bar during active learning session
   useEffect(() => {
@@ -473,19 +545,34 @@ export function AnkiContent({ username }: AnkiContentProps) {
     return deckType === "dekiru" ? filteredVocabulary : customCards;
   }, [deckType, filteredVocabulary, customCards]);
 
-  // Quiz MVP: kanji → furigana. Distractors always come from the active deck,
-  // so the choices stay relevant to the material the learner selected.
+  const cardHasDueDirection = (card: VocabularyCard, now = new Date()) =>
+    QUIZ_DIRECTIONS.some((direction) => {
+      if (!supportsDirection(card, direction)) return false;
+      const progress = directionProgressMap[`${card.cardKey}:${direction}`];
+      return Boolean(progress && new Date(progress.dueDate) <= now);
+    });
+
+  const cardHasNewDirection = (card: VocabularyCard) =>
+    QUIZ_DIRECTIONS.some((direction) =>
+      supportsDirection(card, direction) &&
+      !directionProgressMap[`${card.cardKey}:${direction}`],
+    );
+
+  // Distractors always come from the active deck, so choices stay relevant.
   const quizOptions = useMemo(() => {
     if (!currentCard) return [];
-    const correct = currentCard.hiragana;
+    const correct = quizAnswer(currentCard, currentQuizDirection);
     const distractors = activeVocabularyList
-      .filter((card) => card.cardKey !== currentCard.cardKey && card.hiragana !== correct)
-      .map((card) => card.hiragana)
+      .filter((card) =>
+        card.cardKey !== currentCard.cardKey && supportsDirection(card, currentQuizDirection),
+      )
+      .map((card) => quizAnswer(card, currentQuizDirection))
+      .filter((answer) => answer !== correct)
       .filter((value, index, values) => values.indexOf(value) === index)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3);
     return [correct, ...distractors].sort(() => Math.random() - 0.5);
-  }, [currentCard?.cardKey, activeVocabularyList]);
+  }, [currentCard?.cardKey, activeVocabularyList, currentQuizDirection]);
 
   // Klasifikasikan kartu menjadi: Due (Review) atau New (Baru)
   const cardStats = useMemo(() => {
@@ -494,19 +581,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
     const now = new Date();
 
     activeVocabularyList.forEach((card) => {
-      const prog = progressMap[card.cardKey];
-      if (!prog) {
-        newCards += 1;
-      } else {
-        const dueDate = new Date(prog.dueDate);
-        if (dueDate <= now) {
-          due += 1;
-        }
-      }
+      if (cardHasDueDirection(card, now)) due += 1;
+      else if (cardHasNewDirection(card)) newCards += 1;
     });
 
     return { due, newCards };
-  }, [activeVocabularyList, progressMap]);
+  }, [activeVocabularyList, directionProgressMap]);
 
   // Ekstrak karakter Kanji unik yang dipelajari dari kosakata (anki progress)
   const learnedVocabKanji = useMemo(() => {
@@ -742,29 +822,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
       const now = new Date();
       if (mode === "due") {
         // Ambil yang jatuh tempo saja
-        let dueCards = activeVocabularyList.filter((card) => {
-          const prog = progressMap[card.cardKey];
-          if (!prog) return false; // Abaikan yang baru
-          return new Date(prog.dueDate) <= now;
-        });
+        let dueCards = activeVocabularyList.filter((card) => cardHasDueDirection(card, now));
         if (dailyReviewLimit !== "unlimited") {
           dueCards = dueCards.slice(0, Number(dailyReviewLimit));
         }
         queue = dueCards;
       } else {
         // Campur: Ambil yang jatuh tempo dahulu, baru yang Baru (maksimal limit kartu baru)
-        let dueCards = activeVocabularyList.filter((card) => {
-          const prog = progressMap[card.cardKey];
-          return prog && new Date(prog.dueDate) <= now;
-        });
+        let dueCards = activeVocabularyList.filter((card) => cardHasDueDirection(card, now));
         if (dailyReviewLimit !== "unlimited") {
           dueCards = dueCards.slice(0, Number(dailyReviewLimit));
         }
 
         const newCards = activeVocabularyList
-          .filter((card) => {
-            return !progressMap[card.cardKey];
-          })
+          .filter((card) => cardHasNewDirection(card))
           .slice(0, dailyNewCardsLimit); // Batasi kartu baru per sesi berdasarkan konfigurasi
 
         queue = [...dueCards, ...newCards];
@@ -777,7 +848,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setSessionQueue(queue);
     setCurrentIndex(0);
     setFlipped(false);
-    setIsWritingActive(false);
     setReviewedCount(0);
     setSessionFinished(false);
     setPendingReviews([]);
@@ -799,14 +869,13 @@ export function AnkiContent({ username }: AnkiContentProps) {
       version: 1,
       mode: ankiMode,
       deckLabel,
-      direction: reviewDirection,
+      direction: "normal",
       startedAt: sessionStartedAt || Date.now(),
       endedAt: Date.now(),
       totalReviews,
       items: recapItems,
     });
     setSessionFinished(true);
-    setIsWritingActive(false);
     router.push("/anki/recap");
   };
 
@@ -828,7 +897,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       if (res.ok) {
         const json = await res.json();
         // Perbarui cache progress lokal dengan semua data baru
-        setProgressMap((prev) => {
+          setProgressMap((prev) => {
           const nextMap = { ...prev };
           const progressList = Array.isArray(json.progress)
             ? json.progress
@@ -840,8 +909,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
               nextMap[item.cardKey] = item;
             }
           });
-          return nextMap;
-        });
+            return nextMap;
+          });
+          setDirectionProgressMap((prev) => {
+            const nextMap = { ...prev };
+            const progressList = Array.isArray(json.progress)
+              ? json.progress
+              : json.progress
+                ? [json.progress]
+                : [];
+            progressList.forEach((item: SRSProgress) => {
+              nextMap[`${item.cardKey}:${item.direction}`] = item;
+            });
+            return nextMap;
+          });
       }
     } catch (err) {
       console.error("Gagal menyimpan progres batch:", err);
@@ -880,7 +961,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
         chapter: currentCard.chapter,
         sectionIndex: currentCard.sectionIndex,
         rating,
-        direction: "kanji_to_reading",
+        direction: currentQuizDirection,
       };
 
       if (postMode === "card") {
@@ -894,7 +975,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
       if (!knows) {
         // Tidak tahu: masukkan kartu ke akhir antrean sesi agar diulang terus
-        const reQueueCard = { ...currentCard };
+        const reQueueCard = { ...currentCard, quizDirection: currentQuizDirection };
         setSessionQueue((prev) => [...prev, reQueueCard]);
         setCurrentIndex((prev) => prev + 1);
       } else {
@@ -936,7 +1017,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
         chapter: currentCard.chapter,
         sectionIndex: currentCard.sectionIndex,
         rating,
-        direction: "kanji_to_reading",
+        direction: currentQuizDirection,
       };
 
       if (postMode === "card") {
@@ -950,7 +1031,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
       // LOGIKA ANKI: Jika memilih "Again" (1), kartu akan dimasukkan kembali ke antrean akhir sesi
       if (rating === 1) {
-        const reQueueCard = { ...currentCard };
+        const reQueueCard = { ...currentCard, quizDirection: currentQuizDirection };
         setSessionQueue((prev) => [...prev, reQueueCard]);
         setCurrentIndex((prev) => prev + 1);
       } else {
@@ -976,9 +1057,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const handleQuizAnswer = (answer: string) => {
     if (!currentCard || selectedQuizAnswer || gradingScore !== null) return;
 
-    const correct = answer === currentCard.hiragana;
+    const correct = answer === quizAnswer(currentCard, currentQuizDirection);
     const elapsedMs = Math.max(0, Date.now() - cardStartedAt);
-    const priorRepetitions = progressMap[currentCard.cardKey]?.repetitions ?? 0;
+    const priorRepetitions = directionProgressMap[
+      `${currentCard.cardKey}:${currentQuizDirection}`
+    ]?.repetitions ?? 0;
     // Easy is deliberately conservative: it requires an established streak
     // and a fast recall. A correct but slow answer is still remembered, but
     // gets a shorter interval through Hard.
@@ -1049,7 +1132,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 type="button"
                 onClick={() => setIsGuideOpen(true)}
                 className="flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer text-sm font-bold shrink-0"
-                title={t.ankiGuideTitle || "SRS Grading Guide"}
+                title="Automatic SRS Scoring"
               >
                 <HelpCircle size={16} />
               </button>
@@ -1183,7 +1266,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             : "text-muted hover:text-foreground",
                         ].join(" ")}
                       >
-                        SRS Review
+                        Adaptive Review
                       </button>
                       <button
                         type="button"
@@ -1195,7 +1278,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             : "text-muted hover:text-foreground",
                         ].join(" ")}
                       >
-                        Quick Review
+                        Practice All Cards
                       </button>
                     </div>
 
@@ -1396,7 +1479,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                             onClick={() => startSession("quick")}
                             isDisabled={activeVocabularyList.length === 0}
                           >
-                            Start quick review ({activeVocabularyList.length}{" "}
+                            Practice all cards ({activeVocabularyList.length}{" "}
                             cards)
                           </Button>
                         </div>
@@ -1754,17 +1837,18 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <Chip size="sm" variant="soft" color="default">
                     Point {currentCard.sectionIndex + 1}
                   </Chip>
+                  <Chip size="sm" variant="soft" color="accent">
+                    {quizDirectionLabel(currentQuizDirection)}
+                  </Chip>
                 </div>
 
                 {/* KARTU FLASHCARD DENGAN ANIMASI MORPH */}
                 <div
                   className={[
                     "relative w-full bg-surface border border-border rounded-2xl shadow-sm overflow-hidden transition-all duration-300 flex flex-col",
-                    reviewDirection === "reverse" && isWritingActive && !flipped
-                      ? "max-w-2xl h-auto min-h-64"
-                      : deckType === "custom"
-                        ? "max-w-2xl h-auto min-h-80 sm:min-h-96 md:min-h-[400px]"
-                        : "max-w-2xl h-64",
+                    deckType === "custom"
+                      ? "max-w-2xl h-auto min-h-80 sm:min-h-96 md:min-h-[400px]"
+                      : "max-w-2xl h-64",
                   ].join(" ")}
                   onClick={() => {
                     if (flipped && selectedQuizAnswer && autoRating !== null) {
@@ -1772,102 +1856,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     }
                   }}
                 >
-                  {reviewDirection === "reverse" && isWritingActive && !flipped ? (
-                    /* PANEL MENULIS KANJI (Hanya muncul jika mode menulis aktif & belum di-flip) */
-                    <div
-                      className="w-full flex-1 min-h-0 flex flex-col justify-between p-5 select-none text-left"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {/* Header */}
-                      <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
-                        <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
-                          <h2 className="font-jp text-2xl sm:text-3xl font-extrabold text-indigo-500 leading-none">
-                            {currentCard.hiragana}
-                          </h2>
-                          <p className="text-xs font-semibold text-muted/80 leading-normal whitespace-pre-line">
-                            {currentCard.translation}
-                          </p>
-                        </div>
-                        <span className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase font-black shrink-0">
-                          Write Kanji
-                        </span>
-                      </div>
-
-                      {/* Canvas & Input Area */}
-                      <div className="flex-1 flex flex-col justify-center my-2.5 min-h-0">
-                        {ankiAnswerChecked && !ankiIsCorrect ? (
-                          <div className="flex flex-col gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-xl text-xs text-red-500 animate-in fade-in duration-200">
-                            <p className="font-extrabold uppercase text-[10px] tracking-wider">
-                              Incorrect!
-                            </p>
-                            <p className="font-semibold">
-                              Your drawing: "{ankiWriteInput.trim()}"
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setAnkiAnswerChecked(false);
-                                setAnkiWriteInput("");
-                              }}
-                              className="w-full mt-1.5 py-1.5 bg-foreground text-background font-bold rounded-lg hover:opacity-90 transition-all cursor-pointer"
-                            >
-                              Try Again
-                            </button>
-                          </div>
-                        ) : ankiIsCorrect ? (
-                          <div className="flex flex-col gap-2 p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl text-xs text-emerald-500 animate-in fade-in duration-200">
-                            <p className="font-extrabold uppercase text-[10px] tracking-wider">
-                              Spot on!
-                            </p>
-                            <p className="font-semibold">
-                              Correct! Select your score below.
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col gap-2">
-                            <HandwritingCanvas
-                              value={ankiWriteInput}
-                              onChange={setAnkiWriteInput}
-                              onSubmit={() =>
-                                checkAnkiAnswer(ankiWriteInput)
-                              }
-                              placeholder="Draw kanji here..."
-                              hintText={(currentCard.kanji !== "-"
-                                ? currentCard.kanji
-                                : currentCard.hiragana
-                              )
-                                .replace(/\s*[\(（].*?[\)）]/g, "")
-                                .trim()}
-                              onUseHint={() => setAnkiUsedHint(true)}
-                            />
-                            <div className="flex items-center gap-2 mt-1 z-20">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  checkAnkiAnswer(ankiWriteInput)
-                                }
-                                disabled={!ankiWriteInput.trim()}
-                                className="flex-1 text-xs font-extrabold py-2 bg-accent hover:bg-accent/90 active:scale-95 text-white rounded-xl disabled:opacity-50 transition-all cursor-pointer shadow-3xs"
-                              >
-                                Check Answer
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setAnkiUsedHint(true);
-                                  setFlipped(true);
-                                }}
-                                className="flex-1 text-xs font-bold py-2 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-850 dark:hover:bg-zinc-800 text-muted rounded-xl transition-all cursor-pointer"
-                              >
-                                Show Answer
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    /* KARTU DENGAN ANIMASI MORPH */
+                  {/* Quiz card */}
                     <div className="relative w-full flex-1 min-h-0 flex flex-col justify-between p-6 select-none">
                       {/* Badge / Status Indicator (Question/Answer) */}
                       <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full z-20 transition-all duration-300">
@@ -1887,9 +1876,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           ].join(" ")}
                         >
                           <h2 className="font-jp text-4xl sm:text-5xl font-extrabold text-foreground text-center">
-                            {reviewDirection === "reverse"
-                              ? currentCard.hiragana
-                              : (currentCard.kanji === "-" ? currentCard.hiragana : currentCard.kanji)}
+                            {quizPrompt(currentCard, currentQuizDirection)}
                           </h2>
                           {/* Audio button next to the word (only when flipped and it is custom deck) */}
                           {flipped && deckType === "custom" && currentCard.audio && (
@@ -1911,7 +1898,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           <div className="mt-8 grid w-full max-w-md grid-cols-1 gap-2 px-2 sm:grid-cols-2">
                             {quizOptions.map((option) => {
                               const isSelected = selectedQuizAnswer === option;
-                              const isCorrect = option === currentCard.hiragana;
+                              const isCorrect = option === quizAnswer(currentCard, currentQuizDirection);
                               return (
                                 <button
                                   key={option}
@@ -1952,36 +1939,21 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                 <span
                                   className={[
                                     "rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wide",
-                                    selectedQuizAnswer === currentCard.hiragana
+                                    selectedQuizAnswer === quizAnswer(currentCard, currentQuizDirection)
                                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                       : "bg-rose-500/10 text-rose-600 dark:text-rose-400",
                                   ].join(" ")}
                                 >
-                                  {selectedQuizAnswer === currentCard.hiragana
+                                  {selectedQuizAnswer === quizAnswer(currentCard, currentQuizDirection)
                                     ? "Correct"
-                                    : `Correct answer: ${currentCard.hiragana}`}
+                                    : `Correct answer: ${quizAnswer(currentCard, currentQuizDirection)}`}
                                 </span>
                               )}
                               {/* Reverse Mode Kanji / Normal Mode Hiragana */}
-                              {reviewDirection === "reverse" ? (
-                                <>
-                                  <h3 className="font-jp text-xl sm:text-2xl text-muted font-bold">
-                                    {currentCard.kanji === "-" ? currentCard.hiragana : currentCard.kanji}
-                                  </h3>
-                                  {currentCard.kanji !== "-" && (
-                                    <p className="text-xs font-bold text-muted/60 font-jp">
-                                      〔{currentCard.hiragana}〕
-                                    </p>
-                                  )}
-                                </>
-                              ) : (
-                                <>
-                                  {currentCard.kanji !== "-" && (
-                                    <h3 className="font-jp text-xl sm:text-2xl text-indigo-500 font-bold">
-                                      {currentCard.hiragana}
-                                    </h3>
-                                  )}
-                                </>
+                              {currentCard.kanji !== "-" && (
+                                <h3 className="font-jp text-xl sm:text-2xl text-indigo-500 font-bold">
+                                  {currentCard.hiragana}
+                                </h3>
                               )}
 
                               {/* Romaji */}
@@ -2055,29 +2027,15 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         </div>
 
                         {/* 3. CLICK TO FLIP HINT (Only on Front) */}
-                        {!flipped && reviewDirection === "normal" && (
+                        {!flipped && (
                           <p className="absolute bottom-2 text-xs text-muted/50 animate-pulse select-none inline-flex items-center gap-1.5 transition-all duration-300">
                             <MousePointerClick size={13} />
-                            Choose the correct furigana
+                            {quizInstruction(currentQuizDirection)}
                           </p>
                         )}
                         
-                        {/* 4. CLICK TO WRITE PROMPT (Only on Front for Reverse Mode when writing not active) */}
-                        {!flipped && reviewDirection === "reverse" && !isWritingActive && (
-                          <div 
-                            className="mt-8 px-4 py-2.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 rounded-xl hover:bg-indigo-500 hover:text-white transition-all duration-200 shadow-3xs flex items-center gap-2 font-semibold text-xs cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsWritingActive(true);
-                            }}
-                          >
-                            <Pencil size={14} />
-                            <span>Click to write the kanji...</span>
-                          </div>
-                        )}
                       </div>
                     </div>
-                  )}
                 </div>
 
                 {/* GRADING BUTTONS (Hanya muncul jika kartu sudah dibalik) */}
@@ -2465,13 +2423,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
               <Modal.Header>
                 <Modal.Heading className="flex items-center gap-2">
                   <Lightbulb size={18} />{" "}
-                  {t.ankiGuideTitle || "SRS Grading Guide"}
+                  Automatic SRS Scoring
                 </Modal.Heading>
               </Modal.Header>
               <Modal.Body className="text-xs leading-relaxed flex flex-col gap-3">
                 <p className="text-muted mb-1">
-                  {t.ankiGuideDesc ||
-                    "Learn how the spaced repetition options affect card intervals."}
+                  Your answer is scored automatically from correctness, response time, and prior recall streak.
                 </p>
                 <div className="flex flex-col gap-2">
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/5">
@@ -2479,8 +2436,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       Again
                     </span>
                     <span className="text-foreground">
-                      {t.ankiGuideAgain ||
-                        "Again: Forgot completely. Repetition count resets to 0, interval resets to 1 day, ease value decreases."}
+                      Wrong answer: repetition resets to 0, review is due in 1 day, and the card repeats in this session.
                     </span>
                   </div>
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-amber-500/20 bg-amber-500/5">
@@ -2488,8 +2444,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       Hard
                     </span>
                     <span className="text-foreground">
-                      {t.ankiGuideHard ||
-                        "Hard: Recalled with difficulty. Interval grows slightly slower (1.2x), ease value decreases slightly."}
+                      Correct answer after 10 seconds or more: interval grows more slowly and ease decreases slightly.
                     </span>
                   </div>
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5">
@@ -2497,8 +2452,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       Good
                     </span>
                     <span className="text-foreground">
-                      {t.ankiGuideGood ||
-                        "Good: Recalled correctly. Interval multiplied by ease value, ease value remains unchanged."}
+                      Correct answer in under 10 seconds: interval grows at the normal rate.
                     </span>
                   </div>
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
@@ -2506,8 +2460,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       Easy
                     </span>
                     <span className="text-foreground">
-                      {t.ankiGuideEasy ||
-                        "Easy: Recalled effortlessly. Interval multiplied by ease value and bonus (1.3x), ease value increases."}
+                      Correct in 4 seconds or less after 3 successful recalls: interval receives the Easy bonus.
                     </span>
                   </div>
                 </div>
