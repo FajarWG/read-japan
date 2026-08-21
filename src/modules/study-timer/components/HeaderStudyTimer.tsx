@@ -7,7 +7,6 @@ import {
   Pause,
   Play,
   RotateCcw,
-  Square,
   AlertTriangle,
   X,
   Flame,
@@ -20,7 +19,6 @@ import {
   resetTodayStudyTimer,
   resumeStudyTimer,
   startManualStudyTimer,
-  stopStudyTimer,
 } from "@/src/modules/study-timer/actions/studyTimerActions";
 import { formatStudyTime } from "@/src/modules/study-timer/components/StudyTimerBar";
 import {
@@ -228,11 +226,6 @@ export function HeaderStudyTimer() {
     return run(() => resumeStudyTimer(timer.id));
   };
 
-  const stop = () => {
-    if (!timer) return;
-    run(() => stopStudyTimer(timer.id));
-  };
-
   const handleResetToday = () => {
     run(async () => {
       const result = await resetTodayStudyTimer();
@@ -275,52 +268,42 @@ export function HeaderStudyTimer() {
         </Popover.Trigger>
 
         <Popover.Content
-          className="w-64 p-3 rounded-2xl bg-surface border border-border shadow-2xl text-foreground flex flex-col gap-3"
+          className="w-60 p-3 rounded-2xl bg-surface border border-border shadow-2xl text-foreground flex flex-col gap-3"
           placement="bottom end"
         >
           <Popover.Dialog className="outline-hidden flex flex-col gap-3">
-            {/* Header: Today Total & Reset */}
+            {/* Header: Title & Status */}
             <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-2">
               <div className="flex items-center gap-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
-                  Today Total
+                <span className="text-xs font-bold text-foreground">
+                  Today&apos;s Study Timer
                 </span>
-                {(todayTotal > 0 || timer !== null) && (
-                  <button
-                    type="button"
-                    onClick={() => setShowResetConfirm(true)}
-                    disabled={isPending}
-                    title="Reset today timer"
-                    className="flex cursor-pointer items-center gap-0.5 rounded px-1 py-0.5 text-[9px] font-bold text-muted transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50"
-                  >
-                    <RotateCcw size={9} />
-                    <span>Reset</span>
-                  </button>
-                )}
               </div>
+              <span
+                className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                  running
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    : timer
+                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                    : "bg-surface-muted text-muted"
+                }`}
+              >
+                {running ? "● Active" : timer ? "⏸ Paused" : "Inactive"}
+              </span>
+            </div>
 
-              <span className="font-mono text-sm font-black tabular-nums text-foreground">
+            {/* Single Large Timer Display */}
+            <div className="flex flex-col items-center justify-center py-2 bg-surface-muted/40 rounded-xl border border-border/50">
+              <span className="font-mono text-2xl font-black tabular-nums text-foreground tracking-tight">
                 {formatStudyTime(todayTotal)}
               </span>
-            </div>
-
-            {/* Active Session Box */}
-            <div className="flex items-center justify-between rounded-xl bg-surface-muted/50 p-2.5 border border-border/70">
-              <div className="flex flex-col">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-muted">
-                  Current Session
-                </span>
-                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                  {running ? "● Active Study" : timer ? "⏸ Paused" : "Inactive"}
-                </span>
-              </div>
-              <span className="font-mono text-base font-black tabular-nums text-foreground">
-                {formatStudyTime(liveSeconds)}
+              <span className="text-[10px] text-muted font-medium mt-0.5">
+                Total time studied today
               </span>
             </div>
 
-            {/* Action Buttons */}
+            {/* Action Buttons: Pause/Resume & Reset */}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -345,22 +328,22 @@ export function HeaderStudyTimer() {
                 )}
               </button>
 
-              {timer && !isKakouTimer && (
+              {(todayTotal > 0 || timer !== null) && (
                 <button
                   type="button"
-                  onClick={stop}
+                  onClick={() => setShowResetConfirm(true)}
                   disabled={isPending}
-                  title="Stop study session"
-                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl bg-surface-muted text-muted transition-colors hover:bg-red-500/10 hover:text-red-500 border border-border disabled:opacity-60 shrink-0"
+                  title="Reset today's timer"
+                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl bg-surface-muted text-muted transition-colors hover:bg-red-500/10 hover:text-red-500 border border-border disabled:opacity-60 shrink-0"
                 >
-                  <Square size={13} fill="currentColor" />
+                  <RotateCcw size={13} />
                 </button>
               )}
             </div>
 
             {isKakouTimer && (
-              <p className="text-[10px] leading-snug text-muted">
-                This Kakou session is tracked automatically until finished.
+              <p className="text-[10px] leading-snug text-muted text-center">
+                This Kakou session is tracked automatically.
               </p>
             )}
           </Popover.Dialog>
