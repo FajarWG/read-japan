@@ -247,10 +247,28 @@ export function getQuizAnswer(card: VocabularyCardLike, direction: QuizDirection
   }
 }
 
-export function isCardValidForDirection(card: VocabularyCardLike, direction: QuizDirection): boolean {
-  if (direction === "meaning_to_kanji" || direction === "kanji_to_reading") {
-    return card.kanji !== "-" && card.kanji.trim().length > 0;
+export function hasKanji(card: VocabularyCardLike): boolean {
+  if (!card.kanji || card.kanji === "-" || card.kanji.trim().length === 0) {
+    return false;
   }
+  return /[\u4e00-\u9faf]/.test(card.kanji);
+}
+
+export function isCardValidForDirection(
+  card: VocabularyCardLike,
+  direction: QuizDirection,
+): boolean {
+  const cardHasKanji = hasKanji(card);
+
+  // Jika kata tidak memiliki kanji (misal kata murni kana seperti 'はい', 'ありがとう', 'パン'):
+  // - kanji_to_reading: TIDAK VALID (karena prompt hiragana -> jawaban hiragana = sama persis)
+  // - meaning_to_kanji: TIDAK VALID (karena tidak ada kanji untuk ditebak)
+  // - kanji_to_meaning: TIDAK VALID (karena tidak ada kanji)
+  // - reading_to_meaning: SATU-SATUNYA YANG VALID (prompt hiragana -> pilihan arti bahasa Indonesia)
+  if (!cardHasKanji) {
+    return direction === "reading_to_meaning";
+  }
+
   return true;
 }
 

@@ -43,6 +43,7 @@ import {
   getQuizPrompt,
   getQuizAnswer,
   isCardValidForDirection,
+  hasKanji,
   QuizDirection,
   VocabularyCardLike,
 } from "@/src/modules/anki/lib/distractorEngine";
@@ -102,14 +103,15 @@ function quizInstruction(direction: QuizDirection) {
   }
 }
 
-function quizDirectionLabel(direction: QuizDirection) {
+function quizDirectionLabel(direction: QuizDirection, card?: VocabularyCardLike) {
+  if (direction === "reading_to_meaning") {
+    return card && !hasKanji(card) ? "Kana → Arti" : "Furigana → Arti";
+  }
   switch (direction) {
     case "kanji_to_reading":
       return "Kanji → Furigana";
     case "kanji_to_meaning":
       return "Kanji → Arti";
-    case "reading_to_meaning":
-      return "Furigana → Arti";
     case "meaning_to_kanji":
       return "Arti → Kanji";
   }
@@ -479,7 +481,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   // Direction candidates selection for each card appearance
   const activeDirections = useMemo(() => {
     return studyDose === "normal"
-      ? QUIZ_DIRECTIONS.slice(0, 2)
+      ? (["kanji_to_reading", "kanji_to_meaning", "reading_to_meaning"] as QuizDirection[])
       : QUIZ_DIRECTIONS;
   }, [studyDose]);
 
@@ -506,7 +508,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
           (leftProgress?.repetitions ?? 0) - (rightProgress?.repetitions ?? 0)
         );
       });
-    setCurrentQuizDirection(candidates[0] ?? "kanji_to_reading");
+    const defaultFallback: QuizDirection = hasKanji(currentCard)
+      ? "kanji_to_reading"
+      : "reading_to_meaning";
+    setCurrentQuizDirection(candidates[0] ?? defaultFallback);
   }, [currentCard?.cardKey, currentIndex, directionProgressMap, activeDirections]);
 
   // Hide bottom navigation bar during active learning session
@@ -1649,7 +1654,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     Point {currentCard.sectionIndex + 1}
                   </Chip>
                   <Chip size="sm" variant="soft" color="accent">
-                    {quizDirectionLabel(currentQuizDirection)}
+                    {quizDirectionLabel(currentQuizDirection, currentCard)}
                   </Chip>
                 </div>
 
