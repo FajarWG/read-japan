@@ -377,12 +377,13 @@ export function FloatingStudyTimer() {
                 top: `${dragPos.y}px`,
                 bottom: "auto",
                 right: "auto",
+                transform: "none",
                 touchAction: "none",
               }
             : { touchAction: "none" }
         }
         className={`fixed z-50 border shadow-xl backdrop-blur-xl transition-all duration-300 ease-in-out overflow-hidden select-none cursor-grab active:cursor-grabbing ${
-          !dragPos ? "bottom-22 right-4 sm:bottom-6 sm:right-6" : ""
+          !dragPos ? "top-1/2 -translate-y-1/2 right-3 sm:right-6" : ""
         } ${
           expanded
             ? "w-64 rounded-3xl border-border bg-surface/95 p-4 text-foreground shadow-2xl"

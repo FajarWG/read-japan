@@ -24,9 +24,6 @@ import {
   Grid,
   List,
   Clock,
-  Layers,
-  CheckCircle2,
-  Repeat,
   Eye,
   ChevronDown,
   ChevronUp,
@@ -80,6 +77,26 @@ interface VocabularyCard extends VocabularyCardLike {
   image?: string | null;
 }
 
+interface DekiruSection {
+  title: string;
+  examples?: Array<{
+    kanji?: string;
+    hiragana?: string;
+    romaji?: string;
+    translation?: string;
+    audio?: string | null;
+    sentence?: string | null;
+    sentenceTranslation?: string | null;
+    sentenceAudio?: string | null;
+    image?: string | null;
+  }>;
+}
+
+interface DekiruGroup {
+  title: string;
+  sections: DekiruSection[];
+}
+
 interface SessionCard extends VocabularyCard {
   quizDirection?: QuizDirection;
 }
@@ -124,7 +141,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const deckParam = searchParams.get("deck");
 
   // Settings states with cloud sync support
-  const [dekiruGroups, setDekiruGroups] = useState<any[]>([]);
+  const [dekiruGroups, setDekiruGroups] = useState<DekiruGroup[]>([]);
   const [postMode, setPostMode] = useState<"session" | "card">("card");
   const [dailyNewCardsLimit, setDailyNewCardsLimit] = useState<number>(20);
   const [dailyReviewLimit, setDailyReviewLimit] = useState<string>("unlimited");
@@ -136,20 +153,20 @@ export function AnkiContent({ username }: AnkiContentProps) {
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
 
   // Deck filter state
-  const [filterChapters, setFilterChapters] = useState<any>(
+  const [filterChapters, setFilterChapters] = useState<Set<string> | "all">(
     new Set<string>(["all"]),
   );
-  const [filterPoints, setFilterPoints] = useState<any>(
+  const [filterPoints, setFilterPoints] = useState<Set<string> | "all">(
     new Set<string>(["all"]),
   );
 
-  const handleChapterSelectionChange = (keys: any) => {
+  const handleChapterSelectionChange = (keys: unknown) => {
     if (keys === "all") {
       setFilterChapters(new Set(["all"]));
       setFilterPoints(new Set(["all"]));
       return;
     }
-    const set = new Set(keys);
+    const set = new Set(keys as Iterable<string>);
     if (set.has("all") && set.size > 1) {
       set.delete("all");
     }
@@ -157,12 +174,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
     setFilterPoints(new Set(["all"]));
   };
 
-  const handlePointSelectionChange = (keys: any) => {
+  const handlePointSelectionChange = (keys: unknown) => {
     if (keys === "all") {
       setFilterPoints(new Set(["all"]));
       return;
     }
-    const set = new Set(keys);
+    const set = new Set(keys as Iterable<string>);
     if (set.has("all") && set.size > 1) {
       set.delete("all");
     }
@@ -196,7 +213,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     const chap = dekiruGroups[chapIdx];
     if (!chap) return [];
 
-    return chap.sections.map((sect: any, sIdx: number) => ({
+    return chap.sections.map((sect, sIdx: number) => ({
       id: String(sIdx + 1),
       title: `Point ${sIdx + 1}: ${sect.title}`,
     }));
@@ -233,7 +250,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     return sortedPoints
       .map((ptId) => {
         const opt = availablePointsOptions.find(
-          (o: any) => o.id === String(ptId),
+          (o) => o.id === String(ptId),
         );
         return opt ? opt.title : `Poin ${ptId}`;
       })
@@ -431,7 +448,19 @@ export function AnkiContent({ username }: AnkiContentProps) {
         if (customRes.ok) {
           const customData = await customRes.json();
           const mapped: VocabularyCard[] = (customData.cards || []).map(
-            (card: any) => ({
+            (card: {
+              id: number;
+              deckName: string;
+              kanji: string;
+              hiragana: string;
+              romaji?: string;
+              translation: string;
+              audio?: string | null;
+              sentence?: string | null;
+              sentenceTranslation?: string | null;
+              sentenceAudio?: string | null;
+              image?: string | null;
+            }) => ({
               cardKey: `custom-${card.id}`,
               chapter: card.deckName,
               sectionIndex: 0,
@@ -542,7 +571,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       filterPoints.has("all") ||
       filterPoints.size === 0;
 
-    dekiruGroups.forEach((chap: any, cIdx: number) => {
+    dekiruGroups.forEach((chap, cIdx: number) => {
       const chapterNumber = cIdx + 1;
       if (
         !showAllChaps &&
@@ -552,7 +581,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
         return;
       }
 
-      chap.sections.forEach((sect: any, sIdx: number) => {
+      chap.sections.forEach((sect, sIdx: number) => {
         const pointNumber = sIdx + 1;
         if (
           !showAllPts &&
@@ -1159,15 +1188,15 @@ export function AnkiContent({ username }: AnkiContentProps) {
   }, [currentIndex, sessionQueue]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-start bg-background px-4 pt-6 pb-16">
+    <div className="flex min-h-screen flex-col items-center justify-start bg-background px-3 pt-3 pb-24 sm:px-4 sm:pt-6 sm:pb-16">
       <div className="flex w-full max-w-3xl flex-col">
         {/* Header */}
         <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
-          <div className="flex items-center justify-between gap-4 px-4 py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4">
             <div className="min-w-0">
-              <h1 className="font-jp text-base sm:text-lg font-bold leading-tight text-foreground flex items-center gap-2 truncate">
+              <h1 className="font-jp text-sm sm:text-lg font-bold leading-tight text-foreground flex items-center gap-1.5 sm:gap-2 truncate">
                 <span>日本語フロー</span>
-                <span className="font-sans text-[10px] sm:text-xs bg-indigo-500/10 text-indigo-500 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">
+                <span className="font-sans text-[9px] sm:text-xs bg-indigo-500/10 text-indigo-500 px-1.5 sm:px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">
                   Anki · FSRS
                 </span>
               </h1>
@@ -1175,7 +1204,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 {t.ankiSubtitle || "Spaced Repetition System Flashcards"}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {deckType !== null && (
                 <button
                   type="button"
@@ -1184,7 +1213,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     setSessionQueue([]);
                     setSessionFinished(false);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-surface hover:bg-surface-muted text-muted hover:text-foreground transition-colors cursor-pointer text-xs font-bold shrink-0 animate-in fade-in duration-200"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-border bg-surface hover:bg-surface-muted text-muted hover:text-foreground transition-colors cursor-pointer text-xs font-bold shrink-0 animate-in fade-in duration-200"
                   title="Change deck"
                 >
                   <ArrowLeft size={14} />
@@ -1194,10 +1223,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
               <button
                 type="button"
                 onClick={() => setIsGuideOpen(true)}
-                className="flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer text-sm font-bold shrink-0"
+                className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer text-sm font-bold shrink-0"
                 title="FSRS SRS Scoring Guide"
               >
-                <HelpCircle size={16} />
+                <HelpCircle size={15} />
               </button>
               {deckType !== null && (
                 <button
@@ -1205,10 +1234,10 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   onClick={() =>
                     router.push(`/anki/analytics?deck=${deckType}`)
                   }
-                  className="flex items-center justify-center w-8 h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer"
+                  className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-xl border border-border bg-surface hover:bg-surface-muted text-foreground cursor-pointer"
                   title="Anki analytics"
                 >
-                  <Calendar size={16} />
+                  <Calendar size={15} />
                 </button>
               )}
               <SettingsDropdown />
@@ -1218,18 +1247,18 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
         {/* LOADING STATE */}
         {loading ? (
-          <main className="mt-6 flex flex-col gap-6 w-full max-w-2xl mx-auto">
-            <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
+          <main className="mt-4 sm:mt-6 flex flex-col gap-6 w-full max-w-2xl mx-auto">
+            <Card className="border border-border bg-surface p-4 sm:p-6 shadow-sm flex flex-col gap-6 rounded-2xl">
               <div className="text-center border-b border-border/50 pb-4 flex flex-col items-center gap-1.5">
                 <div className="h-5 w-40 bg-border/40 dark:bg-zinc-800/40 rounded-md animate-pulse"></div>
                 <div className="h-3 w-72 bg-border/40 dark:bg-zinc-800/40 rounded-md animate-pulse"></div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="flex flex-col items-center text-center p-6 bg-slate-50/50 dark:bg-zinc-900/20 border border-border/50 rounded-2xl gap-4 animate-pulse">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="flex flex-col items-center text-center p-4 sm:p-6 bg-slate-50/50 dark:bg-zinc-900/20 border border-border/50 rounded-2xl gap-4 animate-pulse">
                   <div className="w-12 h-12 rounded-2xl bg-border/40 dark:bg-zinc-800/40"></div>
                   <div className="h-4 w-28 bg-border/40 dark:bg-zinc-800/40 rounded-md"></div>
                 </div>
-                <div className="flex flex-col items-center text-center p-6 bg-slate-50/50 dark:bg-zinc-900/20 border border-border/50 rounded-2xl gap-4 animate-pulse">
+                <div className="flex flex-col items-center text-center p-4 sm:p-6 bg-slate-50/50 dark:bg-zinc-900/20 border border-border/50 rounded-2xl gap-4 animate-pulse">
                   <div className="w-12 h-12 rounded-2xl bg-border/40 dark:bg-zinc-800/40"></div>
                   <div className="h-4 w-24 bg-border/40 dark:bg-zinc-800/40 rounded-md"></div>
                 </div>
@@ -1237,36 +1266,36 @@ export function AnkiContent({ username }: AnkiContentProps) {
             </Card>
           </main>
         ) : (
-          <main className="mt-6">
+          <main className="mt-4 sm:mt-6">
             {/* SELEKSI DECK / FILTER (Jika sesi belum aktif) */}
             {sessionQueue.length === 0 || sessionFinished ? (
               deckType === null ? (
-                <div className="flex flex-col gap-6">
-                  <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
-                    <div className="text-center border-b border-border/50 pb-4">
-                      <h2 className="text-lg font-bold text-foreground">
+                <div className="flex flex-col gap-4 sm:gap-6">
+                  <Card className="border border-border bg-surface p-4 sm:p-6 shadow-sm flex flex-col gap-4 sm:gap-6 rounded-2xl">
+                    <div className="text-center border-b border-border/50 pb-3 sm:pb-4">
+                      <h2 className="text-base sm:text-lg font-bold text-foreground">
                         Select Study Deck
                       </h2>
-                      <p className="text-xs text-muted mt-1">
+                      <p className="text-[11px] sm:text-xs text-muted mt-1">
                         Choose a vocabulary deck to start your flashcard review
                         session with FSRS algorithm.
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       {/* Dekiru Nihongo Card */}
                       <div
                         onClick={() => setDeckType("dekiru")}
-                        className="group flex flex-col items-center text-center p-6 bg-slate-50 dark:bg-zinc-900/50 border border-border/60 hover:border-indigo-500 rounded-2xl cursor-pointer hover:scale-102 hover:shadow-md transition-all duration-300 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                        className="group flex flex-col items-center text-center p-4 sm:p-6 bg-slate-50 dark:bg-zinc-900/50 border border-border/60 hover:border-indigo-500 rounded-2xl cursor-pointer hover:scale-102 hover:shadow-md transition-all duration-300 gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300"
                       >
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <BookOpen size={24} />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <BookOpen size={20} className="sm:w-6 sm:h-6" />
                         </div>
                         <div className="flex-1 flex flex-col justify-center">
-                          <h3 className="text-sm font-bold text-foreground group-hover:text-indigo-500 transition-colors">
+                          <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-indigo-500 transition-colors">
                             Dekiru Nihongo N5
                           </h3>
-                          <p className="text-[11px] text-muted mt-1.5 leading-normal">
+                          <p className="text-[10px] sm:text-[11px] text-muted mt-1 leading-normal">
                             Curriculum vocabulary structured by chapters and
                             points (Chapters 1-15).
                           </p>
@@ -1274,7 +1303,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         <Button
                           size="sm"
                           variant="secondary"
-                          className="w-full mt-2 font-bold pointer-events-none group-hover:bg-indigo-600 group-hover:text-white"
+                          className="w-full mt-1.5 sm:mt-2 font-bold pointer-events-none group-hover:bg-indigo-600 group-hover:text-white text-xs"
                         >
                           Select Deck
                         </Button>
@@ -1283,16 +1312,16 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       {/* JLPT N5-N4 Card */}
                       <div
                         onClick={() => setDeckType("custom")}
-                        className="group flex flex-col items-center text-center p-6 bg-slate-50 dark:bg-zinc-900/50 border border-border/60 hover:border-indigo-500 rounded-2xl cursor-pointer hover:scale-102 hover:shadow-md transition-all duration-300 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:100ms]"
+                        className="group flex flex-col items-center text-center p-4 sm:p-6 bg-slate-50 dark:bg-zinc-900/50 border border-border/60 hover:border-indigo-500 rounded-2xl cursor-pointer hover:scale-102 hover:shadow-md transition-all duration-300 gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:100ms]"
                       >
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Flame size={24} />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Flame size={20} className="sm:w-6 sm:h-6" />
                         </div>
                         <div className="flex-1 flex flex-col justify-center">
-                          <h3 className="text-sm font-bold text-foreground group-hover:text-indigo-500 transition-colors">
+                          <h3 className="text-xs sm:text-sm font-bold text-foreground group-hover:text-indigo-500 transition-colors">
                             JLPT N5-N4
                           </h3>
-                          <p className="text-[11px] text-muted mt-1.5 leading-normal">
+                          <p className="text-[10px] sm:text-[11px] text-muted mt-1 leading-normal">
                             Kaishi 1.5k deck with native audio pronunciations,
                             sentences, and illustrations.
                           </p>
@@ -1300,7 +1329,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         <Button
                           size="sm"
                           variant="secondary"
-                          className="w-full mt-2 font-bold pointer-events-none group-hover:bg-indigo-600 group-hover:text-white"
+                          className="w-full mt-1.5 sm:mt-2 font-bold pointer-events-none group-hover:bg-indigo-600 group-hover:text-white text-xs"
                         >
                           Select Deck
                         </Button>
@@ -1309,8 +1338,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   </Card>
                 </div>
               ) : (
-                <div className="flex flex-col gap-6">
-                  <Card className="border border-border bg-surface p-6 shadow-sm flex flex-col gap-6">
+                <div className="flex flex-col gap-4 sm:gap-6">
+                  <Card className="border border-border bg-surface p-4 sm:p-6 shadow-sm flex flex-col gap-4 sm:gap-6 rounded-2xl">
                     {/* Switcher Mode Belajar: SRS vs Practice All */}
                     <div className="flex rounded-xl bg-surface-muted p-1 border border-border">
                       <button
@@ -1615,21 +1644,21 @@ export function AnkiContent({ username }: AnkiContentProps) {
               )
             ) : (
               /* SESI BELAJAR AKTIF */
-              <div className="flex flex-col items-center gap-6 animate-in fade-in duration-200">
+              <div className="flex flex-col items-center gap-4 sm:gap-6 animate-in fade-in duration-200 w-full">
                 {/* Progress bar */}
-                <div className="w-full flex items-center justify-between gap-4 bg-surface border border-border rounded-xl p-3 shadow-xs">
+                <div className="w-full flex items-center justify-between gap-3 bg-surface border border-border rounded-xl p-2.5 sm:p-3 shadow-xs">
                   <div className="flex-1 flex flex-col gap-1">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold text-muted uppercase tracking-wider">
-                        Session Progress: {currentIndex} / {sessionQueue.length}
+                        Progress: {currentIndex} / {sessionQueue.length}
                       </span>
                       <span className="text-[10px] font-semibold text-indigo-500">
                         {cardStyle === "quiz" ? "Quiz (Auto-Score)" : "Classic (Self-Rate)"}
                       </span>
                     </div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2">
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 sm:h-2">
                       <div
-                        className="bg-indigo-500 h-2 rounded-full transition-all duration-300"
+                        className="bg-indigo-500 h-1.5 sm:h-2 rounded-full transition-all duration-300"
                         style={{ width: `${progressPercentage}%` }}
                       />
                     </div>
@@ -1638,22 +1667,22 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <Button
                     size="sm"
                     variant="danger-soft"
-                    className="font-semibold h-8 min-w-20 cursor-pointer"
+                    className="font-semibold h-7 sm:h-8 min-w-16 sm:min-w-20 cursor-pointer text-xs"
                     onClick={handleEndSession}
                   >
-                    {t.ankiEndSession || "End Session"}
+                    {t.ankiEndSession || "End"}
                   </Button>
                 </div>
 
                 {/* Info Card Saat Ini */}
-                <div className="flex items-center gap-2">
-                  <Chip size="sm" variant="soft" color="accent">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center">
+                  <Chip size="sm" variant="soft" color="accent" className="text-[10px] h-5 sm:h-6">
                     {currentCard.chapter}
                   </Chip>
-                  <Chip size="sm" variant="soft" color="default">
+                  <Chip size="sm" variant="soft" color="default" className="text-[10px] h-5 sm:h-6">
                     Point {currentCard.sectionIndex + 1}
                   </Chip>
-                  <Chip size="sm" variant="soft" color="accent">
+                  <Chip size="sm" variant="soft" color="accent" className="text-[10px] h-5 sm:h-6">
                     {quizDirectionLabel(currentQuizDirection, currentCard)}
                   </Chip>
                 </div>
@@ -1663,8 +1692,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   className={[
                     "relative w-full bg-surface border border-border rounded-2xl shadow-sm overflow-hidden transition-all duration-300 flex flex-col cursor-pointer",
                     deckType === "custom"
-                      ? "max-w-2xl h-auto min-h-80 sm:min-h-96 md:min-h-[400px]"
-                      : "max-w-2xl h-64",
+                      ? "max-w-2xl h-auto min-h-72 sm:min-h-96 md:min-h-[400px]"
+                      : "max-w-2xl min-h-56 sm:h-64",
                   ].join(" ")}
                   onClick={() => {
                     if (cardStyle === "classic") {
@@ -1676,24 +1705,24 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     }
                   }}
                 >
-                  <div className="relative w-full flex-1 min-h-0 flex flex-col justify-between p-6 select-none">
+                  <div className="relative w-full flex-1 min-h-0 flex flex-col justify-between p-4 sm:p-6 select-none">
                     {/* Badge Question / Answer */}
-                    <span className="pointer-events-none absolute right-4 top-4 text-[10px] font-bold text-muted uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full z-20 transition-all duration-300">
+                    <span className="pointer-events-none absolute right-3 top-3 sm:right-4 sm:top-4 text-[9px] sm:text-[10px] font-bold text-muted uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full z-20 transition-all duration-300">
                       {flipped ? "Answer" : "Question"}
                     </span>
 
                     {/* MAIN CONTENT CONTAINER */}
-                    <div className="flex-1 flex flex-col justify-center items-center w-full h-full relative">
+                    <div className="flex-1 flex flex-col justify-center items-center w-full h-full relative py-2">
                       {/* 1. Prompt Word Text */}
                       <div
                         className={[
-                          "transition-all duration-500 ease-in-out flex items-center justify-center gap-2.5",
+                          "transition-all duration-500 ease-in-out flex items-center justify-center gap-2",
                           flipped
-                            ? "absolute top-2 sm:top-4 scale-75 opacity-90"
+                            ? "absolute top-1 sm:top-4 scale-75 opacity-90"
                             : "scale-100 opacity-100",
                         ].join(" ")}
                       >
-                        <h2 className="font-jp text-4xl sm:text-5xl font-extrabold text-foreground text-center">
+                        <h2 className="font-jp text-3xl sm:text-5xl font-extrabold text-foreground text-center">
                           {getQuizPrompt(currentCard, currentQuizDirection)}
                         </h2>
                         {flipped &&
@@ -1715,7 +1744,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
                       {/* MULTIPLE CHOICE OPTIONS (Only in Quiz Mode when Front) */}
                       {!flipped && cardStyle === "quiz" && (
-                        <div className="mt-8 grid w-full max-w-md grid-cols-1 gap-2 px-2 sm:grid-cols-2">
+                        <div className="mt-6 sm:mt-8 grid w-full max-w-md grid-cols-1 gap-2 px-1 sm:px-2 sm:grid-cols-2">
                           {quizOptions.map((option) => {
                             const isSelected = selectedQuizAnswer === option;
                             const isCorrect =
@@ -1731,7 +1760,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                                   handleQuizAnswer(option);
                                 }}
                                 className={[
-                                  "rounded-xl border px-4 py-3 font-jp text-lg font-bold transition-colors disabled:cursor-default cursor-pointer",
+                                  "rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 font-jp text-base sm:text-lg font-bold transition-colors disabled:cursor-default cursor-pointer",
                                   isSelected
                                     ? isCorrect
                                       ? "border-emerald-500 bg-emerald-500 text-white"
@@ -2042,11 +2071,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
                       </div>
                       <div>
                         <p className="font-bold text-sm text-foreground">
-                          Kanji "{selectedKanji}"
+                          Kanji &quot;{selectedKanji}&quot;
                         </p>
                         <p className="text-[10px] text-muted mt-0.5">
                           Ditemukan di{" "}
-                          {(selectedKanjiDetail as any).vocabWords.length}{" "}
+                          {(selectedKanjiDetail as { vocabWords: Array<{ word: string; reading: string; meaning: string }> }).vocabWords.length}{" "}
                           kosakata yang sedang dipelajari
                         </p>
                       </div>
@@ -2103,8 +2132,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         Kosakata Terkait:
                       </p>
                       <div className="grid grid-cols-1 gap-2">
-                        {(selectedKanjiDetail as any).vocabWords.map(
-                          (v: any, idx: number) => (
+                        {(selectedKanjiDetail as { vocabWords: Array<{ word: string; reading: string; meaning: string }> }).vocabWords.map(
+                          (v, idx: number) => (
                             <div
                               key={idx}
                               className="flex flex-col gap-1 p-2.5 rounded-xl bg-surface-muted/50 border border-border"
@@ -2376,7 +2405,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                 <p className="text-muted mb-1">
                   This app uses <strong>FSRS (Free Spaced Repetition Scheduler)</strong>,
                   which dynamically estimates memory stability and difficulty
-                  without falling into "Ease Hell".
+                  without falling into &quot;Ease Hell&quot;.
                 </p>
                 <div className="flex flex-col gap-2">
                   <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/5">
