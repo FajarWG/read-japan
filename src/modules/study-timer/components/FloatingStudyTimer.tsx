@@ -82,26 +82,90 @@ export function FloatingStudyTimer() {
     setNow(Date.now());
   }, []);
 
-  // Muat state awal dari server (timer bertahan lintas halaman & reload).
+  // Muat state awal dari server & otomatis mulai belajar jika user sedang aktif di tab
   useEffect(() => {
     if (!user || loadedRef.current) return;
     loadedRef.current = true;
-    void refresh();
-  }, [user, refresh]);
 
-  // Sinkron ulang saat tab kembali fokus — menjaga akurasi setelah device sleep.
+    async function initAutoTimer() {
+      const next = await getStudyTimerOverview();
+      if (!next) return;
+
+      if (!next.activeTimer && document.visibilityState === "visible") {
+        const started = await startManualStudyTimer();
+        if (started.success) {
+          setOverview({ ...next, activeTimer: started.timer });
+          setNow(Date.now());
+          return;
+        }
+      } else if (
+        next.activeTimer &&
+        next.activeTimer.status === "PAUSED" &&
+        document.visibilityState === "visible"
+      ) {
+        const resumed = await resumeStudyTimer(next.activeTimer.id);
+        if (resumed.success) {
+          setOverview({ ...next, activeTimer: resumed.timer });
+          setNow(Date.now());
+          return;
+        }
+      }
+
+      setOverview(next);
+      setNow(Date.now());
+    }
+
+    void initAutoTimer();
+  }, [user]);
+
+  // Otomatis pause saat tab disembunyikan/minimize, dan otomatis resume saat tab kembali dibuka/fokus
   useEffect(() => {
     if (!user) return;
-    const onFocus = () => {
-      if (document.visibilityState === "visible") void refresh();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        if (timer && timer.status === "RUNNING") {
+          void pauseStudyTimer(timer.id).then((res) => {
+            if (res.success) {
+              setOverview((prev) =>
+                prev ? { ...prev, activeTimer: res.timer } : prev,
+              );
+              setNow(Date.now());
+            }
+          });
+        }
+      } else if (document.visibilityState === "visible") {
+        if (timer && timer.status === "PAUSED") {
+          void resumeStudyTimer(timer.id).then((res) => {
+            if (res.success) {
+              setOverview((prev) =>
+                prev ? { ...prev, activeTimer: res.timer } : prev,
+              );
+              setNow(Date.now());
+            }
+          });
+        } else if (!timer) {
+          void startManualStudyTimer().then((res) => {
+            if (res.success) {
+              setOverview((prev) =>
+                prev ? { ...prev, activeTimer: res.timer } : prev,
+              );
+              setNow(Date.now());
+            }
+          });
+        } else {
+          void refresh();
+        }
+      }
     };
-    document.addEventListener("visibilitychange", onFocus);
-    window.addEventListener("focus", onFocus);
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("focus", handleVisibility);
     return () => {
-      document.removeEventListener("visibilitychange", onFocus);
-      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("focus", handleVisibility);
     };
-  }, [user, refresh]);
+  }, [user, timer, refresh]);
 
   // Tick 1 detik hanya saat timer berjalan.
   useEffect(() => {
@@ -115,7 +179,6 @@ export function FloatingStudyTimer() {
   // (bukan terus jalan sampai halaman dibuka lagi nanti).
   useEffect(() => {
     if (!running || !timer) {
-      setLastPingAt(null);
       return;
     }
     const timerId = timer.id;
@@ -125,8 +188,11 @@ export function FloatingStudyTimer() {
     };
     ping();
     const id = window.setInterval(ping, HEARTBEAT_INTERVAL_MS);
-    return () => window.clearInterval(id);
-  }, [running, timer?.id]);
+    return () => {
+      window.clearInterval(id);
+      setLastPingAt(null);
+    };
+  }, [running, timer]);
 
   // Ikut aturan BottomNav: sembunyi saat sesi review memaksa nav tersembunyi.
   useEffect(() => {

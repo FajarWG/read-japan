@@ -8,7 +8,6 @@ import gsap from "gsap";
 const ROUTE_NAMES: Record<string, string> = {
   "/": "Learning Hub",
   "/anki": "Anki Review Engine",
-  "/adaptive": "Adaptive Learning Engine",
   "/kakou": "Kakou Handwriting",
   "/prep": "Pre-Class Cheat Sheet",
   "/kanji-tamago": "Kanji Tamago Mnemonic",

@@ -1077,7 +1077,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
       ? 1
       : priorRepetitions >= 3 && elapsedMs <= 4_000
         ? 4
-        : elapsedMs >= 10_000
+        : elapsedMs >= 7_000
           ? 2
           : 3;
 

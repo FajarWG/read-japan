@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getSession } from "@/src/shared/lib/session";
 import { getLearningCalendarData } from "@/src/modules/goals/services/goalService";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getSession();
     const calendar = await getLearningCalendarData(session?.id);

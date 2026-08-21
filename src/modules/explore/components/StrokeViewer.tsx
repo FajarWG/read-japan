@@ -9,7 +9,11 @@ interface StrokeViewerProps {
   strokeCount?: number;
 }
 
-export const StrokeViewer: React.FC<StrokeViewerProps> = ({ kanji, unicode, strokeCount }) => {
+export const StrokeViewer: React.FC<StrokeViewerProps> = ({
+  kanji,
+  unicode,
+  strokeCount,
+}) => {
   const [svgContent, setSvgContent] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const [key, setKey] = useState(0); // Replay key
@@ -40,7 +44,7 @@ export const StrokeViewer: React.FC<StrokeViewerProps> = ({ kanji, unicode, stro
         } else {
           setError(true);
         }
-      } catch (err) {
+      } catch {
         setError(true);
       }
     }
@@ -49,7 +53,7 @@ export const StrokeViewer: React.FC<StrokeViewerProps> = ({ kanji, unicode, stro
   }, [unicode, key]);
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner gap-2">
+    <div className="flex flex-col items-center justify-center p-3 bg-surface rounded-2xl border border-border shadow-2xs gap-2">
       <style>{`
         @keyframes drawStroke {
           to {
@@ -58,9 +62,9 @@ export const StrokeViewer: React.FC<StrokeViewerProps> = ({ kanji, unicode, stro
         }
       `}</style>
 
-      <div className="relative w-36 h-36 flex items-center justify-center bg-white dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800/80 p-2 overflow-hidden shadow-lg">
+      <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center bg-surface-muted rounded-xl border border-border p-2 overflow-hidden shadow-inner">
         {error || !svgContent ? (
-          <div className="text-5xl font-black text-slate-800 dark:text-slate-300 font-japanese select-none">
+          <div className="text-4xl sm:text-5xl font-black text-foreground font-jp select-none">
             {kanji}
           </div>
         ) : (
@@ -70,20 +74,21 @@ export const StrokeViewer: React.FC<StrokeViewerProps> = ({ kanji, unicode, stro
             dangerouslySetInnerHTML={{ __html: svgContent }}
           />
         )}
-        <div className="absolute bottom-1 right-2 text-[10px] font-mono text-slate-600 dark:text-slate-500 bg-slate-100 dark:bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800">
+        <div className="absolute bottom-1 right-1.5 text-[9px] font-mono text-muted bg-surface/90 px-1 py-0.2 rounded border border-border/70">
           U+{unicode.toUpperCase()}
         </div>
       </div>
 
-      <div className="flex items-center justify-between w-full px-1 gap-2">
-        {strokeCount && (
-          <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
-            {strokeCount} Strokes (画)
+      <div className="flex items-center justify-between w-full px-0.5 gap-2">
+        {strokeCount ? (
+          <span className="text-[10px] font-semibold text-muted">
+            {strokeCount}画
           </span>
-        )}
+        ) : <span />}
         <button
+          type="button"
           onClick={() => setKey((prev) => prev + 1)}
-          className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 rounded-md transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 rounded-md transition-colors cursor-pointer"
           title="Replay Stroke Animation"
         >
           <RotateCcw className="w-3 h-3" />
@@ -93,3 +98,4 @@ export const StrokeViewer: React.FC<StrokeViewerProps> = ({ kanji, unicode, stro
     </div>
   );
 };
+

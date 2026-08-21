@@ -8,7 +8,7 @@ export interface WordFamilyItem {
   id: number;
   kanji: string;
   reading: string;
-  meanings: any[];
+  meanings: unknown[];
   jlpt: number | null;
   status?: ProgressStatus;
 }
@@ -29,43 +29,49 @@ export const WordFamilyCard: React.FC<WordFamilyCardProps> = ({
   if (words.length === 0) return null;
 
   const badgeColors = {
-    Beginner: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    Intermediate: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-    Advanced: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+    Beginner:
+      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    Intermediate:
+      "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+    Advanced:
+      "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
   };
 
   return (
-    <div className="flex flex-col gap-3 p-5 bg-slate-50 dark:bg-slate-900/60 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+    <div className="flex flex-col gap-2 p-3.5 bg-surface rounded-2xl border border-border shadow-2xs">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-extrabold text-slate-900 dark:text-white">{title}</span>
-        <span className={`px-2.5 py-0.5 text-xs font-bold border rounded-full ${badgeColors[levelBadge]}`}>
+        <span className="text-xs font-bold text-foreground">{title}</span>
+        <span
+          className={`px-2 py-0.5 text-[10px] font-bold border rounded-full ${badgeColors[levelBadge]}`}
+        >
           {levelBadge}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {words.map((w) => {
           const glosses = cleanJMdictArray(w.meanings).join("; ");
 
           return (
             <button
               key={w.id}
+              type="button"
               onClick={() => onSelectWord(w.kanji || w.reading)}
-              className="flex flex-col gap-1 p-3.5 bg-white dark:bg-slate-950/80 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800/80 rounded-2xl text-left transition-all group"
+              className="flex flex-col gap-0.5 p-2.5 bg-surface-muted/60 hover:bg-surface-muted border border-border hover:border-indigo-500/40 rounded-xl text-left transition-all group cursor-pointer shadow-2xs"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex flex-col">
-                  <span className="text-lg font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors font-japanese">
+              <div className="flex items-start justify-between gap-1.5">
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-bold text-foreground group-hover:text-indigo-500 transition-colors font-jp truncate">
                     {w.kanji}
                   </span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-japanese">
+                  <span className="text-[10px] text-muted font-jp truncate">
                     {w.reading}
                   </span>
                 </div>
                 {w.status && <ProgressBadge status={w.status} size="sm" />}
               </div>
               {glosses && (
-                <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1 group-hover:text-slate-800 dark:group-hover:text-slate-300">
+                <p className="text-[10px] text-muted line-clamp-1 group-hover:text-foreground">
                   {glosses}
                 </p>
               )}
@@ -76,3 +82,4 @@ export const WordFamilyCard: React.FC<WordFamilyCardProps> = ({
     </div>
   );
 };
+

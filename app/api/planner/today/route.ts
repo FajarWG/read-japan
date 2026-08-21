@@ -8,9 +8,12 @@ export const revalidate = 0;
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
+    const targetParam = request.nextUrl.searchParams.get("target");
+    const customTarget = targetParam ? parseInt(targetParam, 10) : undefined;
+
     const [goal, missions] = await Promise.all([
       getUserActiveGoal(session?.id),
-      getTodayMissions(session?.id),
+      getTodayMissions(session?.id, customTarget),
     ]);
 
     return NextResponse.json({

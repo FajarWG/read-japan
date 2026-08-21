@@ -12,6 +12,16 @@ function calculateStatus(progress?: { interval: number; ease: number; repetition
   return "new";
 }
 
+function safeJsonParse<T = unknown>(val: unknown, fallback: T): T {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val !== "string") return val as T;
+  try {
+    return JSON.parse(val) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ word: string }> }
@@ -19,7 +29,9 @@ export async function GET(
   try {
     const session = await getSession();
     const { word: rawWord } = await params;
-    const word = decodeURIComponent(rawWord).trim();
+    const rawDecoded = decodeURIComponent(rawWord || "").trim();
+    // Sanitize: strip HTML tags and extra brackets
+    const word = rawDecoded.replace(/<[^>]*>/g, "").replace(/\[sound:[^\]]+\]/g, "").trim();
 
     if (!word) {
       return NextResponse.json({ error: "Word parameter is required" }, { status: 400 });
@@ -45,6 +57,7 @@ export async function GET(
       },
       select: {
         id: true,
+        hiragana: true,
         audio: true,
         sentence: true,
         sentenceTranslation: true,
@@ -55,7 +68,7 @@ export async function GET(
 
     // 3. User progress status calculation
     let userProgressStatus: "learned" | "learning" | "weak" | "new" = "new";
-    let progressMap: Record<string, "learned" | "learning" | "weak" | "new"> = {};
+    const progressMap: Record<string, "learned" | "learning" | "weak" | "new"> = {};
     // Detail SRS kata ini, dipakai untuk panel "Your memory" di Explore
     let srs: {
       interval: number;
@@ -118,7 +131,7 @@ export async function GET(
     });
 
     // Kanji Progress for current user
-    let kanjiProgressMap: Record<string, "learned" | "learning" | "weak" | "new"> = {};
+    const kanjiProgressMap: Record<string, "learned" | "learning" | "weak" | "new"> = {};
     if (session?.id && kanjiChars.length > 0) {
       const kProg = await prisma.kanjiProgress.findMany({
         where: { userId: session.id, kanji: { in: kanjiChars } },
@@ -133,7 +146,7 @@ export async function GET(
       id: number;
       kanji: string;
       reading: string;
-      meanings: any;
+      meanings: unknown[];
       jlpt: number | null;
       status: "learned" | "learning" | "weak" | "new";
       rankScore: number;
@@ -151,7 +164,15 @@ export async function GET(
         take: 30,
       });
 
-      const vocabMap = new Map<number, any>();
+      const vocabMap = new Map<number, {
+        id: number;
+        kanji: string;
+        reading: string;
+        meanings: unknown[];
+        jlpt: number | null;
+        status: "learned" | "learning" | "weak" | "new";
+        rankScore: number;
+      }>();
       for (const link of links) {
         if (link.vocabulary && link.vocabulary.kanji !== word && !vocabMap.has(link.vocabulary.id)) {
           const rw = link.vocabulary;
@@ -160,15 +181,15 @@ export async function GET(
           // Calculate ranking score:
           // Status score: learned = 30, learning = 20, weak = 25, new = 10
           // JLPT score: N5 = 50, N4 = 40, N3 = 30, N2 = 20, N1 = 10, null = 5
-          let statusScore = status === "learned" ? 30 : status === "learning" ? 20 : status === "weak" ? 25 : 10;
-          let jlptScore = rw.jlpt === 5 ? 50 : rw.jlpt === 4 ? 40 : rw.jlpt === 3 ? 30 : rw.jlpt === 2 ? 20 : rw.jlpt === 1 ? 10 : 5;
-          let rankScore = statusScore + jlptScore;
+          const statusScore = status === "learned" ? 30 : status === "learning" ? 20 : status === "weak" ? 25 : 10;
+          const jlptScore = rw.jlpt === 5 ? 50 : rw.jlpt === 4 ? 40 : rw.jlpt === 3 ? 30 : rw.jlpt === 2 ? 20 : rw.jlpt === 1 ? 10 : 5;
+          const rankScore = statusScore + jlptScore;
 
           vocabMap.set(rw.id, {
             id: rw.id,
             kanji: rw.kanji,
             reading: rw.reading,
-            meanings: typeof rw.meanings === "string" ? JSON.parse(rw.meanings) : rw.meanings,
+            meanings: safeJsonParse<unknown[]>(rw.meanings, []),
             jlpt: rw.jlpt,
             status,
             rankScore,
@@ -204,7 +225,7 @@ export async function GET(
     }
 
     // 7. Mnemonic buatan user + contoh pemakaian dari Kanji Tamago
-    let mnemonics: Array<{
+    const mnemonics: Array<{
       moji: string;
       yomi: string;
       imi: string;
@@ -224,7 +245,7 @@ export async function GET(
         },
       });
 
-      let mnemonicByKanjiId: Record<number, string | null> = {};
+      const mnemonicByKanjiId: Record<number, string | null> = {};
       if (session?.id && tamagoEntries.length > 0) {
         const tamagoProgress = await prisma.kanjiTamagoProgress.findMany({
           where: {
@@ -242,10 +263,7 @@ export async function GET(
       for (const entry of tamagoEntries) {
         if (seenMoji.has(entry.moji)) continue;
         seenMoji.add(entry.moji);
-        const rawExamples =
-          typeof entry.examples === "string"
-            ? JSON.parse(entry.examples)
-            : entry.examples;
+        const rawExamples = safeJsonParse(entry.examples, []);
         mnemonics.push({
           moji: entry.moji,
           yomi: entry.yomi,
@@ -267,13 +285,13 @@ export async function GET(
         entrySeq: vocab.entrySeq,
         kanji: vocab.kanji,
         reading: vocab.reading,
-        meanings: typeof vocab.meanings === "string" ? JSON.parse(vocab.meanings) : vocab.meanings,
+        meanings: safeJsonParse(vocab.meanings, []),
         jlpt: vocab.jlpt,
       } : {
         id: null,
         entrySeq: null,
         kanji: word,
-        reading: word,
+        reading: ankiCard?.hiragana || word,
         meanings: [],
         jlpt: null,
       },
@@ -281,9 +299,9 @@ export async function GET(
       kanjiGrid: kanjiGridRaw.map((k) => ({
         ...k,
         status: kanjiProgressMap[k.literal] || "new",
-        meanings: typeof k.meanings === "string" ? JSON.parse(k.meanings) : k.meanings,
-        onyomi: typeof k.onyomi === "string" ? JSON.parse(k.onyomi) : k.onyomi,
-        kunyomi: typeof k.kunyomi === "string" ? JSON.parse(k.kunyomi) : k.kunyomi,
+        meanings: safeJsonParse(k.meanings, []),
+        onyomi: safeJsonParse(k.onyomi, []),
+        kunyomi: safeJsonParse(k.kunyomi, []),
       })),
       relatedWords,
     });

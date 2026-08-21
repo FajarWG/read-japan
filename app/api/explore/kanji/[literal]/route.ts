@@ -12,6 +12,16 @@ function calculateStatus(progress?: { interval: number; ease: number; repetition
   return "new";
 }
 
+function safeJsonParse<T = unknown>(val: unknown, fallback: T): T {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val !== "string") return val as T;
+  try {
+    return JSON.parse(val) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ literal: string }> }
@@ -19,7 +29,7 @@ export async function GET(
   try {
     const session = await getSession();
     const { literal: rawLiteral } = await params;
-    const literal = decodeURIComponent(rawLiteral).trim();
+    const literal = decodeURIComponent(rawLiteral || "").trim();
 
     if (!literal) {
       return NextResponse.json({ error: "Literal parameter is required" }, { status: 400 });
@@ -38,7 +48,7 @@ export async function GET(
 
     // 2. Fetch User Kanji SRS status
     let userKanjiStatus: "learned" | "learning" | "weak" | "new" = "new";
-    let progressMap: Record<string, "learned" | "learning" | "weak" | "new"> = {};
+    const progressMap: Record<string, "learned" | "learning" | "weak" | "new"> = {};
 
     if (session?.id) {
       const kProg = await prisma.kanjiProgress.findUnique({
@@ -57,7 +67,7 @@ export async function GET(
     }
 
     // 3. Fetch all vocabularies using this kanji via KanjiVocabulary junction table
-    let words: Array<{ id: number; kanji: string; reading: string; meanings: any; jlpt: number | null; status: "learned" | "learning" | "weak" | "new" }> = [];
+    let words: Array<{ id: number; kanji: string; reading: string; meanings: unknown[]; jlpt: number | null; status: "learned" | "learning" | "weak" | "new" }> = [];
     let totalUsageCount = 0;
 
     if (kanji) {
@@ -77,7 +87,7 @@ export async function GET(
           id: l.vocabulary.id,
           kanji: l.vocabulary.kanji,
           reading: l.vocabulary.reading,
-          meanings: typeof l.vocabulary.meanings === "string" ? JSON.parse(l.vocabulary.meanings) : l.vocabulary.meanings,
+          meanings: safeJsonParse<unknown[]>(l.vocabulary.meanings, []),
           jlpt: l.vocabulary.jlpt,
           status: progressMap[l.vocabulary.kanji] || "new",
         }));
@@ -92,7 +102,7 @@ export async function GET(
         id: v.id,
         kanji: v.kanji,
         reading: v.reading,
-        meanings: typeof v.meanings === "string" ? JSON.parse(v.meanings) : v.meanings,
+        meanings: safeJsonParse<unknown[]>(v.meanings, []),
         jlpt: v.jlpt,
         status: progressMap[v.kanji] || "new",
       }));
@@ -105,6 +115,23 @@ export async function GET(
       advanced: words.filter((w) => w.jlpt === 1 || !w.jlpt),
     };
 
+    // 5. Fetch Similar Kanji
+    const similarKanji = await prisma.similarKanji.findMany({
+      where: {
+        OR: [
+          { kanji: literal },
+          { similarKanji: literal },
+        ],
+      },
+      select: {
+        kanji: true,
+        similarKanji: true,
+        reason: true,
+        difficulty: true,
+      },
+      take: 4,
+    });
+
     return NextResponse.json({
       kanji: {
         id: kanji?.id || null,
@@ -116,14 +143,15 @@ export async function GET(
         frequency: kanji?.frequency || null,
         userStatus: userKanjiStatus,
         usageCount: totalUsageCount,
-        meanings: kanji?.meanings ? (typeof kanji.meanings === "string" ? JSON.parse(kanji.meanings) : kanji.meanings) : [],
-        onyomi: kanji?.onyomi ? (typeof kanji.onyomi === "string" ? JSON.parse(kanji.onyomi) : kanji.onyomi) : [],
-        kunyomi: kanji?.kunyomi ? (typeof kanji.kunyomi === "string" ? JSON.parse(kanji.kunyomi) : kanji.kunyomi) : [],
-        radicals: kanji?.radicals ? (typeof kanji.radicals === "string" ? JSON.parse(kanji.radicals) : kanji.radicals) : [],
+        meanings: kanji?.meanings ? safeJsonParse(kanji.meanings, []) : [],
+        onyomi: kanji?.onyomi ? safeJsonParse(kanji.onyomi, []) : [],
+        kunyomi: kanji?.kunyomi ? safeJsonParse(kanji.kunyomi, []) : [],
+        radicals: kanji?.radicals ? safeJsonParse(kanji.radicals, []) : [],
         strokeSvgUrl,
       },
       words,
       wordFamily,
+      similarKanji,
     });
   } catch (error) {
     console.error("Error in GET /api/explore/kanji/[literal]:", error);

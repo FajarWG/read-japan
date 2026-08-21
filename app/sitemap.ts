@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 const BASE_URL = "https://read-japan.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/anki", "/kakou", "/prep", "/adaptive", "/goals/setup", "/settings"];
+  const routes = ["", "/anki", "/kakou", "/prep", "/goals/setup", "/settings"];
 
   return routes.map((path) => ({
     url: `${BASE_URL}${path}`,
