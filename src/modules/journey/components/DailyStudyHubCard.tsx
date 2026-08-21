@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useRef } from "react";
-import Link from "next/link";
 import {
   Flame,
   Trophy,
@@ -11,7 +10,6 @@ import {
   Clock,
   CheckCircle2,
   Circle,
-  ArrowRight,
   Sparkles,
   CalendarDays,
   XCircle,
@@ -293,7 +291,7 @@ export const DailyStudyHubCard: React.FC<DailyStudyHubCardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         {/* Kolom 1 (50%): Today's Missions */}
         <div className="flex flex-col justify-between gap-4 p-4 sm:p-5 bg-surface-muted/30 rounded-2xl border border-border/80">
-          {/* Mission Sub-header & Target Config Button */}
+          {/* Mission Sub-header */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="text-xs sm:text-sm font-black text-foreground">
@@ -304,32 +302,11 @@ export const DailyStudyHubCard: React.FC<DailyStudyHubCardProps> = ({
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              {/* Target Settings Button */}
-              <button
-                type="button"
-                onClick={() => setShowTargetModal(true)}
-                className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-lg bg-surface border border-border text-muted hover:text-foreground hover:border-border/80 transition-colors cursor-pointer"
-                title="Change review target count per session"
-              >
-                <SlidersHorizontal className="w-3 h-3 text-indigo-500" />
-                <span>Target: {targetCards}</span>
-              </button>
-
-              {isAllMissionsDone ? (
-                <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400">
-                  🎉 Completed!
-                </span>
-              ) : (
-                <Link
-                  href="/anki"
-                  className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition-colors"
-                >
-                  <span>Review</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              )}
-            </div>
+            {isAllMissionsDone && (
+              <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400">
+                🎉 Completed!
+              </span>
+            )}
           </div>
 
           {/* Segmented Progress Bar */}
@@ -509,59 +486,75 @@ export const DailyStudyHubCard: React.FC<DailyStudyHubCardProps> = ({
               </span>
             </div>
             <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-surface text-muted border border-border">
-              Past 20 Weeks
+              <span className="sm:hidden">Past 3 Months</span>
+              <span className="hidden sm:inline">Past 20 Weeks</span>
             </span>
           </div>
 
-          {/* Grid Area: Spanned across width cleanly */}
-          <div className="overflow-x-auto pb-1 -mx-1 px-1">
-            <div className="flex flex-col gap-1.5 min-w-[480px]">
-              {/* Month Labels */}
-              <div className="flex text-[11px] font-bold text-muted pl-7 mb-0.5 relative h-4 select-none">
-                {monthLabels.map((m, idx) => (
-                  <span
-                    key={idx}
-                    className="absolute"
-                    style={{ left: `${m.weekIndex * 21 + 28}px` }}
-                  >
-                    {m.label}
-                  </span>
-                ))}
+          {/* Grid Area: Spanned across width without scrollbar on mobile */}
+          <div className="overflow-hidden pb-1">
+            <div className="flex flex-col gap-1.5 w-full">
+              {/* Month Labels Aligned with Week Columns */}
+              <div className="flex gap-1.5 items-start pl-5 sm:pl-7 h-4 mb-0.5 text-[10px] sm:text-[11px] font-bold text-muted select-none">
+                {weeks.map((week, wIdx) => {
+                  const isOlder = wIdx < weeks.length - 12;
+                  const isMonthStart = monthLabels.find((m) => m.weekIndex === wIdx);
+                  return (
+                    <div
+                      key={wIdx}
+                      className={`w-3.5 sm:w-4 relative shrink-0 ${isOlder ? "hidden sm:block" : "block"}`}
+                    >
+                      {isMonthStart && (
+                        <span className="absolute left-0 top-0 whitespace-nowrap">
+                          {isMonthStart.label}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Heatmap Grid */}
               <div className="flex gap-1.5 items-start">
-                <div className="flex flex-col gap-1.5 text-[10px] font-bold text-muted/70 pr-1 select-none">
+                <div className="flex flex-col gap-1.5 text-[9px] sm:text-[10px] font-bold text-muted/70 pr-0.5 select-none shrink-0">
                   {dayNames.map((d, idx) => (
                     <span
                       key={idx}
-                      className="h-3.5 sm:h-4 leading-3.5 sm:leading-4 w-5 text-right"
+                      className="h-3.5 sm:h-4 leading-3.5 sm:leading-4 w-4 sm:w-5 text-right"
                     >
                       {d}
                     </span>
                   ))}
                 </div>
 
-                <div className="flex gap-1.5 flex-1">
-                  {weeks.map((week, wIdx) => (
-                    <div key={wIdx} className="flex flex-col gap-1.5">
-                      {week.map((day) => {
-                        return (
-                          <button
-                            key={day.date}
-                            type="button"
-                            onMouseEnter={(e) => handleMouseEnterDay(e, day)}
-                            onMouseLeave={handleMouseLeaveDay}
-                            onClick={(e) => handleMouseEnterDay(e, day)}
-                            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] sm:rounded-md border transition-all duration-150 cursor-pointer ${getTileColor(
-                              day.level,
-                            )} hover:scale-140 hover:ring-2 hover:ring-indigo-500 hover:z-10`}
-                            title={`${day.date}: ${day.completedSessions}/3 Sessions (${day.count} cards reviewed)`}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
+                <div className="flex gap-1.5 flex-1 justify-between sm:justify-start">
+                  {weeks.map((week, wIdx) => {
+                    const isOlder = wIdx < weeks.length - 12;
+                    return (
+                      <div
+                        key={wIdx}
+                        className={`flex-col gap-1.5 shrink-0 ${
+                          isOlder ? "hidden sm:flex" : "flex"
+                        }`}
+                      >
+                        {week.map((day) => {
+                          return (
+                            <button
+                              key={day.date}
+                              type="button"
+                              onMouseEnter={(e) => handleMouseEnterDay(e, day)}
+                              onMouseLeave={handleMouseLeaveDay}
+                              onClick={(e) => handleMouseEnterDay(e, day)}
+                              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[3px] sm:rounded-md border transition-all duration-150 cursor-pointer ${getTileColor(
+                                day.level,
+                              )} hover:scale-140 hover:ring-2 hover:ring-indigo-500 hover:z-10`}
+                              title={`${day.date}: ${day.completedSessions}/3 Sessions (${day.count} cards reviewed)`}
+                            />
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -166,69 +166,74 @@ export const LearningHub: React.FC = () => {
       {/* 1. Continue Learning Hero Section */}
       <ContinueLearningCard state={data.continueState} />
 
-      {/* 2. Top Stats Summary Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      {/* 2. Top Stats Summary Grid (Compact on mobile) */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {/* SRS Due Today */}
-        <div className="flex items-center gap-3.5 p-4 bg-surface rounded-2xl border border-border shadow-2xs">
-          <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shrink-0">
-            <Layers className="w-5 h-5" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3.5 p-2.5 sm:p-4 bg-surface rounded-xl sm:rounded-2xl border border-border shadow-2xs">
+          <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shrink-0">
+            <Layers className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-black text-foreground">
+          <div className="flex flex-col min-w-0">
+            <span className="text-base sm:text-2xl font-black text-foreground leading-tight">
               {data.stats.srsDueCount}
             </span>
-            <span className="text-xs text-muted font-medium">SRS Due Today</span>
+            <span className="text-[10px] sm:text-xs text-muted font-medium truncate">
+              SRS Due
+            </span>
           </div>
         </div>
 
         {/* Total Studied Time */}
-        <div className="flex items-center gap-3.5 p-4 bg-surface rounded-2xl border border-border shadow-2xs">
-          <div className="p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">
-            <Hourglass className="w-5 h-5" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3.5 p-2.5 sm:p-4 bg-surface rounded-xl sm:rounded-2xl border border-border shadow-2xs">
+          <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shrink-0">
+            <Hourglass className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
           </div>
-          <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
-            <div className="flex flex-col">
-              <span className="text-2xl font-black text-foreground leading-tight">
+          <div className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
+            <div className="flex flex-col min-w-0">
+              <span className="text-base sm:text-2xl font-black text-foreground leading-tight">
                 {formatHours(studyTime.totalSeconds)}
               </span>
-              <span className="text-xs text-muted font-medium">Total Studied</span>
+              <span className="text-[10px] sm:text-xs text-muted font-medium truncate">
+                Studied
+              </span>
             </div>
-            <div className="flex flex-col items-end">
-              <span className="text-sm font-black text-amber-600 dark:text-amber-400 leading-tight">
+            <div className="flex flex-col sm:items-end">
+              <span className="text-[10px] sm:text-sm font-black text-amber-600 dark:text-amber-400 leading-tight">
                 {formatHours(studyTime.avgSecondsPerActiveDay)}
               </span>
-              <span className="text-[10px] text-muted font-medium">Avg / day</span>
+              <span className="text-[9px] sm:text-[10px] text-muted font-medium">
+                Avg / day
+              </span>
             </div>
           </div>
         </div>
 
         {/* JLPT Exam Countdown */}
-        <div className="flex items-center justify-between p-4 bg-surface rounded-2xl border border-border shadow-2xs text-foreground">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 shrink-0">
-              <Clock className="w-5 h-5" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 p-2.5 sm:p-4 bg-surface rounded-xl sm:rounded-2xl border border-border shadow-2xs text-foreground">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 shrink-0">
+              <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-black text-foreground uppercase tracking-wider">
-                {activeGoal.type.replace(/_/g, " ")} Exam
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] sm:text-xs font-black text-foreground uppercase tracking-wider truncate">
+                {activeGoal.targetLevel} Exam
               </span>
-              <span className="text-[11px] text-muted font-medium">
+              <span className="hidden sm:inline text-[11px] text-muted font-medium">
                 {new Date(
                   activeGoal.examDate || activeGoal.targetDate,
                 ).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
-                  year: "numeric",
                 })}
               </span>
             </div>
           </div>
 
-          <div className="flex flex-col items-end">
-            <span className="text-base font-black text-sky-600 dark:text-sky-400">
+          <div className="flex flex-col items-start sm:items-end">
+            <span className="text-sm sm:text-base font-black text-sky-600 dark:text-sky-400 leading-tight">
               {activeGoal.daysRemaining}d Left
             </span>
-            <span className="text-[10px] text-muted font-medium">
+            <span className="text-[9px] sm:text-[10px] text-muted font-medium">
               ({activeGoal.weeksRemaining}w)
             </span>
           </div>

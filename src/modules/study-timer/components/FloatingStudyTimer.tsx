@@ -279,16 +279,111 @@ export function FloatingStudyTimer() {
     setShowResetConfirm(false);
   };
 
+  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("read_japan_timer_position");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (typeof parsed.x === "number" && typeof parsed.y === "number") {
+            return parsed;
+          }
+        }
+      } catch {
+        // Ignore
+      }
+    }
+    return null;
+  });
+
+  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const initialPosRef = useRef({ x: 0, y: 0 });
+  const hasDraggedRef = useRef(false);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("input") || target.closest("a")) {
+      return;
+    }
+
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (rect) {
+      initialPosRef.current = { x: rect.left, y: rect.top };
+    }
+
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      hasDraggedRef.current = true;
+    }
+
+    const containerW = containerRef.current?.offsetWidth || 56;
+    const containerH = containerRef.current?.offsetHeight || 56;
+    const maxX = Math.max(0, window.innerWidth - containerW - 12);
+    const maxY = Math.max(0, window.innerHeight - containerH - 12);
+
+    const newX = Math.max(12, Math.min(maxX, initialPosRef.current.x + dx));
+    const newY = Math.max(12, Math.min(maxY, initialPosRef.current.y + dy));
+
+    setDragPos({ x: newX, y: newY });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignore
+    }
+
+    if (dragPos) {
+      try {
+        localStorage.setItem("read_japan_timer_position", JSON.stringify(dragPos));
+      } catch {
+        // Ignore
+      }
+    }
+  };
+
   if (!user || HIDDEN_ROUTES.includes(pathname) || hideForced) return null;
 
   const isKakouTimer = timer?.source === "KAKOU";
 
   return (
     <>
-      {/* Container tunggal yang mekar/melebar & mengecil secara mulus */}
+      {/* Container tunggal yang mekar/melebar & mengecil secara mulus (Draggable) */}
       <div
         ref={containerRef}
-        className={`fixed bottom-6 right-4 z-50 border shadow-xl backdrop-blur-xl transition-all duration-300 ease-in-out overflow-hidden sm:bottom-6 sm:right-6 ${
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        style={
+          dragPos
+            ? {
+                left: `${dragPos.x}px`,
+                top: `${dragPos.y}px`,
+                bottom: "auto",
+                right: "auto",
+                touchAction: "none",
+              }
+            : { touchAction: "none" }
+        }
+        className={`fixed z-50 border shadow-xl backdrop-blur-xl transition-all duration-300 ease-in-out overflow-hidden select-none cursor-grab active:cursor-grabbing ${
+          !dragPos ? "bottom-22 right-4 sm:bottom-6 sm:right-6" : ""
+        } ${
           expanded
             ? "w-64 rounded-3xl border-border bg-surface/95 p-4 text-foreground shadow-2xl"
             : timer
@@ -389,7 +484,11 @@ export function FloatingStudyTimer() {
           /* Collapsed State */
           <button
             type="button"
-            onClick={() => (timer ? setExpanded(true) : toggle())}
+            onClick={() => {
+              if (hasDraggedRef.current) return;
+              if (timer) setExpanded(true);
+              else toggle();
+            }}
             disabled={isPending}
             aria-label={timer ? "Open study timer" : "Start study timer"}
             className="flex h-full w-full cursor-pointer items-center justify-center gap-2 outline-none disabled:opacity-60"
