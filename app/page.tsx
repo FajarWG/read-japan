@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getSession } from "@/src/shared/lib/session";
 import { LearningHub } from "@/src/modules/journey/components/LearningHub";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
+import { HeaderStudyTimer } from "@/src/modules/study-timer/components/HeaderStudyTimer";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +14,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Home() {
-  const session = await getSession();
-
+export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground p-6 sm:p-10 font-sans">
+    <div className="min-h-screen bg-background text-foreground p-4 sm:p-10 font-sans">
       <div className="max-w-6xl mx-auto flex flex-col gap-6">
-        {/* Header (copied from Anki header, with Help ? button removed) */}
+        {/* Header */}
         <header className="border-b border-border backdrop-blur-sm rounded-t-2xl">
           <div className="flex items-center justify-between gap-4 px-4 py-4">
             <div className="min-w-0">
@@ -35,11 +33,7 @@ export default async function Home() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {session && (
-                <span className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-border bg-surface text-foreground">
-                  👤 {session.username}
-                </span>
-              )}
+              <HeaderStudyTimer />
               <SettingsDropdown />
             </div>
           </div>

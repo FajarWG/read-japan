@@ -46,6 +46,7 @@ import {
 } from "@/src/modules/anki/lib/distractorEngine";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
+import { HeaderStudyTimer } from "@/src/modules/study-timer/components/HeaderStudyTimer";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
 
 interface AnkiContentProps {
@@ -1240,6 +1241,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   <Calendar size={15} />
                 </button>
               )}
+              <HeaderStudyTimer />
               <SettingsDropdown />
             </div>
           </div>

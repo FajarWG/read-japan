@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
+import { HeaderStudyTimer } from "@/src/modules/study-timer/components/HeaderStudyTimer";
 import { Modal } from "@heroui/react";
 import { DEFAULT_KOTOBA_TERMS, KotobaTerm } from "../data/terms";
 import {
@@ -444,6 +445,7 @@ Keluarkan HANYA JSON tersebut tanpa penjelasan tambahan atau tanda kutip markdow
                 <Plus className="w-3.5 h-3.5" />
                 {text.addBtn}
               </button>
+              <HeaderStudyTimer />
               <SettingsDropdown />
             </div>
           </div>

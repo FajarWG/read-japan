@@ -52,6 +52,8 @@ import {
   type KakouSessionView,
   type KakouSourceType,
 } from "@/src/modules/kakou/data/types";
+import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
+import { HeaderStudyTimer } from "@/src/modules/study-timer/components/HeaderStudyTimer";
 import { formatStudyTime } from "@/src/modules/study-timer/components/StudyTimerBar";
 import { KakouSidebar } from "@/src/modules/kakou/components/KakouSidebar";
 import { MaterialReferenceModal } from "@/src/modules/kakou/components/MaterialReferenceModal";
@@ -1109,6 +1111,10 @@ export function KakouDashboard({
                 <p className="text-[10px] sm:text-xs text-muted line-clamp-1 truncate">
                   Guided Japanese handwriting practice — 書こう
                 </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <HeaderStudyTimer />
+                <SettingsDropdown />
               </div>
             </div>
           </header>

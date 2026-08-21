@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Button, Card, Popover, Tabs, Select, Label, ListBox, TextArea, Input, Spinner } from "@heroui/react";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
+import { HeaderStudyTimer } from "@/src/modules/study-timer/components/HeaderStudyTimer";
 import { DekiruNihongoGroups } from "@/src/helper/DekiruNihongoGroup";
 import { recordKotobaLookup } from "@/src/shared/actions/kotoba-progress";
 import {
@@ -1077,6 +1078,7 @@ ${vocabText || "Tidak ada data kosakata khusus. Gunakan standar kosakata Dekiru 
               >
                 ← Menu Utama
               </Button>
+              <HeaderStudyTimer />
               <SettingsDropdown />
             </div>
           </div>

@@ -20,6 +20,7 @@ import {
   ExploreTarget,
 } from "@/src/modules/explore/components/ExploreDrawer";
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
+import { HeaderStudyTimer } from "@/src/modules/study-timer/components/HeaderStudyTimer";
 import {
   AnkiRecapItem,
   AnkiSessionRecap,
@@ -162,6 +163,7 @@ export function AnkiRecapContent() {
                 <ArrowLeft size={14} />
                 <span className="hidden sm:inline">Back to Anki</span>
               </Link>
+              <HeaderStudyTimer />
               <SettingsDropdown />
             </div>
           </div>

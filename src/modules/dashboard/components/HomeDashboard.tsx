@@ -1,6 +1,7 @@
 "use client";
 
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
+import { HeaderStudyTimer } from "@/src/modules/study-timer/components/HeaderStudyTimer";
 import { useLanguage } from "@/src/modules/language/components/LanguageProvider";
 import { ProgressDashboard } from "@/src/modules/dashboard/components/ProgressDashboard";
 import { ContinueHero } from "@/src/modules/dashboard/components/ContinueHero";
@@ -46,6 +47,7 @@ export function HomeDashboard({ summary, progressStats }: HomeDashboardProps) {
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
+              <HeaderStudyTimer />
               <SettingsDropdown />
             </div>
           </div>
