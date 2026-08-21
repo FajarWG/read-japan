@@ -94,6 +94,7 @@ interface DekiruSection {
 }
 
 interface DekiruGroup {
+  chapter: string;
   title: string;
   sections: DekiruSection[];
 }
@@ -2077,7 +2078,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         </p>
                         <p className="text-[10px] text-muted mt-0.5">
                           Ditemukan di{" "}
-                          {(selectedKanjiDetail as { vocabWords: Array<{ word: string; reading: string; meaning: string }> }).vocabWords.length}{" "}
+                          {selectedKanjiDetail.vocabWords.length}{" "}
                           kosakata yang sedang dipelajari
                         </p>
                       </div>
@@ -2134,7 +2135,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         Kosakata Terkait:
                       </p>
                       <div className="grid grid-cols-1 gap-2">
-                        {(selectedKanjiDetail as { vocabWords: Array<{ word: string; reading: string; meaning: string }> }).vocabWords.map(
+                        {selectedKanjiDetail.vocabWords.map(
                           (v, idx: number) => (
                             <div
                               key={idx}
