@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/src/shared/lib/db";
 import { getSession } from "@/src/shared/lib/session";
 import { logActivity } from "@/src/shared/lib/activity";
+import { scheduleWithFSRS } from "@/src/modules/anki/lib/fsrsEngine";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,14 @@ export async function GET() {
         interval: true,
         repetitions: true,
         ease: true,
+        stability: true,
+        difficulty: true,
+        state: true,
+        reps: true,
+        lapses: true,
+        scheduledDays: true,
+        elapsedDays: true,
+        lastReview: true,
       },
     });
 
@@ -40,7 +49,7 @@ export async function GET() {
     console.error("Error fetching Anki progress:", error);
     return NextResponse.json(
       { error: "Failed to fetch Anki progress" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -75,11 +84,15 @@ export async function POST(request: NextRequest) {
         rating: number;
         responseTimeMs?: number;
       }> = [];
+
+      const now = new Date();
+
       for (const item of body) {
         const { cardKey, chapter, sectionIndex, rating } = item;
         const direction = validDirection(item.direction)
           ? item.direction
           : "kanji_to_reading";
+
         if (
           !cardKey ||
           !chapter ||
@@ -92,34 +105,7 @@ export async function POST(request: NextRequest) {
         }
 
         const existing = existingMap.get(`${cardKey}:${direction}`);
-        let ease = existing?.ease ?? 2.5;
-        let repetitions = existing?.repetitions ?? 0;
-        let interval = existing?.interval ?? 0;
-
-        // Hitung berdasarkan algoritma SM-2
-        if (rating === 1) {
-          // Again
-          repetitions = 0;
-          interval = 1;
-          ease = Math.max(1.3, ease - 0.2);
-        } else if (rating === 2) {
-          // Hard
-          repetitions += 1;
-          interval = repetitions === 1 ? 1 : repetitions === 2 ? 3 : Math.ceil(interval * 1.2);
-          ease = Math.max(1.3, ease - 0.15);
-        } else if (rating === 3) {
-          // Good
-          repetitions += 1;
-          interval = repetitions === 1 ? 1 : repetitions === 2 ? 6 : Math.ceil(interval * ease);
-        } else {
-          // Easy (4)
-          repetitions += 1;
-          interval = repetitions === 1 ? 4 : repetitions === 2 ? 10 : Math.ceil(interval * ease * 1.3);
-          ease += 0.15;
-        }
-
-        const dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + interval);
+        const fsrsResult = scheduleWithFSRS(existing, rating, now);
 
         upserts.push(
           prisma.ankiProgress.upsert({
@@ -131,10 +117,18 @@ export async function POST(request: NextRequest) {
               },
             },
             update: {
-              interval,
-              ease,
-              repetitions,
-              dueDate,
+              interval: fsrsResult.scheduledDays,
+              ease: existing?.ease ?? 2.5,
+              repetitions: fsrsResult.reps,
+              dueDate: fsrsResult.dueDate,
+              stability: fsrsResult.stability,
+              difficulty: fsrsResult.difficulty,
+              elapsedDays: fsrsResult.card.elapsed_days,
+              scheduledDays: fsrsResult.scheduledDays,
+              reps: fsrsResult.reps,
+              lapses: fsrsResult.lapses,
+              state: fsrsResult.state,
+              lastReview: fsrsResult.lastReview,
             },
             create: {
               userId: session.id,
@@ -142,13 +136,22 @@ export async function POST(request: NextRequest) {
               direction,
               chapter,
               sectionIndex,
-              interval,
-              ease,
-              repetitions,
-              dueDate,
+              interval: fsrsResult.scheduledDays,
+              ease: 2.5,
+              repetitions: fsrsResult.reps,
+              dueDate: fsrsResult.dueDate,
+              stability: fsrsResult.stability,
+              difficulty: fsrsResult.difficulty,
+              elapsedDays: fsrsResult.card.elapsed_days,
+              scheduledDays: fsrsResult.scheduledDays,
+              reps: fsrsResult.reps,
+              lapses: fsrsResult.lapses,
+              state: fsrsResult.state,
+              lastReview: fsrsResult.lastReview,
             },
-          })
+          }),
         );
+
         reviewEvents.push({
           userId: session.id,
           cardKey,
@@ -184,11 +187,10 @@ export async function POST(request: NextRequest) {
       ) {
         return NextResponse.json(
           { error: "Invalid parameters" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
-      // Ambil data progres lama jika ada
       const existing = await prisma.ankiProgress.findUnique({
         where: {
           userId_cardKey_direction: {
@@ -199,39 +201,9 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      let ease = existing?.ease ?? 2.5;
-      let repetitions = existing?.repetitions ?? 0;
-      let interval = existing?.interval ?? 0;
+      const now = new Date();
+      const fsrsResult = scheduleWithFSRS(existing, rating, now);
 
-      // Hitung berdasarkan algoritma SM-2
-      if (rating === 1) {
-        // Again
-        repetitions = 0;
-        interval = 1;
-        ease = Math.max(1.3, ease - 0.2);
-      } else if (rating === 2) {
-        // Hard
-        repetitions += 1;
-        interval =
-          repetitions === 1 ? 1 : repetitions === 2 ? 3 : Math.ceil(interval * 1.2);
-        ease = Math.max(1.3, ease - 0.15);
-      } else if (rating === 3) {
-        // Good
-        repetitions += 1;
-        interval =
-          repetitions === 1 ? 1 : repetitions === 2 ? 6 : Math.ceil(interval * ease);
-      } else {
-        // Easy (4)
-        repetitions += 1;
-        interval =
-          repetitions === 1 ? 4 : repetitions === 2 ? 10 : Math.ceil(interval * ease * 1.3);
-        ease += 0.15;
-      }
-
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + interval);
-
-      // Simpan progres baru
       const updated = await prisma.ankiProgress.upsert({
         where: {
           userId_cardKey_direction: {
@@ -241,10 +213,18 @@ export async function POST(request: NextRequest) {
           },
         },
         update: {
-          interval,
-          ease,
-          repetitions,
-          dueDate,
+          interval: fsrsResult.scheduledDays,
+          ease: existing?.ease ?? 2.5,
+          repetitions: fsrsResult.reps,
+          dueDate: fsrsResult.dueDate,
+          stability: fsrsResult.stability,
+          difficulty: fsrsResult.difficulty,
+          elapsedDays: fsrsResult.card.elapsed_days,
+          scheduledDays: fsrsResult.scheduledDays,
+          reps: fsrsResult.reps,
+          lapses: fsrsResult.lapses,
+          state: fsrsResult.state,
+          lastReview: fsrsResult.lastReview,
         },
         create: {
           userId: session.id,
@@ -252,10 +232,18 @@ export async function POST(request: NextRequest) {
           direction,
           chapter,
           sectionIndex,
-          interval,
-          ease,
-          repetitions,
-          dueDate,
+          interval: fsrsResult.scheduledDays,
+          ease: 2.5,
+          repetitions: fsrsResult.reps,
+          dueDate: fsrsResult.dueDate,
+          stability: fsrsResult.stability,
+          difficulty: fsrsResult.difficulty,
+          elapsedDays: fsrsResult.card.elapsed_days,
+          scheduledDays: fsrsResult.scheduledDays,
+          reps: fsrsResult.reps,
+          lapses: fsrsResult.lapses,
+          state: fsrsResult.state,
+          lastReview: fsrsResult.lastReview,
         },
       });
 
@@ -272,13 +260,14 @@ export async function POST(request: NextRequest) {
               : null,
         },
       });
+
       return NextResponse.json({ success: true, progress: updated });
     }
   } catch (error) {
     console.error("Error saving Anki progress:", error);
     return NextResponse.json(
       { error: "Failed to save Anki progress" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
