@@ -7,7 +7,7 @@ import {
   FSRS,
 } from "ts-fsrs";
 
-// Inisialisasi scheduler FSRS dengan parameter default optimal
+// Inisialisasi scheduler FSRS dengan parameter default optimal (termasuk short-term learning steps)
 export const fsrsInstance: FSRS = fsrs();
 
 export interface AnkiProgressRecord {
@@ -22,6 +22,7 @@ export interface AnkiProgressRecord {
   reps?: number;
   lapses?: number;
   state?: number;
+  learningSteps?: number;
   lastReview?: Date | string | null;
   updatedAt?: Date | string;
 }
@@ -35,6 +36,7 @@ export interface FSRSScheduleResult {
   reps: number;
   lapses: number;
   state: number;
+  learningSteps: number;
   lastReview: Date;
 }
 
@@ -91,7 +93,7 @@ export function progressToFsrsCard(progress?: AnkiProgressRecord | null): FSRSCa
       scheduled_days: progress.scheduledDays ?? progress.interval ?? 0,
       reps: progress.reps ?? progress.repetitions ?? 0,
       lapses: progress.lapses ?? 0,
-      learning_steps: 0,
+      learning_steps: progress.learningSteps ?? 0,
       state: (progress.state ?? FSRSState.New) as FSRSState,
       last_review: lastRev,
     };
@@ -149,6 +151,53 @@ export function scheduleWithFSRS(
     reps: nextCard.reps,
     lapses: nextCard.lapses,
     state: nextCard.state,
+    learningSteps: nextCard.learning_steps,
     lastReview: reviewDate,
+  };
+}
+
+/**
+ * Format selisih waktu jatuh tempo ke label yang ringkas (e.g. 1m, 10m, 2d, 1mo)
+ */
+export function formatFsrsInterval(due: Date, now = new Date()): string {
+  const diffMs = due.getTime() - now.getTime();
+  if (diffMs <= 0) return "< 1m";
+  const diffMinutes = Math.round(diffMs / 60000);
+  if (diffMinutes < 60) return `${Math.max(1, diffMinutes)}m`;
+  const diffHours = Math.round(diffMs / (1000 * 60 * 60));
+  if (diffHours < 24) return `${diffHours}h`;
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays < 30) return `${diffDays}d`;
+  const diffMonths = (diffDays / 30).toFixed(1);
+  if (diffDays < 365) return `${diffMonths.replace(/\.0$/, "")}mo`;
+  const diffYears = (diffDays / 365).toFixed(1);
+  return `${diffYears.replace(/\.0$/, "")}y`;
+}
+
+export interface FSRSIntervalPreviews {
+  again: string;
+  hard: string;
+  good: string;
+  easy: string;
+}
+
+/**
+ * Menghasilkan estimasi live interval untuk tombol Again, Hard, Good, Easy
+ */
+export function getFsrsPreviewIntervals(
+  currentProgress: AnkiProgressRecord | null | undefined,
+  now = new Date(),
+): FSRSIntervalPreviews {
+  const card = progressToFsrsCard(currentProgress);
+  const againRes = fsrsInstance.next(card, now, FSRSRating.Again);
+  const hardRes = fsrsInstance.next(card, now, FSRSRating.Hard);
+  const goodRes = fsrsInstance.next(card, now, FSRSRating.Good);
+  const easyRes = fsrsInstance.next(card, now, FSRSRating.Easy);
+
+  return {
+    again: formatFsrsInterval(againRes.card.due, now),
+    hard: formatFsrsInterval(hardRes.card.due, now),
+    good: formatFsrsInterval(goodRes.card.due, now),
+    easy: formatFsrsInterval(easyRes.card.due, now),
   };
 }

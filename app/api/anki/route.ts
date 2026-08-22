@@ -36,6 +36,7 @@ export async function GET() {
         stability: true,
         difficulty: true,
         state: true,
+        learningSteps: true,
         reps: true,
         lapses: true,
         scheduledDays: true,
@@ -128,6 +129,7 @@ export async function POST(request: NextRequest) {
               reps: fsrsResult.reps,
               lapses: fsrsResult.lapses,
               state: fsrsResult.state,
+              learningSteps: fsrsResult.learningSteps,
               lastReview: fsrsResult.lastReview,
             },
             create: {
@@ -147,6 +149,7 @@ export async function POST(request: NextRequest) {
               reps: fsrsResult.reps,
               lapses: fsrsResult.lapses,
               state: fsrsResult.state,
+              learningSteps: fsrsResult.learningSteps,
               lastReview: fsrsResult.lastReview,
             },
           }),
@@ -224,6 +227,7 @@ export async function POST(request: NextRequest) {
           reps: fsrsResult.reps,
           lapses: fsrsResult.lapses,
           state: fsrsResult.state,
+          learningSteps: fsrsResult.learningSteps,
           lastReview: fsrsResult.lastReview,
         },
         create: {
@@ -243,6 +247,7 @@ export async function POST(request: NextRequest) {
           reps: fsrsResult.reps,
           lapses: fsrsResult.lapses,
           state: fsrsResult.state,
+          learningSteps: fsrsResult.learningSteps,
           lastReview: fsrsResult.lastReview,
         },
       });

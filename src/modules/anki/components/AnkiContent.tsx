@@ -48,6 +48,7 @@ import { useLanguage } from "@/src/modules/language/components/LanguageProvider"
 import { SettingsDropdown } from "@/src/shared/components/SettingsDropdown";
 import { HeaderStudyTimer } from "@/src/modules/study-timer/components/HeaderStudyTimer";
 import { KANJI_N5 } from "@/src/helper/kanji-n5";
+import { getFsrsPreviewIntervals } from "@/src/modules/anki/lib/fsrsEngine";
 
 interface AnkiContentProps {
   username: string;
@@ -63,6 +64,7 @@ interface SRSProgress {
   stability?: number;
   difficulty?: number;
   state?: number;
+  learningSteps?: number;
   reps?: number;
   lapses?: number;
   scheduledDays?: number;
@@ -509,11 +511,15 @@ export function AnkiContent({ username }: AnkiContentProps) {
     }
   }, [currentCard?.cardKey, currentIndex]);
 
-  // Direction candidates selection for each card appearance
+const getActiveDirections = (dose: "normal" | "intensive"): QuizDirection[] => {
+  return dose === "normal"
+    ? ["kanji_to_reading", "kanji_to_meaning", "reading_to_meaning"]
+    : QUIZ_DIRECTIONS;
+};
+
+// Direction candidates selection for each card appearance
   const activeDirections = useMemo(() => {
-    return studyDose === "normal"
-      ? (["kanji_to_reading", "kanji_to_meaning", "reading_to_meaning"] as QuizDirection[])
-      : QUIZ_DIRECTIONS;
+    return getActiveDirections(studyDose);
   }, [studyDose]);
 
   useEffect(() => {
@@ -638,6 +644,24 @@ export function AnkiContent({ username }: AnkiContentProps) {
     [directionProgressMap, activeDirections],
   );
 
+  const cardHasLearningDirection = useCallback(
+    (
+      card: VocabularyCard,
+      now = new Date(),
+      directions = activeDirections,
+    ) =>
+      directions.some((direction) => {
+        if (!isCardValidForDirection(card, direction)) return false;
+        const progress = directionProgressMap[`${card.cardKey}:${direction}`];
+        return Boolean(
+          progress &&
+            (progress.state === 1 || progress.state === 3) &&
+            new Date(progress.dueDate) > now,
+        );
+      }),
+    [directionProgressMap, activeDirections],
+  );
+
   const cardHasNewDirection = useCallback(
     (card: VocabularyCard, directions = activeDirections) =>
       directions.some(
@@ -647,6 +671,16 @@ export function AnkiContent({ username }: AnkiContentProps) {
       ),
     [directionProgressMap, activeDirections],
   );
+
+  // Live FSRS intervals preview for Again, Hard, Good, Easy buttons
+  const intervalsPreview = useMemo(() => {
+    if (!currentCard) {
+      return { again: "1m", hard: "6m", good: "10m", easy: "4d" };
+    }
+    const progress =
+      directionProgressMap[`${currentCard.cardKey}:${currentQuizDirection}`];
+    return getFsrsPreviewIntervals(progress);
+  }, [currentCard?.cardKey, currentQuizDirection, directionProgressMap]);
 
   // Smart Distractors generated using linguistic similarity & POS matching
   const quizOptions = useMemo(() => {
@@ -658,19 +692,30 @@ export function AnkiContent({ username }: AnkiContentProps) {
     );
   }, [currentCard?.cardKey, activeVocabularyList, currentQuizDirection]);
 
-  // Card stats: Due vs New
+  // Card stats: Due vs Learning vs New
   const cardStats = useMemo(() => {
     let due = 0;
+    let learning = 0;
     let newCards = 0;
     const now = new Date();
 
     activeVocabularyList.forEach((card) => {
-      if (cardHasDueDirection(card, now)) due += 1;
-      else if (cardHasNewDirection(card)) newCards += 1;
+      if (cardHasDueDirection(card, now)) {
+        due += 1;
+      } else if (cardHasLearningDirection(card, now)) {
+        learning += 1;
+      } else if (cardHasNewDirection(card)) {
+        newCards += 1;
+      }
     });
 
-    return { due, newCards };
-  }, [activeVocabularyList, cardHasDueDirection, cardHasNewDirection]);
+    return { due, learning, newCards };
+  }, [
+    activeVocabularyList,
+    cardHasDueDirection,
+    cardHasLearningDirection,
+    cardHasNewDirection,
+  ]);
 
   // Kanji & Review Queue breakdown for review modal
   const reviewQueueKanji = useMemo(() => {
@@ -700,7 +745,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
     const now = new Date();
 
     activeVocabularyList.forEach((card) => {
-      const prog = progressMap[card.cardKey];
+      const prog =
+        progressMap[card.cardKey] ||
+        activeDirections
+          .map((d) => directionProgressMap[`${card.cardKey}:${d}`])
+          .find(Boolean);
       if (!prog) return;
 
       const dueDate = new Date(prog.dueDate);
@@ -846,8 +895,7 @@ export function AnkiContent({ username }: AnkiContentProps) {
     mode: "due" | "all" | "quick",
     dose = studyDose,
   ) => {
-    const directions =
-      dose === "normal" ? QUIZ_DIRECTIONS.slice(0, 2) : QUIZ_DIRECTIONS;
+    const directions = getActiveDirections(dose);
     let queue: VocabularyCard[] = [];
 
     if (mode === "quick") {
@@ -863,18 +911,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
         }
         queue = dueCards;
       } else {
-        let dueCards = activeVocabularyList.filter((card) =>
-          cardHasDueDirection(card, now, directions),
-        );
-        if (dailyReviewLimit !== "unlimited") {
-          dueCards = dueCards.slice(0, Number(dailyReviewLimit));
-        }
-
+        // Mode Learn: hanya kartu baru yang belum pernah dipelajari
         const newCards = activeVocabularyList
           .filter((card) => cardHasNewDirection(card, directions))
           .slice(0, dailyNewCardsLimit);
 
-        queue = [...dueCards, ...newCards];
+        queue = newCards;
       }
     }
 
@@ -913,8 +955,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
     };
     saveSessionRecap(recapPayload);
     setCurrentRecapData(recapPayload);
-    setIsRecapModalOpen(true);
     setSessionFinished(true);
+    setSessionQueue([]);
   };
 
   const triggerSaveBatch = async (
@@ -1493,20 +1535,28 @@ export function AnkiContent({ username }: AnkiContentProps) {
                     {/* Mode Belajar & Limit Stats */}
                     {ankiMode === "srs" ? (
                       <>
-                        <div className="grid grid-cols-2 gap-3 border-t border-border pt-4">
-                          <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
-                            <p className="text-xs font-bold text-amber-500 tabular-nums">
+                        <div className="grid grid-cols-3 gap-2 sm:gap-3 border-t border-border pt-4">
+                          <div className="rounded-xl bg-surface-muted/50 p-2.5 sm:p-3 text-center border border-border">
+                            <p className="text-xs sm:text-sm font-bold text-amber-500 tabular-nums">
                               {cardStats.due}
                             </p>
-                            <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                            <p className="text-[9px] sm:text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
                               {t.ankiCardDue || "Due"}
                             </p>
                           </div>
-                          <div className="rounded-xl bg-surface-muted/50 p-3 text-center border border-border">
-                            <p className="text-xs font-bold text-indigo-500 tabular-nums">
+                          <div className="rounded-xl bg-surface-muted/50 p-2.5 sm:p-3 text-center border border-border">
+                            <p className="text-xs sm:text-sm font-bold text-orange-500 tabular-nums">
+                              {cardStats.learning}
+                            </p>
+                            <p className="text-[9px] sm:text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                              Learning
+                            </p>
+                          </div>
+                          <div className="rounded-xl bg-surface-muted/50 p-2.5 sm:p-3 text-center border border-border">
+                            <p className="text-xs sm:text-sm font-bold text-indigo-500 tabular-nums">
                               {cardStats.newCards}
                             </p>
-                            <p className="text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
+                            <p className="text-[9px] sm:text-[10px] text-muted uppercase mt-0.5 font-bold tracking-wider">
                               {t.ankiCardNew || "New"}
                             </p>
                           </div>
@@ -1527,14 +1577,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
                               variant="primary"
                               className="font-semibold shadow-xs flex-1 cursor-pointer text-xs sm:text-sm"
                               onClick={() => setPendingStartMode("all")}
-                              isDisabled={activeVocabularyList.length === 0}
+                              isDisabled={cardStats.newCards === 0}
                             >
-                              Learn (
-                              {Math.min(
-                                activeVocabularyList.length,
-                                cardStats.due + dailyNewCardsLimit,
-                              )}
-                              )
+                              Learn ({Math.min(cardStats.newCards, dailyNewCardsLimit)})
                             </Button>
                           </div>
                           <Button
@@ -1747,34 +1792,39 @@ export function AnkiContent({ username }: AnkiContentProps) {
 
                       {/* MULTIPLE CHOICE OPTIONS (Only in Quiz Mode when Front) */}
                       {!flipped && cardStyle === "quiz" && (
-                        <div className="mt-6 sm:mt-8 grid w-full max-w-md grid-cols-1 gap-2 px-1 sm:px-2 sm:grid-cols-2">
-                          {quizOptions.map((option) => {
-                            const isSelected = selectedQuizAnswer === option;
-                            const isCorrect =
-                              option ===
-                              getQuizAnswer(currentCard, currentQuizDirection);
-                            return (
-                              <button
-                                key={option}
-                                type="button"
-                                disabled={selectedQuizAnswer !== null}
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  handleQuizAnswer(option);
-                                }}
-                                className={[
-                                  "rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 font-jp text-base sm:text-lg font-bold transition-colors disabled:cursor-default cursor-pointer",
-                                  isSelected
-                                    ? isCorrect
-                                      ? "border-emerald-500 bg-emerald-500 text-white"
-                                      : "border-rose-500 bg-rose-500 text-white"
-                                    : "border-border bg-surface-muted/40 text-foreground hover:border-indigo-500 hover:bg-indigo-500/10",
-                                ].join(" ")}
-                              >
-                                {option}
-                              </button>
-                            );
-                          })}
+                        <div className="mt-4 sm:mt-6 w-full max-w-md flex flex-col items-center gap-2.5">
+                          <p className="text-[11px] sm:text-xs font-semibold text-muted/70 tracking-wide text-center">
+                            {quizInstruction(currentQuizDirection)}
+                          </p>
+                          <div className="grid w-full grid-cols-1 gap-2 px-1 sm:px-2 sm:grid-cols-2">
+                            {quizOptions.map((option) => {
+                              const isSelected = selectedQuizAnswer === option;
+                              const isCorrect =
+                                option ===
+                                getQuizAnswer(currentCard, currentQuizDirection);
+                              return (
+                                <button
+                                  key={option}
+                                  type="button"
+                                  disabled={selectedQuizAnswer !== null}
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleQuizAnswer(option);
+                                  }}
+                                  className={[
+                                    "rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 font-jp text-base sm:text-lg font-bold transition-colors disabled:cursor-default cursor-pointer",
+                                    isSelected
+                                      ? isCorrect
+                                        ? "border-emerald-500 bg-emerald-500 text-white"
+                                        : "border-rose-500 bg-rose-500 text-white"
+                                      : "border-border bg-surface-muted/40 text-foreground hover:border-indigo-500 hover:bg-indigo-500/10",
+                                  ].join(" ")}
+                                >
+                                  {option}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
 
@@ -1893,13 +1943,11 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         )}
                       </div>
 
-                      {/* 3. FLIP HINT */}
-                      {!flipped && (
+                      {/* 3. FLIP HINT (Only for Classic Mode) */}
+                      {!flipped && cardStyle === "classic" && (
                         <p className="absolute bottom-2 text-xs text-muted/50 animate-pulse select-none inline-flex items-center gap-1.5 transition-all duration-300">
                           <MousePointerClick size={13} />
-                          {cardStyle === "quiz"
-                            ? quizInstruction(currentQuizDirection)
-                            : "Click card or press Space to show answer"}
+                          Click card or press Space to show answer
                         </p>
                       )}
                     </div>
@@ -1924,8 +1972,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           <span className="text-[11px] font-bold">
                             {gradingScore === 1 ? "Saving..." : "Again (1)"}
                           </span>
-                          <span className="text-[9px] opacity-75 mt-0.5">
-                            Forgot
+                          <span className="text-[9px] font-semibold opacity-90 mt-0.5 tabular-nums">
+                            {intervalsPreview.again}
                           </span>
                         </button>
 
@@ -1942,8 +1990,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           <span className="text-[11px] font-bold">
                             {gradingScore === 2 ? "Saving..." : "Hard (2)"}
                           </span>
-                          <span className="text-[9px] opacity-75 mt-0.5">
-                            Difficult
+                          <span className="text-[9px] font-semibold opacity-90 mt-0.5 tabular-nums">
+                            {intervalsPreview.hard}
                           </span>
                         </button>
 
@@ -1960,8 +2008,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           <span className="text-[11px] font-bold">
                             {gradingScore === 3 ? "Saving..." : "Good (3)"}
                           </span>
-                          <span className="text-[9px] opacity-75 mt-0.5">
-                            Normal
+                          <span className="text-[9px] font-semibold opacity-90 mt-0.5 tabular-nums">
+                            {intervalsPreview.good}
                           </span>
                         </button>
 
@@ -1978,8 +2026,8 @@ export function AnkiContent({ username }: AnkiContentProps) {
                           <span className="text-[11px] font-bold">
                             {gradingScore === 4 ? "Saving..." : "Easy (4)"}
                           </span>
-                          <span className="text-[9px] opacity-75 mt-0.5">
-                            Very easy
+                          <span className="text-[9px] font-semibold opacity-90 mt-0.5 tabular-nums">
+                            {intervalsPreview.easy}
                           </span>
                         </button>
                       </div>
@@ -2020,17 +2068,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
                         </button>
                       </div>
                     )
-                  )}
-
-                  {/* Continue Button for Quiz Mode */}
-                  {flipped && cardStyle === "quiz" && (
-                    <Button
-                      variant="primary"
-                      className="w-full py-4 text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer"
-                      onClick={continueQuiz}
-                    >
-                      Next Card → (Space)
-                    </Button>
                   )}
                 </div>
               </div>
@@ -2199,9 +2236,9 @@ export function AnkiContent({ username }: AnkiContentProps) {
         isOpen={pendingStartMode !== null}
         onOpenChange={(open) => !open && setPendingStartMode(null)}
       >
-        <Modal.Backdrop>
-          <Modal.Container className="flex min-h-screen w-screen items-center justify-center">
-            <Modal.Dialog className="sm:max-w-md">
+        <Modal.Backdrop className="flex items-center justify-center p-4">
+          <Modal.Container className="flex items-center justify-center min-h-screen w-screen p-4">
+            <Modal.Dialog className="sm:max-w-md w-full max-w-sm m-auto rounded-3xl">
               <Modal.CloseTrigger />
               <Modal.Header>
                 <Modal.Heading>Choose study dose</Modal.Heading>
@@ -2230,12 +2267,12 @@ export function AnkiContent({ username }: AnkiContentProps) {
                   >
                     <span className="block font-bold text-foreground">
                       {dose === "normal"
-                        ? "Normal · 2 directions"
+                        ? "Normal · Core directions"
                         : "Intensive · 4 directions"}
                     </span>
                     <span className="mt-1 block text-muted">
                       {dose === "normal"
-                        ? "Kanji → Furigana, Kanji → Arti"
+                        ? "Kanji → Furigana/Arti, atau Kana → Arti"
                         : "Includes Furigana → Arti and Arti → Kanji"}
                     </span>
                   </button>
@@ -2683,21 +2720,6 @@ export function AnkiContent({ username }: AnkiContentProps) {
           </Modal.Container>
         </Modal.Backdrop>
       </Modal>
-
-      {/* Modal Recap Sesi Belajar (2 Kolom dengan Knowledge Navigation) */}
-      <AnkiSessionRecapModal
-        isOpen={isRecapModalOpen}
-        onClose={() => {
-          setIsRecapModalOpen(false);
-          setSessionQueue([]);
-          setSessionFinished(false);
-        }}
-        recap={currentRecapData}
-        onStudyAgain={() => {
-          setIsRecapModalOpen(false);
-          startSession(pendingStartMode || "due");
-        }}
-      />
     </div>
   );
 }

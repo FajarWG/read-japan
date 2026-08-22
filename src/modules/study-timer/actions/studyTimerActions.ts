@@ -73,17 +73,29 @@ export async function heartbeatStudyTimer(timerId: number) {
     return { success: false as const, error: "Invalid timer" };
   }
 
-  const updated = await prisma.studyTimerSession.updateMany({
+  const timer = await prisma.studyTimerSession.findFirst({
     where: {
       id: timerId,
       userId: auth.id,
       activeKey: { not: null },
       status: "RUNNING",
     },
-    data: { lastHeartbeatAt: new Date() },
+  });
+  if (!timer) return { success: false as const, error: "Timer not running" };
+
+  const now = new Date();
+  const nextAccumulated = elapsedSeconds(timer, now);
+
+  await prisma.studyTimerSession.update({
+    where: { id: timer.id },
+    data: {
+      accumulatedSeconds: nextAccumulated,
+      lastStartedAt: now,
+      lastHeartbeatAt: now,
+    },
   });
 
-  return { success: updated.count > 0 };
+  return { success: true as const, accumulatedSeconds: nextAccumulated };
 }
 
 /**

@@ -8,5 +8,5 @@
  * Dipakai di server (lib/timer.ts) dan klien (FloatingStudyTimer,
  * StudyTimerBar) — harus tetap sinkron di kedua sisi.
  */
-export const HEARTBEAT_INTERVAL_MS = 30_000;
-export const HEARTBEAT_GRACE_MS = 90_000;
+export const HEARTBEAT_INTERVAL_MS = 10_000;
+export const HEARTBEAT_GRACE_MS = 20_000;

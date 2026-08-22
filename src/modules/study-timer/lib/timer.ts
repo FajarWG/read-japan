@@ -115,8 +115,25 @@ export async function getStudyTimerOverviewForUser(
     daySeconds.set(key, (daySeconds.get(key) ?? 0) + seconds);
   }
 
-  const activeExtra = activeTimer
-    ? elapsedSeconds(activeTimer, now) - activeTimer.accumulatedSeconds
+  let currentActiveTimer = activeTimer;
+  if (activeTimer && activeTimer.status === "RUNNING") {
+    const reference = activeTimer.lastHeartbeatAt ?? activeTimer.lastStartedAt;
+    if (reference && now.getTime() - reference.getTime() > HEARTBEAT_GRACE_MS) {
+      // Sesi ditinggal (tab ditutup / keluar website) — pause otomatis dan kunci accumulatedSeconds
+      const frozenSeconds = elapsedSeconds(activeTimer, now);
+      currentActiveTimer = await prisma.studyTimerSession.update({
+        where: { id: activeTimer.id },
+        data: {
+          status: "PAUSED",
+          accumulatedSeconds: frozenSeconds,
+          lastStartedAt: null,
+        },
+      });
+    }
+  }
+
+  const activeExtra = currentActiveTimer
+    ? elapsedSeconds(currentActiveTimer, now) - currentActiveTimer.accumulatedSeconds
     : 0;
   const todaySeconds = recentTimers
     .filter((timer) => timer.startedAt >= todayStart)
@@ -136,7 +153,7 @@ export async function getStudyTimerOverviewForUser(
   ).size;
 
   return {
-    activeTimer: activeTimer ? toStudyTimerView(activeTimer, now) : null,
+    activeTimer: currentActiveTimer ? toStudyTimerView(currentActiveTimer, now) : null,
     stats: {
       todaySeconds,
       weekSeconds,
